@@ -1,4 +1,11 @@
-﻿using AIAgents.Laboratory.Shared.Helpers;
+﻿// *********************************************************************************
+//	<copyright file="GlobalExceptionMiddleware.cs" company="Personal">
+//		Copyright (c) 2025 Personal
+//	</copyright>
+// <summary>The Global Exception Handler.</summary>
+// *********************************************************************************
+
+using AIAgents.Laboratory.Shared.Helpers;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 

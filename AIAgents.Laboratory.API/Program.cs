@@ -1,3 +1,10 @@
+// *********************************************************************************
+//	<copyright file="Program.cs" company="Personal">
+//		Copyright (c) 2025 Personal
+//	</copyright>
+// <summary>Program class from where the execution starts</summary>
+// *********************************************************************************
+
 using AIAgents.Laboratory.API.IOC;
 using AIAgents.Laboratory.API.Middleware;
 using Azure.Identity;
