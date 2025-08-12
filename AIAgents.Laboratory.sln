@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36310.24
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.API", "AIAgents.Laboratory.API\AIAgents.Laboratory.API.csproj", "{0EC28386-115D-4B24-8A01-FBE21B360894}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.Core", "AIAgents.Laboratory.Core\AIAgents.Laboratory.Core.csproj", "{1162A42F-91C3-4F61-9606-AB0112A1BF43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.Shared", "AIAgents.Laboratory.Shared\AIAgents.Laboratory.Shared.csproj", "{F471D46C-1710-469B-B5C8-A4B8A9653C67}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0EC28386-115D-4B24-8A01-FBE21B360894}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EC28386-115D-4B24-8A01-FBE21B360894}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EC28386-115D-4B24-8A01-FBE21B360894}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EC28386-115D-4B24-8A01-FBE21B360894}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1162A42F-91C3-4F61-9606-AB0112A1BF43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1162A42F-91C3-4F61-9606-AB0112A1BF43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1162A42F-91C3-4F61-9606-AB0112A1BF43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1162A42F-91C3-4F61-9606-AB0112A1BF43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F471D46C-1710-469B-B5C8-A4B8A9653C67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F471D46C-1710-469B-B5C8-A4B8A9653C67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F471D46C-1710-469B-B5C8-A4B8A9653C67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F471D46C-1710-469B-B5C8-A4B8A9653C67}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6B93BAE-85C1-4545-A2FE-51E7BD4362FC}
+	EndGlobalSection
+EndGlobal
