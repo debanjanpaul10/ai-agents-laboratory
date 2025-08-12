@@ -5,12 +5,14 @@
 // <summary>Kernel factory.</summary>
 // *********************************************************************************
 
-
+using AIAgents.Laboratory.Agents.Plugins.IBBS;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Memory;
 using static AIAgents.Laboratory.Shared.Constants.ConfigurationConstants;
 
-namespace AIAgents.Laboratory.API.IOC;
+namespace AIAgents.Laboratory.Agents.IOC;
 
 /// <summary>
 /// The Kernel Factory Class.
@@ -55,6 +57,8 @@ public static class KernelFactory
 			var kernel = kernelBuilder.Build();
 
 			// Import Plugins
+			kernel.Plugins.AddFromType<RewriteTextPlugin>(PluginHelpers.RewriteTextPlugin.PluginName);
+			kernel.Plugins.AddFromType<ContentPlugins>(PluginHelpers.ContentPlugins.PluginName);
 
 			return kernel;
 		};

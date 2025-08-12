@@ -1,12 +1,12 @@
 ﻿// *********************************************************************************
-//	<copyright file="BuilderExtensions.cs" company="Personal">
+//	<copyright file="DIContainer.cs" company="Personal">
 //		Copyright (c) 2025 Personal
 //	</copyright>
-// <summary>Builder extensions.</summary>
+// <summary>The DI Container Class.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.Agents.IOC;
 using AIAgents.Laboratory.API.Controllers;
-using AIAgents.Laboratory.API.IOC;
 using AIAgents.Laboratory.Shared.Constants;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,13 +14,15 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using System.Globalization;
 using System.Security.Claims;
 using static AIAgents.Laboratory.Shared.Constants.ConfigurationConstants;
+using AIAgents.Laboratory.Core.Services;
+using AIAgents.Laboratory.Core.Contracts;
 
-namespace AIAgents.Laboratory.API.Middleware;
+namespace AIAgents.Laboratory.API.IOC;
 
 /// <summary>
-/// The Builder Extensions Class.
+/// The Dependency Injection Container Class.
 /// </summary>
-public static class BuilderExtensions
+public static class DIContainer
 {
 	/// <summary>
 	/// Adds azure services.
@@ -49,36 +51,51 @@ public static class BuilderExtensions
 	}
 
 	/// <summary>
-	/// Configures api services.
+	/// Configures the ai dependencies.
 	/// </summary>
-	/// <param name="builder">The builder.</param>
-	public static void ConfigureAiBusinessServices(this WebApplicationBuilder builder)
+	/// <param name="services">The services.</param>
+	/// <param name="configuration">The configuration.</param>
+	public static void ConfigureAiDependencies(this IServiceCollection services, IConfiguration configuration)
 	{
-		builder.ConfigureAuthenticationServices();
-		builder.ConfigureBusinessDependencies();
+		services.ConfigureAuthenticationServices(configuration);
+		services.ConfigureSemanticKernel(configuration);
+		services.ConfigureBusinessManagers();
 	}
 
 	#region PRIVATE METHODS
 
 	/// <summary>
-	/// Configures authentication services.
+	/// Configures the business managers.
 	/// </summary>
-	/// <param name="builder">The builder.</param>
-	private static void ConfigureAuthenticationServices(this WebApplicationBuilder builder)
+	/// <param name="services">The services.</param>
+	private static void ConfigureBusinessManagers(this IServiceCollection services)
 	{
-		var configuration = builder.Configuration;
-		builder.Services.AddAuthentication(options =>
+		services.AddScoped<IBulletinAIServices, BulletinAIServices>();
+	}
+
+	/// <summary>
+	/// Configures the authentication services.
+	/// </summary>
+	/// <param name="services">The services.</param>
+	/// <param name="configuration">The configuration.</param>
+	private static void ConfigureAuthenticationServices(this IServiceCollection services, IConfiguration configuration)
+	{
+		services.AddAuthentication(options =>
 		{
 			options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 		}).AddJwtBearer(options =>
 		{
-			options.Authority = string.Format(
-				CultureInfo.CurrentCulture, AzureAppConfigurationConstants.TokenFormatUrl, configuration[AzureAppConfigurationConstants.AzureAdTenantIdConstant]);
 			options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
 			{
-				ValidAudience = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant],
 				ValidateLifetime = true,
+				ValidateIssuer = true,
+				ValidateAudience = true,
+				RequireExpirationTime = true,
+				RequireSignedTokens = true,
+				ValidAudience = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant],
+				ValidIssuer = string.Format(CultureInfo.CurrentCulture, AzureAppConfigurationConstants.TokenFormatUrl, configuration[AzureAppConfigurationConstants.AzureAdTenantIdConstant]),
+				SignatureValidator = (token, _) => new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(token)
 			};
 			options.Events = new JwtBearerEvents
 			{
@@ -87,16 +104,6 @@ public static class BuilderExtensions
 			};
 		});
 
-	}
-
-	/// <summary>
-	/// Configures business dependencies.
-	/// </summary>
-	/// <param name="builder">The builder.</param>
-	private static void ConfigureBusinessDependencies(this WebApplicationBuilder builder)
-	{
-		builder.Services.AddSingleton(KernelFactory.CreateKernel(builder.Configuration));
-		builder.Services.AddSingleton(KernelFactory.CreateMemory());
 	}
 
 	/// <summary>

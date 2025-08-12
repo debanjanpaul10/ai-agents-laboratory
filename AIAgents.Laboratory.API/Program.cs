@@ -1,3 +1,4 @@
+using AIAgents.Laboratory.API.IOC;
 using AIAgents.Laboratory.API.Middleware;
 using Azure.Identity;
 using Microsoft.OpenApi.Models;
@@ -17,8 +18,8 @@ public static class Program
 	public static void Main(string[] args)
 	{
 		var builder = WebApplication.CreateBuilder(args);
-		builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
-			.AddJsonFile(path: EnvironmentConfigurationConstants.LocalAppsetingsFileName, optional: true).AddEnvironmentVariables();
+		builder.Configuration.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(path: EnvironmentConfigurationConstants.LocalAppsetingsFileName, optional: true).AddEnvironmentVariables();
+		
 		var miCredentials = builder.Configuration[EnvironmentConfigurationConstants.ManagedIdentityClientIdConstant];
 		var credentials = builder.Environment.IsDevelopment()
 			? new DefaultAzureCredential()
@@ -28,7 +29,7 @@ public static class Program
 			});
 
 		builder.ConfigureAzureAppConfiguration(credentials);
-		builder.ConfigureAiBusinessServices();
+		builder.Services.ConfigureAiDependencies(builder.Configuration);
 		builder.Services.ConfigureServices();
 
 		var app = builder.Build();

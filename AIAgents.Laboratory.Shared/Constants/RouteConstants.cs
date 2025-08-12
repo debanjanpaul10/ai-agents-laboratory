@@ -4,6 +4,7 @@
 //	</copyright>
 // <summary>The Route Constants Class.</summary>
 // *********************************************************************************
+
 namespace AIAgents.Laboratory.Shared.Constants;
 
 public static class RouteConstants
@@ -22,5 +23,15 @@ public static class RouteConstants
 		/// The rewrite text route
 		/// </summary>
 		public const string RewriteText_Route = "rewritetext";
+
+		/// <summary>
+		/// The generate tag route
+		/// </summary>
+		public const string GenerateTag_Route = "generatetag";
+
+		/// <summary>
+		/// The moderate content route
+		/// </summary>
+		public const string ModerateContent_Route = "moderatecontent";
 	}
 }

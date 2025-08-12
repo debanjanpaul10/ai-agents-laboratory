@@ -5,6 +5,7 @@
 // <summary>The Base Controller Class.</summary>
 // *********************************************************************************
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AIAgents.Laboratory.API.Controllers;
@@ -13,6 +14,7 @@ namespace AIAgents.Laboratory.API.Controllers;
 /// The Base Controller Class.
 /// </summary>
 /// <seealso cref="Microsoft.AspNetCore.Mvc.ControllerBase" />
+[Authorize]
 public abstract class BaseController : ControllerBase
 {
 }
