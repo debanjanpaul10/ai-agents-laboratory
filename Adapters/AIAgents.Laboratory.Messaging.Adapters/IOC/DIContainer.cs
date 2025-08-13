@@ -5,25 +5,27 @@
 // <summary>The DI Container Class.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Domain.DrivingPorts;
-using AIAgents.Laboratory.Domain.UseCases;
+using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Messaging.Adapters.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AIAgents.Laboratory.Domain.IOC;
+namespace AIAgents.Laboratory.Messaging.Adapters.IOC;
 
 /// <summary>
-/// The Dependency Injection Container Class.
+/// The Dependency Injection Container.
 /// </summary>
 public static class DIContainer
 {
 	/// <summary>
-	/// Adds the domain dependencies.
+	/// Adds the messaging dependencies.
 	/// </summary>
 	/// <param name="services">The services.</param>
-	/// <returns>The service collection.</returns>
-	public static IServiceCollection AddDomainDependencies(this IServiceCollection services)
+	/// <returns>The services collection.</returns>
+	public static IServiceCollection AddMessagingDependencies(this IServiceCollection services)
 	{
-		return services.AddScoped<IBulletinAIServices, BulletinAIServices>()
-			.AddScoped<ICommonAiService, CommonAiService>();
+		//services.AddHostedService<AgentStatusWatcher>();
+		services.AddSingleton<IAgentStatusStore, AgentStatusStore>();
+
+		return services;
 	}
 }

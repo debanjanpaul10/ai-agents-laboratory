@@ -5,6 +5,8 @@
 // <summary>Common AI Service interface.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.Domain.DomainEntities;
+
 namespace AIAgents.Laboratory.Domain.DrivingPorts;
 
 /// <summary>
@@ -17,4 +19,10 @@ public interface ICommonAiService
 	/// </summary>
 	/// <returns>The current model identifier.</returns>
 	string GetCurrentModelId();
+
+	/// <summary>
+	/// Gets the agent current status.
+	/// </summary>
+	/// <returns>The agent status data.</returns>
+	AgentStatus GetAgentCurrentStatus();
 }

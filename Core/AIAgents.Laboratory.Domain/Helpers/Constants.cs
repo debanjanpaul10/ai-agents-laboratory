@@ -1,4 +1,10 @@
-﻿
+﻿// *********************************************************************************
+//	<copyright file="Constants.cs" company="Personal">
+//		Copyright (c) 2025 Personal
+//	</copyright>
+// <summary>The Constants Class.</summary>
+// *********************************************************************************
+
 namespace AIAgents.Laboratory.Domain.Helpers;
 
 /// <summary>
@@ -14,7 +20,7 @@ internal static class Constants
 		/// <summary>
 		/// The log helper method start.
 		/// </summary>
-		internal const string LogHelperMethodStart = "{0} started at {1}";
+		internal const string LogHelperMethodStart = "{0} started at {1} for {2}";
 
 		/// <summary>
 		/// The log helper method failed.
@@ -24,7 +30,7 @@ internal static class Constants
 		/// <summary>
 		/// The log helper method end.
 		/// </summary>
-		internal const string LogHelperMethodEnd = "{0} ended at {1}";
+		internal const string LogHelperMethodEnd = "{0} ended at {1} for {2}";
 	}
 
 	/// <summary>
@@ -62,5 +68,10 @@ internal static class Constants
 		/// The gemini flash model
 		/// </summary>
 		internal const string GeminiFlashModel = "GeminiFlashModel";
+
+		/// <summary>
+		/// The azure application configuration constant
+		/// </summary>
+		internal const string AzureAppConfigurationConstant = "AzureAppConfiguration";
 	}
 }

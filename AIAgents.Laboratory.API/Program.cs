@@ -7,9 +7,10 @@
 
 using AIAgents.Laboratory.API.IOC;
 using AIAgents.Laboratory.API.Middleware;
+using AIAgents.Laboratory.Messaging.Adapters.Services;
 using Azure.Identity;
 using Microsoft.OpenApi.Models;
-using static AIAgents.Laboratory.API.Adapters.Helpers.Constants;
+using static AIAgents.Laboratory.API.Helpers.Constants;
 
 namespace AIAgents.Laboratory.API;
 
@@ -27,7 +28,7 @@ public static class Program
 		var builder = WebApplication.CreateBuilder(args);
 		builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
 			.AddJsonFile(EnvironmentConfigurationConstants.LocalAppsetingsFileName, true).AddEnvironmentVariables();
-		
+
 		var miCredentials = builder.Configuration[EnvironmentConfigurationConstants.ManagedIdentityClientIdConstant];
 		var credentials = builder.Environment.IsDevelopment()
 			? new DefaultAzureCredential()
@@ -51,6 +52,7 @@ public static class Program
 	internal static void ConfigureServices(this IServiceCollection services)
 	{
 		services.AddControllers();
+		services.AddSignalR();
 		services.AddOpenApi();
 		services.AddCors(options =>
 		{
@@ -105,6 +107,8 @@ public static class Program
 
 		app.UseCors();
 		app.MapControllers();
+		app.MapHub<AgentStatusHub>("/hubs/agent-status");
+
 		app.Run();
 	}
 }

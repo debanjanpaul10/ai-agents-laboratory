@@ -5,6 +5,8 @@
 // <summary>The DI Container Class.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.Agents.Adapters.AIServices;
+using AIAgents.Laboratory.Domain.DrivenPorts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,9 +23,10 @@ public static class DIContainer
 	/// <param name="services">The services.</param>
 	/// <param name="configuration">The configuration.</param>
 	/// <returns>The service collection.</returns>
-	public static IServiceCollection AddAIDependencies(this IServiceCollection services, IConfiguration configuration)
+	public static IServiceCollection AddAIAgentDependencies(this IServiceCollection services, IConfiguration configuration)
 	{
-		return services.AddSingleton(KernelFactory.CreateKernel(configuration))
+		return services.AddScoped<IAIAgentServices, AgentServices>()
+			.AddSingleton(KernelFactory.CreateKernel(configuration))
 			.AddSingleton(KernelFactory.CreateMemory());
 	}
 }

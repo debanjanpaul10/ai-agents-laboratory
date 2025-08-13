@@ -9,12 +9,13 @@ using AIAgents.Laboratory.Agents.Adapters.IOC;
 using AIAgents.Laboratory.API.Adapters.IOC;
 using AIAgents.Laboratory.API.Controllers;
 using AIAgents.Laboratory.Domain.IOC;
+using AIAgents.Laboratory.Messaging.Adapters.IOC;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using System.Globalization;
 using System.Security.Claims;
-using static AIAgents.Laboratory.API.Adapters.Helpers.Constants;
+using static AIAgents.Laboratory.API.Helpers.Constants;
 
 namespace AIAgents.Laboratory.API.IOC;
 
@@ -57,7 +58,8 @@ public static class DIContainer
 	public static void ConfigureAiDependencies(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.ConfigureAuthenticationServices(configuration);
-		services.AddAPIHandlers().AddDomainDependencies().AddAIDependencies(configuration);
+		services.AddAPIHandlers().AddDomainDependencies().AddAIAgentDependencies(configuration).AddMessagingDependencies();
+		services.AddSignalR().AddAzureSignalR(configuration[AzureAppConfigurationConstants.AzureSignalRConnection]);
 	}
 
 	#region PRIVATE METHODS
