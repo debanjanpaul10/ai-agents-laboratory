@@ -5,17 +5,16 @@
 // <summary>The DI Container Class.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Agents.IOC;
+using AIAgents.Laboratory.Agents.Adapters.IOC;
+using AIAgents.Laboratory.API.Adapters.IOC;
 using AIAgents.Laboratory.API.Controllers;
-using AIAgents.Laboratory.Shared.Constants;
+using AIAgents.Laboratory.Domain.IOC;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using System.Globalization;
 using System.Security.Claims;
-using static AIAgents.Laboratory.Shared.Constants.ConfigurationConstants;
-using AIAgents.Laboratory.Core.Services;
-using AIAgents.Laboratory.Core.Contracts;
+using static AIAgents.Laboratory.API.Adapters.Helpers.Constants;
 
 namespace AIAgents.Laboratory.API.IOC;
 
@@ -58,21 +57,10 @@ public static class DIContainer
 	public static void ConfigureAiDependencies(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.ConfigureAuthenticationServices(configuration);
-		services.ConfigureSemanticKernel(configuration);
-		services.ConfigureBusinessManagers();
+		services.AddAPIHandlers().AddDomainDependencies().AddAIDependencies(configuration);
 	}
 
 	#region PRIVATE METHODS
-
-	/// <summary>
-	/// Configures the business managers.
-	/// </summary>
-	/// <param name="services">The services.</param>
-	private static void ConfigureBusinessManagers(this IServiceCollection services)
-	{
-		services.AddScoped<IBulletinAIServices, BulletinAIServices>()
-			.AddScoped<ICommonAiService, CommonAiService>();
-	}
 
 	/// <summary>
 	/// Configures the authentication services.

@@ -15,9 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AIAgents.Laboratory.Shared\AIAgents.Laboratory.Shared.csproj" />
-    <ProjectReference Include="..\Domain\AIAgents.Laboratory.Agents\AIAgents.Laboratory.Agents.csproj" />
-    <ProjectReference Include="..\Domain\AIAgents.Laboratory.Core\AIAgents.Laboratory.Core.csproj" />
+    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.Adapters.Agents\AIAgents.Laboratory.Agents.Adapters.csproj" />
+    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.API.Adapters\AIAgents.Laboratory.API.Adapters.csproj" />
+    <ProjectReference Include="..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
   </ItemGroup>
 
 </Project>

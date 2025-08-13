@@ -9,7 +9,7 @@ using AIAgents.Laboratory.API.IOC;
 using AIAgents.Laboratory.API.Middleware;
 using Azure.Identity;
 using Microsoft.OpenApi.Models;
-using static AIAgents.Laboratory.Shared.Constants.ConfigurationConstants;
+using static AIAgents.Laboratory.API.Adapters.Helpers.Constants;
 
 namespace AIAgents.Laboratory.API;
 
@@ -25,7 +25,8 @@ public static class Program
 	public static void Main(string[] args)
 	{
 		var builder = WebApplication.CreateBuilder(args);
-		builder.Configuration.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(path: EnvironmentConfigurationConstants.LocalAppsetingsFileName, optional: true).AddEnvironmentVariables();
+		builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
+			.AddJsonFile(EnvironmentConfigurationConstants.LocalAppsetingsFileName, true).AddEnvironmentVariables();
 		
 		var miCredentials = builder.Configuration[EnvironmentConfigurationConstants.ManagedIdentityClientIdConstant];
 		var credentials = builder.Environment.IsDevelopment()
