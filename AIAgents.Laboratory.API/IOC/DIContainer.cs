@@ -1,0 +1,140 @@
+﻿// *********************************************************************************
+//	<copyright file="DIContainer.cs" company="Personal">
+//		Copyright (c) 2025 Personal
+//	</copyright>
+// <summary>The DI Container Class.</summary>
+// *********************************************************************************
+
+using AIAgents.Laboratory.Agents.IOC;
+using AIAgents.Laboratory.API.Controllers;
+using AIAgents.Laboratory.Shared.Constants;
+using Azure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using System.Globalization;
+using System.Security.Claims;
+using static AIAgents.Laboratory.Shared.Constants.ConfigurationConstants;
+using AIAgents.Laboratory.Core.Services;
+using AIAgents.Laboratory.Core.Contracts;
+
+namespace AIAgents.Laboratory.API.IOC;
+
+/// <summary>
+/// The Dependency Injection Container Class.
+/// </summary>
+public static class DIContainer
+{
+	/// <summary>
+	/// Adds azure services.
+	/// </summary>
+	/// <param name="builder">The builder.</param>
+	/// <param name="credentials">The credentials.</param>
+	/// <exception cref="InvalidOperationException">InvalidOperationException error.</exception>
+	public static void ConfigureAzureAppConfiguration(this WebApplicationBuilder builder, DefaultAzureCredential credentials)
+	{
+		var configuration = builder.Configuration;
+		var appConfigurationEndpoint = configuration[EnvironmentConfigurationConstants.AppConfigurationEndpointKeyConstant];
+		if (string.IsNullOrEmpty(appConfigurationEndpoint))
+		{
+			throw new InvalidOperationException(ExceptionConstants.MissingConfigurationMessage);
+		}
+
+		builder.Configuration.AddAzureAppConfiguration(options =>
+		{
+			options.Connect(new Uri(appConfigurationEndpoint), credentials)
+			.Select(KeyFilter.Any).Select(KeyFilter.Any, AzureAppConfigurationConstants.BaseConfigurationAppConfigKeyConstant)
+			.ConfigureKeyVault(configure =>
+			{
+				configure.SetCredential(credentials);
+			});
+		});
+	}
+
+	/// <summary>
+	/// Configures the ai dependencies.
+	/// </summary>
+	/// <param name="services">The services.</param>
+	/// <param name="configuration">The configuration.</param>
+	public static void ConfigureAiDependencies(this IServiceCollection services, IConfiguration configuration)
+	{
+		services.ConfigureAuthenticationServices(configuration);
+		services.ConfigureSemanticKernel(configuration);
+		services.ConfigureBusinessManagers();
+	}
+
+	#region PRIVATE METHODS
+
+	/// <summary>
+	/// Configures the business managers.
+	/// </summary>
+	/// <param name="services">The services.</param>
+	private static void ConfigureBusinessManagers(this IServiceCollection services)
+	{
+		services.AddScoped<IBulletinAIServices, BulletinAIServices>()
+			.AddScoped<ICommonAiService, CommonAiService>();
+	}
+
+	/// <summary>
+	/// Configures the authentication services.
+	/// </summary>
+	/// <param name="services">The services.</param>
+	/// <param name="configuration">The configuration.</param>
+	private static void ConfigureAuthenticationServices(this IServiceCollection services, IConfiguration configuration)
+	{
+		services.AddAuthentication(options =>
+		{
+			options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+		}).AddJwtBearer(options =>
+		{
+			options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+			{
+				ValidateLifetime = true,
+				ValidateIssuer = true,
+				ValidateAudience = true,
+				RequireExpirationTime = true,
+				RequireSignedTokens = true,
+				ValidAudience = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant],
+				ValidIssuer = string.Format(CultureInfo.CurrentCulture, AzureAppConfigurationConstants.TokenFormatUrl, configuration[AzureAppConfigurationConstants.AzureAdTenantIdConstant]),
+				SignatureValidator = (token, _) => new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(token)
+			};
+			options.Events = new JwtBearerEvents
+			{
+				OnTokenValidated = HandleAuthTokenValidationSuccessAsync,
+				OnAuthenticationFailed = HandleAuthTokenValidationFailedAsync
+			};
+		});
+
+	}
+
+	/// <summary>
+	/// Handles auth token validation success async.
+	/// </summary>
+	/// <param name="context">The token validation context.</param>
+	private static async Task HandleAuthTokenValidationSuccessAsync(this TokenValidatedContext context)
+	{
+		var claimsPrincipal = context.Principal;
+		if (claimsPrincipal?.Identity is not ClaimsIdentity claimsIdentity || !claimsIdentity.IsAuthenticated)
+		{
+			context.Fail(ExceptionConstants.InvalidTokenExceptionConstant);
+			return;
+		}
+
+		context.HttpContext.User = new ClaimsPrincipal(claimsIdentity);
+		await Task.CompletedTask;
+	}
+
+	/// <summary>
+	/// Handles auth token validation failed async.
+	/// </summary>
+	/// <param name="context">The auth failed context.</param>
+	private static async Task HandleAuthTokenValidationFailedAsync(this AuthenticationFailedContext context)
+	{
+		var authenticationFailedException = new UnauthorizedAccessException(ExceptionConstants.InvalidTokenExceptionConstant);
+		var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();
+		logger.LogError(authenticationFailedException, authenticationFailedException.Message);
+		await Task.CompletedTask;
+	}
+
+	#endregion
+}

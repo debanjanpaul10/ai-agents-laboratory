@@ -1,0 +1,9 @@
+# CONFIGURATIONS
+
+**appsettings.Development.json
+.vs
+.vscode
+
+# BUILD TARGETS
+obj
+bin
