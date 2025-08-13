@@ -38,14 +38,24 @@ public static class ConfigurationConstants
 		public const string AIAgentsClientIdConstant = "AiAgentsClientId";
 
 		/// <summary>
-		/// The gemini ai model id constant.
-		/// </summary>
-		public const string GeminiAiModelIdConstant = "GeminiAiModelId";
-
-		/// <summary>
 		/// The gemini api key constant.
 		/// </summary>
 		public const string GeminiAPIKeyConstant = "GeminiAPIKey";
+
+		/// <summary>
+		/// The gemini flash model
+		/// </summary>
+		public const string GeminiFlashModel = "GeminiFlashModel";
+
+		/// <summary>
+		/// The gemini pro model
+		/// </summary>
+		public const string GeminiProModel = "GeminiProModel";
+
+		/// <summary>
+		/// The is pro model enabled flag
+		/// </summary>
+		public const string IsProModelEnabledFlag = "IsProModelEnabled";
 	}
 
 	/// <summary>

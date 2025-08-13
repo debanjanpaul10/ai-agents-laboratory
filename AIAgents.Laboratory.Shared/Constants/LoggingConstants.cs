@@ -102,4 +102,9 @@ public static class ExceptionConstants
 	/// </summary>
 	public const string InvalidTokenExceptionConstant = "Invalid token: Identity is not authenticated.";
 
+	/// <summary>
+	/// The model name not found exception constant
+	/// </summary>
+	public const string ModelNameNotFoundExceptionConstant = "It seems the model name could not be determined";
+
 }

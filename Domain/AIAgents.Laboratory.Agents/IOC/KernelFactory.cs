@@ -36,14 +36,17 @@ public static class KernelFactory
 	}
 
 	/// <summary>
-	/// Creates kernel.
+	/// Creates the kernel.
 	/// </summary>
 	/// <param name="configuration">The configuration.</param>
 	public static Func<IServiceProvider, Kernel> CreateKernel(IConfiguration configuration)
 	{
+		var isProModelEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsProModelEnabledFlag], out bool parsedValue) && parsedValue;
+		var geminiAiModel = isProModelEnabled ? AzureAppConfigurationConstants.GeminiProModel : AzureAppConfigurationConstants.GeminiFlashModel;
+
 		return provider =>
 		{
-			var modelId = configuration[AzureAppConfigurationConstants.GeminiAiModelIdConstant];
+			var modelId = configuration[geminiAiModel];
 			var apiKey = configuration[AzureAppConfigurationConstants.GeminiAPIKeyConstant];
 			var kernelBuilder = Kernel.CreateBuilder();
 
