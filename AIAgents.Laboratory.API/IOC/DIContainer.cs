@@ -70,7 +70,8 @@ public static class DIContainer
 	/// <param name="services">The services.</param>
 	private static void ConfigureBusinessManagers(this IServiceCollection services)
 	{
-		services.AddScoped<IBulletinAIServices, BulletinAIServices>();
+		services.AddScoped<IBulletinAIServices, BulletinAIServices>()
+			.AddScoped<ICommonAiService, CommonAiService>();
 	}
 
 	/// <summary>
