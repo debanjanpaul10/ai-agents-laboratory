@@ -6,6 +6,7 @@
 // *********************************************************************************
 
 using AIAgents.Laboratory.Agents.Plugins.IBBS;
+using AIAgents.Laboratory.Shared.Constants;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
@@ -48,6 +49,11 @@ public static class KernelFactory
 		{
 			var modelId = configuration[geminiAiModel];
 			var apiKey = configuration[AzureAppConfigurationConstants.GeminiAPIKeyConstant];
+			if (string.IsNullOrEmpty(modelId) || string.IsNullOrEmpty(apiKey))
+			{
+				throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
+			}
+
 			var kernelBuilder = Kernel.CreateBuilder();
 
 			if (!string.IsNullOrEmpty(modelId) && !string.IsNullOrEmpty(apiKey))

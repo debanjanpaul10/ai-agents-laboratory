@@ -36,20 +36,18 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAIServi
 		try
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(RewriteTextAsync), DateTime.UtcNow));
-			{
-				var result = await bulletinAiServices.RewriteTextAsync(requestDto.Story).ConfigureAwait(false);
-				if (string.IsNullOrEmpty(result.RewrittenStory))
-				{
-					var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
-					logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(RewriteTextAsync), DateTime.UtcNow, exception.Message));
-					throw exception;
-				}
-				else
-				{
-					return result;
-				}
-			}
 
+			var result = await bulletinAiServices.RewriteTextAsync(requestDto.Story).ConfigureAwait(false);
+			if (string.IsNullOrEmpty(result.RewrittenStory))
+			{
+				var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
+				logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(RewriteTextAsync), DateTime.UtcNow, exception.Message));
+				throw exception;
+			}
+			else
+			{
+				return result;
+			}
 		}
 		catch (Exception ex)
 		{
@@ -74,20 +72,18 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAIServi
 		try
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GenerateTagForStoryAsync), DateTime.UtcNow));
-			{
-				var result = await bulletinAiServices.GenerateTagForStoryAsync(requestDto.Story).ConfigureAwait(false);
-				if (string.IsNullOrEmpty(result.UserStoryTag))
-				{
-					var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
-					logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GenerateTagForStoryAsync), DateTime.UtcNow, exception.Message));
-					throw exception;
-				}
-				else
-				{
-					return result;
-				}
-			}
 
+			var result = await bulletinAiServices.GenerateTagForStoryAsync(requestDto.Story).ConfigureAwait(false);
+			if (string.IsNullOrEmpty(result.UserStoryTag))
+			{
+				var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
+				logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GenerateTagForStoryAsync), DateTime.UtcNow, exception.Message));
+				throw exception;
+			}
+			else
+			{
+				return result;
+			}
 		}
 		catch (Exception ex)
 		{
@@ -112,20 +108,18 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAIServi
 		try
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ModerateContentDataAsync), DateTime.UtcNow));
+			
+			var result = await bulletinAiServices.ModerateContentDataAsync(requestDto.Story).ConfigureAwait(false);
+			if (string.IsNullOrEmpty(result.ContentRating))
 			{
-				var result = await bulletinAiServices.ModerateContentDataAsync(requestDto.Story).ConfigureAwait(false);
-				if (string.IsNullOrEmpty(result.ContentRating))
-				{
-					var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
-					logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ModerateContentDataAsync), DateTime.UtcNow, exception.Message));
-					throw exception;
-				}
-				else
-				{
-					return result;
-				}
+				var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
+				logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ModerateContentDataAsync), DateTime.UtcNow, exception.Message));
+				throw exception;
 			}
-
+			else
+			{
+				return result;
+			}
 		}
 		catch (Exception ex)
 		{
