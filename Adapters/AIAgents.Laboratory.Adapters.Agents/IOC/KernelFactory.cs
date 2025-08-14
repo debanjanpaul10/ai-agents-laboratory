@@ -6,14 +6,14 @@
 // *********************************************************************************
 
 using AIAgents.Laboratory.Adapters.Agents.Plugins.IBBS;
-using AIAgents.Laboratory.Agents.Adapters.Plugins.IBBS;
+using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.IBBS;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Memory;
-using static AIAgents.Laboratory.Agents.Adapters.Helpers.Constants;
+using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
-namespace AIAgents.Laboratory.Agents.Adapters.IOC;
+namespace AIAgents.Laboratory.SemanticKernel.Adapters.IOC;
 
 /// <summary>
 /// The Kernel Factory Class.

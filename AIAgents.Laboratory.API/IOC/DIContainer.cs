@@ -5,11 +5,11 @@
 // <summary>The DI Container Class.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Agents.Adapters.IOC;
 using AIAgents.Laboratory.API.Adapters.IOC;
 using AIAgents.Laboratory.API.Controllers;
 using AIAgents.Laboratory.Domain.IOC;
 using AIAgents.Laboratory.Messaging.Adapters.IOC;
+using AIAgents.Laboratory.SemanticKernel.Adapters.IOC;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;

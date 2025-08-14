@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Adapters", "Adapters", "{D52AF77B-723B-43C6-911E-05DB4387462A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.Agents.Adapters", "Adapters\AIAgents.Laboratory.Adapters.Agents\AIAgents.Laboratory.Agents.Adapters.csproj", "{E3121AA2-5F8B-C50C-3484-FE72140080F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.SemanticKernel.Adapters", "Adapters\AIAgents.Laboratory.Adapters.Agents\AIAgents.Laboratory.SemanticKernel.Adapters.csproj", "{E3121AA2-5F8B-C50C-3484-FE72140080F3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject

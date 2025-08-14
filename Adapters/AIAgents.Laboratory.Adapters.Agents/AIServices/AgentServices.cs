@@ -1,12 +1,19 @@
-﻿using AIAgents.Laboratory.Domain.DrivenPorts;
+﻿// *********************************************************************************
+//	<copyright file="AgentServices.cs" company="Personal">
+//		Copyright (c) 2025 Personal
+//	</copyright>
+// <summary>The Agent Services Class.</summary>
+// *********************************************************************************
+
+using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Newtonsoft.Json;
 using System.Globalization;
-using static AIAgents.Laboratory.Agents.Adapters.Helpers.Constants;
+using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
-namespace AIAgents.Laboratory.Agents.Adapters.AIServices;
+namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 
 /// <summary>
 /// The Agent Services Class.

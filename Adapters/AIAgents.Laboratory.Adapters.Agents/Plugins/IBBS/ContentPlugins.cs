@@ -5,14 +5,14 @@
 // <summary>The Content Plugins.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Agents.Adapters.Helpers;
 using AIAgents.Laboratory.Domain.DomainEntities.IBBS;
+using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 using Microsoft.SemanticKernel;
 using Newtonsoft.Json;
 using System.ComponentModel;
 using static AIAgents.Laboratory.Adapters.Agents.Plugins.IBBS.PluginHelpers.ContentPlugins;
 
-namespace AIAgents.Laboratory.Agents.Adapters.Plugins.IBBS;
+namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.IBBS;
 
 /// <summary>
 /// The Content Plugins.

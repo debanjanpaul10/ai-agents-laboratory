@@ -5,14 +5,14 @@
 // <summary>Rewrite text plugin.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Agents.Adapters.Helpers;
 using AIAgents.Laboratory.Domain.DomainEntities.IBBS;
+using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 using Microsoft.SemanticKernel;
 using Newtonsoft.Json;
 using System.ComponentModel;
 using static AIAgents.Laboratory.Adapters.Agents.Plugins.IBBS.PluginHelpers.RewriteTextPlugin;
 
-namespace AIAgents.Laboratory.Agents.Adapters.Plugins.IBBS;
+namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.IBBS;
 
 /// <summary>
 /// Rewrite text plugin.
