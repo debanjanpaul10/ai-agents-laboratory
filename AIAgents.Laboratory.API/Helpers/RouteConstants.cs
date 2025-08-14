@@ -39,6 +39,17 @@ public static class RouteConstants
 	}
 
 	/// <summary>
+	/// The FitGymTool AI Routes.
+	/// </summary>
+	internal static class FitGymToolAi
+	{
+		/// <summary>
+		/// The get bug severity route
+		/// </summary>
+		internal const string GetBugSeverity_Route = "getbugseverity";
+	}
+
+	/// <summary>
 	/// The Health Check Routes.
 	/// </summary>
 	public static class HealthCheck

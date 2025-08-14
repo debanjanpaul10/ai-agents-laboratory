@@ -27,8 +27,7 @@ public class HealthCheckController(ILogger<HealthCheckController> logger, ICommo
 	/// Gets the agent status.
 	/// </summary>
 	/// <returns>The action result of the response.</returns>
-	[HttpGet]
-	[Route(RouteConstants.HealthCheck.GetAgentStatus_Route)]
+	[HttpGet(RouteConstants.HealthCheck.GetAgentStatus_Route)]
 	public IActionResult GetAgentStatus()
 	{
 		try

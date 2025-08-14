@@ -10,7 +10,7 @@ using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 using Microsoft.SemanticKernel;
 using Newtonsoft.Json;
 using System.ComponentModel;
-using static AIAgents.Laboratory.Adapters.Agents.Plugins.IBBS.PluginHelpers.RewriteTextPlugin;
+using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers.RewriteTextPlugin;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.IBBS;
 
@@ -24,16 +24,16 @@ public class RewriteTextPlugin
 	/// </summary>
 	/// <param name="kernel">The kernel.</param>
 	/// <param name="input">The input.</param>
-	[KernelFunction(name: RewriteUserStoryPlugin.FunctionName)]
-	[Description(RewriteUserStoryPlugin.FunctionDescription)]
-	public static async Task<string> ExecuteRewriteUserStoryAsync(Kernel kernel, [Description(RewriteUserStoryPlugin.InputDescription)] string input)
+	[KernelFunction(RewriteUserStoryFunction.FunctionName)]
+	[Description(RewriteUserStoryFunction.FunctionDescription)]
+	public static async Task<string> ExecuteRewriteUserStoryAsync(Kernel kernel, [Description(RewriteUserStoryFunction.InputDescription)] string input)
 	{
 		var arguments = new KernelArguments
 		{{
 			Constants.ArgumentsConstants.KernelArgumentsInputConstant, input
 		}};
 
-		var result = await kernel.InvokePromptAsync(RewriteUserStoryPlugin.FunctionInstructions, arguments).ConfigureAwait(false);
+		var result = await kernel.InvokePromptAsync(RewriteUserStoryFunction.FunctionInstructions, arguments).ConfigureAwait(false);
 		var aiMetadata = result.Metadata;
 
 		return JsonConvert.SerializeObject(new RewriteResponse

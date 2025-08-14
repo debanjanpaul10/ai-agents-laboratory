@@ -5,7 +5,8 @@
 // <summary>Kernel factory.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Adapters.Agents.Plugins.IBBS;
+using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.FitGymTool;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.IBBS;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -68,6 +69,7 @@ public static class KernelFactory
 			// Import Plugins
 			kernel.Plugins.AddFromType<RewriteTextPlugin>(PluginHelpers.RewriteTextPlugin.PluginName);
 			kernel.Plugins.AddFromType<ContentPlugins>(PluginHelpers.ContentPlugins.PluginName);
+			kernel.Plugins.AddFromType<UtilityPlugins>(PluginHelpers.UtilityPlugins.PluginName);
 
 			return kernel;
 		};

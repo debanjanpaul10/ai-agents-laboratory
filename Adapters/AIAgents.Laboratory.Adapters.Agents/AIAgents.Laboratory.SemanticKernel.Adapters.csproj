@@ -17,8 +17,4 @@
 	  <ProjectReference Include="..\..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Plugins\FitGymTool\" />
-	</ItemGroup>
-
 </Project>

@@ -1,4 +1,11 @@
-﻿namespace AIAgents.Laboratory.Domain.DrivenPorts;
+﻿// *********************************************************************************
+//	<copyright file="IAIAgentServices.cs" company="Personal">
+//		Copyright (c) 2025 Personal
+//	</copyright>
+// <summary>The Agent Services Interface.</summary>
+// *********************************************************************************
+
+namespace AIAgents.Laboratory.Domain.DrivenPorts;
 
 /// <summary>
 /// The Agent Services Interface.
@@ -6,13 +13,13 @@
 public interface IAIAgentServices
 {
 	/// <summary>
-	/// Invokes the bulletin ai agents asynchronous.
+	/// Invokes the plugin function asynchronous.
 	/// </summary>
-	/// <typeparam name="T">The input type.</typeparam>
-	/// <typeparam name="TR">The type of the response.</typeparam>
+	/// <typeparam name="TInput">The type of the input.</typeparam>
+	/// <typeparam name="TResponse">The type of the response.</typeparam>
 	/// <param name="input">The input.</param>
 	/// <param name="pluginName">Name of the plugin.</param>
 	/// <param name="functionName">Name of the function.</param>
-	/// <returns>The response from AI agent.</returns>
-	Task<TR> InvokeBulletinAIAgentsAsync<T, TR>(T input, string pluginName, string functionName);
+	/// <returns>The AI response.</returns>
+	Task<TResponse> InvokePluginFunctionAsync<TInput, TResponse>(TInput input, string pluginName, string functionName);
 }

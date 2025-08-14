@@ -28,6 +28,7 @@ public static class DIContainer
 	{
 		return services.AddScoped<IBulletinAiHandler, BulletinAiHandler>()
 			.AddScoped<ICommonAiHandler, CommonAiHandler>()
+			.AddScoped<IFitGymToolAIHandler, FitGymToolAIHandler>()
 			.AddAutoMapper(config =>
 			{
 				config.AddProfile<DomainMapperProfile>();
