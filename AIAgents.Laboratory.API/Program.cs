@@ -19,96 +19,94 @@ namespace AIAgents.Laboratory.API;
 /// </summary>
 public static class Program
 {
-	/// <summary>
-	/// Defines the entry point of the application.
-	/// </summary>
-	/// <param name="args">The arguments.</param>
-	public static void Main(string[] args)
-	{
-		var builder = WebApplication.CreateBuilder(args);
-		builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
-			.AddJsonFile(EnvironmentConfigurationConstants.LocalAppsetingsFileName, true).AddEnvironmentVariables();
+    /// <summary>
+    /// Defines the entry point of the application.
+    /// </summary>
+    /// <param name="args">The arguments.</param>
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+        builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile(EnvironmentConfigurationConstants.LocalAppsetingsFileName, true).AddEnvironmentVariables();
 
-		var miCredentials = builder.Configuration[EnvironmentConfigurationConstants.ManagedIdentityClientIdConstant];
-		var credentials = builder.Environment.IsDevelopment()
-			? new DefaultAzureCredential()
-			: new DefaultAzureCredential(new DefaultAzureCredentialOptions
-			{
-				ManagedIdentityClientId = miCredentials,
-			});
+        var miCredentials = builder.Configuration[EnvironmentConfigurationConstants.ManagedIdentityClientIdConstant];
+        var credentials = builder.Environment.IsDevelopment()
+            ? new DefaultAzureCredential()
+            : new DefaultAzureCredential(new DefaultAzureCredentialOptions
+            {
+                ManagedIdentityClientId = miCredentials,
+            });
 
-		builder.ConfigureAzureAppConfiguration(credentials);
-		builder.Services.ConfigureAiDependencies(builder.Configuration);
-		builder.Services.ConfigureServices();
+        builder.ConfigureAzureAppConfiguration(credentials);
+        builder.Services.ConfigureAiDependencies(builder.Configuration);
+        builder.Services.ConfigureServices();
 
-		var app = builder.Build();
-		app.ConfigureApplication();
-	}
+        var app = builder.Build();
+        app.ConfigureApplication();
+    }
 
-	/// <summary>
-	/// Configures the services.
-	/// </summary>
-	/// <param name="services">The services.</param>
-	internal static void ConfigureServices(this IServiceCollection services)
-	{
-		services.AddControllers();
-		services.AddSignalR();
-		services.AddOpenApi();
-		services.AddCors(options =>
-		{
-			options.AddDefaultPolicy(policy =>
-			{
-				policy.AllowAnyOrigin()
-				.AllowAnyHeader()
-				.AllowAnyMethod();
-			});
-		});
+    /// <summary>
+    /// Configures the services.
+    /// </summary>
+    /// <param name="services">The services.</param>
+    internal static void ConfigureServices(this IServiceCollection services)
+    {
+        services.AddControllers();
+        services.AddSignalR();
+        services.AddOpenApi();
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.SetIsOriginAllowed(_ => true).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+            });
+        });
 
-		services.AddSwaggerGen(c =>
-		{
-			c.SwaggerDoc("v1", new OpenApiInfo
-			{
-				Title = "AIAgents.Laboratory",
-				Version = "v1",
-				Description = "API Documentation for AIAgents.Laboratory",
-				Contact = new OpenApiContact
-				{
-					Name = "Debanjan Paul",
-					Email = "debanjanpaul10@gmail.com"
-				}
-			});
-		});
-		services.AddExceptionHandler<GlobalExceptionMiddleware>();
-		services.AddProblemDetails();
-	}
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "AIAgents.Laboratory",
+                Version = "v1",
+                Description = "API Documentation for AIAgents.Laboratory",
+                Contact = new OpenApiContact
+                {
+                    Name = "Debanjan Paul",
+                    Email = "debanjanpaul10@gmail.com"
+                }
+            });
+        });
+        services.AddExceptionHandler<GlobalExceptionMiddleware>();
+        services.AddProblemDetails();
+    }
 
-	/// <summary>
-	/// Configures the application.
-	/// </summary>
-	/// <param name="app">The application.</param>
-	internal static void ConfigureApplication(this WebApplication app)
-	{
-		if (app.Environment.IsDevelopment())
-		{
-			app.MapOpenApi();
-			app.UseDeveloperExceptionPage();
-			app.UseSwagger();
-			app.UseSwaggerUI(c =>
-			{
-				c.SwaggerEndpoint("/swagger/v1/swagger.json", "AIAgents.Laboratory API v1");
-				c.RoutePrefix = "swaggerui";
-			});
-		}
+    /// <summary>
+    /// Configures the application.
+    /// </summary>
+    /// <param name="app">The application.</param>
+    internal static void ConfigureApplication(this WebApplication app)
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            app.MapOpenApi();
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "AIAgents.Laboratory API v1");
+                c.RoutePrefix = "swaggerui";
+            });
+        }
 
-		app.UseExceptionHandler();
-		app.UseHttpsRedirection();
-		app.UseAuthentication();
-		app.UseAuthorization();
+        app.UseExceptionHandler();
+        app.UseHttpsRedirection();
+        app.UseAuthentication();
+        app.UseAuthorization();
 
-		app.UseCors();
-		app.MapControllers();
-		app.MapHub<AgentStatusHub>("/hubs/agent-status");
+        app.UseCors();
+        app.MapControllers();
+        app.MapHub<AgentStatusHub>("/hubs/agent-status");
 
-		app.Run();
-	}
+        app.Run();
+    }
 }

@@ -5,7 +5,9 @@
 // <summary>The Domain Mapper Profile Class.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Adapters.Models.Response.IBBS;
+using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.IBBS;
 using AutoMapper;
 
@@ -25,5 +27,6 @@ public class DomainMapperProfile : Profile
 		CreateMap<TagResponse, TagResponseDTO>();
 		CreateMap<ModerationContentResponse, ModerationContentResponseDTO>();
 		CreateMap<RewriteResponse, RewriteResponseDTO>();
+		CreateMap<AgentStatus, AgentStatusDTO>();
 	}
 }
