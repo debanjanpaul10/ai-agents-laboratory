@@ -5,7 +5,7 @@
 // <summary>AI Constants class.</summary>
 // *********************************************************************************
 
-namespace AIAgents.Laboratory.Agents.Adapters.Helpers;
+namespace AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 
 /// <summary>
 /// The AI Constants Class.

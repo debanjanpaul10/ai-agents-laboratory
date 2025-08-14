@@ -1,12 +1,19 @@
-﻿using AIAgents.Laboratory.Domain.DrivenPorts;
+// *********************************************************************************
+//	<copyright file="AgentServices.cs" company="Personal">
+//		Copyright (c) 2025 Personal
+//	</copyright>
+// <summary>The Agent Services Class.</summary>
+// *********************************************************************************
+
+using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Newtonsoft.Json;
 using System.Globalization;
-using static AIAgents.Laboratory.Agents.Adapters.Helpers.Constants;
+using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
-namespace AIAgents.Laboratory.Agents.Adapters.AIServices;
+namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 
 /// <summary>
 /// The Agent Services Class.
@@ -17,36 +24,35 @@ namespace AIAgents.Laboratory.Agents.Adapters.AIServices;
 public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : IAIAgentServices
 {
 	/// <summary>
-	/// Invokes the bulletin ai agents asynchronous.
+	/// Invokes the plugin function with dynamic plugin loading.
 	/// </summary>
-	/// <typeparam name="T">The input type.</typeparam>
-	/// <typeparam name="TR">The type of the response.</typeparam>
+	/// <typeparam name="TInput">The input type.</typeparam>
+	/// <typeparam name="TResponse">The type of the response.</typeparam>
 	/// <param name="input">The input.</param>
 	/// <param name="pluginName">Name of the plugin.</param>
 	/// <param name="functionName">Name of the function.</param>
-	/// <returns>The response from AI agent.</returns>
-	public async Task<TR> InvokeBulletinAIAgentsAsync<T, TR>(T input, string pluginName, string functionName)
+	/// <returns>The AI Response.</returns>
+	public async Task<TResponse> InvokePluginFunctionAsync<TInput, TResponse>(TInput input, string pluginName, string functionName)
 	{
 		try
 		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(InvokeBulletinAIAgentsAsync), DateTime.UtcNow));
-			
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
 			var kernelArguments = new KernelArguments()
 			{
-				[ArgumentsConstants.KernelArgumentsInputConstant] = input
+				[ArgumentsConstants.KernelArgumentsInputConstant] = JsonConvert.SerializeObject(input)
 			};
 
 			var responseFromAI = await kernel.InvokeAsync(pluginName, functionName, kernelArguments);
-			return JsonConvert.DeserializeObject<TR>(responseFromAI.GetValue<string>()!) ?? default!;
+			return JsonConvert.DeserializeObject<TResponse>(responseFromAI.GetValue<string>()!) ?? default!;
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(InvokeBulletinAIAgentsAsync), DateTime.UtcNow, ex.Message));
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(InvokePluginFunctionAsync), DateTime.UtcNow, ex.Message));
 			throw;
 		}
 		finally
 		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(InvokeBulletinAIAgentsAsync), DateTime.UtcNow));
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
 		}
 	}
 }

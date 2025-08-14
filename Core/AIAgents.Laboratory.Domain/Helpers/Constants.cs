@@ -47,6 +47,11 @@ internal static class Constants
 		/// The model name not found exception constant
 		/// </summary>
 		internal const string ModelNameNotFoundExceptionConstant = "It seems the model name could not be determined";
+
+		/// <summary>
+		/// The input parameters cannot be empty message
+		/// </summary>
+		internal const string InputParametersCannotBeEmptyMessage = "The input parameters cannot be empty";
 	}
 
 	/// <summary>

@@ -31,8 +31,7 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAiHandl
 	/// <param name="requestDto">The rewrite request dto.</param>
 	/// <returns>The AI rewritten story.</returns>
 	/// <exception cref="Exception"></exception>
-	[HttpPost]
-	[Route(RouteConstants.IBBSAi.RewriteText_Route)]
+	[HttpPost(RouteConstants.IBBSAi.RewriteText_Route)]
 	public async Task<RewriteResponseDTO> RewriteTextAsync(UserStoryRequestDTO requestDto)
 	{
 		try
@@ -67,8 +66,7 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAiHandl
 	/// </summary>
 	/// <param name="requestDto">The request dto.</param>
 	/// <returns>The tag response dto.</returns>
-	[HttpPost]
-	[Route(RouteConstants.IBBSAi.GenerateTag_Route)]
+	[HttpPost(RouteConstants.IBBSAi.GenerateTag_Route)]
 	public async Task<TagResponseDTO> GenerateTagForStoryAsync(UserStoryRequestDTO requestDto)
 	{
 		try
@@ -103,8 +101,7 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAiHandl
 	/// </summary>
 	/// <param name="requestDto">The request dto.</param>
 	/// <returns>The moderation content response.</returns>
-	[HttpPost]
-	[Route(RouteConstants.IBBSAi.ModerateContent_Route)]
+	[HttpPost(RouteConstants.IBBSAi.ModerateContent_Route)]
 	public async Task<ModerationContentResponseDTO> ModerateContentDataAsync(UserStoryRequestDTO requestDto)
 	{
 		try
