@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SignalR Test</title>
+        <script src="https://unpkg.com/@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
+    </head>
+    <body>
+        <div id="status">Connecting...</div>
+        <button onclick="getCurrentStatus()">Get Current Status</button>
+        <div id="messages"></div>
+
+        <script>
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("https://localhost:8190/hubs/agent-status", {
+                    skipNegotiation: false,
+                    withCredentials: false,
+                })
+                .build();
+
+            connection
+                .start()
+                .then(function () {
+                    document.getElementById("status").innerText =
+                        "Connected to SignalR Hub";
+                    console.log("SignalR Connected");
+                })
+                .catch(function (err) {
+                    document.getElementById("status").innerText =
+                        "Connection failed: " + err;
+                    console.error(err.toString());
+                });
+
+            connection.on("ReceiveAgentStatus", function (status) {
+                const messages = document.getElementById("messages");
+                messages.innerHTML += `<p>Status Update: ${JSON.stringify(
+                    status
+                )}</p>`;
+            });
+
+            function getCurrentStatus() {
+                connection.invoke("GetCurrentStatus").then(function (status) {
+                    const messages = document.getElementById("messages");
+                    messages.innerHTML += `<p>Current Status: ${JSON.stringify(
+                        status
+                    )}</p>`;
+                });
+            }
+        </script>
+    </body>
+</html>
