@@ -19,7 +19,7 @@ public class AgentStatusStore : IAgentStatusStore
 	/// <summary>
 	/// The lock object.
 	/// </summary>
-	private readonly object _lock = new();
+	private readonly Lock _lock = new();
 
 	/// <summary>
 	/// Gets the current agent status.
