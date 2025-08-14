@@ -29,8 +29,6 @@ namespace AIAgents.Laboratory.Messaging.Adapters.Services;
 /// <seealso cref="Microsoft.Extensions.Hosting.BackgroundService" />
 public class AgentStatusWatcher(ILogger<AgentStatusWatcher> logger, IConfiguration configuration, IAgentStatusStore agentStatusStore, IHubContext<AgentStatusHub> agentHub) : BackgroundService
 {
-
-
 	/// <summary>
 	/// This method is called when the <see cref="T:Microsoft.Extensions.Hosting.IHostedService" /> starts. The implementation should return a task that represents
 	/// the lifetime of the long running operation(s) being performed.
