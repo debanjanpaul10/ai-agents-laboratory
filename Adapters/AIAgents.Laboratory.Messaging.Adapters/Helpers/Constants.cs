@@ -67,7 +67,7 @@ internal static class Constants
 		/// <summary>
 		/// The delay between iterations ms
 		/// </summary>
-		internal const int DelayBetweenIterationsMs = 10000;
+		internal const int DelayBetweenIterationsMs = 60000;
 
 		/// <summary>
 		/// The agent status changed

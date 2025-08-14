@@ -70,7 +70,7 @@ public class AgentStatusWatcher(ILogger<AgentStatusWatcher> logger, IConfigurati
 			catch (Exception ex)
 			{
 				logger.LogError(ex, "Error in AgentStatusWatcher: {Message}", ex.Message);
-				await Task.Delay(5000, stoppingToken);
+				await Task.Delay(MessagingConstants.DelayBetweenIterationsMs, stoppingToken);
 			}
 			
 			await Task.Delay(MessagingConstants.DelayBetweenIterationsMs, stoppingToken);
