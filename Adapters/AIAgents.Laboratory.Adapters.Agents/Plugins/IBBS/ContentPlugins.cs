@@ -27,8 +27,7 @@ public class ContentPlugins
 	/// <returns>The AI response.</returns>
 	[KernelFunction(name: GenerateGenreTagForStoryPlugin.FunctionName)]
 	[Description(description: GenerateGenreTagForStoryPlugin.FunctionDescription)]
-	public static async Task<string> ExecuteGenerateTagForStoryPluginAsync(
-		Kernel kernel, [Description(GenerateGenreTagForStoryPlugin.InputDescription)]string input)
+	public static async Task<string> ExecuteGenerateTagForStoryPluginAsync(Kernel kernel, [Description(GenerateGenreTagForStoryPlugin.InputDescription)]string input)
 	{
 		var arguments = new KernelArguments
 		{{
@@ -55,8 +54,7 @@ public class ContentPlugins
 	/// <returns>The AI response.</returns>
 	[KernelFunction(name: ContentModerationPlugin.FunctionName)]
 	[Description(description: ContentModerationPlugin.FunctionDescription)]
-	public static async Task<string> ExecuteContentModerationPlugin(
-		Kernel kernel, [Description(ContentModerationPlugin.InputDescription)] string input)
+	public static async Task<string> ExecuteContentModerationPlugin(Kernel kernel, [Description(ContentModerationPlugin.InputDescription)] string input)
 	{
 		var arguments = new KernelArguments
 		{{
