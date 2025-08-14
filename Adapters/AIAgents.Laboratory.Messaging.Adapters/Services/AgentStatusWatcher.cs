@@ -7,9 +7,11 @@
 
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Azure.SignalR.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 using static AIAgents.Laboratory.Messaging.Adapters.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Messaging.Adapters.Services;
@@ -31,22 +33,38 @@ public class AgentStatusWatcher(ILogger<AgentStatusWatcher> logger, IConfigurati
 	/// <param name="stoppingToken">Triggered when <see cref="M:Microsoft.Extensions.Hosting.IHostedService.StopAsync(System.Threading.CancellationToken)" /> is called.</param>
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
-		logger.LogInformation("AgentStatusWatcher started at {Time}", DateTime.UtcNow);
-		
+		logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(AgentStatusWatcher), DateTime.UtcNow, string.Empty));
 		while(!stoppingToken.IsCancellationRequested)
 		{
 			try
 			{
 				var isAiServiceEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsAIServiceEnabledConstant], out bool parsedValue) && parsedValue;
+				logger.LogInformation("Current AI service status from configuration: {Status}", isAiServiceEnabled);
+				
+				var previousStatus = agentStatusStore.Current;
 				if (agentStatusStore.TryUpdate(isAiServiceEnabled, out var updated))
 				{
-					logger.LogInformation("Agent status changed to {IsAvailable}. Broadcasting to clients.", updated.IsAvailable);
-					
-					await agentHub.Clients.All.SendAsync("agentStatusChanged", new
+					logger.LogInformation("Agent status changed from {PreviousStatus} to {CurrentStatus} at {Timestamp}", previousStatus.IsAvailable, updated.IsAvailable, updated.UpdatedAt);
+					try
 					{
-						isAvailable = updated.IsAvailable,
-						updatedAt = updated.UpdatedAt
-					}, cancellationToken: stoppingToken);
+						await agentHub.Clients.All.SendAsync(MessagingConstants.AgentStatusChanged, new
+						{
+							isAvailable = updated.IsAvailable,
+							updatedAt = updated.UpdatedAt
+						}, cancellationToken: stoppingToken);
+					}
+					catch (AzureSignalRNotConnectedException ex)
+					{
+						logger.LogWarning(LoggingConstants.UnableToRelayMessage, ex.Message);
+					}
+					catch (Exception ex)
+					{
+						logger.LogError(ex, LoggingConstants.ErrorBroadcastingStatusChange, ex.Message);
+					}
+				}
+				else
+				{
+					logger.LogDebug(LoggingConstants.NoStatusChangeDetected, updated.IsAvailable);
 				}
 			}
 			catch (Exception ex)

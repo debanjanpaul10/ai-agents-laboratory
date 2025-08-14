@@ -8,8 +8,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Automapper" Version="15.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.4" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.7" />
 		<PackageReference Include="Microsoft.SemanticKernel.Connectors.Google" Version="1.61.0-alpha" />
 		<PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.61.0-alpha" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

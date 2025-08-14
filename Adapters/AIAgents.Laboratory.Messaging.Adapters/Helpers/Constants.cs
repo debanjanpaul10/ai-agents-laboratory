@@ -31,6 +31,21 @@ internal static class Constants
 		/// The log helper method end.
 		/// </summary>
 		internal const string LogHelperMethodEnd = "{0} ended at {1} for {2}";
+
+		/// <summary>
+		/// The unable to relay message
+		/// </summary>
+		internal const string UnableToRelayMessage = "Unable to broadcast status change: Azure SignalR Service is not connected. This is expected when AI service is disabled. Error: {Message}";
+
+		/// <summary>
+		/// The no status change detected
+		/// </summary>
+		internal const string NoStatusChangeDetected = "No status change detected. Current status remains: {CurrentStatus}";
+
+		/// <summary>
+		/// The error broadcasting status change
+		/// </summary>
+		internal const string ErrorBroadcastingStatusChange = "Error broadcasting status change: {Message}";
 	}
 
 	/// <summary>
@@ -52,6 +67,11 @@ internal static class Constants
 		/// <summary>
 		/// The delay between iterations ms
 		/// </summary>
-		internal const int DelayBetweenIterationsMs = 10000; 
+		internal const int DelayBetweenIterationsMs = 10000;
+
+		/// <summary>
+		/// The agent status changed
+		/// </summary>
+		internal const string AgentStatusChanged = "AgentStatusChanged";
 	}
 }
