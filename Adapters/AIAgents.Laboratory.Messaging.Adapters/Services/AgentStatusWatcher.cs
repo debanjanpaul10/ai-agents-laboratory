@@ -1,4 +1,4 @@
-﻿// *********************************************************************************
+// *********************************************************************************
 //	<copyright file="AgentStatusWatcher.cs" company="Personal">
 //		Copyright (c) 2025 Personal
 //	</copyright>
@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
 using static AIAgents.Laboratory.Messaging.Adapters.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Messaging.Adapters.Services;
@@ -32,6 +31,8 @@ public class AgentStatusWatcher(ILogger<AgentStatusWatcher> logger, IConfigurati
 	/// <param name="stoppingToken">Triggered when <see cref="M:Microsoft.Extensions.Hosting.IHostedService.StopAsync(System.Threading.CancellationToken)" /> is called.</param>
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
+		logger.LogInformation("AgentStatusWatcher started at {Time}", DateTime.UtcNow);
+		
 		while(!stoppingToken.IsCancellationRequested)
 		{
 			try
@@ -39,6 +40,8 @@ public class AgentStatusWatcher(ILogger<AgentStatusWatcher> logger, IConfigurati
 				var isAiServiceEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsAIServiceEnabledConstant], out bool parsedValue) && parsedValue;
 				if (agentStatusStore.TryUpdate(isAiServiceEnabled, out var updated))
 				{
+					logger.LogInformation("Agent status changed to {IsAvailable}. Broadcasting to clients.", updated.IsAvailable);
+					
 					await agentHub.Clients.All.SendAsync("agentStatusChanged", new
 					{
 						isAvailable = updated.IsAvailable,
@@ -48,10 +51,11 @@ public class AgentStatusWatcher(ILogger<AgentStatusWatcher> logger, IConfigurati
 			}
 			catch (Exception ex)
 			{
-				logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(AgentStatusWatcher), DateTime.UtcNow, string.Empty));
-				throw;
+				logger.LogError(ex, "Error in AgentStatusWatcher: {Message}", ex.Message);
+				await Task.Delay(5000, stoppingToken);
 			}
+			
+			await Task.Delay(MessagingConstants.DelayBetweenIterationsMs, stoppingToken);
 		}
-		
 	}
 }

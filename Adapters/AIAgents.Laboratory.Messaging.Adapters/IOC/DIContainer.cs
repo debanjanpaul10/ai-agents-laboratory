@@ -16,16 +16,14 @@ namespace AIAgents.Laboratory.Messaging.Adapters.IOC;
 /// </summary>
 public static class DIContainer
 {
-	/// <summary>
-	/// Adds the messaging dependencies.
-	/// </summary>
-	/// <param name="services">The services.</param>
-	/// <returns>The services collection.</returns>
-	public static IServiceCollection AddMessagingDependencies(this IServiceCollection services)
-	{
-		//services.AddHostedService<AgentStatusWatcher>();
-		services.AddSingleton<IAgentStatusStore, AgentStatusStore>();
-
-		return services;
-	}
+    /// <summary>
+    /// Adds the messaging dependencies.
+    /// </summary>
+    /// <param name="services">The services.</param>
+    /// <returns>The services collection.</returns>
+    public static IServiceCollection AddMessagingDependencies(this IServiceCollection services)
+    {
+        return services.AddHostedService<AgentStatusWatcher>()
+            .AddSingleton<IAgentStatusStore, AgentStatusStore>();
+    }
 }

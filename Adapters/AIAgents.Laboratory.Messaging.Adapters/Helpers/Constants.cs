@@ -43,4 +43,15 @@ internal static class Constants
 		/// </summary>
 		internal const string IsAIServiceEnabledConstant = "IsAIServiceEnabled";
 	}
+
+	/// <summary>
+	/// The Messaging Constants Class.
+	/// </summary>
+	internal static class MessagingConstants
+	{
+		/// <summary>
+		/// The delay between iterations ms
+		/// </summary>
+		internal const int DelayBetweenIterationsMs = 10000; 
+	}
 }
