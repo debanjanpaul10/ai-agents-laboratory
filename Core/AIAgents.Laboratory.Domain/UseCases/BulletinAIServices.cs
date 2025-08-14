@@ -124,10 +124,6 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 			{
 				response.ModelUsed = commonAiService.GetCurrentModelId();
 			}
-			if (response is not null)
-			{
-				response.ModelUsed = commonAiService.GetCurrentModelId();
-			}
 
 			return response ?? new RewriteResponse { ModelUsed = commonAiService.GetCurrentModelId() };
 		}
