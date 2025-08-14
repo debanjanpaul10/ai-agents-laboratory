@@ -5,7 +5,7 @@
 // <summary>The Global Exception Handler.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Shared.Helpers;
+using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
