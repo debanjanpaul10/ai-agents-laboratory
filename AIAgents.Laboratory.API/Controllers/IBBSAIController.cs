@@ -5,23 +5,25 @@
 // <summary>The IBBS AI Controller Class.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Core.Contracts;
-using AIAgents.Laboratory.Shared.Constants;
-using AIAgents.Laboratory.Shared.Models.IBBS;
+using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Models.Request.IBBS;
+using AIAgents.Laboratory.API.Adapters.Models.Response.IBBS;
+using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using static AIAgents.Laboratory.API.Helpers.Constants;
 
 namespace AIAgents.Laboratory.API.Controllers;
 
 /// <summary>
 /// The IBBS AI Controller Class.
 /// </summary>
-/// <param name="bulletinAiServices">The Bulletin AI Services.</param>
+/// <param name="bulletinAiHandler">The Bulletin AI Handler.</param>
 /// <param name="logger">The logger service.</param>
 /// <seealso cref="AIAgents.Laboratory.API.Controllers.BaseController" />
 [ApiController]
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
-public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAIServices bulletinAiServices) : BaseController
+public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAiHandler bulletinAiHandler) : BaseController
 {
 	/// <summary>
 	/// Rewrites the text async.
@@ -37,7 +39,7 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAIServi
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(RewriteTextAsync), DateTime.UtcNow));
 
-			var result = await bulletinAiServices.RewriteTextAsync(requestDto.Story).ConfigureAwait(false);
+			var result = await bulletinAiHandler.RewriteTextAsync(requestDto.Story).ConfigureAwait(false);
 			if (string.IsNullOrEmpty(result.RewrittenStory))
 			{
 				var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
@@ -73,7 +75,7 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAIServi
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GenerateTagForStoryAsync), DateTime.UtcNow));
 
-			var result = await bulletinAiServices.GenerateTagForStoryAsync(requestDto.Story).ConfigureAwait(false);
+			var result = await bulletinAiHandler.GenerateTagForStoryAsync(requestDto.Story).ConfigureAwait(false);
 			if (string.IsNullOrEmpty(result.UserStoryTag))
 			{
 				var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
@@ -109,7 +111,7 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAIServi
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ModerateContentDataAsync), DateTime.UtcNow));
 			
-			var result = await bulletinAiServices.ModerateContentDataAsync(requestDto.Story).ConfigureAwait(false);
+			var result = await bulletinAiHandler.ModerateContentDataAsync(requestDto.Story).ConfigureAwait(false);
 			if (string.IsNullOrEmpty(result.ContentRating))
 			{
 				var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
