@@ -24,6 +24,7 @@ public static class DIContainer
 	public static IServiceCollection AddDomainDependencies(this IServiceCollection services)
 	{
 		return services.AddScoped<IBulletinAIServices, BulletinAIServices>()
-			.AddScoped<ICommonAiService, CommonAiService>();
+			.AddScoped<ICommonAiService, CommonAiService>()
+			.AddScoped<IFitGymToolAIService, FitGymToolAIService>();
 	}
 }

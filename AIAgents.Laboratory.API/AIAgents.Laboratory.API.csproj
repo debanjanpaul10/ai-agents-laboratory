@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.Adapters.Agents\AIAgents.Laboratory.Agents.Adapters.csproj" />
+    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.Adapters.Agents\AIAgents.Laboratory.SemanticKernel.Adapters.csproj" />
     <ProjectReference Include="..\Adapters\AIAgents.Laboratory.API.Adapters\AIAgents.Laboratory.API.Adapters.csproj" />
     <ProjectReference Include="..\Adapters\AIAgents.Laboratory.Messaging.Adapters\AIAgents.Laboratory.Messaging.Adapters.csproj" />
     <ProjectReference Include="..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />

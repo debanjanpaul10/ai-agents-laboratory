@@ -10,7 +10,7 @@ using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
-using static AIAgents.Laboratory.Adapters.Agents.Plugins.IBBS.PluginHelpers;
+using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
@@ -35,7 +35,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 	{
 		try
 		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GenerateTagForStoryAsync), DateTime.UtcNow));
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GenerateTagForStoryAsync), DateTime.UtcNow, string.Empty));
 			if (string.IsNullOrEmpty(story))
 			{
 				var exception = new Exception(ExceptionConstants.StoryCannotBeEmptyMessage);
@@ -43,7 +43,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 				throw exception;
 			}
 
-			var response = await aiAgentServices.InvokeBulletinAIAgentsAsync<string, TagResponse>(story, ContentPlugins.PluginName, ContentPlugins.GenerateGenreTagForStoryPlugin.FunctionName).ConfigureAwait(false);
+			var response = await aiAgentServices.InvokePluginFunctionAsync<string, TagResponse>(story, ContentPlugins.PluginName, ContentPlugins.GenerateGenreTagForStoryFunction.FunctionName).ConfigureAwait(false);
 			if (response is not null)
 			{
 				response.ModelUsed = commonAiService.GetCurrentModelId();
@@ -58,7 +58,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 		}
 		finally
 		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GenerateTagForStoryAsync), DateTime.UtcNow));
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GenerateTagForStoryAsync), DateTime.UtcNow, string.Empty));
 		}
 	}
 
@@ -73,7 +73,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 	{
 		try
 		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ModerateContentDataAsync), DateTime.UtcNow));
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ModerateContentDataAsync), DateTime.UtcNow, string.Empty));
 			if (string.IsNullOrEmpty(story))
 			{
 				var exception = new Exception(ExceptionConstants.StoryCannotBeEmptyMessage);
@@ -81,7 +81,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 				throw exception;
 			}
 
-			var response = await aiAgentServices.InvokeBulletinAIAgentsAsync<string, ModerationContentResponse>(story, ContentPlugins.PluginName, ContentPlugins.ContentModerationPlugin.FunctionName).ConfigureAwait(false);
+			var response = await aiAgentServices.InvokePluginFunctionAsync<string, ModerationContentResponse>(story, ContentPlugins.PluginName, ContentPlugins.ContentModerationFunction.FunctionName).ConfigureAwait(false);
 			if (response is not null)
 			{
 				response.ModelUsed = commonAiService.GetCurrentModelId();
@@ -91,7 +91,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ModerateContentDataAsync), DateTime.UtcNow, ex.Message));
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ModerateContentDataAsync), DateTime.UtcNow, ex.Message, string.Empty));
 			throw;
 		}
 		finally
@@ -111,7 +111,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 	{
 		try
 		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(RewriteTextAsync), DateTime.UtcNow));
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(RewriteTextAsync), DateTime.UtcNow, string.Empty));
 			if (string.IsNullOrEmpty(story))
 			{
 				var exception = new Exception(ExceptionConstants.StoryCannotBeEmptyMessage);
@@ -119,7 +119,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 				throw exception;
 			}
 
-			var response = await aiAgentServices.InvokeBulletinAIAgentsAsync<string, RewriteResponse>(story, RewriteTextPlugin.PluginName, RewriteTextPlugin.RewriteUserStoryPlugin.FunctionName).ConfigureAwait(false);
+			var response = await aiAgentServices.InvokePluginFunctionAsync<string, RewriteResponse>(story, RewriteTextPlugin.PluginName, RewriteTextPlugin.RewriteUserStoryFunction.FunctionName).ConfigureAwait(false);
 			if (response is not null)
 			{
 				response.ModelUsed = commonAiService.GetCurrentModelId();
@@ -134,7 +134,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 		}
 		finally
 		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(RewriteTextAsync), DateTime.UtcNow));
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(RewriteTextAsync), DateTime.UtcNow, string.Empty));
 		}
 	}
 }

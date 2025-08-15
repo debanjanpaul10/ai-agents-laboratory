@@ -5,12 +5,12 @@
 // <summary>The DI Container Class.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Agents.Adapters.AIServices;
 using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AIAgents.Laboratory.Agents.Adapters.IOC;
+namespace AIAgents.Laboratory.SemanticKernel.Adapters.IOC;
 
 /// <summary>
 /// The DI Container Class.

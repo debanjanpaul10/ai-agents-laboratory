@@ -5,7 +5,7 @@
 // <summary>Plugin helpers.</summary>
 // *********************************************************************************
 
-namespace AIAgents.Laboratory.Adapters.Agents.Plugins.IBBS
+namespace AIAgents.Laboratory.Domain.Helpers
 {
 	/// <summary>
 	/// Plugin helpers.
@@ -25,12 +25,12 @@ namespace AIAgents.Laboratory.Adapters.Agents.Plugins.IBBS
 			/// <summary>
 			/// Rewrite user story plugin.
 			/// </summary>
-			public static class RewriteUserStoryPlugin
+			public static class RewriteUserStoryFunction
 			{
 				/// <summary>
 				/// The function name.
 				/// </summary>
-				public const string FunctionName = nameof(RewriteUserStoryPlugin);
+				public const string FunctionName = nameof(RewriteUserStoryFunction);
 
 				/// <summary>
 				/// The function description.
@@ -76,12 +76,12 @@ namespace AIAgents.Laboratory.Adapters.Agents.Plugins.IBBS
 			/// <summary>
 			/// Generate genre tag for user's story plugin.
 			/// </summary>
-			public static class GenerateGenreTagForStoryPlugin
+			public static class GenerateGenreTagForStoryFunction
 			{
 				/// <summary>
 				/// The function name.
 				/// </summary>
-				public const string FunctionName = nameof(GenerateGenreTagForStoryPlugin);
+				public const string FunctionName = nameof(GenerateGenreTagForStoryFunction);
 
 				/// <summary>
 				/// The function description.
@@ -115,12 +115,12 @@ namespace AIAgents.Laboratory.Adapters.Agents.Plugins.IBBS
 			/// <summary>
 			/// Manage the content moderation.
 			/// </summary>
-			public static class ContentModerationPlugin
+			public static class ContentModerationFunction
 			{
 				/// <summary>
 				/// The function name.
 				/// </summary>
-				public const string FunctionName = nameof(ContentModerationPlugin);
+				public const string FunctionName = nameof(ContentModerationFunction);
 
 				/// <summary>
 				/// The function description.
@@ -152,9 +152,58 @@ namespace AIAgents.Laboratory.Adapters.Agents.Plugins.IBBS
 			}
 		}
 
+		/// <summary>
+		/// The Utility Plugins.
+		/// </summary>
+		public static class UtilityPlugins
+		{
+			/// <summary>
+			/// The plugin name
+			/// </summary>
+			public const string PluginName = nameof(UtilityPlugins);
 
+			/// <summary>
+			/// The Determine Bug Severity Function.
+			/// </summary>
+			public static class DetermineBugSeverityFunction
+			{
+				/// <summary>
+				/// The function name
+				/// </summary>
+				public const string FunctionName = nameof(DetermineBugSeverityFunction);
 
+				/// <summary>
+				/// The function description
+				/// </summary>
+				public const string FunctionDescription = "Generates the bug severity based on the bug description provided by the user.";
+
+				/// <summary>
+				/// The function instructions
+				/// </summary>
+				public const string FunctionInstructions = """
+					You are an AI assistant tasked to generate the bug severity based on the following parameters:
+						1. Users will be providing you with the bug title and the bug description in a JSON object format and you will be thoroughly going through it.
+						2. After perusing through the contents, you will be determining the bug severity out of High, Medium, Low and NA respectively.
+						3. If the bug that user describes:
+							- Is a blocker that is preventing user to do any action; then mark it as High
+							- Is a issue that is not exactly blocking the user, but seems to be a problem in data or data mismatch or can be solved via a workaround; then mark it as Medium
+							- Is a feature or request that would be a nice to have or good to have that might provide users with better clarity or could be simpler; then mark it as Low
+							- For others, mark it as NA.
+						Input:
+						++++++++++++
+
+						{{$input}}
+
+						+++++++++++
+						
+					""";
+
+				/// <summary>
+				/// The input description
+				/// </summary>
+				public const string InputDescription = "The object containing bug title and bug description provided by user.";
+			}
+		}
 	}
-
 }
 
