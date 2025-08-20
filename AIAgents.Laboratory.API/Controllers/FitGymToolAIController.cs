@@ -99,7 +99,4 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow));
 		}
 	}
-
-
-
 }
