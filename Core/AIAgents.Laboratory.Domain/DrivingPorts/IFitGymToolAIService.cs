@@ -5,6 +5,7 @@
 // <summary>The FitGym Tool AI Service Interface.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
 
 namespace AIAgents.Laboratory.Domain.DrivingPorts;
@@ -20,4 +21,11 @@ public interface IFitGymToolAIService
 	/// <param name="bugSeverityInput">The bug severity input.</param>
 	/// <returns>The bug severity response.</returns>
 	Task<BugSeverityResponse> GetBugSeverityAsync(BugSeverityInput bugSeverityInput);
+
+	/// <summary>
+	/// Gets the orchestrator response asynchronous.
+	/// </summary>
+	/// <param name="userQueryRequest">The user query request.</param>
+	/// <returns>The AI response.</returns>
+	Task<string> GetOrchestratorResponseAsync(UserRequestDomain userQueryRequest);
 }

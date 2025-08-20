@@ -6,7 +6,9 @@
 // *********************************************************************************
 
 using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Request.FitGymTool;
+using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Adapters.Models.Response.FitGymTool;
 using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +32,10 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 	/// <param name="bugSeverityInput">The bug severity input.</param>
 	/// <returns>The bug severity ai response dto.</returns>
 	[HttpPost(RouteConstants.FitGymToolAi.GetBugSeverity_Route)]
+	[ProducesResponseType(typeof(BugSeverityResponseDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<BugSeverityResponseDTO> GetBugSeverityAsync([FromBody] BugSeverityInputDTO bugSeverityInput)
 	{
 		try
@@ -56,6 +62,41 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 		finally
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetBugSeverityAsync), DateTime.UtcNow));
+		}
+	}
+
+	/// <summary>
+	/// Gets the chatbot response asynchronous.
+	/// </summary>
+	/// <param name="userQueryRequest">The user query request.</param>
+	/// <returns>The ai response.</returns>
+	[HttpPost(RouteConstants.FitGymToolAi.GetChatbotResponse_Route)]
+	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	public async Task<ResponseDTO> GetChatbotResponseAsync([FromBody] UserQueryRequestDTO userQueryRequest)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetChatbotResponseAsync), DateTime.UtcNow));
+
+			var result = await fitGymToolAIHandler.GetOrchestratorResponseAsync(userQueryRequest).ConfigureAwait(false);
+			if (!string.IsNullOrEmpty(result))
+			{
+				return HandleSuccessRequestResponse(result);
+			}
+
+			return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetChatbotResponseAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow));
 		}
 	}
 }

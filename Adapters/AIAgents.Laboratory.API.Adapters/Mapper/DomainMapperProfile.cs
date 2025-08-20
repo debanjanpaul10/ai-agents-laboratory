@@ -5,6 +5,7 @@
 // <summary>The Domain Mapper Profile Class.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Request.FitGymTool;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Adapters.Models.Response.FitGymTool;
@@ -35,5 +36,6 @@ public class DomainMapperProfile : Profile
 		CreateMap<AgentStatus, AgentStatusDTO>();
 		CreateMap<BugSeverityInputDTO, BugSeverityInput>();
 		CreateMap<BugSeverityResponse, BugSeverityResponseDTO>();
+		CreateMap<UserQueryRequestDTO, UserRequestDomain>();
 	}
 }

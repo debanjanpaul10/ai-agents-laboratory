@@ -13,7 +13,7 @@ namespace AIAgents.Laboratory.Domain.DrivenPorts;
 public interface IAIAgentServices
 {
 	/// <summary>
-	/// Invokes the plugin function asynchronous.
+	/// Gets the ai function response asynchronous.
 	/// </summary>
 	/// <typeparam name="TInput">The type of the input.</typeparam>
 	/// <typeparam name="TResponse">The type of the response.</typeparam>
@@ -21,5 +21,12 @@ public interface IAIAgentServices
 	/// <param name="pluginName">Name of the plugin.</param>
 	/// <param name="functionName">Name of the function.</param>
 	/// <returns>The AI response.</returns>
-	Task<TResponse> InvokePluginFunctionAsync<TInput, TResponse>(TInput input, string pluginName, string functionName);
+	Task<TResponse> GetAiFunctionResponseAsync<TInput, TResponse>(TInput input, string pluginName, string functionName);
+
+	/// <summary>
+	/// Gets the orchestrator function response asynchronous.
+	/// </summary>
+	/// <param name="input">The input.</param>
+	/// <returns>The AI response.</returns>
+	Task<string> GetOrchestratorFunctionResponseAsync(string input);
 }

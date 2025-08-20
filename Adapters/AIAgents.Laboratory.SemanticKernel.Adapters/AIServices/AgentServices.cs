@@ -1,0 +1,128 @@
+// *********************************************************************************
+//	<copyright file="AgentServices.cs" company="Personal">
+//		Copyright (c) 2025 Personal
+//	</copyright>
+// <summary>The Agent Services Class.</summary>
+// *********************************************************************************
+
+using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.UseCases;
+using Microsoft.Extensions.Logging;
+using Microsoft.SemanticKernel;
+using Newtonsoft.Json;
+using System.Globalization;
+using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers;
+using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
+
+namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
+
+/// <summary>
+/// The Agent Services Class.
+/// </summary>
+/// <param name="kernel">The Semantic Kernel.</param>
+/// <param name="logger">The Logger service.</param>
+/// <seealso cref="IAIAgentServices" />
+public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : IAIAgentServices
+{
+	/// <summary>
+	/// Gets the orchestrator function response asynchronous.
+	/// </summary>
+	/// <param name="input">The input.</param>
+	/// <returns>
+	/// The AI response.
+	/// </returns>
+	public async Task<string> GetOrchestratorFunctionResponseAsync(string input)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorFunctionResponseAsync), DateTime.UtcNow));
+
+			var userIntent = await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.DetermineUserIntentFunction.FunctionName).ConfigureAwait(false);
+			if (!string.IsNullOrEmpty(userIntent) && userIntent.Contains("GREETING", StringComparison.CurrentCultureIgnoreCase))
+			{
+				return await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.GreetingFunction.FunctionName).ConfigureAwait(false);
+			}
+			else
+			{
+				return "Feature not available yet.";
+			}
+
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetOrchestratorFunctionResponseAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetOrchestratorFunctionResponseAsync), DateTime.UtcNow));
+		}
+	}
+
+	/// <summary>
+	/// Gets the ai function response asynchronous.
+	/// </summary>
+	/// <typeparam name="TInput">The type of the input.</typeparam>
+	/// <typeparam name="TResponse">The type of the response.</typeparam>
+	/// <param name="input">The input.</param>
+	/// <param name="pluginName">Name of the plugin.</param>
+	/// <param name="functionName">Name of the function.</param>
+	/// <returns>
+	/// The AI response.
+	/// </returns>
+	/// <exception cref="System.Exception"></exception>
+	public async Task<TResponse> GetAiFunctionResponseAsync<TInput, TResponse>(TInput input, string pluginName, string functionName)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
+			var aiResponse = await InvokePluginFunctionAsync(input, pluginName, functionName).ConfigureAwait(false);
+			return JsonConvert.DeserializeObject<TResponse>(aiResponse) ?? throw new Exception();
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(InvokePluginFunctionAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
+		}
+	}
+
+	#region PRIVATE METHODS
+
+	/// <summary>
+	/// Invokes the plugin function asynchronous.
+	/// </summary>
+	/// <typeparam name="TInput">The type of the input.</typeparam>
+	/// <param name="input">The input.</param>
+	/// <param name="pluginName">Name of the plugin.</param>
+	/// <param name="functionName">Name of the function.</param>
+	/// <returns>The AI string response.</returns>
+	private async Task<string> InvokePluginFunctionAsync<TInput>(TInput input, string pluginName, string functionName)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
+			var kernelArguments = new KernelArguments()
+			{
+				[ArgumentsConstants.KernelArgumentsInputConstant] = JsonConvert.SerializeObject(input)
+			};
+
+			var responseFromAI = await kernel.InvokeAsync(pluginName, functionName, kernelArguments).ConfigureAwait(false);
+			return responseFromAI.GetValue<string>()!;
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(InvokePluginFunctionAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
+		}
+	}
+
+	#endregion
+}
