@@ -5,6 +5,7 @@
 // <summary>The interface for FitGym Tool handler.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Request.FitGymTool;
 using AIAgents.Laboratory.API.Adapters.Models.Response.FitGymTool;
 
@@ -21,4 +22,11 @@ public interface IFitGymToolAIHandler
 	/// <param name="bugSeverityInput">The bug severity input.</param>
 	/// <returns>The bug severity response.</returns>
 	Task<BugSeverityResponseDTO> GetBugSeverityAsync(BugSeverityInputDTO bugSeverityInput);
+
+	/// <summary>
+	/// Gets the orchestrator response asynchronous.
+	/// </summary>
+	/// <param name="userQueryRequest">The user query request.</param>
+	/// <returns>The AI response.</returns>
+	Task<string> GetOrchestratorResponseAsync(UserQueryRequestDTO userQueryRequest);
 }

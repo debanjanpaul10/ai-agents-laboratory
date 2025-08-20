@@ -43,7 +43,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 				throw exception;
 			}
 
-			var response = await aiAgentServices.InvokePluginFunctionAsync<string, TagResponse>(story, ContentPlugins.PluginName, ContentPlugins.GenerateGenreTagForStoryFunction.FunctionName).ConfigureAwait(false);
+			var response = await aiAgentServices.GetAiFunctionResponseAsync<string, TagResponse>(story, ContentPlugins.PluginName, ContentPlugins.GenerateGenreTagForStoryFunction.FunctionName).ConfigureAwait(false);
 			if (response is not null)
 			{
 				response.ModelUsed = commonAiService.GetCurrentModelId();
@@ -81,7 +81,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 				throw exception;
 			}
 
-			var response = await aiAgentServices.InvokePluginFunctionAsync<string, ModerationContentResponse>(story, ContentPlugins.PluginName, ContentPlugins.ContentModerationFunction.FunctionName).ConfigureAwait(false);
+			var response = await aiAgentServices.GetAiFunctionResponseAsync<string, ModerationContentResponse>(story, ContentPlugins.PluginName, ContentPlugins.ContentModerationFunction.FunctionName).ConfigureAwait(false);
 			if (response is not null)
 			{
 				response.ModelUsed = commonAiService.GetCurrentModelId();
@@ -119,7 +119,7 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 				throw exception;
 			}
 
-			var response = await aiAgentServices.InvokePluginFunctionAsync<string, RewriteResponse>(story, RewriteTextPlugin.PluginName, RewriteTextPlugin.RewriteUserStoryFunction.FunctionName).ConfigureAwait(false);
+			var response = await aiAgentServices.GetAiFunctionResponseAsync<string, RewriteResponse>(story, RewriteTextPlugin.PluginName, RewriteTextPlugin.RewriteUserStoryFunction.FunctionName).ConfigureAwait(false);
 			if (response is not null)
 			{
 				response.ModelUsed = commonAiService.GetCurrentModelId();

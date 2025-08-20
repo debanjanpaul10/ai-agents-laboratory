@@ -47,6 +47,11 @@ public static class RouteConstants
 		/// The get bug severity route
 		/// </summary>
 		internal const string GetBugSeverity_Route = "getbugseverity";
+
+		/// <summary>
+		/// The get orchestrator response route
+		/// </summary>
+		internal const string GetChatbotResponse_Route = "getchatbotresponse";
 	}
 
 	/// <summary>
