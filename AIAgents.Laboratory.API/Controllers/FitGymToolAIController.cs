@@ -32,6 +32,10 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 	/// <param name="bugSeverityInput">The bug severity input.</param>
 	/// <returns>The bug severity ai response dto.</returns>
 	[HttpPost(RouteConstants.FitGymToolAi.GetBugSeverity_Route)]
+	[ProducesResponseType(typeof(BugSeverityResponseDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<BugSeverityResponseDTO> GetBugSeverityAsync([FromBody] BugSeverityInputDTO bugSeverityInput)
 	{
 		try
