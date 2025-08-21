@@ -38,15 +38,20 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorFunctionResponseAsync), DateTime.UtcNow));
 
 			var userIntent = await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.DetermineUserIntentFunction.FunctionName).ConfigureAwait(false);
-			if (!string.IsNullOrEmpty(userIntent) && userIntent.Contains("GREETING", StringComparison.CurrentCultureIgnoreCase))
+			if (string.IsNullOrEmpty(userIntent))
 			{
-				return await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.GreetingFunction.FunctionName).ConfigureAwait(false);
-			}
-			else
-			{
-				return "Feature not available yet.";
+				return ExceptionConstants.SomethingWentWrongMessage;
 			}
 
+			var normalizedIntent = userIntent.Trim().ToUpperInvariant();
+			return normalizedIntent switch
+			{
+				IntentConstants.GreetingIntent => await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.GreetingFunction.FunctionName).ConfigureAwait(false),
+				IntentConstants.SQLIntent => await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.NLToSqlSkillFunction.FunctionName).ConfigureAwait(false),
+				IntentConstants.RAGIntent => await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.RAGTextSkillFunction.FunctionName).ConfigureAwait(false),
+				IntentConstants.UnclearIntent => "Cannot determine the user intent",
+				_ => string.Empty
+			};
 		}
 		catch (Exception ex)
 		{
@@ -70,7 +75,6 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 	/// <returns>
 	/// The AI response.
 	/// </returns>
-	/// <exception cref="System.Exception"></exception>
 	public async Task<TResponse> GetAiFunctionResponseAsync<TInput, TResponse>(TInput input, string pluginName, string functionName)
 	{
 		try

@@ -216,43 +216,6 @@ namespace AIAgents.Laboratory.Domain.Helpers
 			public const string PluginName = nameof(ChatBotPlugins);
 
 			/// <summary>
-			/// The greeting function.
-			/// </summary>
-			public static class GreetingFunction
-			{
-				/// <summary>
-				/// The function name
-				/// </summary>
-				public const string FunctionName = nameof(GreetingFunction);
-
-				/// <summary>
-				/// The function description
-				/// </summary>
-				public const string FunctionDescription = "Gets a greeting for the user.";
-
-				/// <summary>
-				/// The function instructions
-				/// </summary>
-				public const string FunctionInstructions = """
-					You are solely responsible for greeting the user based on the type of message user has greeted you with.
-					Return a greeting like "Hello how are you, I am FitGymTool AI Agent" or simply "Good morning" or "Good Evening" based on the user's greeting.
-					Understand the context and only return the greeting and nothing else. Do not give any explanations or anything.
-
-					Input:
-					++++++++++++
-
-					{{$input}}
-
-					+++++++++++
-					""";
-
-				/// <summary>
-				/// The input description
-				/// </summary>
-				public const string InputDescription = "The string containing the user's query or question.";
-			}
-
-			/// <summary>
 			/// The Determine user intent function.
 			/// </summary>
 			public static class DetermineUserIntentFunction
@@ -294,6 +257,43 @@ namespace AIAgents.Laboratory.Domain.Helpers
 				/// The input description
 				/// </summary>
 				public const string InputDescription = "The string containing the user's question from which intent needs to be determined.";
+			}
+
+			/// <summary>
+			/// The greeting function.
+			/// </summary>
+			public static class GreetingFunction
+			{
+				/// <summary>
+				/// The function name
+				/// </summary>
+				public const string FunctionName = nameof(GreetingFunction);
+
+				/// <summary>
+				/// The function description
+				/// </summary>
+				public const string FunctionDescription = "Gets a greeting for the user.";
+
+				/// <summary>
+				/// The function instructions
+				/// </summary>
+				public const string FunctionInstructions = """
+					You are solely responsible for greeting the user based on the type of message user has greeted you with.
+					Return a greeting like "Hello how are you, I am FitGymTool AI Agent" or simply "Good morning" or "Good Evening" based on the user's greeting.
+					Understand the context and only return the greeting and nothing else. Do not give any explanations or anything.
+
+					Input:
+					++++++++++++
+
+					{{$input}}
+
+					+++++++++++
+					""";
+
+				/// <summary>
+				/// The input description
+				/// </summary>
+				public const string InputDescription = "The string containing the user's query or question.";
 			}
 
 			/// <summary>
@@ -363,6 +363,7 @@ namespace AIAgents.Laboratory.Domain.Helpers
 
 						+++++++++++
 					""";
+				
 				/// <summary>
 				/// The input description
 				/// </summary>
@@ -432,6 +433,7 @@ namespace AIAgents.Laboratory.Domain.Helpers
 
 						+++++++++++
 					""";
+				
 				/// <summary>
 				/// The input description
 				/// </summary>

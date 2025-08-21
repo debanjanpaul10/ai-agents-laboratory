@@ -12,8 +12,10 @@ using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Adapters.Models.Response.FitGymTool;
 using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Globalization;
 using static AIAgents.Laboratory.API.Helpers.Constants;
+using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.FitGymToolAIController;
 
 namespace AIAgents.Laboratory.API.Controllers;
 
@@ -36,6 +38,7 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetBugSeverityAction.Summary, Description = GetBugSeverityAction.Description, OperationId = GetBugSeverityAction.OperationId)]
 	public async Task<BugSeverityResponseDTO> GetBugSeverityAsync([FromBody] BugSeverityInputDTO bugSeverityInput)
 	{
 		try
@@ -75,6 +78,7 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetChatbotResponseAction.Summary, Description = GetChatbotResponseAction.Description, OperationId = GetChatbotResponseAction.OperationId)]
 	public async Task<ResponseDTO> GetChatbotResponseAsync([FromBody] UserQueryRequestDTO userQueryRequest)
 	{
 		try
