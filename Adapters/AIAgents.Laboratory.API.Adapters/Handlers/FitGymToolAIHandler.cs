@@ -45,9 +45,10 @@ public class FitGymToolAIHandler(IFitGymToolAIService fitGymToolAIService, IMapp
 	/// <returns>
 	/// The AI response.
 	/// </returns>
-	public async Task<string> GetOrchestratorResponseAsync(UserQueryRequestDTO userQueryRequest)
+	public async Task<AIAgentResponseDTO> GetOrchestratorResponseAsync(UserQueryRequestDTO userQueryRequest)
 	{
 		var domainInput = mapper.Map<UserRequestDomain>(userQueryRequest);
-		return await fitGymToolAIService.GetOrchestratorResponseAsync(domainInput).ConfigureAwait(false);
+		var domainResult = await fitGymToolAIService.GetOrchestratorResponseAsync(domainInput).ConfigureAwait(false);
+		return mapper.Map<AIAgentResponseDTO>(domainResult);
 	}
 }

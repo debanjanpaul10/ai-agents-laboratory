@@ -340,7 +340,14 @@ namespace AIAgents.Laboratory.Domain.Helpers
 							- Handle potential NULL values where necessary
 							- Use efficient join strategies
 							- Apply proper filtering and aggregation logic
-						7. You will only return the SQL query and nothing else - no explanations, comments, or additional text.
+						7. You will only return the SQL query and nothing else - no explanations, comments, or additional text 
+						    - The output will only contain a string that has the SQL query and nothing else. 
+							- DO NOT FORMAT IN MARKDOWN OR ANY OTHER FORMAT, KEEP IT SIMPLE STRING.
+
+					EXAMPLE: 
+						USER_QUERY: Give me the list of active members
+
+						RESPONSE: SELECT MD.MemberId, MD.MemberName, MD.MemberEmail, MD.MemberPhoneNumber, MD.MemberJoinDate, MSM.StatusName AS MembershipStatus FROM dbo.MemberDetails MD INNER JOIN dbo.MembershipStatusMapping MSM ON MD.MembershipStatusId = MSM.Id WHERE MD.IsActive = 1 AND MSM.IsActive = 1 ORDER BY MD.MemberJoinDate DESC
 
 						Input:
 						++++++++++++
@@ -368,6 +375,24 @@ namespace AIAgents.Laboratory.Domain.Helpers
 				/// The input description
 				/// </summary>
 				public const string InputDescription = "The string containing the user's question from which SQL query needs to be created.";
+
+				/// <summary>
+				/// The format SQL response to markdown instructions
+				/// </summary>
+				public const string FormatSQLResponseToMarkdownInstructions = """
+					You are an AI assistant specialized in converting the given SQL data from JSON Format to a clean markdown format. Follow the instructions:
+					- Do not add any justifications or comments, take the input as is and provide a clean output in markdown format that has table format.
+					- Take the json data and properly arrange them in clean tabular format so that it will be dumped to the UI for user to read.
+
+					
+					Input:
+					++++++++++++
+
+					{{$sql_result}}
+
+					+++++++++++
+
+					""";
 			}
 
 			/// <summary>

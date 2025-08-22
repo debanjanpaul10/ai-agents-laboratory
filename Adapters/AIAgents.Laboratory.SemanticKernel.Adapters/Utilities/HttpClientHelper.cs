@@ -8,6 +8,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;

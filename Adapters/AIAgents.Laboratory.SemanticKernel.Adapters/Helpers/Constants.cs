@@ -33,6 +33,11 @@ internal static class Constants
 		internal const string DatabaseSchemaInputConstant = "database_schema";
 
 		/// <summary>
+		/// The SQL query result input constant
+		/// </summary>
+		internal const string SQLQueryResultInputConstant = "sql_result";
+
+		/// <summary>
 		/// The total tokens count constant.
 		/// </summary>
 		internal const string TotalTokenCountConstant = "TotalTokenCount";

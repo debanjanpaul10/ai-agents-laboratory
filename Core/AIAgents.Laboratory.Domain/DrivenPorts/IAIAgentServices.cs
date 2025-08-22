@@ -5,6 +5,8 @@
 // <summary>The Agent Services Interface.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
+
 namespace AIAgents.Laboratory.Domain.DrivenPorts;
 
 /// <summary>
@@ -28,5 +30,5 @@ public interface IAIAgentServices
 	/// </summary>
 	/// <param name="input">The input.</param>
 	/// <returns>The AI response.</returns>
-	Task<string> GetOrchestratorFunctionResponseAsync(string input);
+	Task<AIAgentResponseDomain> GetOrchestratorFunctionResponseAsync(string input);
 }

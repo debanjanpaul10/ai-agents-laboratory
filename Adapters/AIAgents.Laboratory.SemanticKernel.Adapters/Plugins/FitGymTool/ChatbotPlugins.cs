@@ -75,15 +75,13 @@ public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins
 
 		var arguments = new KernelArguments()
 		{
-			{ ArgumentsConstants.KernelArgumentsInputConstant , input },
+			{ ArgumentsConstants.KernelArgumentsInputConstant, input },
 			{ ArgumentsConstants.KnowledgeBaseInputConstant, sqlKnowledgebaseTask.Result },
 			{ ArgumentsConstants.DatabaseSchemaInputConstant, databaseSchemaTask.Result },
 		};
-
-		var result = await kernel.InvokePromptAsync(NLToSqlSkillFunction.FunctionInstructions, arguments).ConfigureAwait(false);
-		return result.GetValue<string>() ?? string.Empty;
+		var aiResponse = await kernel.InvokePromptAsync(NLToSqlSkillFunction.FunctionInstructions, arguments).ConfigureAwait(false);
+		return aiResponse.GetValue<string>() ?? string.Empty;
 	}
-
 	/// <summary>
 	/// The RAG text skill function.
 	/// </summary>

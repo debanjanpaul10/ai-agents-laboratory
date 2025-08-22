@@ -70,7 +70,7 @@ public class FitGymToolAIService(ILogger<FitGymToolAIService> logger, IAIAgentSe
     /// <returns>
     /// The AI response.
     /// </returns>
-    public async Task<string> GetOrchestratorResponseAsync(UserRequestDomain userQueryRequest)
+    public async Task<AIAgentResponseDomain> GetOrchestratorResponseAsync(UserRequestDomain userQueryRequest)
     {
         try
         {

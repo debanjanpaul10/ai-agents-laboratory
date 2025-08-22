@@ -5,12 +5,14 @@
 // <summary>The Agent Services Class.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.UseCases;
+using AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
-using Newtonsoft.Json;
 using System.Globalization;
+using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
@@ -31,20 +33,21 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 	/// <returns>
 	/// The AI response.
 	/// </returns>
-	public async Task<string> GetOrchestratorFunctionResponseAsync(string input)
+	public async Task<AIAgentResponseDomain> GetOrchestratorFunctionResponseAsync(string input)
 	{
 		try
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorFunctionResponseAsync), DateTime.UtcNow));
 
+			var aiAgentResponse = new AIAgentResponseDomain();
 			var userIntent = await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.DetermineUserIntentFunction.FunctionName).ConfigureAwait(false);
 			if (string.IsNullOrEmpty(userIntent))
 			{
-				return ExceptionConstants.SomethingWentWrongMessage;
+				throw new Exception(ExceptionConstants.SomethingWentWrongMessage);
 			}
-
+			
 			var normalizedIntent = userIntent.Trim().ToUpperInvariant();
-			return normalizedIntent switch
+			var aiResponse = normalizedIntent switch
 			{
 				IntentConstants.GreetingIntent => await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.GreetingFunction.FunctionName).ConfigureAwait(false),
 				IntentConstants.SQLIntent => await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.NLToSqlSkillFunction.FunctionName).ConfigureAwait(false),
@@ -52,6 +55,8 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 				IntentConstants.UnclearIntent => "Cannot determine the user intent",
 				_ => string.Empty
 			};
+
+			return aiAgentResponse.PrepareAgentChatbotReponse(userIntent, input, aiResponse);
 		}
 		catch (Exception ex)
 		{
@@ -81,7 +86,7 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
 			var aiResponse = await InvokePluginFunctionAsync(input, pluginName, functionName).ConfigureAwait(false);
-			return JsonConvert.DeserializeObject<TResponse>(aiResponse) ?? throw new Exception();
+			return JsonSerializer.Deserialize<TResponse>(aiResponse) ?? throw new Exception();
 		}
 		catch (Exception ex)
 		{
@@ -111,7 +116,7 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
 			var kernelArguments = new KernelArguments()
 			{
-				[ArgumentsConstants.KernelArgumentsInputConstant] = JsonConvert.SerializeObject(input)
+				[ArgumentsConstants.KernelArgumentsInputConstant] = JsonSerializer.Serialize(input)
 			};
 
 			var responseFromAI = await kernel.InvokeAsync(pluginName, functionName, kernelArguments).ConfigureAwait(false);

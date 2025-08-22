@@ -37,5 +37,6 @@ public class DomainMapperProfile : Profile
 		CreateMap<BugSeverityInputDTO, BugSeverityInput>();
 		CreateMap<BugSeverityResponse, BugSeverityResponseDTO>();
 		CreateMap<UserQueryRequestDTO, UserRequestDomain>();
+		CreateMap<AIAgentResponseDomain, AIAgentResponseDTO>();
 	}
 }
