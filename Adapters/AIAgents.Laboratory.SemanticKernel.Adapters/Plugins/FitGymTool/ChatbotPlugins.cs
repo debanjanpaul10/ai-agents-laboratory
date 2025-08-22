@@ -92,6 +92,7 @@ public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins
 	[Description(RAGTextSkillFunction.FunctionDescription)]
 	public async Task<string> RAGTextSkillFunctionAsync(Kernel kernel, [Description(RAGTextSkillFunction.InputDescription)] string input)
 	{
+		return "I am unable to process this response right now, please try something else";
 		string knowledgeBase = await GetFitGymToolMetadataAsync(ExternalApiRouteConstants.FitGymToolAPI.RagKnowledgeBase_ApiRoute).ConfigureAwait(false);
 		var arguments = new KernelArguments()
 		{
