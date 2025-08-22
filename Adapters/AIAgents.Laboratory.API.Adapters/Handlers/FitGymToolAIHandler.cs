@@ -51,4 +51,16 @@ public class FitGymToolAIHandler(IFitGymToolAIService fitGymToolAIService, IMapp
 		var domainResult = await fitGymToolAIService.GetOrchestratorResponseAsync(domainInput).ConfigureAwait(false);
 		return mapper.Map<AIAgentResponseDTO>(domainResult);
 	}
+
+	/// <summary>
+	/// Gets the SQL query markdown response asynchronous.
+	/// </summary>
+	/// <param name="input">The input.</param>
+	/// <returns>
+	/// The formatted AI response.
+	/// </returns>
+	public async Task<string> GetSQLQueryMarkdownResponseAsync(string input)
+	{
+		return await fitGymToolAIService.GetSQLQueryMarkdownResponseAsync(input).ConfigureAwait(false);
+	}
 }

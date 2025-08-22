@@ -103,4 +103,40 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow));
 		}
 	}
+
+	/// <summary>
+	/// Gets the SQL query markdown response asynchronous.
+	/// </summary>
+	/// <param name="sqlQueryResult">The SQL query.</param>
+	/// <returns>The AI formatted response.</returns>
+	[HttpPost(RouteConstants.FitGymToolAi.GetSQLQueryMarkdownResponse_Route)]
+	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetSQLQueryMarkdownResponseAction.Summary, Description = GetSQLQueryMarkdownResponseAction.Description, OperationId = GetSQLQueryMarkdownResponseAction.OperationId)]
+	public async Task<ResponseDTO> GetSQLQueryMarkdownResponseAsync([FromBody]SqlQueryResultDTO sqlQueryResult)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow));
+
+			var result = await fitGymToolAIHandler.GetSQLQueryMarkdownResponseAsync(sqlQueryResult.JsonQuery).ConfigureAwait(false);
+			if (result is not null)
+			{
+				return HandleSuccessRequestResponse(result);
+			}
+
+			return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow));
+		}
+	}
 }

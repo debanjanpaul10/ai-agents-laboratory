@@ -52,6 +52,11 @@ public static class RouteConstants
 		/// The get orchestrator response route
 		/// </summary>
 		internal const string GetChatbotResponse_Route = "getchatbotresponse";
+
+		/// <summary>
+		/// The get SQL query markdown response route
+		/// </summary>
+		internal const string GetSQLQueryMarkdownResponse_Route = "getsqlquerymarkdownresponse";
 	}
 
 	/// <summary>

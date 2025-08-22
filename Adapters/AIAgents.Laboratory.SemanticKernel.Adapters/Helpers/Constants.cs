@@ -38,6 +38,11 @@ internal static class Constants
 		internal const string SQLQueryResultInputConstant = "sql_result";
 
 		/// <summary>
+		/// The SQL json input constant
+		/// </summary>
+		internal const string SQLJsonInputConstant = "sql_json";
+
+		/// <summary>
 		/// The total tokens count constant.
 		/// </summary>
 		internal const string TotalTokenCountConstant = "TotalTokenCount";

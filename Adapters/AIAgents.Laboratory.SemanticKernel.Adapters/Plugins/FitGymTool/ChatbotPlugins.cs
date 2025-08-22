@@ -103,6 +103,25 @@ public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins
 		return result.GetValue<string>() ?? string.Empty;
 	}
 
+	/// <summary>
+	/// SQLs the query markdown response function asynchronous.
+	/// </summary>
+	/// <param name="kernel">The kernel.</param>
+	/// <param name="input">The input.</param>
+	/// <returns>The AI response.</returns>
+	[KernelFunction(SQLQueryMarkdownResponseFunction.FunctionName)]
+	[Description(SQLQueryMarkdownResponseFunction.FunctionDescription)]
+	public static async Task<string> SQLQueryMarkdownResponseFunctionAsync(Kernel kernel, [Description(SQLQueryMarkdownResponseFunction.InputDescription)] string input)
+	{
+		var arguments = new KernelArguments()
+		{
+			{ ArgumentsConstants.SQLJsonInputConstant, input },
+		};
+
+		var result = await kernel.InvokePromptAsync(SQLQueryMarkdownResponseFunction.FunctionInstructions, arguments).ConfigureAwait(false);
+		return result.GetValue<string>() ?? string.Empty;
+	}
+
 	#region PRIVATE METHODS
 
 	/// <summary>

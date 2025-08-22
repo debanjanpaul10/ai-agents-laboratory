@@ -11,6 +11,7 @@ using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
+using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers;
 
@@ -25,73 +26,101 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.IFitGymToolAIService" />
 public class FitGymToolAIService(ILogger<FitGymToolAIService> logger, IAIAgentServices aiAgentServices, ICommonAiService commonAiService) : IFitGymToolAIService
 {
-    /// <summary>
-    /// Gets the bug severity asynchronous.
-    /// </summary>
-    /// <param name="bugSeverityInput">The bug severity input.</param>
-    /// <returns>
-    /// The bug severity response.
-    /// </returns>
-    public async Task<BugSeverityResponse> GetBugSeverityAsync(BugSeverityInput bugSeverityInput)
-    {
-        try
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetBugSeverityAsync), DateTime.UtcNow, string.Empty));
-            if (bugSeverityInput is null)
-            {
-                var exception = new Exception(ExceptionConstants.InputParametersCannotBeEmptyMessage);
-                logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetBugSeverityAsync), DateTime.UtcNow, exception.Message));
-                throw exception;
-            }
+	/// <summary>
+	/// Gets the bug severity asynchronous.
+	/// </summary>
+	/// <param name="bugSeverityInput">The bug severity input.</param>
+	/// <returns>
+	/// The bug severity response.
+	/// </returns>
+	public async Task<BugSeverityResponse> GetBugSeverityAsync(BugSeverityInput bugSeverityInput)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetBugSeverityAsync), DateTime.UtcNow, string.Empty));
+			if (bugSeverityInput is null)
+			{
+				var exception = new Exception(ExceptionConstants.InputParametersCannotBeEmptyMessage);
+				logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetBugSeverityAsync), DateTime.UtcNow, exception.Message));
+				throw exception;
+			}
 
-            var response = await aiAgentServices.GetAiFunctionResponseAsync<BugSeverityInput, BugSeverityResponse>(bugSeverityInput, UtilityPlugins.PluginName, UtilityPlugins.DetermineBugSeverityFunction.FunctionName).ConfigureAwait(false);
-            if (response is not null)
-            {
-                response.ModelUsed = commonAiService.GetCurrentModelId();
-            }
+			var response = await aiAgentServices.GetAiFunctionResponseAsync(bugSeverityInput, UtilityPlugins.PluginName, UtilityPlugins.DetermineBugSeverityFunction.FunctionName).ConfigureAwait(false);
+			var bugSeverityResponse = JsonSerializer.Deserialize<BugSeverityResponse>(response);
+			if (bugSeverityResponse is not null)
+			{
+				bugSeverityResponse.ModelUsed = commonAiService.GetCurrentModelId();
+			}
 
-            return response ?? new BugSeverityResponse { ModelUsed = commonAiService.GetCurrentModelId() };
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetBugSeverityAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetBugSeverityAsync), DateTime.UtcNow, string.Empty));
-        }
-    }
+			return bugSeverityResponse ?? new BugSeverityResponse { ModelUsed = commonAiService.GetCurrentModelId() };
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetBugSeverityAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetBugSeverityAsync), DateTime.UtcNow, string.Empty));
+		}
+	}
 
-    /// <summary>
-    /// Gets the orchestrator response asynchronous.
-    /// </summary>
-    /// <param name="userQueryRequest">The user query request.</param>
-    /// <returns>
-    /// The AI response.
-    /// </returns>
-    public async Task<AIAgentResponseDomain> GetOrchestratorResponseAsync(UserRequestDomain userQueryRequest)
-    {
-        try
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorResponseAsync), DateTime.UtcNow, string.Empty));
-            if (userQueryRequest is null || string.IsNullOrEmpty(userQueryRequest.UserQuery))
-            {
-                var exception = new Exception(ExceptionConstants.InputParametersCannotBeEmptyMessage);
-                logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetOrchestratorResponseAsync), DateTime.UtcNow, exception.Message));
-                throw exception;
-            }
+	/// <summary>
+	/// Gets the orchestrator response asynchronous.
+	/// </summary>
+	/// <param name="userQueryRequest">The user query request.</param>
+	/// <returns>
+	/// The AI response.
+	/// </returns>
+	public async Task<AIAgentResponseDomain> GetOrchestratorResponseAsync(UserRequestDomain userQueryRequest)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorResponseAsync), DateTime.UtcNow, string.Empty));
+			if (userQueryRequest is null || string.IsNullOrEmpty(userQueryRequest.UserQuery))
+			{
+				var exception = new Exception(ExceptionConstants.InputParametersCannotBeEmptyMessage);
+				logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetOrchestratorResponseAsync), DateTime.UtcNow, exception.Message));
+				throw exception;
+			}
 
-            return await aiAgentServices.GetOrchestratorFunctionResponseAsync(userQueryRequest.UserQuery).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetOrchestratorResponseAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetOrchestratorResponseAsync), DateTime.UtcNow, string.Empty));
-        }
-    }
+			return await aiAgentServices.GetOrchestratorFunctionResponseAsync(userQueryRequest.UserQuery).ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetOrchestratorResponseAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetOrchestratorResponseAsync), DateTime.UtcNow, string.Empty));
+		}
+	}
+
+	/// <summary>
+	/// Gets the SQL query markdown response asynchronous.
+	/// </summary>
+	/// <param name="input">The input.</param>
+	/// <returns>
+	/// The formatted AI response.
+	/// </returns>
+	public async Task<string> GetSQLQueryMarkdownResponseAsync(string input)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow, string.Empty));
+			ArgumentException.ThrowIfNullOrWhiteSpace(input);
+
+			return await aiAgentServices.GetAiFunctionResponseAsync<string>(input, ChatBotPlugins.PluginName, ChatBotPlugins.SQLQueryMarkdownResponseFunction.FunctionName).ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow, string.Empty));
+		}
+	}
 }

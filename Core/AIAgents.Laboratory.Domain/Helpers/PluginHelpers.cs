@@ -5,6 +5,8 @@
 // <summary>Plugin helpers.</summary>
 // *********************************************************************************
 
+using Microsoft.VisualBasic;
+
 namespace AIAgents.Laboratory.Domain.Helpers
 {
 	/// <summary>
@@ -327,7 +329,6 @@ namespace AIAgents.Laboratory.Domain.Helpers
 							- What conditions or filters need to be applied (WHERE clause)
 							- How the data should be grouped or aggregated (GROUP BY, HAVING clauses)
 							- How the results should be ordered (ORDER BY clause)
-							- If any limits should be applied (LIMIT clause)
 						4. Use the knowledge base to identify similar query patterns and adapt them to the current request, ensuring you follow established conventions and best practices.
 						5. Reference the database schema to:
 							- Verify table names and column names are correct and exist
@@ -340,9 +341,10 @@ namespace AIAgents.Laboratory.Domain.Helpers
 							- Handle potential NULL values where necessary
 							- Use efficient join strategies
 							- Apply proper filtering and aggregation logic
-						7. You will only return the SQL query and nothing else - no explanations, comments, or additional text 
-						    - The output will only contain a string that has the SQL query and nothing else. 
-							- DO NOT FORMAT IN MARKDOWN OR ANY OTHER FORMAT, KEEP IT SIMPLE STRING.
+						7. The response will be in the format:
+							- Only return a single string containing the SQL query and nothing else.
+							- Do not format the response or add any interpolations.
+							- Do not add any keywords like sql or anything, this will break the code.
 
 					EXAMPLE: 
 						USER_QUERY: Give me the list of active members
@@ -463,6 +465,46 @@ namespace AIAgents.Laboratory.Domain.Helpers
 				/// The input description
 				/// </summary>
 				public const string InputDescription = "The string containing user's question or query from which RAG text needs to be gotten.";
+			}
+
+			/// <summary>
+			/// The SQL query markdown response function.
+			/// </summary>
+			public static class SQLQueryMarkdownResponseFunction
+			{
+				/// <summary>
+				/// The function name
+				/// </summary>
+				public const string FunctionName = nameof(SQLQueryMarkdownResponseFunction);
+
+				/// <summary>
+				/// The function description
+				/// </summary>
+				public const string FunctionDescription = "Takes the json input of database and turns into a table readable format for user in markdown format";
+
+				/// <summary>
+				/// The function instructions
+				/// </summary>
+				public const string FunctionInstructions = """
+					You are an AI assistant whose sole responsibility is to show the JSON in a presentable format back to the user. Strictly ahere to the following rules:
+						- The input you will receive will contain unstructured JSON data which will contain SQL response.
+						- You will be creating a markdown format from this JSON that will be presented back to the UI for user.
+						- The JSON will contain the same headers in repeating format, you will decide on the column names from that and display the results in a tabular format.
+						- You will only return the table format markdown response and nothing else.
+					
+					Input:
+					++++++++++++
+
+					{{$sql_json}}
+
+					+++++++++++	
+
+					""";
+
+				/// <summary>
+				/// The input description
+				/// </summary>
+				public const string InputDescription = "The json containing the data that will be formatted.";
 			}
 		}
 	}

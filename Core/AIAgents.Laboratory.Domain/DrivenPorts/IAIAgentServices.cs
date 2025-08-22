@@ -18,12 +18,11 @@ public interface IAIAgentServices
 	/// Gets the ai function response asynchronous.
 	/// </summary>
 	/// <typeparam name="TInput">The type of the input.</typeparam>
-	/// <typeparam name="TResponse">The type of the response.</typeparam>
 	/// <param name="input">The input.</param>
 	/// <param name="pluginName">Name of the plugin.</param>
 	/// <param name="functionName">Name of the function.</param>
 	/// <returns>The AI response.</returns>
-	Task<TResponse> GetAiFunctionResponseAsync<TInput, TResponse>(TInput input, string pluginName, string functionName);
+	Task<string> GetAiFunctionResponseAsync<TInput>(TInput input, string pluginName, string functionName);
 
 	/// <summary>
 	/// Gets the orchestrator function response asynchronous.

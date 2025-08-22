@@ -73,20 +73,18 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 	/// Gets the ai function response asynchronous.
 	/// </summary>
 	/// <typeparam name="TInput">The type of the input.</typeparam>
-	/// <typeparam name="TResponse">The type of the response.</typeparam>
 	/// <param name="input">The input.</param>
 	/// <param name="pluginName">Name of the plugin.</param>
 	/// <param name="functionName">Name of the function.</param>
 	/// <returns>
 	/// The AI response.
 	/// </returns>
-	public async Task<TResponse> GetAiFunctionResponseAsync<TInput, TResponse>(TInput input, string pluginName, string functionName)
+	public async Task<string> GetAiFunctionResponseAsync<TInput>(TInput input, string pluginName, string functionName)
 	{
 		try
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
-			var aiResponse = await InvokePluginFunctionAsync(input, pluginName, functionName).ConfigureAwait(false);
-			return JsonSerializer.Deserialize<TResponse>(aiResponse) ?? throw new Exception();
+			return await InvokePluginFunctionAsync(input, pluginName, functionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{

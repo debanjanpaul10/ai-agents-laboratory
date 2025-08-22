@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using System.Globalization;
 using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
+using System.Text.Json;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
 
@@ -43,13 +44,14 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 				throw exception;
 			}
 
-			var response = await aiAgentServices.GetAiFunctionResponseAsync<string, TagResponse>(story, ContentPlugins.PluginName, ContentPlugins.GenerateGenreTagForStoryFunction.FunctionName).ConfigureAwait(false);
-			if (response is not null)
+			var response = await aiAgentServices.GetAiFunctionResponseAsync(story, ContentPlugins.PluginName, ContentPlugins.GenerateGenreTagForStoryFunction.FunctionName).ConfigureAwait(false);
+			var tagResponse = JsonSerializer.Deserialize<TagResponse>(response);
+			if (tagResponse is not null)
 			{
-				response.ModelUsed = commonAiService.GetCurrentModelId();
+				tagResponse.ModelUsed = commonAiService.GetCurrentModelId();
 			}
 
-			return response ?? new TagResponse { ModelUsed = commonAiService.GetCurrentModelId() };
+			return tagResponse ?? new TagResponse { ModelUsed = commonAiService.GetCurrentModelId() };
 		}
 		catch (Exception ex)
 		{
@@ -81,13 +83,14 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 				throw exception;
 			}
 
-			var response = await aiAgentServices.GetAiFunctionResponseAsync<string, ModerationContentResponse>(story, ContentPlugins.PluginName, ContentPlugins.ContentModerationFunction.FunctionName).ConfigureAwait(false);
-			if (response is not null)
+			var response = await aiAgentServices.GetAiFunctionResponseAsync(story, ContentPlugins.PluginName, ContentPlugins.ContentModerationFunction.FunctionName).ConfigureAwait(false);
+			var moderationResponse = JsonSerializer.Deserialize<ModerationContentResponse>(response);
+			if (moderationResponse is not null)
 			{
-				response.ModelUsed = commonAiService.GetCurrentModelId();
+				moderationResponse.ModelUsed = commonAiService.GetCurrentModelId();
 			}
 
-			return response ?? new ModerationContentResponse { ModelUsed = commonAiService.GetCurrentModelId() };
+			return moderationResponse ?? new ModerationContentResponse { ModelUsed = commonAiService.GetCurrentModelId() };
 		}
 		catch (Exception ex)
 		{
@@ -119,13 +122,14 @@ public class BulletinAIServices(ILogger<BulletinAIServices> logger, IAIAgentServ
 				throw exception;
 			}
 
-			var response = await aiAgentServices.GetAiFunctionResponseAsync<string, RewriteResponse>(story, RewriteTextPlugin.PluginName, RewriteTextPlugin.RewriteUserStoryFunction.FunctionName).ConfigureAwait(false);
-			if (response is not null)
+			var response = await aiAgentServices.GetAiFunctionResponseAsync(story, RewriteTextPlugin.PluginName, RewriteTextPlugin.RewriteUserStoryFunction.FunctionName).ConfigureAwait(false);
+			var rewriteResponse = JsonSerializer.Deserialize<RewriteResponse>(response);
+			if (rewriteResponse is not null)
 			{
-				response.ModelUsed = commonAiService.GetCurrentModelId();
+				rewriteResponse.ModelUsed = commonAiService.GetCurrentModelId();
 			}
 
-			return response ?? new RewriteResponse { ModelUsed = commonAiService.GetCurrentModelId() };
+			return rewriteResponse ?? new RewriteResponse { ModelUsed = commonAiService.GetCurrentModelId() };
 		}
 		catch (Exception ex)
 		{
