@@ -28,5 +28,12 @@ public interface IFitGymToolAIHandler
 	/// </summary>
 	/// <param name="userQueryRequest">The user query request.</param>
 	/// <returns>The AI response.</returns>
-	Task<string> GetOrchestratorResponseAsync(UserQueryRequestDTO userQueryRequest);
+	Task<AIAgentResponseDTO> GetOrchestratorResponseAsync(UserQueryRequestDTO userQueryRequest);
+
+	/// <summary>
+	/// Gets the SQL query markdown response asynchronous.
+	/// </summary>
+	/// <param name="input">The input.</param>
+	/// <returns>The formatted AI response.</returns>
+	Task<string> GetSQLQueryMarkdownResponseAsync(string input);
 }

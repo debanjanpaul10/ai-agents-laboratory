@@ -1,11 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// *********************************************************************************
+//	<copyright file="BaseResponseDTO.cs" company="Personal">
+//		Copyright (c) 2025 Personal
+//	</copyright>
+// <summary>The base response dto.</summary>
+// *********************************************************************************
 
 namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 
+/// <summary>
+/// The base response dto.
+/// </summary>
 public class BaseResponseDTO
 {
 	/// <summary>

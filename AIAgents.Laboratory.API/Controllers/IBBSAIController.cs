@@ -10,8 +10,10 @@ using AIAgents.Laboratory.API.Adapters.Models.Request.IBBS;
 using AIAgents.Laboratory.API.Adapters.Models.Response.IBBS;
 using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Globalization;
 using static AIAgents.Laboratory.API.Helpers.Constants;
+using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.IBBSAIController;
 
 namespace AIAgents.Laboratory.API.Controllers;
 
@@ -32,6 +34,11 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAiHandl
 	/// <returns>The AI rewritten story.</returns>
 	/// <exception cref="Exception"></exception>
 	[HttpPost(RouteConstants.IBBSAi.RewriteText_Route)]
+	[ProducesResponseType(typeof(RewriteResponseDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = RewriteTextAction.Summary, Description = RewriteTextAction.Description, OperationId = RewriteTextAction.OperationId)]
 	public async Task<RewriteResponseDTO> RewriteTextAsync(UserStoryRequestDTO requestDto)
 	{
 		try
@@ -67,6 +74,11 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAiHandl
 	/// <param name="requestDto">The request dto.</param>
 	/// <returns>The tag response dto.</returns>
 	[HttpPost(RouteConstants.IBBSAi.GenerateTag_Route)]
+	[ProducesResponseType(typeof(TagResponseDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GenerateTagForStoryAction.Summary, Description = GenerateTagForStoryAction.Description, OperationId = GenerateTagForStoryAction.OperationId)]
 	public async Task<TagResponseDTO> GenerateTagForStoryAsync(UserStoryRequestDTO requestDto)
 	{
 		try
@@ -102,6 +114,11 @@ public class IBBSAIController(ILogger<IBBSAIController> logger, IBulletinAiHandl
 	/// <param name="requestDto">The request dto.</param>
 	/// <returns>The moderation content response.</returns>
 	[HttpPost(RouteConstants.IBBSAi.ModerateContent_Route)]
+	[ProducesResponseType(typeof(ModerationContentResponseDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = ModerateContentDataAction.Summary, Description = ModerateContentDataAction.Description, OperationId = ModerateContentDataAction.OperationId)]
 	public async Task<ModerationContentResponseDTO> ModerateContentDataAsync(UserStoryRequestDTO requestDto)
 	{
 		try

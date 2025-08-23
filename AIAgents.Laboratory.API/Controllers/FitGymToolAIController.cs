@@ -12,8 +12,10 @@ using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Adapters.Models.Response.FitGymTool;
 using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Globalization;
 using static AIAgents.Laboratory.API.Helpers.Constants;
+using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.FitGymToolAIController;
 
 namespace AIAgents.Laboratory.API.Controllers;
 
@@ -36,6 +38,7 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetBugSeverityAction.Summary, Description = GetBugSeverityAction.Description, OperationId = GetBugSeverityAction.OperationId)]
 	public async Task<BugSeverityResponseDTO> GetBugSeverityAsync([FromBody] BugSeverityInputDTO bugSeverityInput)
 	{
 		try
@@ -71,10 +74,11 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 	/// <param name="userQueryRequest">The user query request.</param>
 	/// <returns>The ai response.</returns>
 	[HttpPost(RouteConstants.FitGymToolAi.GetChatbotResponse_Route)]
-	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(AIAgentResponseDTO), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetChatbotResponseAction.Summary, Description = GetChatbotResponseAction.Description, OperationId = GetChatbotResponseAction.OperationId)]
 	public async Task<ResponseDTO> GetChatbotResponseAsync([FromBody] UserQueryRequestDTO userQueryRequest)
 	{
 		try
@@ -82,7 +86,7 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetChatbotResponseAsync), DateTime.UtcNow));
 
 			var result = await fitGymToolAIHandler.GetOrchestratorResponseAsync(userQueryRequest).ConfigureAwait(false);
-			if (!string.IsNullOrEmpty(result))
+			if (result is not null && !string.IsNullOrEmpty(result.AIResponseData))
 			{
 				return HandleSuccessRequestResponse(result);
 			}
@@ -97,6 +101,42 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 		finally
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow));
+		}
+	}
+
+	/// <summary>
+	/// Gets the SQL query markdown response asynchronous.
+	/// </summary>
+	/// <param name="sqlQueryResult">The SQL query.</param>
+	/// <returns>The AI formatted response.</returns>
+	[HttpPost(RouteConstants.FitGymToolAi.GetSQLQueryMarkdownResponse_Route)]
+	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetSQLQueryMarkdownResponseAction.Summary, Description = GetSQLQueryMarkdownResponseAction.Description, OperationId = GetSQLQueryMarkdownResponseAction.OperationId)]
+	public async Task<ResponseDTO> GetSQLQueryMarkdownResponseAsync([FromBody]SqlQueryResultDTO sqlQueryResult)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow));
+
+			var result = await fitGymToolAIHandler.GetSQLQueryMarkdownResponseAsync(sqlQueryResult.JsonQuery).ConfigureAwait(false);
+			if (!string.IsNullOrEmpty(result))
+			{
+				return HandleSuccessRequestResponse(result);
+			}
+
+			return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow));
 		}
 	}
 }

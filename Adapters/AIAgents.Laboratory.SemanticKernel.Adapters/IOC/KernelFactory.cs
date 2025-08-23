@@ -23,57 +23,57 @@ public static class KernelFactory
 {
 #pragma warning disable SKEXP0001
 #pragma warning disable SKEXP0050
-	/// <summary>
-	/// Creates memory.
-	/// </summary>
-	public static Func<IServiceProvider, ISemanticTextMemory> CreateMemory()
-	{
-		return provider =>
-		{
-			var memoryBuilder = new MemoryBuilder();
-			memoryBuilder.WithMemoryStore(new VolatileMemoryStore());
+    /// <summary>
+    /// Creates memory.
+    /// </summary>
+    public static Func<IServiceProvider, ISemanticTextMemory> CreateMemory()
+    {
+        return provider =>
+        {
+            var memoryBuilder = new MemoryBuilder();
+            memoryBuilder.WithMemoryStore(new VolatileMemoryStore());
 
-			return memoryBuilder.Build();
-		};
-	}
+            return memoryBuilder.Build();
+        };
+    }
 
-	/// <summary>
-	/// Creates the kernel.
-	/// </summary>
-	/// <param name="configuration">The configuration.</param>
-	public static Func<IServiceProvider, Kernel> CreateKernel(IConfiguration configuration)
-	{
-		var isProModelEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsProModelEnabledFlag], out bool parsedValue) && parsedValue;
-		var geminiAiModel = isProModelEnabled ? AzureAppConfigurationConstants.GeminiProModel : AzureAppConfigurationConstants.GeminiFlashModel;
+    /// <summary>
+    /// Creates the kernel.
+    /// </summary>
+    /// <param name="configuration">The configuration.</param>
+    public static Func<IServiceProvider, Kernel> CreateKernel(IConfiguration configuration)
+    {
+        var isProModelEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsProModelEnabledFlag], out bool parsedValue) && parsedValue;
+        var geminiAiModel = isProModelEnabled ? AzureAppConfigurationConstants.GeminiProModel : AzureAppConfigurationConstants.GeminiFlashModel;
 
-		return provider =>
-		{
-			var modelId = configuration[geminiAiModel];
-			var apiKey = configuration[AzureAppConfigurationConstants.GeminiAPIKeyConstant];
-			if (string.IsNullOrEmpty(modelId) || string.IsNullOrEmpty(apiKey))
-			{
-				throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
-			}
+        return provider =>
+        {
+            var modelId = configuration[geminiAiModel];
+            var apiKey = configuration[AzureAppConfigurationConstants.GeminiAPIKeyConstant];
+            if (string.IsNullOrEmpty(modelId) || string.IsNullOrEmpty(apiKey))
+            {
+                throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
+            }
 
-			var kernelBuilder = Kernel.CreateBuilder();
+            var kernelBuilder = Kernel.CreateBuilder();
 
-			if (!string.IsNullOrEmpty(modelId) && !string.IsNullOrEmpty(apiKey))
-			{
+            if (!string.IsNullOrEmpty(modelId) && !string.IsNullOrEmpty(apiKey))
+            {
 
-				kernelBuilder.AddGoogleAIGeminiChatCompletion(modelId, apiKey);
-				kernelBuilder.AddGoogleAIEmbeddingGenerator(modelId, apiKey);
-				kernelBuilder.Services.AddSingleton(CreateMemory());
-			}
-			var kernel = kernelBuilder.Build();
+                kernelBuilder.AddGoogleAIGeminiChatCompletion(modelId, apiKey);
+                kernelBuilder.AddGoogleAIEmbeddingGenerator(modelId, apiKey);
+                kernelBuilder.Services.AddSingleton(CreateMemory());
+            }
+            var kernel = kernelBuilder.Build();
 
-			// Import Plugins
-			kernel.Plugins.AddFromType<RewriteTextPlugin>(PluginHelpers.RewriteTextPlugin.PluginName);
-			kernel.Plugins.AddFromType<ContentPlugins>(PluginHelpers.ContentPlugins.PluginName);
-			kernel.Plugins.AddFromType<UtilityPlugins>(PluginHelpers.UtilityPlugins.PluginName);
-			kernel.Plugins.AddFromType<ChatbotPlugins>(PluginHelpers.ChatBotPlugins.PluginName);
+            // Import Plugins
+            kernel.Plugins.AddFromType<RewriteTextPlugin>(PluginHelpers.RewriteTextPlugin.PluginName);
+            kernel.Plugins.AddFromType<ContentPlugins>(PluginHelpers.ContentPlugins.PluginName);
+            kernel.Plugins.AddFromType<UtilityPlugins>(PluginHelpers.UtilityPlugins.PluginName);
+            kernel.Plugins.AddFromType<ChatbotPlugins>(PluginHelpers.ChatBotPlugins.PluginName, provider);
 
-			return kernel;
-		};
-	}
+            return kernel;
+        };
+    }
 
 }

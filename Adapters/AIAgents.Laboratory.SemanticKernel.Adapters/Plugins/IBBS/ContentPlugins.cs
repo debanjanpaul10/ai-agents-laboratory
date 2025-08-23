@@ -8,8 +8,8 @@
 using AIAgents.Laboratory.Domain.DomainEntities.IBBS;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 using Microsoft.SemanticKernel;
-using Newtonsoft.Json;
 using System.ComponentModel;
+using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers.ContentPlugins;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.IBBS;
@@ -37,7 +37,7 @@ public class ContentPlugins
 		var result = await kernel.InvokePromptAsync(GenerateGenreTagForStoryFunction.FunctionInstructions, arguments).ConfigureAwait(false);
 		var aiMetadata = result.Metadata;
 
-		return JsonConvert.SerializeObject(new TagResponse
+		return JsonSerializer.Serialize(new TagResponse
 		{
 			UserStoryTag = result.GetValue<string>() ?? string.Empty,
 			TotalTokensConsumed = Convert.ToInt32(aiMetadata?[Constants.ArgumentsConstants.TotalTokenCountConstant] ?? 0),
@@ -64,7 +64,7 @@ public class ContentPlugins
 		var result = await kernel.InvokePromptAsync(ContentModerationFunction.FunctionInstructions, arguments).ConfigureAwait(false);
 		var aiMetadata = result.Metadata;
 
-		return JsonConvert.SerializeObject(new ModerationContentResponse
+		return JsonSerializer.Serialize(new ModerationContentResponse
 		{
 			ContentRating = result.GetValue<string>() ?? string.Empty,
 			TotalTokensConsumed = Convert.ToInt32(aiMetadata?[Constants.ArgumentsConstants.TotalTokenCountConstant] ?? 0),

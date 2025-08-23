@@ -18,6 +18,11 @@ public static class RouteConstants
 	public const string AiBase_RoutePrefix = "aiagentsapi";
 
 	/// <summary>
+	/// The agent status hub route
+	/// </summary>
+	public const string AgentStatusHub_Route = "/hubs/agent-status";
+
+	/// <summary>
 	/// The IBBS AI Routes.
 	/// </summary>
 	public static class IBBSAi
@@ -52,6 +57,11 @@ public static class RouteConstants
 		/// The get orchestrator response route
 		/// </summary>
 		internal const string GetChatbotResponse_Route = "getchatbotresponse";
+
+		/// <summary>
+		/// The get SQL query markdown response route
+		/// </summary>
+		internal const string GetSQLQueryMarkdownResponse_Route = "getsqlquerymarkdownresponse";
 	}
 
 	/// <summary>

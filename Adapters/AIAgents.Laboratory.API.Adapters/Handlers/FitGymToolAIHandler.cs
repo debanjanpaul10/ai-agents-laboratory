@@ -45,9 +45,22 @@ public class FitGymToolAIHandler(IFitGymToolAIService fitGymToolAIService, IMapp
 	/// <returns>
 	/// The AI response.
 	/// </returns>
-	public async Task<string> GetOrchestratorResponseAsync(UserQueryRequestDTO userQueryRequest)
+	public async Task<AIAgentResponseDTO> GetOrchestratorResponseAsync(UserQueryRequestDTO userQueryRequest)
 	{
 		var domainInput = mapper.Map<UserRequestDomain>(userQueryRequest);
-		return await fitGymToolAIService.GetOrchestratorResponseAsync(domainInput).ConfigureAwait(false);
+		var domainResult = await fitGymToolAIService.GetOrchestratorResponseAsync(domainInput).ConfigureAwait(false);
+		return mapper.Map<AIAgentResponseDTO>(domainResult);
+	}
+
+	/// <summary>
+	/// Gets the SQL query markdown response asynchronous.
+	/// </summary>
+	/// <param name="input">The input.</param>
+	/// <returns>
+	/// The formatted AI response.
+	/// </returns>
+	public async Task<string> GetSQLQueryMarkdownResponseAsync(string input)
+	{
+		return await fitGymToolAIService.GetSQLQueryMarkdownResponseAsync(input).ConfigureAwait(false);
 	}
 }

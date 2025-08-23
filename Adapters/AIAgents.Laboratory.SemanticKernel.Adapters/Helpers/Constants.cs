@@ -23,6 +23,26 @@ internal static class Constants
 		internal const string KernelArgumentsInputConstant = "input";
 
 		/// <summary>
+		/// The knowledge base input constant
+		/// </summary>
+		internal const string KnowledgeBaseInputConstant = "knowledge_base";
+
+		/// <summary>
+		/// The database schema input constant
+		/// </summary>
+		internal const string DatabaseSchemaInputConstant = "database_schema";
+
+		/// <summary>
+		/// The SQL query result input constant
+		/// </summary>
+		internal const string SQLQueryResultInputConstant = "sql_result";
+
+		/// <summary>
+		/// The SQL json input constant
+		/// </summary>
+		internal const string SQLJsonInputConstant = "sql_json";
+
+		/// <summary>
 		/// The total tokens count constant.
 		/// </summary>
 		internal const string TotalTokenCountConstant = "TotalTokenCount";
@@ -94,6 +114,125 @@ internal static class Constants
 		/// The ai api key missing message.
 		/// </summary>
 		public const string AiAPIKeyMissingMessage = "The AI Api Key is missing in configuration.";
+
+		/// <summary>
+		/// Something went wrong message
+		/// </summary>
+		internal const string SomethingWentWrongMessage = "Something went wrong while processing the request!";
+
+		/// <summary>
+		/// The default ai exception message
+		/// </summary>
+		internal const string DefaultAIExceptionMessage = "I am currently unable to access the required information to process this request. Please try again later!";
+	}
+
+	/// <summary>
+	/// The external api route constants class.
+	/// </summary>
+	internal static class ExternalApiRouteConstants
+	{
+		/// <summary>
+		/// The Fit Gym Tool API constants class.
+		/// </summary>
+		internal static class FitGymToolAPI
+		{
+			/// <summary>
+			/// The SQL knowledge base SQL API route
+			/// </summary>
+			internal const string SqlKnowledgeBaseSql_ApiRoute = "aiservices/getsqlknowledgebasejson";
+
+			/// <summary>
+			/// The database schema SQL API route
+			/// </summary>
+			internal const string DatabaseSchemaSql_ApiRoute = "aiservices/getdatabaseschemajson";
+
+			/// <summary>
+			/// The rag knowledge base API route
+			/// </summary>
+			internal const string RagKnowledgeBase_ApiRoute = "aiservices/getragknowledgebasejson";
+		}
+	}
+
+	/// <summary>
+	/// The intent constants class.
+	/// </summary>
+	internal static class IntentConstants
+	{
+		/// <summary>
+		/// The greeting intent
+		/// </summary>
+		internal const string GreetingIntent = "GREETING";
+
+		/// <summary>
+		/// The SQL intent
+		/// </summary>
+		internal const string SQLIntent = "SQL";
+
+		/// <summary>
+		/// The rag intent
+		/// </summary>
+		internal const string RAGIntent = "RAG";
+
+		/// <summary>
+		/// The unclear intent
+		/// </summary>
+		internal const string UnclearIntent = "UNCLEAR";
+	}
+
+	/// <summary>
+	/// The Configuration Constants class.
+	/// </summary>
+	internal static class ConfigurationConstants
+	{
+		/// <summary>
+		/// The tenant identifier constant
+		/// </summary>
+		internal const string FGToolTenantIdConstant = "FitGymTool:TenantId";
+
+		/// <summary>
+		/// The fg tool client identifier constant
+		/// </summary>
+		internal const string FGToolClientIdConstant = "FitGymTool:ClientId";
+
+		/// <summary>
+		/// The fg tool client secret constant
+		/// </summary>
+		internal const string FGToolClientSecretConstant = "FitGymTool:ClientSecret";
+
+		/// <summary>
+		/// The bearer constant
+		/// </summary>
+		internal const string BearerConstant = "Bearer";
+
+		/// <summary>
+		/// The application json constant
+		/// </summary>
+		internal const string ApplicationJsonConstant = "application/json";
+
+		/// <summary>
+		/// The fg tool HTTP client
+		/// </summary>
+		internal const string FGToolHttpClient = nameof(FGToolHttpClient);
+
+		/// <summary>
+		/// The token scope format.
+		/// </summary>
+		internal const string TokenScopeFormat = "{0}/.default";
+
+		/// <summary>
+		/// The is development mode constant
+		/// </summary>
+		internal const string IsDevelopmentModeConstant = "IsDevelopmentMode";
+
+		/// <summary>
+		/// The managed identity client identifier constant
+		/// </summary>
+		internal const string ManagedIdentityClientIdConstant = "ManagedIdentityClientId";
+
+		/// <summary>
+		/// The FG Tool api base URL
+		/// </summary>
+		internal const string FitGymToolApiBaseUrl = "FitGymToolApiBaseUrl";
 	}
 
 }

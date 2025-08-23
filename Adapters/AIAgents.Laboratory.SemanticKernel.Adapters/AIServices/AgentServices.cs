@@ -5,12 +5,14 @@
 // <summary>The Agent Services Class.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.UseCases;
+using AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
-using Newtonsoft.Json;
 using System.Globalization;
+using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
@@ -31,22 +33,30 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 	/// <returns>
 	/// The AI response.
 	/// </returns>
-	public async Task<string> GetOrchestratorFunctionResponseAsync(string input)
+	public async Task<AIAgentResponseDomain> GetOrchestratorFunctionResponseAsync(string input)
 	{
 		try
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorFunctionResponseAsync), DateTime.UtcNow));
 
+			var aiAgentResponse = new AIAgentResponseDomain();
 			var userIntent = await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.DetermineUserIntentFunction.FunctionName).ConfigureAwait(false);
-			if (!string.IsNullOrEmpty(userIntent) && userIntent.Contains("GREETING", StringComparison.CurrentCultureIgnoreCase))
+			if (string.IsNullOrEmpty(userIntent))
 			{
-				return await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.GreetingFunction.FunctionName).ConfigureAwait(false);
+				throw new Exception(ExceptionConstants.SomethingWentWrongMessage);
 			}
-			else
+			
+			var normalizedIntent = userIntent.Trim().ToUpperInvariant();
+			var aiResponse = normalizedIntent switch
 			{
-				return "Feature not available yet.";
-			}
+				IntentConstants.GreetingIntent => await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.GreetingFunction.FunctionName).ConfigureAwait(false),
+				IntentConstants.SQLIntent => await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.NLToSqlSkillFunction.FunctionName).ConfigureAwait(false),
+				IntentConstants.RAGIntent => await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.RAGTextSkillFunction.FunctionName).ConfigureAwait(false),
+				IntentConstants.UnclearIntent => "Cannot determine the user intent",
+				_ => string.Empty
+			};
 
+			return aiAgentResponse.PrepareAgentChatbotReponse(userIntent, input, aiResponse);
 		}
 		catch (Exception ex)
 		{
@@ -63,21 +73,18 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 	/// Gets the ai function response asynchronous.
 	/// </summary>
 	/// <typeparam name="TInput">The type of the input.</typeparam>
-	/// <typeparam name="TResponse">The type of the response.</typeparam>
 	/// <param name="input">The input.</param>
 	/// <param name="pluginName">Name of the plugin.</param>
 	/// <param name="functionName">Name of the function.</param>
 	/// <returns>
 	/// The AI response.
 	/// </returns>
-	/// <exception cref="System.Exception"></exception>
-	public async Task<TResponse> GetAiFunctionResponseAsync<TInput, TResponse>(TInput input, string pluginName, string functionName)
+	public async Task<string> GetAiFunctionResponseAsync<TInput>(TInput input, string pluginName, string functionName)
 	{
 		try
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
-			var aiResponse = await InvokePluginFunctionAsync(input, pluginName, functionName).ConfigureAwait(false);
-			return JsonConvert.DeserializeObject<TResponse>(aiResponse) ?? throw new Exception();
+			return await InvokePluginFunctionAsync(input, pluginName, functionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
@@ -107,7 +114,7 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
 			var kernelArguments = new KernelArguments()
 			{
-				[ArgumentsConstants.KernelArgumentsInputConstant] = JsonConvert.SerializeObject(input)
+				[ArgumentsConstants.KernelArgumentsInputConstant] = JsonSerializer.Serialize(input)
 			};
 
 			var responseFromAI = await kernel.InvokeAsync(pluginName, functionName, kernelArguments).ConfigureAwait(false);
