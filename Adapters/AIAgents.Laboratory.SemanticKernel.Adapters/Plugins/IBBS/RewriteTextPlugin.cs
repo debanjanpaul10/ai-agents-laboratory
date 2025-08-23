@@ -8,8 +8,8 @@
 using AIAgents.Laboratory.Domain.DomainEntities.IBBS;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 using Microsoft.SemanticKernel;
-using Newtonsoft.Json;
 using System.ComponentModel;
+using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers.RewriteTextPlugin;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.IBBS;
@@ -36,7 +36,7 @@ public class RewriteTextPlugin
 		var result = await kernel.InvokePromptAsync(RewriteUserStoryFunction.FunctionInstructions, arguments).ConfigureAwait(false);
 		var aiMetadata = result.Metadata;
 
-		return JsonConvert.SerializeObject(new RewriteResponse
+		return JsonSerializer.Serialize(new RewriteResponse
 		{
 			RewrittenStory = result.GetValue<string>() ?? string.Empty,
 			TotalTokensConsumed = Convert.ToInt32(aiMetadata?[Constants.ArgumentsConstants.TotalTokenCountConstant] ?? 0),

@@ -10,14 +10,14 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.3.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.Adapters.Agents\AIAgents.Laboratory.SemanticKernel.Adapters.csproj" />
     <ProjectReference Include="..\Adapters\AIAgents.Laboratory.API.Adapters\AIAgents.Laboratory.API.Adapters.csproj" />
     <ProjectReference Include="..\Adapters\AIAgents.Laboratory.Messaging.Adapters\AIAgents.Laboratory.Messaging.Adapters.csproj" />
+    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.SemanticKernel.Adapters\AIAgents.Laboratory.SemanticKernel.Adapters.csproj" />
     <ProjectReference Include="..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
   </ItemGroup>
 

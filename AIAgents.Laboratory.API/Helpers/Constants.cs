@@ -13,6 +13,53 @@ namespace AIAgents.Laboratory.API.Helpers;
 internal static class Constants
 {
 	/// <summary>
+	/// The Swagger Constants class.
+	/// </summary>
+	internal static class SwaggerConstants
+	{
+		/// <summary>
+		/// The api version for Swagger documentation.
+		/// </summary>
+		public const string ApiVersion = "v1";
+
+		/// <summary>
+		/// The swagger endpoint for the API documentation.
+		/// </summary>
+		public const string SwaggerEndpointUrl = "/swagger/v1/swagger.json";
+
+		/// <summary>
+		/// The swagger ui endpoint prefix.
+		/// </summary>
+		public const string SwaggerUiPrefix = "swaggerui";
+
+		/// <summary>
+		/// The description for the Swagger documentation.
+		/// </summary>
+		public const string SwaggerDescription = "API documentation for AI.Agents.Laboratory";
+
+		/// <summary>
+		/// The Author Details class contains information about the author of the API.
+		/// </summary>
+		public static class AuthorDetails
+		{
+			/// <summary>
+			/// The author's name.
+			/// </summary>
+			public static readonly string Name = "Debanjan Paul";
+
+			/// <summary>
+			/// The author's email address.
+			/// </summary>
+			public static readonly string Email = "debanjanpaul10@gmail.com";
+		}
+
+		/// <summary>
+		/// The API name for Swagger documentation.
+		/// </summary>
+		public const string ApplicationAPIName = "AI.Agents.Laboratory.API";
+	}
+
+	/// <summary>
 	/// Logging constants.
 	/// </summary>
 	internal static class LoggingConstants

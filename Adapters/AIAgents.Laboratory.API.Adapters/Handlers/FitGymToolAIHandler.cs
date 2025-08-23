@@ -6,8 +6,10 @@
 // *********************************************************************************
 
 using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Request.FitGymTool;
 using AIAgents.Laboratory.API.Adapters.Models.Response.FitGymTool;
+using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AutoMapper;
@@ -34,5 +36,31 @@ public class FitGymToolAIHandler(IFitGymToolAIService fitGymToolAIService, IMapp
 		var domainInput = mapper.Map<BugSeverityInput>(bugSeverityInput);
 		var domainResult = await fitGymToolAIService.GetBugSeverityAsync(domainInput).ConfigureAwait(false);
 		return mapper.Map<BugSeverityResponseDTO>(domainResult);
+	}
+
+	/// <summary>
+	/// Gets the orchestrator response asynchronous.
+	/// </summary>
+	/// <param name="userQueryRequest">The user query request.</param>
+	/// <returns>
+	/// The AI response.
+	/// </returns>
+	public async Task<AIAgentResponseDTO> GetOrchestratorResponseAsync(UserQueryRequestDTO userQueryRequest)
+	{
+		var domainInput = mapper.Map<UserRequestDomain>(userQueryRequest);
+		var domainResult = await fitGymToolAIService.GetOrchestratorResponseAsync(domainInput).ConfigureAwait(false);
+		return mapper.Map<AIAgentResponseDTO>(domainResult);
+	}
+
+	/// <summary>
+	/// Gets the SQL query markdown response asynchronous.
+	/// </summary>
+	/// <param name="input">The input.</param>
+	/// <returns>
+	/// The formatted AI response.
+	/// </returns>
+	public async Task<string> GetSQLQueryMarkdownResponseAsync(string input)
+	{
+		return await fitGymToolAIService.GetSQLQueryMarkdownResponseAsync(input).ConfigureAwait(false);
 	}
 }

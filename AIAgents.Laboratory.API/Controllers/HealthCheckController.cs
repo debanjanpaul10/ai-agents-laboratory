@@ -6,10 +6,13 @@
 // *********************************************************************************
 
 using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Globalization;
 using static AIAgents.Laboratory.API.Helpers.Constants;
+using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.HealthCheckController;
 
 namespace AIAgents.Laboratory.API.Controllers;
 
@@ -26,8 +29,13 @@ public class HealthCheckController(ILogger<HealthCheckController> logger, ICommo
 	/// <summary>
 	/// Gets the agent status.
 	/// </summary>
-	/// <returns>The action result of the response.</returns>
+	/// <returns>The agent status data dto.</returns>
 	[HttpGet(RouteConstants.HealthCheck.GetAgentStatus_Route)]
+	[ProducesResponseType(typeof(AgentStatusDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetAgentStatusAction.Summary, Description = GetAgentStatusAction.Description, OperationId = GetAgentStatusAction.OperationId)]
 	public IActionResult GetAgentStatus()
 	{
 		try

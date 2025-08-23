@@ -8,8 +8,8 @@
 using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 using Microsoft.SemanticKernel;
-using Newtonsoft.Json;
 using System.ComponentModel;
+using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers.UtilityPlugins;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.FitGymTool;
@@ -37,7 +37,7 @@ public class UtilityPlugins
 		var result = await kernel.InvokePromptAsync(DetermineBugSeverityFunction.FunctionInstructions, arguments).ConfigureAwait(false);
 		var aiMetadata = result.Metadata;
 
-		return JsonConvert.SerializeObject(new BugSeverityResponse
+		return JsonSerializer.Serialize(new BugSeverityResponse
 		{
 			BugSeverity = result.GetValue<string>() ?? string.Empty,
 			TotalTokensConsumed = Convert.ToInt32(aiMetadata?[Constants.ArgumentsConstants.TotalTokenCountConstant] ?? 0),
