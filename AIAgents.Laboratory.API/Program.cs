@@ -14,7 +14,6 @@ using Microsoft.OpenApi.Models;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using SwaggerConstants = AIAgents.Laboratory.API.Helpers.Constants.SwaggerConstants;
 
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(EnvironmentConfigurationConstants.LocalAppsetingsFileName, true).AddEnvironmentVariables();
 
