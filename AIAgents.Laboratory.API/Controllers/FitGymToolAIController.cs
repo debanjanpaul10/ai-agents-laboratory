@@ -86,7 +86,7 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetChatbotResponseAsync), DateTime.UtcNow));
 
 			var result = await fitGymToolAIHandler.GetOrchestratorResponseAsync(userQueryRequest).ConfigureAwait(false);
-			if (result is not null)
+			if (result is not null && !string.IsNullOrEmpty(result.AIResponseData))
 			{
 				return HandleSuccessRequestResponse(result);
 			}
@@ -122,7 +122,7 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow));
 
 			var result = await fitGymToolAIHandler.GetSQLQueryMarkdownResponseAsync(sqlQueryResult.JsonQuery).ConfigureAwait(false);
-			if (result is not null)
+			if (!string.IsNullOrEmpty(result))
 			{
 				return HandleSuccessRequestResponse(result);
 			}

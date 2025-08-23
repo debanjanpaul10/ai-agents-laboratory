@@ -9,6 +9,7 @@ using AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using System.ComponentModel;
+using System.Globalization;
 using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers.ChatBotPlugins;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
@@ -69,18 +70,27 @@ public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins
 	[Description(NLToSqlSkillFunction.FunctionDescription)]
 	public async Task<string> NLToSQLSkillFunctionAsync(Kernel kernel, [Description(NLToSqlSkillFunction.InputDescription)] string input)
 	{
-		var sqlKnowledgebaseTask = GetFitGymToolMetadataAsync(ExternalApiRouteConstants.FitGymToolAPI.SqlKnowledgeBaseSql_ApiRoute);
-		var databaseSchemaTask = GetFitGymToolMetadataAsync(ExternalApiRouteConstants.FitGymToolAPI.DatabaseSchemaSql_ApiRoute);
-		await Task.WhenAll(sqlKnowledgebaseTask, databaseSchemaTask).ConfigureAwait(false);
-
-		var arguments = new KernelArguments()
+		try
 		{
-			{ ArgumentsConstants.KernelArgumentsInputConstant, input },
-			{ ArgumentsConstants.KnowledgeBaseInputConstant, sqlKnowledgebaseTask.Result },
-			{ ArgumentsConstants.DatabaseSchemaInputConstant, databaseSchemaTask.Result },
-		};
-		var aiResponse = await kernel.InvokePromptAsync(NLToSqlSkillFunction.FunctionInstructions, arguments).ConfigureAwait(false);
-		return aiResponse.GetValue<string>() ?? string.Empty;
+			var sqlKnowledgebaseTask = GetFitGymToolMetadataAsync(ExternalApiRouteConstants.FitGymToolAPI.SqlKnowledgeBaseSql_ApiRoute);
+			var databaseSchemaTask = GetFitGymToolMetadataAsync(ExternalApiRouteConstants.FitGymToolAPI.DatabaseSchemaSql_ApiRoute);
+			await Task.WhenAll(sqlKnowledgebaseTask, databaseSchemaTask).ConfigureAwait(false);
+
+			var arguments = new KernelArguments()
+			{
+				{ ArgumentsConstants.KernelArgumentsInputConstant, input },
+				{ ArgumentsConstants.KnowledgeBaseInputConstant, sqlKnowledgebaseTask.Result },
+				{ ArgumentsConstants.DatabaseSchemaInputConstant, databaseSchemaTask.Result },
+			};
+			var aiResponse = await kernel.InvokePromptAsync(NLToSqlSkillFunction.FunctionInstructions, arguments).ConfigureAwait(false);
+			return aiResponse.GetValue<string>() ?? string.Empty;
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(NLToSQLSkillFunctionAsync), DateTime.UtcNow, ex.Message));
+			return ExceptionConstants.DefaultAIExceptionMessage;
+		}
+		
 	}
 	/// <summary>
 	/// The RAG text skill function.
@@ -92,16 +102,24 @@ public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins
 	[Description(RAGTextSkillFunction.FunctionDescription)]
 	public async Task<string> RAGTextSkillFunctionAsync(Kernel kernel, [Description(RAGTextSkillFunction.InputDescription)] string input)
 	{
-		return "I am unable to process this response right now, please try something else";
-		string knowledgeBase = await GetFitGymToolMetadataAsync(ExternalApiRouteConstants.FitGymToolAPI.RagKnowledgeBase_ApiRoute).ConfigureAwait(false);
-		var arguments = new KernelArguments()
+		try
 		{
-			{ ArgumentsConstants.KernelArgumentsInputConstant, input },
-			{ ArgumentsConstants.KnowledgeBaseInputConstant, knowledgeBase },
-		};
+			string knowledgeBase = await GetFitGymToolMetadataAsync(ExternalApiRouteConstants.FitGymToolAPI.RagKnowledgeBase_ApiRoute).ConfigureAwait(false);
+			var arguments = new KernelArguments()
+			{
+				{ ArgumentsConstants.KernelArgumentsInputConstant, input },
+				{ ArgumentsConstants.KnowledgeBaseInputConstant, knowledgeBase },
+			};
 
-		var result = await kernel.InvokePromptAsync(RAGTextSkillFunction.FunctionInstructions, arguments).ConfigureAwait(false);
-		return result.GetValue<string>() ?? string.Empty;
+			var result = await kernel.InvokePromptAsync(RAGTextSkillFunction.FunctionInstructions, arguments).ConfigureAwait(false);
+			return result.GetValue<string>() ?? string.Empty;
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(RAGTextSkillFunctionAsync), DateTime.UtcNow, ex.Message));
+			return ExceptionConstants.DefaultAIExceptionMessage;
+		}
+
 	}
 
 	/// <summary>

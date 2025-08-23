@@ -119,6 +119,11 @@ internal static class Constants
 		/// Something went wrong message
 		/// </summary>
 		internal const string SomethingWentWrongMessage = "Something went wrong while processing the request!";
+
+		/// <summary>
+		/// The default ai exception message
+		/// </summary>
+		internal const string DefaultAIExceptionMessage = "I am currently unable to access the required information to process this request. Please try again later!";
 	}
 
 	/// <summary>
