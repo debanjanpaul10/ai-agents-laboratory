@@ -306,4 +306,42 @@ public static class ChatbotPluginHelpers
 		/// </summary>
 		public const string InputDescription = "The json containing the data that will be formatted.";
 	}
+
+	/// <summary>
+	/// The generate followup questions function.
+	/// </summary>
+	public static class GenerateFollowupQuestionsFunction
+	{
+		/// <summary>
+		/// The function name
+		/// </summary>
+		public const string FunctionName = nameof(GenerateFollowupQuestionsFunction);
+
+		/// <summary>
+		/// The function description
+		/// </summary>
+		public const string FunctionDescription = "Generates followup questions based on the AI response.";
+
+		/// <summary>
+		/// The function instructions
+		/// </summary>
+		public const string FunctionInstructions = """
+
+			""";
+
+		/// <summary>
+		/// The input description
+		/// </summary>
+		public const string UserQueryInput = "The string of user query.";
+
+		/// <summary>
+		/// The user intent input
+		/// </summary>
+		public const string UserIntentInput = "The intent of user's question.";
+
+		/// <summary>
+		/// The generated ai response
+		/// </summary>
+		public const string GeneratedAiResponse = "The generated AI response";
+	}
 }
