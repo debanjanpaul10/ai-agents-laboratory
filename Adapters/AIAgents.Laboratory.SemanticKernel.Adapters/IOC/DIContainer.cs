@@ -45,7 +45,8 @@ public static class DIContainer
     {
         services.AddHttpClient(ConfigurationConstants.FGToolHttpClient, client =>
         {
-            var apiBaseAddress = configuration[ConfigurationConstants.FitGymToolApiBaseUrl];
+            var apiBaseAddress = bool.TryParse(configuration[ConfigurationConstants.IsDevelopmentModeConstant], out var isDevelopmentMode) && isDevelopmentMode
+                ? configuration[ConfigurationConstants.LocalFGToolBaseUrl] : configuration[ConfigurationConstants.FitGymToolApiBaseUrl];
             if (string.IsNullOrEmpty(apiBaseAddress))
             {
                 throw new ArgumentNullException(apiBaseAddress);
