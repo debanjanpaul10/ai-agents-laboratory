@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using System.ComponentModel;
 using System.Globalization;
-using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers.ChatBotPlugins;
+using static AIAgents.Laboratory.Domain.Helpers.ChatbotPluginHelpers;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.FitGymTool;

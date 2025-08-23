@@ -9,11 +9,11 @@ using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
-using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
 
@@ -45,7 +45,7 @@ public class FitGymToolAIService(ILogger<FitGymToolAIService> logger, IAIAgentSe
 				throw exception;
 			}
 
-			var response = await aiAgentServices.GetAiFunctionResponseAsync(bugSeverityInput, UtilityPlugins.PluginName, UtilityPlugins.DetermineBugSeverityFunction.FunctionName).ConfigureAwait(false);
+			var response = await aiAgentServices.GetAiFunctionResponseAsync(bugSeverityInput, PluginHelpers.UtilityPlugins.PluginName, PluginHelpers.UtilityPlugins.DetermineBugSeverityFunction.FunctionName).ConfigureAwait(false);
 			var bugSeverityResponse = JsonSerializer.Deserialize<BugSeverityResponse>(response);
 			if (bugSeverityResponse is not null)
 			{
@@ -111,7 +111,7 @@ public class FitGymToolAIService(ILogger<FitGymToolAIService> logger, IAIAgentSe
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow, string.Empty));
 			ArgumentException.ThrowIfNullOrWhiteSpace(input);
 
-			return await aiAgentServices.GetAiFunctionResponseAsync<string>(input, ChatBotPlugins.PluginName, ChatBotPlugins.SQLQueryMarkdownResponseFunction.FunctionName).ConfigureAwait(false);
+			return await aiAgentServices.GetAiFunctionResponseAsync<string>(input, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.SQLQueryMarkdownResponseFunction.FunctionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
