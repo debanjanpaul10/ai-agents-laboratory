@@ -233,6 +233,11 @@ internal static class Constants
 		/// The FG Tool api base URL
 		/// </summary>
 		internal const string FitGymToolApiBaseUrl = "FitGymToolApiBaseUrl";
+
+		/// <summary>
+		/// The local fg tool base URL
+		/// </summary>
+		internal const string LocalFGToolBaseUrl = "LocalFGToolBaseUrl";
 	}
 
 }

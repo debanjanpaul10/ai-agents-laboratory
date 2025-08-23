@@ -21,7 +21,7 @@ public static class AgentHelpers
 	/// <param name="userIntent">The user intent.</param>
 	/// <param name="input">The input.</param>
 	/// <param name="aiResponse">The ai response.</param>
-	/// <returns></returns>
+	/// <returns>The populated agent response domain.</returns>
 	public static AIAgentResponseDomain PrepareAgentChatbotReponse(this AIAgentResponseDomain aiAgentResponse, string userIntent, string input, string aiResponse)
 	{
 		aiAgentResponse.UserIntent = userIntent.Trim();
