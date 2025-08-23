@@ -18,6 +18,11 @@ public static class RouteConstants
 	public const string AiBase_RoutePrefix = "aiagentsapi";
 
 	/// <summary>
+	/// The agent status hub route
+	/// </summary>
+	public const string AgentStatusHub_Route = "/hubs/agent-status";
+
+	/// <summary>
 	/// The IBBS AI Routes.
 	/// </summary>
 	public static class IBBSAi

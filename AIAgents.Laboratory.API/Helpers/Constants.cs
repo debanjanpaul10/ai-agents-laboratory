@@ -12,6 +12,9 @@ namespace AIAgents.Laboratory.API.Helpers;
 /// </summary>
 internal static class Constants
 {
+	/// <summary>
+	/// The Swagger Constants class.
+	/// </summary>
 	internal static class SwaggerConstants
 	{
 		/// <summary>
