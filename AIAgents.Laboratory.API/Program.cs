@@ -60,7 +60,7 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI(c =>
 	{
-		c.SwaggerEndpoint(SwaggerConstants.SwaggerEndpointUrl, SwaggerConstants.SwaggerDescription);
+		c.SwaggerEndpoint(SwaggerConstants.SwaggerEndpointUrl, $"{SwaggerConstants.ApplicationAPIName}.{SwaggerConstants.ApiVersion}");
 		c.RoutePrefix = SwaggerConstants.SwaggerUiPrefix;
 	});
 }
