@@ -326,22 +326,46 @@ public static class ChatbotPluginHelpers
 		/// The function instructions
 		/// </summary>
 		public const string FunctionInstructions = """
+			You are an AI assitant whose sole responsibility is to generate exactly three followup questions based on the passed parameters. Strictly adhere to the following rules:
+				- You will not use any pre-trained knowledge when creating the questions.
+				- These questions will be some questions that user will ask you back based on your previous response.
+				- There will be always exactly three questions and never more or never less.
+				- You will be using the `userQuery`, `userIntent` and `aiResponse` to generate the list of followup questions. 
+				- Never add any clarifications or extra context. Only return the list of those strings.
+				- While returning the member related data, make sure to use the correct member name or member email.
 
+			Example:
+
+			USER_QUERY: Give me the list of all the active members
+			USER_INTENT: SQL
+			AI_RESPONSE: <Markdown_table_containing_the_tabular_data>
+			OUTPUT: ['Give me the payment history data for all members', 'Give me the contact details for `Member_Name`', '']
+
+			User Query:
+			++++++++++++
+
+			{{$user_query}}
+
+			+++++++++++	
+
+			User Intent:
+			++++++++++++
+
+			{{$user_intent}}
+
+			+++++++++++	
+
+			AI Response:
+			++++++++++++
+
+			{{$ai_response}}
+
+			+++++++++++	
 			""";
 
 		/// <summary>
 		/// The input description
 		/// </summary>
-		public const string UserQueryInput = "The string of user query.";
-
-		/// <summary>
-		/// The user intent input
-		/// </summary>
-		public const string UserIntentInput = "The intent of user's question.";
-
-		/// <summary>
-		/// The generated ai response
-		/// </summary>
-		public const string GeneratedAiResponse = "The generated AI response";
+		public const string InputDescription = "The input is a JSON string containing a FollowupQuestionsRequestDomain object with `UserIntent`, `UserQuery` and `AiResponseData` properties";
 	}
 }

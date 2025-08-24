@@ -5,12 +5,14 @@
 // <summary>The Chatbot Plugins.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using System.CodeDom.Compiler;
 using System.ComponentModel;
 using System.Globalization;
+using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.ChatbotPluginHelpers;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
@@ -146,22 +148,18 @@ public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins
 	/// Generates the followup questions function asynchronous.
 	/// </summary>
 	/// <param name="kernel">The kernel.</param>
-	/// <param name="userQuery">The user query.</param>
-	/// <param name="userIntent">The user intent.</param>
-	/// <param name="aiResponse">The ai response.</param>
+	/// <param name="input">The input data as JSON string.</param>
 	/// <returns>The ai response.</returns>
 	[KernelFunction(GenerateFollowupQuestionsFunction.FunctionName)]
 	[Description(GenerateFollowupQuestionsFunction.FunctionDescription)]
-	public static async Task<string> GenerateFollowupQuestionsFunctionAsync(
-		Kernel kernel, [Description(GenerateFollowupQuestionsFunction.UserQueryInput)] string userQuery,
-		[Description(GenerateFollowupQuestionsFunction.UserIntentInput)] string userIntent,
-		[Description(GenerateFollowupQuestionsFunction.GeneratedAiResponse)] string aiResponse)
+	public static async Task<string> GenerateFollowupQuestionsFunctionAsync(Kernel kernel, [Description(GenerateFollowupQuestionsFunction.InputDescription)] string input)
 	{
+		var followupQuestionsRequest = JsonSerializer.Deserialize<FollowupQuestionsRequestDomain>(input) ?? throw new Exception();
 		var arguments = new KernelArguments()
 		{
-			{ ArgumentsConstants.UserQueryInputConstant, userQuery },
-			{ ArgumentsConstants.UserIntentInputConstant, userIntent },
-			{ ArgumentsConstants.AIResponseInputConstant, aiResponse }
+			{ ArgumentsConstants.UserQueryInputConstant, followupQuestionsRequest.UserQuery },
+			{ ArgumentsConstants.UserIntentInputConstant, followupQuestionsRequest.UserIntent },
+			{ ArgumentsConstants.AIResponseInputConstant, followupQuestionsRequest.AiResponseData }
 		};
 
 		var result = await kernel.InvokePromptAsync(GenerateFollowupQuestionsFunction.FunctionInstructions, arguments).ConfigureAwait(false);

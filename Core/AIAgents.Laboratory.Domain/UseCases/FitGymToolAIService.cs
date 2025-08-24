@@ -66,6 +66,43 @@ public class FitGymToolAIService(ILogger<FitGymToolAIService> logger, IAIAgentSe
 	}
 
 	/// <summary>
+	/// Gets the list of followup questions.
+	/// </summary>
+	/// <param name="followupQuestionsRequest">The followup questions request.</param>
+	/// <returns>The list of followup questions.</returns>
+	public async Task<IEnumerable<string>> GetFollowupQuestionsResponseAsync(FollowupQuestionsRequestDomain followupQuestionsRequest)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetFollowupQuestionsResponseAsync), DateTime.UtcNow, followupQuestionsRequest.UserQuery));
+			if (followupQuestionsRequest is null || string.IsNullOrEmpty(followupQuestionsRequest.UserQuery))
+			{
+				var exception = new Exception(ExceptionConstants.InputParametersCannotBeEmptyMessage);
+				logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetFollowupQuestionsResponseAsync), DateTime.UtcNow, exception.Message));
+				throw exception;
+			}
+
+			var response = await aiAgentServices.GetAiFunctionResponseAsync(followupQuestionsRequest, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.GenerateFollowupQuestionsFunction.FunctionName).ConfigureAwait(false);
+			var cleanedResponse = response?.Trim().Trim('"').Replace("\\n", "").Replace("\n", "");
+			if (!string.IsNullOrEmpty(cleanedResponse) && cleanedResponse.StartsWith('[') && cleanedResponse.EndsWith(']'))
+			{
+				cleanedResponse = cleanedResponse.Replace("'", "\"");
+			}
+
+			return JsonSerializer.Deserialize<IEnumerable<string>>(cleanedResponse ?? "[]") ?? [];
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetFollowupQuestionsResponseAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetFollowupQuestionsResponseAsync), DateTime.UtcNow, followupQuestionsRequest.UserQuery));
+		}
+	}
+
+	/// <summary>
 	/// Gets the orchestrator response asynchronous.
 	/// </summary>
 	/// <param name="userQueryRequest">The user query request.</param>
