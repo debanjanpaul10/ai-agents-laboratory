@@ -43,6 +43,21 @@ internal static class Constants
 		internal const string SQLJsonInputConstant = "sql_json";
 
 		/// <summary>
+		/// The user intent input constant
+		/// </summary>
+		internal const string UserIntentInputConstant = "user_intent";
+
+		/// <summary>
+		/// The user query input constant
+		/// </summary>
+		internal const string UserQueryInputConstant = "user_query";
+
+		/// <summary>
+		/// The ai response input constant
+		/// </summary>
+		internal const string AIResponseInputConstant = "ai_response";
+
+		/// <summary>
 		/// The total tokens count constant.
 		/// </summary>
 		internal const string TotalTokenCountConstant = "TotalTokenCount";

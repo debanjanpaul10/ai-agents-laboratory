@@ -5,12 +5,15 @@
 // <summary>The Chatbot Plugins.</summary>
 // *********************************************************************************
 
+using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
+using System.CodeDom.Compiler;
 using System.ComponentModel;
 using System.Globalization;
-using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers.ChatBotPlugins;
+using System.Text.Json;
+using static AIAgents.Laboratory.Domain.Helpers.ChatbotPluginHelpers;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.FitGymTool;
@@ -90,7 +93,7 @@ public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins
 			logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(NLToSQLSkillFunctionAsync), DateTime.UtcNow, ex.Message));
 			return ExceptionConstants.DefaultAIExceptionMessage;
 		}
-		
+
 	}
 	/// <summary>
 	/// The RAG text skill function.
@@ -138,6 +141,28 @@ public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins
 		};
 
 		var result = await kernel.InvokePromptAsync(SQLQueryMarkdownResponseFunction.FunctionInstructions, arguments).ConfigureAwait(false);
+		return result.GetValue<string>() ?? string.Empty;
+	}
+
+	/// <summary>
+	/// Generates the followup questions function asynchronous.
+	/// </summary>
+	/// <param name="kernel">The kernel.</param>
+	/// <param name="input">The input data as JSON string.</param>
+	/// <returns>The ai response.</returns>
+	[KernelFunction(GenerateFollowupQuestionsFunction.FunctionName)]
+	[Description(GenerateFollowupQuestionsFunction.FunctionDescription)]
+	public static async Task<string> GenerateFollowupQuestionsFunctionAsync(Kernel kernel, [Description(GenerateFollowupQuestionsFunction.InputDescription)] string input)
+	{
+		var followupQuestionsRequest = JsonSerializer.Deserialize<FollowupQuestionsRequestDomain>(input) ?? throw new Exception();
+		var arguments = new KernelArguments()
+		{
+			{ ArgumentsConstants.UserQueryInputConstant, followupQuestionsRequest.UserQuery },
+			{ ArgumentsConstants.UserIntentInputConstant, followupQuestionsRequest.UserIntent },
+			{ ArgumentsConstants.AIResponseInputConstant, followupQuestionsRequest.AiResponseData }
+		};
+
+		var result = await kernel.InvokePromptAsync(GenerateFollowupQuestionsFunction.FunctionInstructions, arguments).ConfigureAwait(false);
 		return result.GetValue<string>() ?? string.Empty;
 	}
 

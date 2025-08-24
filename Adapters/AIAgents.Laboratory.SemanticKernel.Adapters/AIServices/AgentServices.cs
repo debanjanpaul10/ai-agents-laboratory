@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using System.Globalization;
 using System.Text.Json;
-using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers;
+using AIAgents.Laboratory.Domain.Helpers;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
@@ -40,7 +40,7 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorFunctionResponseAsync), DateTime.UtcNow));
 
 			var aiAgentResponse = new AIAgentResponseDomain();
-			var userIntent = await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.DetermineUserIntentFunction.FunctionName).ConfigureAwait(false);
+			var userIntent = await InvokePluginFunctionAsync(input, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.DetermineUserIntentFunction.FunctionName).ConfigureAwait(false);
 			if (string.IsNullOrEmpty(userIntent))
 			{
 				throw new Exception(ExceptionConstants.SomethingWentWrongMessage);
@@ -49,9 +49,9 @@ public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : 
 			var normalizedIntent = userIntent.Trim().ToUpperInvariant();
 			var aiResponse = normalizedIntent switch
 			{
-				IntentConstants.GreetingIntent => await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.GreetingFunction.FunctionName).ConfigureAwait(false),
-				IntentConstants.SQLIntent => await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.NLToSqlSkillFunction.FunctionName).ConfigureAwait(false),
-				IntentConstants.RAGIntent => await InvokePluginFunctionAsync(input, ChatBotPlugins.PluginName, ChatBotPlugins.RAGTextSkillFunction.FunctionName).ConfigureAwait(false),
+				IntentConstants.GreetingIntent => await InvokePluginFunctionAsync(input, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.GreetingFunction.FunctionName).ConfigureAwait(false),
+				IntentConstants.SQLIntent => await InvokePluginFunctionAsync(input, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.NLToSqlSkillFunction.FunctionName).ConfigureAwait(false),
+				IntentConstants.RAGIntent => await InvokePluginFunctionAsync(input, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.RAGTextSkillFunction.FunctionName).ConfigureAwait(false),
 				IntentConstants.UnclearIntent => "Cannot determine the user intent",
 				_ => string.Empty
 			};

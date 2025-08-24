@@ -35,4 +35,11 @@ public interface IFitGymToolAIService
 	/// <param name="input">The input.</param>
 	/// <returns>The formatted AI response.</returns>
 	Task<string> GetSQLQueryMarkdownResponseAsync(string input);
+
+	/// <summary>
+	/// Gets the list of followup questions.
+	/// </summary>
+	/// <param name="followupQuestionsRequest">The followup questions request.</param>
+	/// <returns>The list of followup questions.</returns>
+	Task<IEnumerable<string>> GetFollowupQuestionsResponseAsync(FollowupQuestionsRequestDomain followupQuestionsRequest);
 }

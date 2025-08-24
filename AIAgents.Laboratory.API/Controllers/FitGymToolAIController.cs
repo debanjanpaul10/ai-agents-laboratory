@@ -115,7 +115,7 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	[SwaggerOperation(Summary = GetSQLQueryMarkdownResponseAction.Summary, Description = GetSQLQueryMarkdownResponseAction.Description, OperationId = GetSQLQueryMarkdownResponseAction.OperationId)]
-	public async Task<ResponseDTO> GetSQLQueryMarkdownResponseAsync([FromBody]SqlQueryResultDTO sqlQueryResult)
+	public async Task<ResponseDTO> GetSQLQueryMarkdownResponseAsync([FromBody] SqlQueryResultDTO sqlQueryResult)
 	{
 		try
 		{
@@ -137,6 +137,42 @@ public class FitGymToolAIController(ILogger<FitGymToolAIController> logger, IFit
 		finally
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow));
+		}
+	}
+
+	/// <summary>
+	/// Gets the list of followup questions based on ai response and user query.
+	/// </summary>
+	/// <param name="followupQuestionsRequest">The followup questions request.</param>
+	/// <returns>The list of ai responses.</returns>
+	[HttpPost(RouteConstants.FitGymToolAi.GetFollowupQuestionsResponse_Route)]
+	[ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetFollowupQuestionsResponseAction.Summary, Description = GetFollowupQuestionsResponseAction.Description, OperationId = GetFollowupQuestionsResponseAction.OperationId)]
+	public async Task<ResponseDTO> GetFollowupQuestionsResponseAsync([FromBody] FollowupQuestionsRequestDTO followupQuestionsRequest)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetFollowupQuestionsResponseAsync), DateTime.UtcNow));
+
+			var result = await fitGymToolAIHandler.GetFollowupQuestionsResponseAsync(followupQuestionsRequest).ConfigureAwait(false);
+			if (result is not null && result.Any())
+			{
+				return HandleSuccessRequestResponse(result);
+			}
+
+			return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetFollowupQuestionsResponseAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetFollowupQuestionsResponseAsync), DateTime.UtcNow));
 		}
 	}
 }

@@ -40,6 +40,16 @@ internal static class SwaggerConstants
 			internal const string OperationId = nameof(GetSQLQueryMarkdownResponseAction);
 		}
 
+		/// <summary>
+		/// Swagger documentation for GetFollowupQuestionsResponseAsync.
+		/// </summary>
+		internal static class GetFollowupQuestionsResponseAction
+		{
+			internal const string Summary = "Gets the list of followup questions.";
+			internal const string Description = "Gets a list of strings that contain followup questions based on last user query and ai responses.";
+			internal const string OperationId = nameof(GetFollowupQuestionsResponseAction);
+		}
+
 	}
 
 	/// <summary>

@@ -70,7 +70,7 @@ public static class KernelFactory
             kernel.Plugins.AddFromType<RewriteTextPlugin>(PluginHelpers.RewriteTextPlugin.PluginName);
             kernel.Plugins.AddFromType<ContentPlugins>(PluginHelpers.ContentPlugins.PluginName);
             kernel.Plugins.AddFromType<UtilityPlugins>(PluginHelpers.UtilityPlugins.PluginName);
-            kernel.Plugins.AddFromType<ChatbotPlugins>(PluginHelpers.ChatBotPlugins.PluginName, provider);
+            kernel.Plugins.AddFromType<ChatbotPlugins>(ChatbotPluginHelpers.PluginName, provider);
 
             return kernel;
         };
