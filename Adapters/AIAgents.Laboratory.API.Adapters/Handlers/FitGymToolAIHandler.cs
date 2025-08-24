@@ -39,6 +39,17 @@ public class FitGymToolAIHandler(IFitGymToolAIService fitGymToolAIService, IMapp
 	}
 
 	/// <summary>
+	/// Gets the list of followup questions.
+	/// </summary>
+	/// <param name="followupQuestionsRequest">The followup questions request.</param>
+	/// <returns>The list of followup questions.</returns>
+	public async Task<IEnumerable<string>> GetFollowupQuestionsResponseAsync(FollowupQuestionsRequestDTO followupQuestionsRequest)
+	{
+		var domainInput = mapper.Map<FollowupQuestionsRequestDomain>(followupQuestionsRequest);
+		return await fitGymToolAIService.GetFollowupQuestionsResponseAsync(domainInput).ConfigureAwait(false);
+	}
+
+	/// <summary>
 	/// Gets the orchestrator response asynchronous.
 	/// </summary>
 	/// <param name="userQueryRequest">The user query request.</param>

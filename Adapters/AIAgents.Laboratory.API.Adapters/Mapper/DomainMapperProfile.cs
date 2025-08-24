@@ -29,7 +29,6 @@ public class DomainMapperProfile : Profile
 	public DomainMapperProfile()
 	{
 		CreateMap<BaseResponse, BaseResponseDTO>().ReverseMap();
-
 		CreateMap<TagResponse, TagResponseDTO>();
 		CreateMap<ModerationContentResponse, ModerationContentResponseDTO>();
 		CreateMap<RewriteResponse, RewriteResponseDTO>();
@@ -38,5 +37,6 @@ public class DomainMapperProfile : Profile
 		CreateMap<BugSeverityResponse, BugSeverityResponseDTO>();
 		CreateMap<UserQueryRequestDTO, UserRequestDomain>();
 		CreateMap<AIAgentResponseDomain, AIAgentResponseDTO>();
+		CreateMap<FollowupQuestionsRequestDTO, FollowupQuestionsRequestDomain>();
 	}
 }

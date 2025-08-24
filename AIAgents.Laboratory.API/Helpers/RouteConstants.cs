@@ -62,6 +62,11 @@ public static class RouteConstants
 		/// The get SQL query markdown response route
 		/// </summary>
 		internal const string GetSQLQueryMarkdownResponse_Route = "getsqlquerymarkdownresponse";
+
+		/// <summary>
+		/// The get followup questions api route.
+		/// </summary>
+		internal const string GetFollowupQuestionsResponse_Route = "getfollowupquestionsresponse";
 	}
 
 	/// <summary>
