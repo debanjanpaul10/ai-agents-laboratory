@@ -7,7 +7,7 @@
 
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
-using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.FitGymTool;
+using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

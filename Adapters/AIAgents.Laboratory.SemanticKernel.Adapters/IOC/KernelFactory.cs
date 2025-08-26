@@ -6,8 +6,7 @@
 // *********************************************************************************
 
 using AIAgents.Laboratory.Domain.Helpers;
-using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.FitGymTool;
-using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins.IBBS;
+using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;

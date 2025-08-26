@@ -5,9 +5,7 @@
 // <summary>The Agent Services Class.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
 using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.UseCases;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
@@ -15,6 +13,7 @@ using System.Globalization;
 using System.Text.Json;
 using AIAgents.Laboratory.Domain.Helpers;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
+using AIAgents.Laboratory.Domain.DomainEntities;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 
@@ -24,7 +23,7 @@ namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 /// <param name="kernel">The Semantic Kernel.</param>
 /// <param name="logger">The Logger service.</param>
 /// <seealso cref="IAIAgentServices" />
-public class AgentServices(ILogger<BulletinAIServices> logger, Kernel kernel) : IAIAgentServices
+public class AgentServices(ILogger<AgentServices> logger, Kernel kernel) : IAIAgentServices
 {
 	/// <summary>
 	/// Gets the orchestrator function response asynchronous.
