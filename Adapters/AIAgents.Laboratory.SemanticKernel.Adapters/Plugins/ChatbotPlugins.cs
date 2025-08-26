@@ -6,7 +6,6 @@
 // *********************************************************************************
 
 using AIAgents.Laboratory.Domain.DomainEntities.SkillsEntities;
-using AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using System.ComponentModel;
@@ -20,9 +19,8 @@ namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
 /// <summary>
 /// The Chatbot Plugins.
 /// </summary>
-/// <param name="httpClient">The http client.</param>
 /// <param name="logger">The logger service.</param>
-public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins> logger)
+public class ChatbotPlugins(ILogger<ChatbotPlugins> logger)
 {
     /// <summary>
     /// Detects the user intent function.
@@ -74,15 +72,12 @@ public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins
     {
         try
         {
-            var sqlKnowledgebaseTask = GetFitGymToolMetadataAsync(ExternalApiRouteConstants.FitGymToolAPI.SqlKnowledgeBaseSql_ApiRoute);
-            var databaseSchemaTask = GetFitGymToolMetadataAsync(ExternalApiRouteConstants.FitGymToolAPI.DatabaseSchemaSql_ApiRoute);
-            await Task.WhenAll(sqlKnowledgebaseTask, databaseSchemaTask).ConfigureAwait(false);
-
+            var nltosqlRequest = JsonSerializer.Deserialize<NltosqlInputDomain>(input) ?? throw new Exception(); ;
             var arguments = new KernelArguments()
             {
-                { ArgumentsConstants.KernelArgumentsInputConstant, input },
-                { ArgumentsConstants.KnowledgeBaseInputConstant, sqlKnowledgebaseTask.Result },
-                { ArgumentsConstants.DatabaseSchemaInputConstant, databaseSchemaTask.Result },
+                { ArgumentsConstants.KernelArgumentsInputConstant, nltosqlRequest.UserQuery },
+                { ArgumentsConstants.KnowledgeBaseInputConstant, nltosqlRequest.KnowledgeBase },
+                { ArgumentsConstants.DatabaseSchemaInputConstant, nltosqlRequest.DatabaseSchema },
             };
             var aiResponse = await kernel.InvokePromptAsync(NLToSqlSkillFunction.FunctionInstructions, arguments).ConfigureAwait(false);
             return aiResponse.GetValue<string>() ?? string.Empty;
@@ -106,11 +101,11 @@ public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins
     {
         try
         {
-            string knowledgeBase = await GetFitGymToolMetadataAsync(ExternalApiRouteConstants.FitGymToolAPI.RagKnowledgeBase_ApiRoute).ConfigureAwait(false);
+            var ragTextSkillInput = JsonSerializer.Deserialize<SkillsInputDomain>(input) ?? throw new Exception();
             var arguments = new KernelArguments()
             {
-                { ArgumentsConstants.KernelArgumentsInputConstant, input },
-                { ArgumentsConstants.KnowledgeBaseInputConstant, knowledgeBase },
+                { ArgumentsConstants.KernelArgumentsInputConstant, ragTextSkillInput.UserQuery },
+                { ArgumentsConstants.KnowledgeBaseInputConstant, ragTextSkillInput.KnowledgeBase },
             };
 
             var result = await kernel.InvokePromptAsync(RAGTextSkillFunction.FunctionInstructions, arguments).ConfigureAwait(false);
@@ -164,32 +159,4 @@ public class ChatbotPlugins(IHttpClientHelper httpClient, ILogger<ChatbotPlugins
         var result = await kernel.InvokePromptAsync(GenerateFollowupQuestionsFunction.FunctionInstructions, arguments).ConfigureAwait(false);
         return result.GetValue<string>() ?? string.Empty;
     }
-
-    #region PRIVATE METHODS
-
-    /// <summary>
-    /// Gets the fit gym tool metadata asynchronous.
-    /// </summary>
-    /// <param name="apiUrl">The API URL.</param>
-    /// <returns>The response.</returns>
-    private async Task<string> GetFitGymToolMetadataAsync(string apiUrl)
-    {
-        try
-        {
-            logger.LogInformation(string.Format(LoggingConstants.LogHelperMethodStart, nameof(GetFitGymToolMetadataAsync), DateTime.UtcNow, apiUrl));
-            var response = await httpClient.GetFitGymToolApiResponseAsync(apiUrl).ConfigureAwait(false);
-            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-        }
-        catch (HttpRequestException ex)
-        {
-            logger.LogError(ex, string.Format(LoggingConstants.LogHelperMethodFailed, nameof(GetFitGymToolMetadataAsync), DateTime.UtcNow, apiUrl));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(LoggingConstants.LogHelperMethodEnd, nameof(GetFitGymToolMetadataAsync), DateTime.UtcNow, apiUrl));
-        }
-    }
-
-    #endregion
 }
