@@ -11,10 +11,11 @@ using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.SkillsController;
 namespace AIAgents.Laboratory.API.Controllers.v1;
 
 /// <summary>
-/// The Skills AI API controller.
+/// The AI Skills controller.
 /// </summary>
 /// <param name="logger">The logger service.</param>
-/// <param name="skillsHandler">The skills ai handler.</param>
+/// <param name="skillsHandler">The skills handler adapter.</param>
+/// <seealso cref="AIAgents.Laboratory.API.Controllers.BaseController" />
 [ApiController]
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
 public class SkillsController(ILogger<SkillsController> logger, ISkillsHandler skillsHandler) : BaseController
@@ -54,7 +55,6 @@ public class SkillsController(ILogger<SkillsController> logger, ISkillsHandler s
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(DetectUserIntentAsync), DateTime.UtcNow));
         }
     }
-
 
     /// <summary>
     /// Gets the user greeting response asynchronous.
