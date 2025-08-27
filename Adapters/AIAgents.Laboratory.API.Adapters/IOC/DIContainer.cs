@@ -26,9 +26,9 @@ public static class DIContainer
 	/// <returns>The service collection.</returns>
 	public static IServiceCollection AddAPIHandlers(this IServiceCollection services)
 	{
-		return services.AddScoped<IBulletinAiHandler, BulletinAiHandler>()
+		return services.AddScoped<IPluginsHandler, PluginsHandler>()
 			.AddScoped<ICommonAiHandler, CommonAiHandler>()
-			.AddScoped<IFitGymToolAIHandler, FitGymToolAIHandler>()
+			.AddScoped<ISkillsHandler, SkillsHandler>()
 			.AddAutoMapper(config =>
 			{
 				config.AddProfile<DomainMapperProfile>();

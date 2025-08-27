@@ -5,7 +5,7 @@
 // <summary>The Agent Services Interface.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
+using AIAgents.Laboratory.Domain.DomainEntities;
 
 namespace AIAgents.Laboratory.Domain.DrivenPorts;
 

@@ -52,6 +52,11 @@ internal static class Constants
 		/// The input parameters cannot be empty message
 		/// </summary>
 		internal const string InputParametersCannotBeEmptyMessage = "The input parameters cannot be empty";
+
+		/// <summary>
+		/// The cannot process user query message
+		/// </summary>
+		internal const string CannotProcessUserQueryMessage = "This message query cannot be processed right now. Please try something else!";
 	}
 
 	/// <summary>

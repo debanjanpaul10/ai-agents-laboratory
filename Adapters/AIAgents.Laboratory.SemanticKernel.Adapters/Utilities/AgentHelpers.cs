@@ -5,7 +5,7 @@
 // <summary>The Agent Helpers Utility class.</summary>
 // *********************************************************************************
 
-using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
+using AIAgents.Laboratory.Domain.DomainEntities;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;
 

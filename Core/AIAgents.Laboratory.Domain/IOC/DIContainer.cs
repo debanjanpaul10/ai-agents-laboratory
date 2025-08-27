@@ -23,8 +23,8 @@ public static class DIContainer
 	/// <returns>The service collection.</returns>
 	public static IServiceCollection AddDomainDependencies(this IServiceCollection services)
 	{
-		return services.AddScoped<IBulletinAIServices, BulletinAIServices>()
+		return services.AddScoped<IPluginsAiServices, PluginsAiServices>()
 			.AddScoped<ICommonAiService, CommonAiService>()
-			.AddScoped<IFitGymToolAIService, FitGymToolAIService>();
+			.AddScoped<IAiSkillsService, AiSkillsService>();
 	}
 }

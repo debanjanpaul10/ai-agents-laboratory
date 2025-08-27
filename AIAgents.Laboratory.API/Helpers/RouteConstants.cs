@@ -23,9 +23,9 @@ public static class RouteConstants
 	public const string AgentStatusHub_Route = "/hubs/agent-status";
 
 	/// <summary>
-	/// The IBBS AI Routes.
+	/// The route constants for plugins.
 	/// </summary>
-	public static class IBBSAi
+	internal static class Plugins
 	{
 		/// <summary>
 		/// The rewrite text route
@@ -41,22 +41,18 @@ public static class RouteConstants
 		/// The moderate content route
 		/// </summary>
 		public const string ModerateContent_Route = "moderatecontent";
-	}
 
-	/// <summary>
-	/// The FitGymTool AI Routes.
-	/// </summary>
-	internal static class FitGymToolAi
-	{
 		/// <summary>
 		/// The get bug severity route
 		/// </summary>
 		internal const string GetBugSeverity_Route = "getbugseverity";
+	}
 
-		/// <summary>
-		/// The get orchestrator response route
-		/// </summary>
-		internal const string GetChatbotResponse_Route = "getchatbotresponse";
+	/// <summary>
+	/// The AI skills routes.
+	/// </summary>
+	internal static class AISkillsRoutes
+	{
 
 		/// <summary>
 		/// The get SQL query markdown response route
@@ -67,6 +63,26 @@ public static class RouteConstants
 		/// The get followup questions api route.
 		/// </summary>
 		internal const string GetFollowupQuestionsResponse_Route = "getfollowupquestionsresponse";
+
+		/// <summary>
+		/// The detect user intent route
+		/// </summary>
+		internal const string DetectUserIntent_Route = "intentdetectionskill";
+
+		/// <summary>
+		/// The get user greeting response route
+		/// </summary>
+		internal const string GetUserGreetingResponse_Route = "usergreetingskill";
+
+		/// <summary>
+		/// The get rag text response route
+		/// </summary>
+		internal const string GetRAGTextResponse_Route = "ragtextresponseskill";
+
+		/// <summary>
+		/// The get nl to SQL response route
+		/// </summary>
+		internal const string GetNlToSqlResponse_Route = "nltosqlskill";
 	}
 
 	/// <summary>
