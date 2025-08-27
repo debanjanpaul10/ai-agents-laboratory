@@ -6,30 +6,10 @@
 internal static class SwaggerConstants
 {
 	/// <summary>
-	/// The FitGym Tool AI Controller.
+	/// The Skills Controller.
 	/// </summary>
-	internal static class FitGymToolAIController
+	internal static class SkillsController
 	{
-		/// <summary>
-		/// Swagger documentation for GetBugSeverityAsync
-		/// </summary>
-		internal static class GetBugSeverityAction
-		{
-			internal const string Summary = "Gets the bug severity string data asynchronous.";
-			internal const string Description = "Gets the bug severity for the given user bug based on the bug title and bug description.";
-			internal const string OperationId = nameof(GetBugSeverityAction);
-		}
-
-		/// <summary>
-		/// Swagger documentation for GetChatbotResponseAsync
-		/// </summary>
-		internal static class GetChatbotResponseAction
-		{
-			internal const string Summary = "Gets the chatbot response asynchronous.";
-			internal const string Description = "Gets the chatbot response from AI based on user query and the existing prompts and metadata.";
-			internal const string OperationId = nameof(GetChatbotResponseAction);
-		}
-
 		/// <summary>
 		/// Swagger documentation for GetSQLQueryMarkdownResponseAsync
 		/// </summary>
@@ -50,13 +30,62 @@ internal static class SwaggerConstants
 			internal const string OperationId = nameof(GetFollowupQuestionsResponseAction);
 		}
 
+		/// <summary>
+		/// Swagger documentation for DetectUserIntentAsync.
+		/// </summary>
+		internal static class DetectUserIntentAction
+		{
+			internal const string Summary = "Detects the user intent based on the user's query.";
+			internal const string Description = "Detects the user intent and classifies them into SQL, RAG, GREETING, etc based on the user's asked question and query.";
+			internal const string OperationId = nameof(DetectUserIntentAction);
+		}
+
+		/// <summary>
+		/// Swagger documentation for GetUserGreetingResponseAsync.
+		/// </summary>
+		internal static class GetUserGreetingResponseAction
+		{
+			internal const string Summary = "Gives a greeting message for the user's reply.";
+			internal const string Description = "Based on the user's greeting message, returns an AI generated greeting response.";
+			internal const string OperationId = nameof(GetUserGreetingResponseAction);
+		}
+
+		/// <summary>
+		/// Swagger documentation for GetRAGTextResponseAsync.
+		/// </summary>
+		internal static class GetRAGTextResponseAction
+		{
+			internal const string Summary = "Gives the RAG text response based on user query.";
+			internal const string Description = "Gives the RAG text response based on user query and knowledge base passed on.";
+			internal const string OperationId = nameof(GetRAGTextResponseAction);
+		}
+
+		/// <summary>
+		/// Swagger documentation for GetNLToSQLResponseAsync.
+		/// </summary>
+		internal static class GetNLToSQLResponseAction
+		{
+			internal const string Summary = "Gives the Nl to sql response based on user query.";
+			internal const string Description = "Creates a SQL query based on user's query, knowledge base and database schema.";
+			internal const string OperationId = nameof(GetNLToSQLResponseAction);
+		}
 	}
 
 	/// <summary>
-	/// The Internet Bulletin Board System AI Controller.
+	/// The Plugins Controller.
 	/// </summary>
-	internal static class IBBSAIController
+	internal static class PluginsController
 	{
+		/// <summary>
+		/// Swagger documentation for GetBugSeverityAsync
+		/// </summary>
+		internal static class GetBugSeverityAction
+		{
+			internal const string Summary = "Gets the bug severity string data asynchronous.";
+			internal const string Description = "Gets the bug severity for the given user bug based on the bug title and bug description.";
+			internal const string OperationId = nameof(GetBugSeverityAction);
+		}
+
 		/// <summary>
 		/// Swagger documentation for RewriteTextAsync
 		/// </summary>

@@ -6,13 +6,9 @@
 // *********************************************************************************
 
 using AIAgents.Laboratory.API.Adapters.Models.Request;
-using AIAgents.Laboratory.API.Adapters.Models.Request.FitGymTool;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using AIAgents.Laboratory.API.Adapters.Models.Response.FitGymTool;
-using AIAgents.Laboratory.API.Adapters.Models.Response.IBBS;
 using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DomainEntities.FitGymTool;
-using AIAgents.Laboratory.Domain.DomainEntities.IBBS;
+using AIAgents.Laboratory.Domain.DomainEntities.SkillsEntities;
 using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Mapper;
@@ -28,15 +24,18 @@ public class DomainMapperProfile : Profile
 	/// </summary>
 	public DomainMapperProfile()
 	{
+		CreateMap<SkillsInputDTO, SkillsInputDomain>();
+		CreateMap<NltosqlInputDTO, NltosqlInputDomain>();
+		CreateMap<BugSeverityInputDTO, BugSeverityInput>();
+		CreateMap<UserQueryRequestDTO, UserRequestDomain>();
+		CreateMap<FollowupQuestionsRequestDTO, FollowupQuestionsRequestDomain>();
+
 		CreateMap<BaseResponse, BaseResponseDTO>().ReverseMap();
 		CreateMap<TagResponse, TagResponseDTO>();
 		CreateMap<ModerationContentResponse, ModerationContentResponseDTO>();
 		CreateMap<RewriteResponse, RewriteResponseDTO>();
 		CreateMap<AgentStatus, AgentStatusDTO>();
-		CreateMap<BugSeverityInputDTO, BugSeverityInput>();
 		CreateMap<BugSeverityResponse, BugSeverityResponseDTO>();
-		CreateMap<UserQueryRequestDTO, UserRequestDomain>();
 		CreateMap<AIAgentResponseDomain, AIAgentResponseDTO>();
-		CreateMap<FollowupQuestionsRequestDTO, FollowupQuestionsRequestDomain>();
 	}
 }
