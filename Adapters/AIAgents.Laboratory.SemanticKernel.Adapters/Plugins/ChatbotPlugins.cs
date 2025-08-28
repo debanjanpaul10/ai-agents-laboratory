@@ -1,11 +1,4 @@
-﻿// *********************************************************************************
-//	<copyright file="ChatbotPlugins.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The Chatbot Plugins.</summary>
-// *********************************************************************************
-
-using AIAgents.Laboratory.Domain.DomainEntities.SkillsEntities;
+﻿using AIAgents.Laboratory.Domain.DomainEntities.SkillsEntities;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using System.ComponentModel;
