@@ -1,4 +1,3 @@
-using System.Globalization;
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
@@ -11,13 +10,13 @@ using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.PluginsController;
 namespace AIAgents.Laboratory.API.Controllers.v1;
 
 /// <summary>
-/// The AI plugins controller.
+/// The Plugins Controller Class.
 /// </summary>
-/// <param name="logger">The logger service.</param>
-/// <param name="pluginsHandler">The plugins handler</param>
+/// <param name="pluginsHandler">The plugins api adapter class.</param>
+/// <seealso cref="BaseController"/>
 [ApiController]
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
-public class PluginsController(ILogger<PluginsController> logger, IPluginsHandler pluginsHandler)
+public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 {
 	/// <summary>
 	/// Rewrites the text async.
@@ -31,33 +30,15 @@ public class PluginsController(ILogger<PluginsController> logger, IPluginsHandle
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	[SwaggerOperation(Summary = RewriteTextAction.Summary, Description = RewriteTextAction.Description, OperationId = RewriteTextAction.OperationId)]
-	public async Task<RewriteResponseDTO> RewriteTextAsync(UserStoryRequestDTO requestDto)
+	public async Task<ResponseDTO> RewriteTextAsync(UserStoryRequestDTO requestDto)
 	{
-		try
+		var result = await pluginsHandler.RewriteTextAsync(requestDto.Story).ConfigureAwait(false);
+		if (!string.IsNullOrEmpty(result.RewrittenStory))
 		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(RewriteTextAsync), DateTime.UtcNow));
+			return HandleSuccessRequestResponse(result);
+		}
 
-			var result = await pluginsHandler.RewriteTextAsync(requestDto.Story).ConfigureAwait(false);
-			if (string.IsNullOrEmpty(result.RewrittenStory))
-			{
-				var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
-				logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(RewriteTextAsync), DateTime.UtcNow, exception.Message));
-				throw exception;
-			}
-			else
-			{
-				return result;
-			}
-		}
-		catch (Exception ex)
-		{
-			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(RewriteTextAsync), DateTime.UtcNow, ex.Message));
-			throw;
-		}
-		finally
-		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(RewriteTextAsync), DateTime.UtcNow));
-		}
+		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 	}
 
 	/// <summary>
@@ -71,33 +52,15 @@ public class PluginsController(ILogger<PluginsController> logger, IPluginsHandle
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	[SwaggerOperation(Summary = GenerateTagForStoryAction.Summary, Description = GenerateTagForStoryAction.Description, OperationId = GenerateTagForStoryAction.OperationId)]
-	public async Task<TagResponseDTO> GenerateTagForStoryAsync(UserStoryRequestDTO requestDto)
+	public async Task<ResponseDTO> GenerateTagForStoryAsync(UserStoryRequestDTO requestDto)
 	{
-		try
+		var result = await pluginsHandler.GenerateTagForStoryAsync(requestDto.Story).ConfigureAwait(false);
+		if (!string.IsNullOrEmpty(result.UserStoryTag))
 		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GenerateTagForStoryAsync), DateTime.UtcNow));
+			return HandleSuccessRequestResponse(result);
+		}
 
-			var result = await pluginsHandler.GenerateTagForStoryAsync(requestDto.Story).ConfigureAwait(false);
-			if (string.IsNullOrEmpty(result.UserStoryTag))
-			{
-				var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
-				logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GenerateTagForStoryAsync), DateTime.UtcNow, exception.Message));
-				throw exception;
-			}
-			else
-			{
-				return result;
-			}
-		}
-		catch (Exception ex)
-		{
-			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GenerateTagForStoryAsync), DateTime.UtcNow, ex.Message));
-			throw;
-		}
-		finally
-		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GenerateTagForStoryAsync), DateTime.UtcNow));
-		}
+		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 	}
 
 	/// <summary>
@@ -111,33 +74,15 @@ public class PluginsController(ILogger<PluginsController> logger, IPluginsHandle
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	[SwaggerOperation(Summary = ModerateContentDataAction.Summary, Description = ModerateContentDataAction.Description, OperationId = ModerateContentDataAction.OperationId)]
-	public async Task<ModerationContentResponseDTO> ModerateContentDataAsync(UserStoryRequestDTO requestDto)
+	public async Task<ResponseDTO> ModerateContentDataAsync(UserStoryRequestDTO requestDto)
 	{
-		try
+		var result = await pluginsHandler.ModerateContentDataAsync(requestDto.Story).ConfigureAwait(false);
+		if (!string.IsNullOrEmpty(result.ContentRating))
 		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ModerateContentDataAsync), DateTime.UtcNow));
+			return HandleSuccessRequestResponse(result);
+		}
 
-			var result = await pluginsHandler.ModerateContentDataAsync(requestDto.Story).ConfigureAwait(false);
-			if (string.IsNullOrEmpty(result.ContentRating))
-			{
-				var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
-				logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ModerateContentDataAsync), DateTime.UtcNow, exception.Message));
-				throw exception;
-			}
-			else
-			{
-				return result;
-			}
-		}
-		catch (Exception ex)
-		{
-			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ModerateContentDataAsync), DateTime.UtcNow, ex.Message));
-			throw;
-		}
-		finally
-		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(ModerateContentDataAsync), DateTime.UtcNow));
-		}
+		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 	}
 
 	/// <summary>
@@ -151,32 +96,15 @@ public class PluginsController(ILogger<PluginsController> logger, IPluginsHandle
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	[SwaggerOperation(Summary = GetBugSeverityAction.Summary, Description = GetBugSeverityAction.Description, OperationId = GetBugSeverityAction.OperationId)]
-	public async Task<BugSeverityResponseDTO> GetBugSeverityAsync([FromBody] BugSeverityInputDTO bugSeverityInput)
+	public async Task<ResponseDTO> GetBugSeverityAsync([FromBody] BugSeverityInputDTO bugSeverityInput)
 	{
-		try
-		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetBugSeverityAsync), DateTime.UtcNow));
 
-			var result = await pluginsHandler.GetBugSeverityAsync(bugSeverityInput).ConfigureAwait(false);
-			if (string.IsNullOrEmpty(result.BugSeverity))
-			{
-				var exception = new Exception(ExceptionConstants.AiServicesDownMessage);
-				logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetBugSeverityAsync), DateTime.UtcNow, exception.Message));
-				throw exception;
-			}
-			else
-			{
-				return result;
-			}
-		}
-		catch (Exception ex)
+		var result = await pluginsHandler.GetBugSeverityAsync(bugSeverityInput).ConfigureAwait(false);
+		if (!string.IsNullOrEmpty(result.BugSeverity))
 		{
-			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetBugSeverityAsync), DateTime.UtcNow, ex.Message));
-			throw;
+			return HandleSuccessRequestResponse(result);
 		}
-		finally
-		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetBugSeverityAsync), DateTime.UtcNow));
-		}
+
+		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 	}
 }

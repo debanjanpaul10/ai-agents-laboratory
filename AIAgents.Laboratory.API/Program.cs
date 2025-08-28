@@ -48,7 +48,6 @@ builder.Services.AddSwaggerGen(options =>
 	});
 	options.EnableAnnotations();
 });
-builder.Services.AddExceptionHandler<GlobalExceptionMiddleware>();
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
@@ -64,7 +63,7 @@ if (app.Environment.IsDevelopment())
 	});
 }
 
-app.UseExceptionHandler();
+app.UseExceptionMiddleware();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

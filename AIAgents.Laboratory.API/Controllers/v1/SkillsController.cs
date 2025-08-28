@@ -4,7 +4,6 @@ using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Globalization;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.SkillsController;
 
@@ -13,12 +12,11 @@ namespace AIAgents.Laboratory.API.Controllers.v1;
 /// <summary>
 /// The AI Skills controller.
 /// </summary>
-/// <param name="logger">The logger service.</param>
 /// <param name="skillsHandler">The skills handler adapter.</param>
 /// <seealso cref="AIAgents.Laboratory.API.Controllers.BaseController" />
 [ApiController]
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
-public class SkillsController(ILogger<SkillsController> logger, ISkillsHandler skillsHandler) : BaseController
+public class SkillsController(ISkillsHandler skillsHandler) : BaseController
 {
     /// <summary>
     /// Detects the user intent asynchronous.
@@ -33,27 +31,13 @@ public class SkillsController(ILogger<SkillsController> logger, ISkillsHandler s
     [SwaggerOperation(Summary = DetectUserIntentAction.Summary, Description = DetectUserIntentAction.Description, OperationId = DetectUserIntentAction.OperationId)]
     public async Task<ResponseDTO> DetectUserIntentAsync([FromBody] UserQueryRequestDTO userQueryRequest)
     {
-        try
+        var result = await skillsHandler.DetectUserIntentAsync(userQueryRequest).ConfigureAwait(false);
+        if (!string.IsNullOrEmpty(result))
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(DetectUserIntentAsync), DateTime.UtcNow));
+            return HandleSuccessRequestResponse(result);
+        }
 
-            var result = await skillsHandler.DetectUserIntentAsync(userQueryRequest).ConfigureAwait(false);
-            if (!string.IsNullOrEmpty(result))
-            {
-                return HandleSuccessRequestResponse(result);
-            }
-
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(DetectUserIntentAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(DetectUserIntentAsync), DateTime.UtcNow));
-        }
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -68,27 +52,13 @@ public class SkillsController(ILogger<SkillsController> logger, ISkillsHandler s
     [SwaggerOperation(Summary = GetUserGreetingResponseAction.Summary, Description = GetUserGreetingResponseAction.Description, OperationId = GetUserGreetingResponseAction.OperationId)]
     public async Task<ResponseDTO> GetUserGreetingResponseAsync()
     {
-        try
+        var result = await skillsHandler.GetUserGreetingResponseAsync().ConfigureAwait(false);
+        if (!string.IsNullOrEmpty(result))
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(DetectUserIntentAsync), DateTime.UtcNow));
+            return HandleSuccessRequestResponse(result);
+        }
 
-            var result = await skillsHandler.GetUserGreetingResponseAsync().ConfigureAwait(false);
-            if (!string.IsNullOrEmpty(result))
-            {
-                return HandleSuccessRequestResponse(result);
-            }
-
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(DetectUserIntentAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(DetectUserIntentAsync), DateTime.UtcNow));
-        }
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -104,27 +74,13 @@ public class SkillsController(ILogger<SkillsController> logger, ISkillsHandler s
     [SwaggerOperation(Summary = GetRAGTextResponseAction.Summary, Description = GetRAGTextResponseAction.Description, OperationId = GetRAGTextResponseAction.OperationId)]
     public async Task<ResponseDTO> GetRAGTextResponseAsync([FromBody] SkillsInputDTO ragTextInput)
     {
-        try
+        var result = await skillsHandler.GetRAGTextResponseAsync(ragTextInput).ConfigureAwait(false);
+        if (!string.IsNullOrEmpty(result))
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetRAGTextResponseAsync), DateTime.UtcNow));
+            return HandleSuccessRequestResponse(result);
+        }
 
-            var result = await skillsHandler.GetRAGTextResponseAsync(ragTextInput).ConfigureAwait(false);
-            if (!string.IsNullOrEmpty(result))
-            {
-                return HandleSuccessRequestResponse(result);
-            }
-
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetRAGTextResponseAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetRAGTextResponseAsync), DateTime.UtcNow));
-        }
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -140,27 +96,13 @@ public class SkillsController(ILogger<SkillsController> logger, ISkillsHandler s
     [SwaggerOperation(Summary = GetNLToSQLResponseAction.Summary, Description = GetNLToSQLResponseAction.Description, OperationId = GetNLToSQLResponseAction.OperationId)]
     public async Task<ResponseDTO> GetNLToSQLResponseAsync([FromBody] NltosqlInputDTO nltosqlInput)
     {
-        try
+        var result = await skillsHandler.GetNLToSQLResponseAsync(nltosqlInput).ConfigureAwait(false);
+        if (!string.IsNullOrEmpty(result))
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetRAGTextResponseAsync), DateTime.UtcNow));
+            return HandleSuccessRequestResponse(result);
+        }
 
-            var result = await skillsHandler.GetNLToSQLResponseAsync(nltosqlInput).ConfigureAwait(false);
-            if (!string.IsNullOrEmpty(result))
-            {
-                return HandleSuccessRequestResponse(result);
-            }
-
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetRAGTextResponseAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetRAGTextResponseAsync), DateTime.UtcNow));
-        }
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -176,27 +118,13 @@ public class SkillsController(ILogger<SkillsController> logger, ISkillsHandler s
     [SwaggerOperation(Summary = GetSQLQueryMarkdownResponseAction.Summary, Description = GetSQLQueryMarkdownResponseAction.Description, OperationId = GetSQLQueryMarkdownResponseAction.OperationId)]
     public async Task<ResponseDTO> GetSQLQueryMarkdownResponseAsync([FromBody] SqlQueryResultDTO sqlQueryResult)
     {
-        try
+        var result = await skillsHandler.GetSQLQueryMarkdownResponseAsync(sqlQueryResult.JsonQuery).ConfigureAwait(false);
+        if (!string.IsNullOrEmpty(result))
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow));
+            return HandleSuccessRequestResponse(result);
+        }
 
-            var result = await skillsHandler.GetSQLQueryMarkdownResponseAsync(sqlQueryResult.JsonQuery).ConfigureAwait(false);
-            if (!string.IsNullOrEmpty(result))
-            {
-                return HandleSuccessRequestResponse(result);
-            }
-
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetSQLQueryMarkdownResponseAsync), DateTime.UtcNow));
-        }
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -212,27 +140,13 @@ public class SkillsController(ILogger<SkillsController> logger, ISkillsHandler s
     [SwaggerOperation(Summary = GetFollowupQuestionsResponseAction.Summary, Description = GetFollowupQuestionsResponseAction.Description, OperationId = GetFollowupQuestionsResponseAction.OperationId)]
     public async Task<ResponseDTO> GetFollowupQuestionsResponseAsync([FromBody] FollowupQuestionsRequestDTO followupQuestionsRequest)
     {
-        try
+        var result = await skillsHandler.GetFollowupQuestionsResponseAsync(followupQuestionsRequest).ConfigureAwait(false);
+        if (result is not null && result.Any())
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetFollowupQuestionsResponseAsync), DateTime.UtcNow));
+            return HandleSuccessRequestResponse(result);
+        }
 
-            var result = await skillsHandler.GetFollowupQuestionsResponseAsync(followupQuestionsRequest).ConfigureAwait(false);
-            if (result is not null && result.Any())
-            {
-                return HandleSuccessRequestResponse(result);
-            }
-
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetFollowupQuestionsResponseAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetFollowupQuestionsResponseAsync), DateTime.UtcNow));
-        }
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 }
 
