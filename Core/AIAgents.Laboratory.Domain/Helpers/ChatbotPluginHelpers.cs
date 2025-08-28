@@ -35,7 +35,7 @@ public static class ChatbotPluginHelpers
 		/// <summary>
 		/// The function instructions
 		/// </summary>
-		public const string FunctionInstructions = 
+		public const string FunctionInstructions =
 			"""
 			You are an AI assistant tasked with analyzing user queries to determine their intent. Follow the below instructions strictly:
 				1. Users will provide you with a question or query and you need to carefully analyze the content, context, and keywords to understand what they are trying to accomplish.
@@ -81,7 +81,7 @@ public static class ChatbotPluginHelpers
 		/// <summary>
 		/// The function instructions
 		/// </summary>
-		public const string FunctionInstructions = 
+		public const string FunctionInstructions =
 			"""
 			You are solely responsible for greeting the user based on the type of message user has greeted you with.
 				- Return a greeting like "Hello how are you, I am your Assistant AI Agent" or simply "Good morning" or "Good Evening" based on the user's greeting.
@@ -119,7 +119,7 @@ public static class ChatbotPluginHelpers
 		/// <summary>
 		/// The function instructions
 		/// </summary>
-		public const string FunctionInstructions = 
+		public const string FunctionInstructions =
 			"""
 			You are an AI assistant specialized in converting natural language queries into SQL statements. Follow the below instructions strictly:
 				1. Users will provide you with a natural language question that requires data retrieval from a database, and you need to generate the appropriate SQL query.
@@ -182,7 +182,7 @@ public static class ChatbotPluginHelpers
 		/// <summary>
 		/// The format SQL response to markdown instructions
 		/// </summary>
-		public const string FormatSQLResponseToMarkdownInstructions = 
+		public const string FormatSQLResponseToMarkdownInstructions =
 			"""
 			You are an AI assistant specialized in converting the given SQL data from JSON Format to a clean markdown format. Follow the instructions:
 				- Do not add any justifications or comments, take the input as is and provide a clean output in markdown format that has table format.
@@ -217,7 +217,7 @@ public static class ChatbotPluginHelpers
 		/// <summary>
 		/// The function instructions
 		/// </summary>
-		public const string FunctionInstructions = 
+		public const string FunctionInstructions =
 			"""
 			You are an AI assistant specialized in Retrieval-Augmented Generation (RAG) for answering user questions using a provided knowledge base. Follow the below instructions strictly:
 				1. Users will provide you with a question or query that requires information retrieval and text generation, and you need to generate a comprehensive, well-formatted answer.
@@ -289,7 +289,7 @@ public static class ChatbotPluginHelpers
 		/// <summary>
 		/// The function instructions
 		/// </summary>
-		public const string FunctionInstructions = 
+		public const string FunctionInstructions =
 			"""
 			You are an AI assistant whose sole responsibility is to show the JSON in a presentable format back to the user. Strictly ahere to the following rules:
 				- The input you will receive will contain unstructured JSON data which will contain SQL response.
@@ -338,13 +338,7 @@ public static class ChatbotPluginHelpers
 				- You will be using the `userQuery`, `userIntent` and `aiResponse` to generate the list of followup questions. 
 				- Never add any clarifications or extra context. Only return the list of those strings.
 				- While returning the member related data, make sure to use the correct member name or member email.
-
-				Example:
-
-				USER_QUERY: Give me the list of all the active members
-				USER_INTENT: SQL
-				AI_RESPONSE: <Markdown_table_containing_the_tabular_data>
-				OUTPUT: ['Give me the payment history data for all members', 'Give me the contact details for `Member_Name`', '']
+				- DO NOT ADD ANY PREFIXES ON THE TYPE OF FILES. ONLY THREE FOLLOWUP QUESTIONS AND NOTHING ELSE.
 
 			User Query:
 			++++++++++++

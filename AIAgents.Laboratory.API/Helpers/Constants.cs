@@ -99,6 +99,11 @@ internal static class Constants
 		/// The managed identity client identifier constant
 		/// </summary>
 		internal const string ManagedIdentityClientIdConstant = "ManagedIdentityClientId";
+
+		/// <summary>
+		/// The application json constant
+		/// </summary>
+		internal const string ApplicationJsonConstant = "application/json";
 	}
 
 	/// <summary>
