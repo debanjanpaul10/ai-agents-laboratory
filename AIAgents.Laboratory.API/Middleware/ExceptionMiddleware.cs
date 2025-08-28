@@ -38,7 +38,7 @@ public class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, RequestDel
 	/// <param name="statusCode">The status code.</param>
 	/// <param name="error">The error.</param>
 	/// <param name="message">The message.</param>
-	public async Task HandleExceptionAsync(HttpContext httpContext, Exception ex, int statusCode, string error, string message)
+	private async Task HandleExceptionAsync(HttpContext httpContext, Exception ex, int statusCode, string error, string message)
 	{
 		logger.LogError(ex, string.Format(LoggingConstants.LogHelperMethodFailed, httpContext.Request.Method, DateTime.UtcNow, ex.Message));
 
