@@ -98,7 +98,6 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	[SwaggerOperation(Summary = GetBugSeverityAction.Summary, Description = GetBugSeverityAction.Description, OperationId = GetBugSeverityAction.OperationId)]
 	public async Task<ResponseDTO> GetBugSeverityAsync([FromBody] BugSeverityInputDTO bugSeverityInput)
 	{
-
 		var result = await pluginsHandler.GetBugSeverityAsync(bugSeverityInput).ConfigureAwait(false);
 		if (!string.IsNullOrEmpty(result.BugSeverity))
 		{
