@@ -340,6 +340,11 @@ public static class ChatbotPluginHelpers
 				- While returning the member related data, make sure to use the correct member name or member email.
 				- DO NOT ADD ANY PREFIXES ON THE TYPE OF FILES. ONLY THREE FOLLOWUP QUESTIONS AND NOTHING ELSE.
 
+			Format:
+
+			['QUESTION_1', 'QUESTION_2', 'QUESTION_3']
+
+
 			User Query:
 			++++++++++++
 
