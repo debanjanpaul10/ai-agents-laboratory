@@ -22,57 +22,91 @@ public static class KernelFactory
 {
 #pragma warning disable SKEXP0001
 #pragma warning disable SKEXP0050
-    /// <summary>
-    /// Creates memory.
-    /// </summary>
-    public static Func<IServiceProvider, ISemanticTextMemory> CreateMemory()
-    {
-        return provider =>
-        {
-            var memoryBuilder = new MemoryBuilder();
-            memoryBuilder.WithMemoryStore(new VolatileMemoryStore());
+#pragma warning disable SKEXP0010
 
-            return memoryBuilder.Build();
-        };
-    }
+    /// <summary>
+    /// Creates the memory.
+    /// </summary>
+    /// <returns>The service provider and kernel memory</returns>
+    public static Func<IServiceProvider, ISemanticTextMemory> CreateMemory() => (provider) =>
+    {
+        var memoryBuilder = new MemoryBuilder();
+        memoryBuilder.WithMemoryStore(new VolatileMemoryStore());
+
+        return memoryBuilder.Build();
+    };
 
     /// <summary>
     /// Creates the kernel.
     /// </summary>
     /// <param name="configuration">The configuration.</param>
-    public static Func<IServiceProvider, Kernel> CreateKernel(IConfiguration configuration)
+    /// <returns>The service provider and kernel.</returns>
+    public static Func<IServiceProvider, Kernel> CreateKernel(IConfiguration configuration) => (provider) =>
     {
-        var isProModelEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsProModelEnabledFlag], out bool parsedValue) && parsedValue;
-        var geminiAiModel = isProModelEnabled ? AzureAppConfigurationConstants.GeminiProModel : AzureAppConfigurationConstants.GeminiFlashModel;
+        var currentAiServiceProvider = configuration[AzureAppConfigurationConstants.CurrentAiServiceProvider] ?? throw new Exception();
+        var kernelBuilder = Kernel.CreateBuilder();
 
-        return provider =>
+        switch (currentAiServiceProvider)
         {
-            var modelId = configuration[geminiAiModel];
-            var apiKey = configuration[AzureAppConfigurationConstants.GeminiAPIKeyConstant];
-            if (string.IsNullOrEmpty(modelId) || string.IsNullOrEmpty(apiKey))
-            {
-                throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
-            }
+            case GoogleGeminiAiConstants.ServiceProviderName:
+                kernelBuilder.ConfigureGoogleGeminiAiKernel(configuration);
+                break;
+            case PerplexityAiConstants.ServiceProviderName:
+                kernelBuilder.ConfigurePerplexityAiKernel(configuration);
+                break;
+            default:
+                throw new InvalidOperationException(string.Format(ExceptionConstants.InvalidServiceProvider, currentAiServiceProvider));
+        }
 
-            var kernelBuilder = Kernel.CreateBuilder();
+        var kernel = kernelBuilder.Build();
 
-            if (!string.IsNullOrEmpty(modelId) && !string.IsNullOrEmpty(apiKey))
-            {
+        kernel.Plugins.AddFromType<RewriteTextPlugin>(PluginHelpers.RewriteTextPlugin.PluginName);
+        kernel.Plugins.AddFromType<ContentPlugins>(PluginHelpers.ContentPlugins.PluginName);
+        kernel.Plugins.AddFromType<UtilityPlugins>(PluginHelpers.UtilityPlugins.PluginName);
+        kernel.Plugins.AddFromType<ChatbotPlugins>(ChatbotPluginHelpers.PluginName, provider);
+        return kernel;
+    };
 
-                kernelBuilder.AddGoogleAIGeminiChatCompletion(modelId, apiKey);
-                kernelBuilder.AddGoogleAIEmbeddingGenerator(modelId, apiKey);
-                kernelBuilder.Services.AddSingleton(CreateMemory());
-            }
-            var kernel = kernelBuilder.Build();
+    /// <summary>
+    /// Configures the google gemini ai kernel.
+    /// </summary>
+    /// <param name="kernelBuilder">The kernel builder.</param>
+    /// <param name="configuration">The configuration.</param>
+    /// <exception cref="System.InvalidOperationException"></exception>
+    private static void ConfigureGoogleGeminiAiKernel(this IKernelBuilder kernelBuilder, IConfiguration configuration)
+    {
+        var isProModelEnabled = bool.TryParse(configuration[GoogleGeminiAiConstants.IsProModelEnabledFlag], out bool parsedValue) && parsedValue;
+        var geminiAiModel = isProModelEnabled ? GoogleGeminiAiConstants.GeminiProModel : GoogleGeminiAiConstants.GeminiFlashModel;
+        var modelId = configuration[geminiAiModel];
+        var apiKey = configuration[GoogleGeminiAiConstants.GeminiAPIKeyConstant];
+        if (string.IsNullOrEmpty(modelId) || string.IsNullOrEmpty(apiKey))
+        {
+            throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
+        }
 
-            // Import Plugins
-            kernel.Plugins.AddFromType<RewriteTextPlugin>(PluginHelpers.RewriteTextPlugin.PluginName);
-            kernel.Plugins.AddFromType<ContentPlugins>(PluginHelpers.ContentPlugins.PluginName);
-            kernel.Plugins.AddFromType<UtilityPlugins>(PluginHelpers.UtilityPlugins.PluginName);
-            kernel.Plugins.AddFromType<ChatbotPlugins>(ChatbotPluginHelpers.PluginName, provider);
-
-            return kernel;
-        };
+        kernelBuilder.AddGoogleAIGeminiChatCompletion(modelId, apiKey);
+        kernelBuilder.AddGoogleAIEmbeddingGenerator(modelId, apiKey);
+        kernelBuilder.Services.AddSingleton(CreateMemory());
     }
 
+    /// <summary>
+    /// Configures the perplexity ai kernel.
+    /// </summary>
+    /// <param name="kernelBuilder">The kernel builder.</param>
+    /// <param name="configuration">The configuration.</param>
+    /// <exception cref="System.InvalidOperationException"></exception>
+    private static void ConfigurePerplexityAiKernel(this IKernelBuilder kernelBuilder, IConfiguration configuration)
+    {
+        var aiModelId = configuration[PerplexityAiConstants.ModelId];
+        var aiApiKey = configuration[PerplexityAiConstants.ApiKey];
+        var apiEndpoint = configuration[PerplexityAiConstants.ApiEndpoint];
+        if (string.IsNullOrEmpty(aiModelId) || string.IsNullOrEmpty(aiApiKey) || string.IsNullOrEmpty(apiEndpoint))
+        {
+            throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
+        }
+
+        kernelBuilder.AddOpenAIChatCompletion(modelId: aiModelId, apiKey: aiApiKey, endpoint: new Uri(apiEndpoint));
+        kernelBuilder.AddOpenAIEmbeddingGenerator(modelId: aiModelId, apiKey: aiApiKey);
+        kernelBuilder.Services.AddSingleton(CreateMemory());
+    }
 }
