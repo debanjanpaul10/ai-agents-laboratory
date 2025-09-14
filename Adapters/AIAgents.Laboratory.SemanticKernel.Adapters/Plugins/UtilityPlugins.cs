@@ -1,15 +1,6 @@
-﻿// *********************************************************************************
-//	<copyright file="UtilityPlugins.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The Utility Plugins.</summary>
-// *********************************************************************************
-
-using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
+﻿using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 using Microsoft.SemanticKernel;
 using System.ComponentModel;
-using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers.UtilityPlugins;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
@@ -31,18 +22,10 @@ public class UtilityPlugins
 	{
 		var arguments = new KernelArguments()
 		{{
-				Constants.ArgumentsConstants.KernelArgumentsInputConstant, input
+			Constants.ArgumentsConstants.KernelArgumentsInputConstant, input
 		}};
 
 		var result = await kernel.InvokePromptAsync(DetermineBugSeverityFunction.FunctionInstructions, arguments).ConfigureAwait(false);
-		var aiMetadata = result.Metadata;
-
-		return JsonSerializer.Serialize(new BugSeverityResponse
-		{
-			BugSeverity = result.GetValue<string>() ?? string.Empty,
-			TotalTokensConsumed = Convert.ToInt32(aiMetadata?[Constants.ArgumentsConstants.TotalTokenCountConstant] ?? 0),
-			CandidatesTokenCount = Convert.ToInt32(aiMetadata?[Constants.ArgumentsConstants.CandidatesTokenCountConstant] ?? 0),
-			PromptTokenCount = Convert.ToInt32(aiMetadata?[Constants.ArgumentsConstants.PromptTokenCountConstant] ?? 0)
-		});
+		return result.GetValue<string>() ?? string.Empty;
 	}
 }
