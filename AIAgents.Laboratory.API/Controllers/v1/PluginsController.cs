@@ -91,7 +91,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	/// <param name="bugSeverityInput">The bug severity input.</param>
 	/// <returns>The bug severity ai response dto.</returns>
 	[HttpPost(RouteConstants.Plugins.GetBugSeverity_Route)]
-	[ProducesResponseType(typeof(BugSeverityResponseDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -99,7 +99,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	public async Task<ResponseDTO> GetBugSeverityAsync([FromBody] BugSeverityInputDTO bugSeverityInput)
 	{
 		var result = await pluginsHandler.GetBugSeverityAsync(bugSeverityInput).ConfigureAwait(false);
-		if (!string.IsNullOrEmpty(result.BugSeverity))
+		if (!string.IsNullOrEmpty(result))
 		{
 			return HandleSuccessRequestResponse(result);
 		}
