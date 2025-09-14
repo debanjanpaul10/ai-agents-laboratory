@@ -33,5 +33,5 @@ public interface IPluginsAiServices
     /// </summary>
     /// <param name="bugSeverityInput">The bug severity input.</param>
     /// <returns>The bug severity response.</returns>
-    Task<BugSeverityResponse> GetBugSeverityAsync(BugSeverityInput bugSeverityInput);
+    Task<string> GetBugSeverityAsync(BugSeverityInput bugSeverityInput);
 }

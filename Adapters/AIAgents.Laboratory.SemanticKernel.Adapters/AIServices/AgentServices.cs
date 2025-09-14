@@ -1,19 +1,12 @@
-// *********************************************************************************
-//	<copyright file="AgentServices.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The Agent Services Class.</summary>
-// *********************************************************************************
-
+using System.Globalization;
+using System.Text.Json;
+using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
-using System.Globalization;
-using System.Text.Json;
-using AIAgents.Laboratory.Domain.Helpers;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
-using AIAgents.Laboratory.Domain.DomainEntities;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 
@@ -44,7 +37,7 @@ public class AgentServices(ILogger<AgentServices> logger, Kernel kernel) : IAIAg
 			{
 				throw new Exception(ExceptionConstants.SomethingWentWrongMessage);
 			}
-			
+
 			var normalizedIntent = userIntent.Trim().ToUpperInvariant();
 			var aiResponse = normalizedIntent switch
 			{
