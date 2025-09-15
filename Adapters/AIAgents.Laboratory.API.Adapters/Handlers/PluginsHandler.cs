@@ -1,6 +1,5 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
-using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AutoMapper;
@@ -22,10 +21,9 @@ public class PluginsHandler(IMapper mapper, IPluginsAiServices pluginsAiServices
 	/// <returns>
 	/// The genre tag response dto.
 	/// </returns>
-	public async Task<TagResponseDTO> GenerateTagForStoryAsync(string story)
+	public async Task<string> GenerateTagForStoryAsync(string story)
 	{
-		var response = await pluginsAiServices.GenerateTagForStoryAsync(story).ConfigureAwait(false);
-		return mapper.Map<TagResponseDTO>(response);
+		return await pluginsAiServices.GenerateTagForStoryAsync(story).ConfigureAwait(false);
 	}
 
 	/// <summary>
@@ -48,10 +46,9 @@ public class PluginsHandler(IMapper mapper, IPluginsAiServices pluginsAiServices
 	/// <returns>
 	/// The moderation content response dto.
 	/// </returns>
-	public async Task<ModerationContentResponseDTO> ModerateContentDataAsync(string story)
+	public async Task<string> ModerateContentDataAsync(string story)
 	{
-		var response = await pluginsAiServices.ModerateContentDataAsync(story).ConfigureAwait(false);
-		return mapper.Map<ModerationContentResponseDTO>(response);
+		return await pluginsAiServices.ModerateContentDataAsync(story).ConfigureAwait(false);
 	}
 
 	/// <summary>
@@ -61,9 +58,8 @@ public class PluginsHandler(IMapper mapper, IPluginsAiServices pluginsAiServices
 	/// <returns>
 	/// The rewrite response dto.
 	/// </returns>
-	public async Task<RewriteResponseDTO> RewriteTextAsync(string story)
+	public async Task<string> RewriteTextAsync(string story)
 	{
-		var response = await pluginsAiServices.RewriteTextAsync(story).ConfigureAwait(false);
-		return mapper.Map<RewriteResponseDTO>(response);
+		return await pluginsAiServices.RewriteTextAsync(story).ConfigureAwait(false);
 	}
 }

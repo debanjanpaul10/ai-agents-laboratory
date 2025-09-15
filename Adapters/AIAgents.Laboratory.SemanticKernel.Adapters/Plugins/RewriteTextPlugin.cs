@@ -1,15 +1,8 @@
-// *********************************************************************************
-//	<copyright file="RewriteTextPlugin.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>Rewrite text plugin.</summary>
-// *********************************************************************************
-
+using System.ComponentModel;
+using System.Text.Json;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 using Microsoft.SemanticKernel;
-using System.ComponentModel;
-using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers.RewriteTextPlugin;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
