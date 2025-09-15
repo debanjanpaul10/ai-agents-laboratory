@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.Json;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
@@ -15,8 +14,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// </summary>
 /// <param name="logger">The logger service.</param>
 /// <param name="aiAgentServices">The AI agent services.</param>
-/// <param name="commonAiService">The common ai services.</param>
-public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServices aiAgentServices, ICommonAiService commonAiService) : IPluginsAiServices
+public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServices aiAgentServices) : IPluginsAiServices
 {
 	/// <summary>
 	/// Gets the bug severity asynchronous.
@@ -35,7 +33,7 @@ public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServic
 				throw new Exception(ExceptionConstants.InputParametersCannotBeEmptyMessage);
 			}
 
-			return await aiAgentServices.GetAiFunctionResponseAsync(bugSeverityInput, PluginHelpers.UtilityPlugins.PluginName, PluginHelpers.UtilityPlugins.DetermineBugSeverityFunction.FunctionName).ConfigureAwait(false);
+			return await aiAgentServices.GetAiFunctionResponseAsync(bugSeverityInput, PluginHelpers.UtilityPlugins.PluginName, UtilityPlugins.DetermineBugSeverityFunction.FunctionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
@@ -55,7 +53,7 @@ public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServic
 	/// <returns>
 	/// The genre tag response dto.
 	/// </returns>
-	public async Task<TagResponse> GenerateTagForStoryAsync(string story)
+	public async Task<string> GenerateTagForStoryAsync(string story)
 	{
 		try
 		{
@@ -67,14 +65,7 @@ public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServic
 				throw exception;
 			}
 
-			var response = await aiAgentServices.GetAiFunctionResponseAsync(story, ContentPlugins.PluginName, ContentPlugins.GenerateGenreTagForStoryFunction.FunctionName).ConfigureAwait(false);
-			var tagResponse = JsonSerializer.Deserialize<TagResponse>(response);
-			if (tagResponse is not null)
-			{
-				tagResponse.ModelUsed = commonAiService.GetCurrentModelId();
-			}
-
-			return tagResponse ?? new TagResponse { ModelUsed = commonAiService.GetCurrentModelId() };
+			return await aiAgentServices.GetAiFunctionResponseAsync(story, ContentPlugins.PluginName, ContentPlugins.GenerateGenreTagForStoryFunction.FunctionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
@@ -94,7 +85,7 @@ public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServic
 	/// <returns>
 	/// The moderation content response dto.
 	/// </returns>
-	public async Task<ModerationContentResponse> ModerateContentDataAsync(string story)
+	public async Task<string> ModerateContentDataAsync(string story)
 	{
 		try
 		{
@@ -106,14 +97,7 @@ public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServic
 				throw exception;
 			}
 
-			var response = await aiAgentServices.GetAiFunctionResponseAsync(story, ContentPlugins.PluginName, ContentPlugins.ContentModerationFunction.FunctionName).ConfigureAwait(false);
-			var moderationResponse = JsonSerializer.Deserialize<ModerationContentResponse>(response);
-			if (moderationResponse is not null)
-			{
-				moderationResponse.ModelUsed = commonAiService.GetCurrentModelId();
-			}
-
-			return moderationResponse ?? new ModerationContentResponse { ModelUsed = commonAiService.GetCurrentModelId() };
+			return await aiAgentServices.GetAiFunctionResponseAsync(story, ContentPlugins.PluginName, ContentPlugins.ContentModerationFunction.FunctionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
@@ -133,7 +117,7 @@ public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServic
 	/// <returns>
 	/// The rewrite response dto.
 	/// </returns>
-	public async Task<RewriteResponse> RewriteTextAsync(string story)
+	public async Task<string> RewriteTextAsync(string story)
 	{
 		try
 		{
@@ -145,14 +129,7 @@ public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServic
 				throw exception;
 			}
 
-			var response = await aiAgentServices.GetAiFunctionResponseAsync(story, RewriteTextPlugin.PluginName, RewriteTextPlugin.RewriteUserStoryFunction.FunctionName).ConfigureAwait(false);
-			var rewriteResponse = JsonSerializer.Deserialize<RewriteResponse>(response);
-			if (rewriteResponse is not null)
-			{
-				rewriteResponse.ModelUsed = commonAiService.GetCurrentModelId();
-			}
-
-			return rewriteResponse ?? new RewriteResponse { ModelUsed = commonAiService.GetCurrentModelId() };
+			return await aiAgentServices.GetAiFunctionResponseAsync(story, RewriteTextPlugin.PluginName, RewriteTextPlugin.RewriteUserStoryFunction.FunctionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{

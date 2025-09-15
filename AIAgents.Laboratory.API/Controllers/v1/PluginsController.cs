@@ -25,7 +25,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	/// <returns>The AI rewritten story.</returns>
 	/// <exception cref="Exception"></exception>
 	[HttpPost(RouteConstants.Plugins.RewriteText_Route)]
-	[ProducesResponseType(typeof(RewriteResponseDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -33,7 +33,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	public async Task<ResponseDTO> RewriteTextAsync(UserStoryRequestDTO requestDto)
 	{
 		var result = await pluginsHandler.RewriteTextAsync(requestDto.Story).ConfigureAwait(false);
-		if (!string.IsNullOrEmpty(result.RewrittenStory))
+		if (!string.IsNullOrEmpty(result))
 		{
 			return HandleSuccessRequestResponse(result);
 		}
@@ -47,7 +47,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	/// <param name="requestDto">The request dto.</param>
 	/// <returns>The tag response dto.</returns>
 	[HttpPost(RouteConstants.Plugins.GenerateTag_Route)]
-	[ProducesResponseType(typeof(TagResponseDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -55,7 +55,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	public async Task<ResponseDTO> GenerateTagForStoryAsync(UserStoryRequestDTO requestDto)
 	{
 		var result = await pluginsHandler.GenerateTagForStoryAsync(requestDto.Story).ConfigureAwait(false);
-		if (!string.IsNullOrEmpty(result.UserStoryTag))
+		if (!string.IsNullOrEmpty(result))
 		{
 			return HandleSuccessRequestResponse(result);
 		}
@@ -69,7 +69,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	/// <param name="requestDto">The request dto.</param>
 	/// <returns>The moderation content response.</returns>
 	[HttpPost(RouteConstants.Plugins.ModerateContent_Route)]
-	[ProducesResponseType(typeof(ModerationContentResponseDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -77,7 +77,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	public async Task<ResponseDTO> ModerateContentDataAsync(UserStoryRequestDTO requestDto)
 	{
 		var result = await pluginsHandler.ModerateContentDataAsync(requestDto.Story).ConfigureAwait(false);
-		if (!string.IsNullOrEmpty(result.ContentRating))
+		if (!string.IsNullOrEmpty(result))
 		{
 			return HandleSuccessRequestResponse(result);
 		}

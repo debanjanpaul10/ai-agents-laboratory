@@ -1,15 +1,8 @@
-﻿// *********************************************************************************
-//	<copyright file="ContentPlugins.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The Content Plugins.</summary>
-// *********************************************************************************
-
+﻿using System.ComponentModel;
+using System.Text.Json;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 using Microsoft.SemanticKernel;
-using System.ComponentModel;
-using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers.ContentPlugins;
 
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
@@ -27,7 +20,7 @@ public class ContentPlugins
 	/// <returns>The AI response.</returns>
 	[KernelFunction(name: GenerateGenreTagForStoryFunction.FunctionName)]
 	[Description(description: GenerateGenreTagForStoryFunction.FunctionDescription)]
-	public static async Task<string> ExecuteGenerateTagForStoryPluginAsync(Kernel kernel, [Description(GenerateGenreTagForStoryFunction.InputDescription)]string input)
+	public static async Task<string> ExecuteGenerateTagForStoryPluginAsync(Kernel kernel, [Description(GenerateGenreTagForStoryFunction.InputDescription)] string input)
 	{
 		var arguments = new KernelArguments
 		{{
