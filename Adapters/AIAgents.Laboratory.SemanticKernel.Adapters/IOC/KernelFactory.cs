@@ -55,9 +55,7 @@ public static class KernelFactory
 
 		var kernel = kernelBuilder.Build();
 
-		kernel.Plugins.AddFromType<RewriteTextPlugin>(PluginHelpers.RewriteTextPlugin.PluginName);
-		kernel.Plugins.AddFromType<ContentPlugins>(PluginHelpers.ContentPlugins.PluginName);
-		kernel.Plugins.AddFromType<UtilityPlugins>(PluginHelpers.UtilityPlugins.PluginName);
+		kernel.Plugins.AddFromType<ApplicationPlugins>(ApplicationPluginsHelpers.PluginName, provider);
 		kernel.Plugins.AddFromType<ChatbotPlugins>(ChatbotPluginHelpers.PluginName, provider);
 		return kernel;
 	};
