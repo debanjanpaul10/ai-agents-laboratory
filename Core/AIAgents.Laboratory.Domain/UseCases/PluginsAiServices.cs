@@ -5,7 +5,6 @@ using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Logging;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
-using static AIAgents.Laboratory.Domain.Helpers.PluginHelpers;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
 
@@ -16,6 +15,11 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="aiAgentServices">The AI agent services.</param>
 public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServices aiAgentServices) : IPluginsAiServices
 {
+	/// <summary>
+	/// The application plugin name.
+	/// </summary>
+	private static readonly string ApplicationPluginName = ApplicationPluginsHelpers.PluginName;
+
 	/// <summary>
 	/// Gets the bug severity asynchronous.
 	/// </summary>
@@ -33,7 +37,7 @@ public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServic
 				throw new Exception(ExceptionConstants.InputParametersCannotBeEmptyMessage);
 			}
 
-			return await aiAgentServices.GetAiFunctionResponseAsync(bugSeverityInput, PluginHelpers.UtilityPlugins.PluginName, UtilityPlugins.DetermineBugSeverityFunction.FunctionName).ConfigureAwait(false);
+			return await aiAgentServices.GetAiFunctionResponseAsync(bugSeverityInput, ApplicationPluginName, ApplicationPluginsHelpers.DetermineBugSeverityFunction.FunctionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
@@ -65,7 +69,7 @@ public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServic
 				throw exception;
 			}
 
-			return await aiAgentServices.GetAiFunctionResponseAsync(story, ContentPlugins.PluginName, ContentPlugins.GenerateGenreTagForStoryFunction.FunctionName).ConfigureAwait(false);
+			return await aiAgentServices.GetAiFunctionResponseAsync(story, ApplicationPluginName, ApplicationPluginsHelpers.GenerateGenreTagForStoryFunction.FunctionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
@@ -97,7 +101,7 @@ public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServic
 				throw exception;
 			}
 
-			return await aiAgentServices.GetAiFunctionResponseAsync(story, ContentPlugins.PluginName, ContentPlugins.ContentModerationFunction.FunctionName).ConfigureAwait(false);
+			return await aiAgentServices.GetAiFunctionResponseAsync(story, ApplicationPluginName, ApplicationPluginsHelpers.ContentModerationFunction.FunctionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
@@ -129,7 +133,7 @@ public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServic
 				throw exception;
 			}
 
-			return await aiAgentServices.GetAiFunctionResponseAsync(story, RewriteTextPlugin.PluginName, RewriteTextPlugin.RewriteUserStoryFunction.FunctionName).ConfigureAwait(false);
+			return await aiAgentServices.GetAiFunctionResponseAsync(story, ApplicationPluginName, ApplicationPluginsHelpers.RewriteUserStoryFunction.FunctionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
