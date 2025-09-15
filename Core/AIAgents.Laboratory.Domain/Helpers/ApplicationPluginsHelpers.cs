@@ -37,6 +37,7 @@ public static class ApplicationPluginsHelpers
 						- Is a issue that is not exactly blocking the user, but seems to be a problem in data or data mismatch or can be solved via a workaround; then mark it as Medium
 						- Is a feature or request that would be a nice to have or good to have that might provide users with better clarity or could be simpler; then mark it as Low
 						- For others, mark it as NA.
+					4. Only return the bug severity out of -- High, Medium, Low, NA. Do not return anything else. No explanations.
 					Input:
 					++++++++++++
 
