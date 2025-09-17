@@ -1,11 +1,11 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities;
+﻿using System.Globalization;
+using System.Text.Json;
+using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.SkillsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
-using System.Text.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
@@ -15,8 +15,8 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// </summary>
 /// <param name="aiAgentServices">The AI agent services.</param>
 /// <param name="logger">The logger service.</param>
-/// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.IAiSkillsService" />
-public class AiSkillsService(ILogger<AiSkillsService> logger, IAIAgentServices aiAgentServices) : IAiSkillsService
+/// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.ISkillsService" />
+public class SkillsService(ILogger<SkillsService> logger, IAIAgentServices aiAgentServices) : ISkillsService
 {
 	/// <summary>
 	/// Detects the user intent asynchronous.
@@ -118,7 +118,7 @@ public class AiSkillsService(ILogger<AiSkillsService> logger, IAIAgentServices a
 		try
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(HandleRAGTextResponseAsync), DateTime.UtcNow, string.Empty));
-			
+
 			ArgumentException.ThrowIfNullOrWhiteSpace(skillsInput.UserQuery);
 			if (string.IsNullOrEmpty(skillsInput.KnowledgeBase))
 			{

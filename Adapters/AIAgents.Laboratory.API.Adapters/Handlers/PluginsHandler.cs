@@ -12,7 +12,7 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <param name="mapper">The auto mapper service.</param>
 /// <param name="pluginsAiServices">The plugins ai services.</param>
 /// <seealso cref="IPluginsHandler"/>
-public class PluginsHandler(IMapper mapper, IPluginsAiServices pluginsAiServices) : IPluginsHandler
+public class PluginsHandler(IMapper mapper, IPluginsAiService pluginsAiServices) : IPluginsHandler
 {
 	/// <summary>
 	/// Generates the tag for story asynchronous.

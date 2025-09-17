@@ -8,6 +8,7 @@
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.SkillsEntities;
 using AutoMapper;
 
@@ -30,12 +31,15 @@ public class DomainMapperProfile : Profile
 		CreateMap<UserQueryRequestDTO, UserRequestDomain>();
 		CreateMap<FollowupQuestionsRequestDTO, FollowupQuestionsRequestDomain>();
 
-		CreateMap<BaseResponse, BaseResponseDTO>().ReverseMap();
 		CreateMap<TagResponse, TagResponseDTO>();
 		CreateMap<ModerationContentResponse, ModerationContentResponseDTO>();
 		CreateMap<RewriteResponse, RewriteResponseDTO>();
 		CreateMap<AgentStatus, AgentStatusDTO>();
 		CreateMap<BugSeverityResponse, BugSeverityResponseDTO>();
 		CreateMap<AIAgentResponseDomain, AIAgentResponseDTO>();
+
+		CreateMap<AgentSkillDTO, AgentSkillDomain>().ReverseMap();
+		CreateMap<BaseResponse, BaseResponseDTO>().ReverseMap();
+		CreateMap<AgentDataDTO, AgentDataDomain>().ReverseMap();
 	}
 }

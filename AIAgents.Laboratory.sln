@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36310.24
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11012.119 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.API", "AIAgents.Laboratory.API\AIAgents.Laboratory.API.csproj", "{0EC28386-115D-4B24-8A01-FBE21B360894}"
 EndProject
@@ -21,6 +21,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.Messaging.Adapters", "Adapters\AIAgents.Laboratory.Messaging.Adapters\AIAgents.Laboratory.Messaging.Adapters.csproj", "{64ECA9FF-1BD7-437E-9071-2B4A15F84A8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.SemanticKernel.Adapters", "Adapters\AIAgents.Laboratory.SemanticKernel.Adapters\AIAgents.Laboratory.SemanticKernel.Adapters.csproj", "{1191E906-4475-81B9-DD20-4F27689CED9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.Persistence.MongoDatabase", "Adapters\AIAgents.Laboratory.Persistence.MongoDatabase\AIAgents.Laboratory.Persistence.MongoDatabase.csproj", "{04149D16-5E58-4859-A3D6-C352E9E15B29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +50,10 @@ Global
 		{1191E906-4475-81B9-DD20-4F27689CED9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1191E906-4475-81B9-DD20-4F27689CED9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1191E906-4475-81B9-DD20-4F27689CED9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04149D16-5E58-4859-A3D6-C352E9E15B29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04149D16-5E58-4859-A3D6-C352E9E15B29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04149D16-5E58-4859-A3D6-C352E9E15B29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04149D16-5E58-4859-A3D6-C352E9E15B29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +63,7 @@ Global
 		{E60C19CE-5B6D-80A1-A9B3-F154AEFD59FB} = {D52AF77B-723B-43C6-911E-05DB4387462A}
 		{64ECA9FF-1BD7-437E-9071-2B4A15F84A8B} = {D52AF77B-723B-43C6-911E-05DB4387462A}
 		{1191E906-4475-81B9-DD20-4F27689CED9C} = {D52AF77B-723B-43C6-911E-05DB4387462A}
+		{04149D16-5E58-4859-A3D6-C352E9E15B29} = {D52AF77B-723B-43C6-911E-05DB4387462A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D6B93BAE-85C1-4545-A2FE-51E7BD4362FC}

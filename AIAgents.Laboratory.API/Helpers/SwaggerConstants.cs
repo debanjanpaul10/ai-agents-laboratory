@@ -72,7 +72,7 @@ internal static class SwaggerConstants
 	}
 
 	/// <summary>
-	/// The Plugins Controller.
+	/// The PluginsRoutes Controller.
 	/// </summary>
 	internal static class PluginsController
 	{
@@ -133,4 +133,75 @@ internal static class SwaggerConstants
 		}
 	}
 
+	/// <summary>
+	/// The Agent Skills Controller.
+	/// </summary>
+	internal static class AgentSkillsController
+	{
+		/// <summary>
+		/// Swagger documentation for CreateNewSkillAsync.
+		/// </summary>
+		internal static class CreateNewSkillAction
+		{
+			internal const string Summary = "Creates a new skill.";
+			internal const string Description = "Creates a new skill for the plugins.";
+			internal const string OperationId = nameof(CreateNewSkillAction);
+		}
+
+		/// <summary>
+		/// Swagger documentation for GetAllSkillsAsync.
+		/// </summary>
+		internal static class GetAllSkillsAction
+		{
+			internal const string Summary = "Gets all the skills.";
+			internal const string Description = "Get all the skills available.";
+			internal const string OperationId = nameof(GetAllSkillsAction);
+		}
+
+		/// <summary>
+		/// Swagger documentation for GetSkillByIdAsync.
+		/// </summary>
+		internal static class GetSkillByIdAction
+		{
+			internal const string Summary = "Gets a skill by id.";
+			internal const string Description = "Gets a unique skill by the skill id guid.";
+			internal const string OperationId = nameof(GetSkillByIdAction);
+		}
+	}
+
+	/// <summary>
+	/// Swagger documentation for AgentsController.
+	/// </summary>
+	internal static class AgentsController
+	{
+		/// <summary>
+		/// Swagger documentation for CreateNewAgentAsync.
+		/// </summary>
+		internal static class CreateNewAgentAction
+		{
+			internal const string Summary = "Creates a new agent.";
+			internal const string Description = "Creates a new agent for the plugins.";
+			internal const string OperationId = nameof(CreateNewAgentAction);
+		}
+
+		/// <summary>
+		/// Swagger documentation for GetAllAgentsDataAsync.
+		/// </summary>
+		internal static class GetAllAgentsDataAction
+		{
+			internal const string Summary = "Gets all the agents data.";
+			internal const string Description = "Get all the agents data available.";
+			internal const string OperationId = nameof(GetAllAgentsDataAction);
+		}
+
+		/// <summary>
+		/// Swagger documentation for GetAgentDataByIdAsync.
+		/// </summary>
+		internal static class GetAgentDataByIdAction
+		{
+			internal const string Summary = "Gets a agent data by id.";
+			internal const string Description = "Gets a unique agent data by the agent id guid.";
+			internal const string OperationId = nameof(GetAgentDataByIdAction);
+		}
+	}
 }

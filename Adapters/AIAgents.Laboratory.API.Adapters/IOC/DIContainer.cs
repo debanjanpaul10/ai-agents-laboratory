@@ -1,15 +1,8 @@
-﻿// *********************************************************************************
-//	<copyright file="DependencyContainer.cs" company="Personal">
-//		Copyright (c) 2025 <Debanjan's Lab>
-//	</copyright>
-// <summary>The DI Container Class.</summary>
-// *********************************************************************************
-
+﻿using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Handlers;
 using AIAgents.Laboratory.API.Adapters.Mapper;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics.CodeAnalysis;
 
 namespace AIAgents.Laboratory.API.Adapters.IOC;
 
@@ -24,14 +17,13 @@ public static class DIContainer
 	/// </summary>
 	/// <param name="services">The services.</param>
 	/// <returns>The service collection.</returns>
-	public static IServiceCollection AddAPIHandlers(this IServiceCollection services)
-	{
-		return services.AddScoped<IPluginsHandler, PluginsHandler>()
+	public static IServiceCollection AddAPIHandlers(this IServiceCollection services) =>
+		services.AddScoped<IPluginsHandler, PluginsHandler>()
 			.AddScoped<ICommonAiHandler, CommonAiHandler>()
 			.AddScoped<ISkillsHandler, SkillsHandler>()
+			.AddScoped<IAgentSkillsHandler, AgentSkillsHandler>()
 			.AddAutoMapper(config =>
 			{
 				config.AddProfile<DomainMapperProfile>();
 			});
-	}
 }

@@ -5,7 +5,7 @@ namespace AIAgents.Laboratory.Domain.DrivingPorts;
 /// <summary>
 /// The plugins service interface.
 /// </summary>
-public interface IPluginsAiServices
+public interface IPluginsAiService
 {
 	/// <summary>
 	/// Rewrites text async.

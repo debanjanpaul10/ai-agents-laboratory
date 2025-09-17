@@ -84,4 +84,26 @@ internal static class Constants
 		/// </summary>
 		internal const string AzureAppConfigurationConstant = "AzureAppConfiguration";
 	}
+
+	/// <summary>
+	/// The MongoDB collection constants class.
+	/// </summary>
+	internal static class MongoDbCollectionConstants
+	{
+		/// <summary>
+		/// The skills database name
+		/// </summary>
+		internal const string AiAgentsPrimaryDatabase = "ai-agents-primary";
+
+		/// <summary>
+		/// The skills collection name
+		/// </summary>
+		internal const string SkillsCollectionName = "skills";
+
+		/// <summary>
+		/// The agents collection name
+		/// </summary>
+		internal const string AgentsCollectionName = "agents";
+	}
+
 }

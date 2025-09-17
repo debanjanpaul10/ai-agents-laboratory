@@ -13,7 +13,7 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <param name="aiSkillsService">The ai skills service.</param>
 /// <param name="mapper">The mapper service.</param>
 /// <seealso cref="AIAgents.Laboratory.API.Adapters.Contracts.ISkillsHandler" />
-public class SkillsHandler(IMapper mapper, IAiSkillsService aiSkillsService) : ISkillsHandler
+public class SkillsHandler(IMapper mapper, ISkillsService aiSkillsService) : ISkillsHandler
 {
 	/// <summary>
 	/// Detects the user intent asynchronous.

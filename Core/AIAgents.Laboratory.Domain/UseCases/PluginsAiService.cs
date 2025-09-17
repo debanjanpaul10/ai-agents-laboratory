@@ -13,7 +13,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// </summary>
 /// <param name="logger">The logger service.</param>
 /// <param name="aiAgentServices">The AI agent services.</param>
-public class PluginsAiServices(ILogger<PluginsAiServices> logger, IAIAgentServices aiAgentServices) : IPluginsAiServices
+public class PluginsAiService(ILogger<PluginsAiService> logger, IAIAgentServices aiAgentServices) : IPluginsAiService
 {
 	/// <summary>
 	/// The application plugin name.

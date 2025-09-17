@@ -6,7 +6,7 @@ namespace AIAgents.Laboratory.Domain.DrivingPorts;
 /// <summary>
 /// The AI Skills service interface.
 /// </summary>
-public interface IAiSkillsService
+public interface ISkillsService
 {
 	/// <summary>
 	/// Gets the SQL query markdown response asynchronous.

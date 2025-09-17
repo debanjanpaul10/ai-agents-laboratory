@@ -15,32 +15,32 @@ public static class RouteConstants
 	/// <summary>
 	/// The ai base route prefix
 	/// </summary>
-	public const string AiBase_RoutePrefix = "aiagentsapi";
+	internal const string AiBase_RoutePrefix = "aiagentsapi";
 
 	/// <summary>
 	/// The agent status hub route
 	/// </summary>
-	public const string AgentStatusHub_Route = "/hubs/agent-status";
+	internal const string AgentStatusHub_Route = "/hubs/agent-status";
 
 	/// <summary>
 	/// The route constants for plugins.
 	/// </summary>
-	internal static class Plugins
+	internal static class PluginsRoutes
 	{
 		/// <summary>
 		/// The rewrite text route
 		/// </summary>
-		public const string RewriteText_Route = "rewritetext";
+		internal const string RewriteText_Route = "rewritetext";
 
 		/// <summary>
 		/// The generate tag route
 		/// </summary>
-		public const string GenerateTag_Route = "generatetag";
+		internal const string GenerateTag_Route = "generatetag";
 
 		/// <summary>
 		/// The moderate content route
 		/// </summary>
-		public const string ModerateContent_Route = "moderatecontent";
+		internal const string ModerateContent_Route = "moderatecontent";
 
 		/// <summary>
 		/// The get bug severity route
@@ -86,13 +86,55 @@ public static class RouteConstants
 	}
 
 	/// <summary>
-	/// The Health Check Routes.
+	/// The Route constants for Health Check.
 	/// </summary>
-	public static class HealthCheck
+	internal static class HealthCheckRoutes
 	{
 		/// <summary>
 		/// The get agent status route
 		/// </summary>
-		public const string GetAgentStatus_Route = "agentstatus";
+		internal const string GetAgentStatus_Route = "agentstatus";
+	}
+
+	/// <summary>
+	/// The Route constants for Agent Skills Controller.
+	/// </summary>
+	internal static class AgentSkillsRoutes
+	{
+		/// <summary>
+		/// The create new skill route
+		/// </summary>
+		internal const string CreateNewSkill_Route = "createskill";
+
+		/// <summary>
+		/// The get all skills route
+		/// </summary>
+		internal const string GetAllSkills_Route = "getallskills";
+
+		/// <summary>
+		/// The get skill by identifier route
+		/// </summary>
+		internal const string GetSkillById_Route = "getskillbyid/{skillId}";
+	}
+
+	/// <summary>
+	/// The Route constants for Agents Controller.
+	/// </summary>
+	internal static class AgentsRoutes
+	{
+		/// <summary>
+		/// The create new agent route
+		/// </summary>
+		internal const string CreateNewAgent_Route = "createagent";
+
+		/// <summary>
+		/// The get all agents route
+		/// </summary>
+		internal const string GetAllAgents_Route = "getallagents";
+
+		/// <summary>
+		/// The get agent by identifier route
+		/// </summary>
+		internal const string GetAgentById_Route = "getagentbyid/{agentid}";
 	}
 }

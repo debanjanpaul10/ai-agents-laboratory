@@ -1,11 +1,4 @@
-﻿// *********************************************************************************
-//	<copyright file="DIContainer.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The DI Container Class.</summary>
-// *********************************************************************************
-
-using AIAgents.Laboratory.Domain.DrivingPorts;
+﻿using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,10 +14,9 @@ public static class DIContainer
 	/// </summary>
 	/// <param name="services">The services.</param>
 	/// <returns>The service collection.</returns>
-	public static IServiceCollection AddDomainDependencies(this IServiceCollection services)
-	{
-		return services.AddScoped<IPluginsAiServices, PluginsAiServices>()
+	public static IServiceCollection AddDomainDependencies(this IServiceCollection services) =>
+		services.AddScoped<IPluginsAiService, PluginsAiService>()
 			.AddScoped<ICommonAiService, CommonAiService>()
-			.AddScoped<IAiSkillsService, AiSkillsService>();
-	}
+			.AddScoped<ISkillsService, SkillsService>()
+			.AddScoped<IAgentSkillsService, AgentSkillsService>();
 }
