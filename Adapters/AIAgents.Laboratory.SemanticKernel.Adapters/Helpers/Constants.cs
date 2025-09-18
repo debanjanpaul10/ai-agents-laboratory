@@ -71,6 +71,26 @@ internal static class Constants
 		/// The prompt token count constant.
 		/// </summary>
 		internal const string PromptTokenCountConstant = "PromptTokenCount";
+
+		/// <summary>
+		/// The agent name constant
+		/// </summary>
+		internal const string AgentNameConstant = "agent_name";
+
+		/// <summary>
+		/// The user message constant
+		/// </summary>
+		internal const string UserMessageConstant = "user_message";
+
+		/// <summary>
+		/// The agent metaprompt constant
+		/// </summary>
+		internal const string AgentMetapromptConstant = "agent_metaprompt";
+
+		/// <summary>
+		/// The agent skills constant
+		/// </summary>
+		internal const string AgentSkillsConstant = "agent_skills";
 	}
 
 	/// <summary>

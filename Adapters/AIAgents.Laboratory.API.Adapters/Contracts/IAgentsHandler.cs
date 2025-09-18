@@ -1,4 +1,5 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Models.Request;
+using AIAgents.Laboratory.API.Adapters.Models.Response;
 
 namespace AIAgents.Laboratory.API.Adapters.Contracts;
 
@@ -12,7 +13,7 @@ public interface IAgentsHandler
 	/// </summary>
 	/// <param name="agentData">The agent data.</param>
 	/// <returns>The boolean for success/failure.</returns>
-	Task<bool> CreateNewAgentAsync(AgentDataDTO agentData);
+	Task<bool> CreateNewAgentAsync(CreateAgentDTO agentData);
 
 	/// <summary>
 	/// Gets all agents data asynchronous.

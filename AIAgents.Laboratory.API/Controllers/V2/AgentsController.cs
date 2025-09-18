@@ -32,7 +32,7 @@ public class AgentsController(IAgentsHandler agentsHandler) : BaseController
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	[SwaggerOperation(Summary = CreateNewAgentAction.Summary, Description = CreateNewAgentAction.Description, OperationId = CreateNewAgentAction.OperationId)]
-	public async Task<ResponseDTO> CreateNewAgentAsync([FromBody] AgentDataDTO agentData)
+	public async Task<ResponseDTO> CreateNewAgentAsync([FromBody] CreateAgentDTO agentData)
 	{
 		ArgumentNullException.ThrowIfNull(agentData);
 		var result = await agentsHandler.CreateNewAgentAsync(agentData).ConfigureAwait(false);
@@ -47,7 +47,7 @@ public class AgentsController(IAgentsHandler agentsHandler) : BaseController
 	/// <summary>
 	/// Gets all agents data asynchronous.
 	/// </summary>
-	/// <returns>The list of <see cref="AgentDataDTO"/></returns>
+	/// <returns>The list of <see cref="CreateAgentDTO"/></returns>
 	[HttpGet(RouteConstants.AgentsRoutes.GetAllAgents_Route)]
 	[ProducesResponseType(typeof(IEnumerable<AgentDataDTO>), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]

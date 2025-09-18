@@ -44,14 +44,6 @@ public class AgentDataDomain
 	public string AgentMetaPrompt { get; set; } = string.Empty;
 
 	/// <summary>
-	/// Gets or sets the agent skill ids.
-	/// </summary>
-	/// <value>
-	/// The agent skill ids.
-	/// </value>
-	public IEnumerable<string> AgentSkillIds { get; set; } = [];
-
-	/// <summary>
 	/// Gets or sets the name of the application.
 	/// </summary>
 	/// <value>

@@ -1,5 +1,6 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
+using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AutoMapper;
@@ -21,7 +22,7 @@ public class AgentsHandler(IMapper mapper, IAgentsService agentsService) : IAgen
 	/// <returns>
 	/// The boolean for success/failure.
 	/// </returns>
-	public async Task<bool> CreateNewAgentAsync(AgentDataDTO agentData)
+	public async Task<bool> CreateNewAgentAsync(CreateAgentDTO agentData)
 	{
 		var domainInput = mapper.Map<AgentDataDomain>(agentData);
 		return await agentsService.CreateNewAgentAsync(domainInput).ConfigureAwait(false);

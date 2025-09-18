@@ -1,18 +1,10 @@
 ﻿namespace AIAgents.Laboratory.API.Adapters.Models.Request;
 
 /// <summary>
-/// The Agent Data DTO model.
+/// The Create Agent Data DTO model.
 /// </summary>
-public class AgentDataDTO
+public class CreateAgentDTO
 {
-	/// <summary>
-	/// Gets or sets the agent identifier.
-	/// </summary>
-	/// <value>
-	/// The agent identifier.
-	/// </value>
-	public string AgentId { get; set; } = string.Empty;
-
 	/// <summary>
 	/// Gets or sets the name of the agent.
 	/// </summary>
@@ -28,14 +20,6 @@ public class AgentDataDTO
 	/// The agent meta prompt.
 	/// </value>
 	public string AgentMetaPrompt { get; set; } = string.Empty;
-
-	/// <summary>
-	/// Gets or sets the agent skill ids.
-	/// </summary>
-	/// <value>
-	/// The agent skill ids.
-	/// </value>
-	public IEnumerable<string> AgentSkillIds { get; set; } = [];
 
 	/// <summary>
 	/// Gets or sets the name of the application.

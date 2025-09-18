@@ -204,4 +204,21 @@ internal static class SwaggerConstants
 			internal const string OperationId = nameof(GetAgentDataByIdAction);
 		}
 	}
+
+	/// <summary>
+	/// Swagger documentation for ChatController.
+	/// </summary>
+	internal static class ChatController
+	{
+		/// <summary>
+		/// Swagger documentation for InvokeAgentAsync.
+		/// </summary>
+		internal static class InvokeAgentAction
+		{
+			internal const string Summary = "Invokes an agent via chat.";
+			internal const string Description = "Invokes an agent via chat with the user prompt and agent metadata.";
+			internal const string OperationId = nameof(InvokeAgentAction);
+		}
+	}
+
 }

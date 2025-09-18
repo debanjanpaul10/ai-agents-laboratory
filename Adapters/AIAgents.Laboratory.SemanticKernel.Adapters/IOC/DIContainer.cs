@@ -26,7 +26,7 @@ public static class DIContainer
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddAIAgentDependencies(this IServiceCollection services, IConfiguration configuration)
     {
-        return services.AddScoped<IAIAgentServices, AgentServices>()
+        return services.AddScoped<IAiServices, AiServices>()
             .AddSingleton<ChatbotPlugins>()
             .AddSingleton(KernelFactory.CreateKernel(configuration))
             .AddSingleton(KernelFactory.CreateMemory());

@@ -170,4 +170,42 @@ public static class ApplicationPluginsHelpers
 		/// </summary>
 		public const string InputDescription = "The user story text to rewrite";
 	}
+
+	/// <summary>
+	/// The get chat message response function.
+	/// </summary>
+	public static class GetChatMessageResponseFunction
+	{
+		/// <summary>
+		/// The function name
+		/// </summary>
+		public const string FunctionName = nameof(GetChatMessageResponseFunction);
+
+		/// <summary>
+		/// The function description
+		/// </summary>
+		public const string FunctionDescription = "Gets the response for user's query from the chat message.";
+
+		/// <summary>
+		/// The function instructions
+		/// </summary>
+		public const string FunctionInstructions = """
+			You are an assistant for the user whose responsibility is to reply to user queries. 
+				1. You will be receiving the user message and agent metaprompt as inputs.
+				2. Based on these inputs you will be framing a response for the user for the user message.
+				3. You will never give any explanations or side notes. You will only return the fixed output and nothing else.
+
+			Input:
+			++++++++++++
+
+			{{$input}}
+
+			+++++++++++
+			""";
+
+		/// <summary>
+		/// The input description
+		/// </summary>
+		public const string InputDescription = "The chat request message that contains AgentName, UserMessage and AgentMetaprompt.";
+	}
 }

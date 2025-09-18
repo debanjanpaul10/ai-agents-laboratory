@@ -89,5 +89,25 @@ public class ApplicationPlugins
 		return result.GetValue<string>() ?? string.Empty;
 	}
 
+	/// <summary>
+	/// Gets the chat message response asynchronous.
+	/// </summary>
+	/// <param name="kernel">The kernel.</param>
+	/// <param name="input">The input.</param>
+	/// <returns>The AI response.</returns>
+	[KernelFunction(GetChatMessageResponseFunction.FunctionName)]
+	[Description(GetChatMessageResponseFunction.FunctionDescription)]
+	public static async Task<string> GetChatMessageResponseAsync(Kernel kernel, [Description(GetChatMessageResponseFunction.InputDescription)] string input)
+	{
+		var arguments = new KernelArguments()
+		{
+			{
+				Constants.ArgumentsConstants.KernelArgumentsInputConstant, input
+			}
+		};
+
+		var result = await kernel.InvokePromptAsync(GetChatMessageResponseFunction.FunctionInstructions, arguments).ConfigureAwait(false);
+		return result.GetValue<string>() ?? string.Empty;
+	}
 
 }

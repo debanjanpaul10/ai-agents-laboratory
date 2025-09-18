@@ -137,4 +137,15 @@ public static class RouteConstants
 		/// </summary>
 		internal const string GetAgentById_Route = "getagentbyid/{agentid}";
 	}
+
+	/// <summary>
+	/// The route constants for Chat Controller.
+	/// </summary>
+	internal static class ChatRoutes
+	{
+		/// <summary>
+		/// The invoke agent route
+		/// </summary>
+		internal const string InvokeAgent_Route = "invokeagent";
+	}
 }

@@ -27,6 +27,8 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
 		try
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow, agentData.AgentName));
+
+			agentData.AgentId = Guid.NewGuid().ToString();
 			return await mongoDatabaseService.SaveDataAsync(agentData, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
 		}
 		catch (Exception ex)

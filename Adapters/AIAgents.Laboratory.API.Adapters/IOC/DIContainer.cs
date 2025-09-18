@@ -19,11 +19,12 @@ public static class DIContainer
 	/// <returns>The service collection.</returns>
 	public static IServiceCollection AddAPIHandlers(this IServiceCollection services) =>
 		services.AddScoped<IPluginsHandler, PluginsHandler>()
-			.AddScoped<ICommonAiHandler, CommonAiHandler>()
-			.AddScoped<ISkillsHandler, SkillsHandler>()
-			.AddScoped<IAgentSkillsHandler, AgentSkillsHandler>()
-			.AddAutoMapper(config =>
-			{
-				config.AddProfile<DomainMapperProfile>();
-			});
+		.AddScoped<ICommonAiHandler, CommonAiHandler>()
+		.AddScoped<ISkillsHandler, SkillsHandler>()
+		.AddScoped<IAgentsHandler, AgentsHandler>()
+		.AddScoped<IChatHandler, ChatHandler>()
+		.AddAutoMapper(config =>
+		{
+			config.AddProfile<DomainMapperProfile>();
+		});
 }

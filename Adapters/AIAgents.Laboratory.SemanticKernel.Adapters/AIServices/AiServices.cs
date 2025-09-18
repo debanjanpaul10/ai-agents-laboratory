@@ -1,9 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.Helpers;
-using AIAgents.Laboratory.SemanticKernel.Adapters.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
@@ -11,55 +8,13 @@ using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 
 /// <summary>
-/// The Agent Services Class.
+/// The AI services Class.
 /// </summary>
 /// <param name="kernel">The Semantic Kernel.</param>
 /// <param name="logger">The Logger service.</param>
-/// <seealso cref="IAIAgentServices" />
-public class AgentServices(ILogger<AgentServices> logger, Kernel kernel) : IAIAgentServices
+/// <seealso cref="IAiServices" />
+public class AiServices(ILogger<AiServices> logger, Kernel kernel) : IAiServices
 {
-	/// <summary>
-	/// Gets the orchestrator function response asynchronous.
-	/// </summary>
-	/// <param name="input">The input.</param>
-	/// <returns>
-	/// The AI response.
-	/// </returns>
-	public async Task<AIAgentResponseDomain> GetOrchestratorFunctionResponseAsync(string input)
-	{
-		try
-		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorFunctionResponseAsync), DateTime.UtcNow));
-
-			var aiAgentResponse = new AIAgentResponseDomain();
-			var userIntent = await InvokePluginFunctionAsync(input, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.DetermineUserIntentFunction.FunctionName).ConfigureAwait(false);
-			if (string.IsNullOrEmpty(userIntent))
-			{
-				throw new Exception(ExceptionConstants.SomethingWentWrongMessage);
-			}
-
-			var normalizedIntent = userIntent.Trim().ToUpperInvariant();
-			var aiResponse = normalizedIntent switch
-			{
-				IntentConstants.GreetingIntent => await InvokePluginFunctionAsync(input, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.GreetingFunction.FunctionName).ConfigureAwait(false),
-				IntentConstants.SQLIntent => await InvokePluginFunctionAsync(input, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.NLToSqlSkillFunction.FunctionName).ConfigureAwait(false),
-				IntentConstants.RAGIntent => await InvokePluginFunctionAsync(input, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.RAGTextSkillFunction.FunctionName).ConfigureAwait(false),
-				IntentConstants.UnclearIntent => "Cannot determine the user intent",
-				_ => string.Empty
-			};
-
-			return aiAgentResponse.PrepareAgentChatbotReponse(userIntent, input, aiResponse);
-		}
-		catch (Exception ex)
-		{
-			logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetOrchestratorFunctionResponseAsync), DateTime.UtcNow, ex.Message));
-			throw;
-		}
-		finally
-		{
-			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetOrchestratorFunctionResponseAsync), DateTime.UtcNow));
-		}
-	}
 
 	/// <summary>
 	/// Gets the ai function response asynchronous.
@@ -122,6 +77,8 @@ public class AgentServices(ILogger<AgentServices> logger, Kernel kernel) : IAIAg
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
 		}
 	}
+
+
 
 	#endregion
 }

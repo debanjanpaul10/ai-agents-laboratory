@@ -57,6 +57,11 @@ internal static class Constants
 		/// The cannot process user query message
 		/// </summary>
 		internal const string CannotProcessUserQueryMessage = "This message query cannot be processed right now. Please try something else!";
+
+		/// <summary>
+		/// The agent not found exception message
+		/// </summary>
+		internal const string AgentNotFoundExceptionMessage = "Oops! It seems the AI agent you are looking for does not exists!";
 	}
 
 	/// <summary>
@@ -94,11 +99,6 @@ internal static class Constants
 		/// The skills database name
 		/// </summary>
 		internal const string AiAgentsPrimaryDatabase = "ai-agents-primary";
-
-		/// <summary>
-		/// The skills collection name
-		/// </summary>
-		internal const string SkillsCollectionName = "skills";
 
 		/// <summary>
 		/// The agents collection name

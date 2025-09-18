@@ -1,11 +1,4 @@
-﻿// *********************************************************************************
-//	<copyright file="DomainMapperProfile.cs" company="Personal">
-//		Copyright (c) 2025 <Debanjan's Lab>
-//	</copyright>
-// <summary>The Domain Mapper Profile Class.</summary>
-// *********************************************************************************
-
-using AIAgents.Laboratory.API.Adapters.Models.Request;
+﻿using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
@@ -30,6 +23,7 @@ public class DomainMapperProfile : Profile
 		CreateMap<BugSeverityInputDTO, BugSeverityInput>();
 		CreateMap<UserQueryRequestDTO, UserRequestDomain>();
 		CreateMap<FollowupQuestionsRequestDTO, FollowupQuestionsRequestDomain>();
+		CreateMap<CreateAgentDTO, AgentDataDomain>();
 
 		CreateMap<TagResponse, TagResponseDTO>();
 		CreateMap<ModerationContentResponse, ModerationContentResponseDTO>();
@@ -37,9 +31,9 @@ public class DomainMapperProfile : Profile
 		CreateMap<AgentStatus, AgentStatusDTO>();
 		CreateMap<BugSeverityResponse, BugSeverityResponseDTO>();
 		CreateMap<AIAgentResponseDomain, AIAgentResponseDTO>();
+		CreateMap<AgentDataDomain, AgentDataDTO>();
 
-		CreateMap<AgentSkillDTO, AgentSkillDomain>().ReverseMap();
 		CreateMap<BaseResponse, BaseResponseDTO>().ReverseMap();
-		CreateMap<AgentDataDTO, AgentDataDomain>().ReverseMap();
+		CreateMap<ChatRequestDTO, ChatRequestDomain>().ReverseMap();
 	}
 }
