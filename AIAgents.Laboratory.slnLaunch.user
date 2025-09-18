@@ -1,0 +1,11 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "AIAgents.Laboratory.API\\AIAgents.Laboratory.API.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

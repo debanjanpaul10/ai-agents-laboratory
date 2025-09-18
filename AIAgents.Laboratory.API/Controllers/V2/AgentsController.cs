@@ -3,6 +3,7 @@ using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Helpers;
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.Constants;
@@ -16,6 +17,7 @@ namespace AIAgents.Laboratory.API.Controllers.V2;
 /// <param name="agentsHandler">The agents handler service.</param>
 /// <seealso cref="BaseController" />
 [ApiController]
+[AllowAnonymous]
 [ApiVersion(2.0)]
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
 public class AgentsController(IAgentsHandler agentsHandler) : BaseController

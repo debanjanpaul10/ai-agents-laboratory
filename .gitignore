@@ -10,3 +10,4 @@ bin
 
 # UI
 node_modules
+.next
