@@ -1,4 +1,0 @@
-export const TOGGLE_SPINNER = "TOGGLE_SPINNER";
-export const GET_ALL_AGENTS_DATA = "GET_ALL_AGENTS_DATA";
-export const GET_AGENT_BY_ID = "GET_AGENT_BY_ID";
-export const CREATE_NEW_AGENT = "CREATE_NEW_AGENT";
