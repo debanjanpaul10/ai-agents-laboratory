@@ -59,7 +59,7 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, agentId));
             var allData = await mongoDatabaseService.GetDataFromCollectionAsync<AgentDataDomain>(MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
-            return allData.FirstOrDefault(x => x.AgentId == agentId) ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
+            return allData.FirstOrDefault(x => x.AgentId == agentId && x.IsActive) ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
         }
         catch (Exception ex)
         {
@@ -83,7 +83,9 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
         try
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, string.Empty));
-            return await mongoDatabaseService.GetDataFromCollectionAsync<AgentDataDomain>(MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
+            var allAgents = await mongoDatabaseService.GetDataFromCollectionAsync<AgentDataDomain>(MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
+
+            return allAgents.Where(agent => agent.IsActive);
         }
         catch (Exception ex)
         {
