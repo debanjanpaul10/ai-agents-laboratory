@@ -136,6 +136,16 @@ public static class RouteConstants
 		/// The get agent by identifier route
 		/// </summary>
 		internal const string GetAgentById_Route = "getagentbyid/{agentid}";
+
+		/// <summary>
+		/// The update existing agent data route.
+		/// </summary>
+		internal const string UpdateExistingAgent_Route = "updateagent";
+
+		/// <summary>
+		/// The delete agent data route.
+		/// </summary>
+		internal const string DeleteExistingAgent_Route = "deleteagent/{agentId}";
 	}
 
 	/// <summary>

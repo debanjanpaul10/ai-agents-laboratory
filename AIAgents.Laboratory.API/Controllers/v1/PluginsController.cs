@@ -13,12 +13,13 @@ namespace AIAgents.Laboratory.API.Controllers.v1;
 /// <summary>
 /// The PluginsRoutes Controller Class.
 /// </summary>
+/// <param name="httpContextAccessor">The http context accessor.</param>
 /// <param name="pluginsHandler">The plugins api adapter class.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
 [ApiVersion(1.0)]
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
-public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
+public class PluginsController(IHttpContextAccessor httpContextAccessor, IPluginsHandler pluginsHandler) : BaseController(httpContextAccessor)
 {
 	/// <summary>
 	/// Rewrites the text async.

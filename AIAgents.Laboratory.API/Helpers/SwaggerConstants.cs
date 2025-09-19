@@ -203,6 +203,26 @@ internal static class SwaggerConstants
 			internal const string Description = "Gets a unique agent data by the agent id guid.";
 			internal const string OperationId = nameof(GetAgentDataByIdAction);
 		}
+
+		/// <summary>
+		/// Swagger documentation for UpdateExistingAgentDataAsync.
+		/// </summary>
+		internal static class UpdateExistingAgentDataAction
+		{
+			internal const string Summary = "Updates an existing agent data.";
+			internal const string Description = "Updates an existing agent data in db.";
+			internal const string OperationId = nameof(UpdateExistingAgentDataAction);
+		}
+
+		/// <summary>
+		/// Swagger documentation for DeleteExistingAgentDataAsync.
+		/// </summary>
+		internal static class DeleteExistingAgentDataAction
+		{
+			internal const string Summary = "Deletes an existing agent data.";
+			internal const string Description = "Deletes an existing agent data from database.";
+			internal const string OperationId = nameof(DeleteExistingAgentDataAction);
+		}
 	}
 
 	/// <summary>

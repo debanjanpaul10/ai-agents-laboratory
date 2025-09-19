@@ -50,4 +50,19 @@ public class AgentDataDomain
 	/// The name of the application.
 	/// </value>
 	public string ApplicationName { get; set; } = string.Empty;
+
+	/// <summary>
+	/// Gets or sets the isactive boolean flag.
+	/// </summary>
+	public bool IsActive { get; set; } = true;
+
+	/// <summary>
+	/// Gets or sets the created by identifier.
+	/// </summary>
+	public string CreatedBy { get; set; } = string.Empty;
+
+	/// <summary>
+	/// Gets or sets the date created.
+	/// </summary>
+	public DateTime DateCreated { get; set; }
 }

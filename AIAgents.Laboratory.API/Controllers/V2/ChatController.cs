@@ -13,12 +13,13 @@ namespace AIAgents.Laboratory.API.Controllers.V2;
 /// <summary>
 /// The Chat API Controller class.
 /// </summary>
+/// <param name="httpContextAccessor">The http context accessor.</param>
 /// <param name="chatHandler">The Chat API adapter handler.</param>
 /// <seealso cref="AIAgents.Laboratory.API.Controllers.BaseController" />
 [ApiController]
 [ApiVersion(2.0)]
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
-public class ChatController(IChatHandler chatHandler) : BaseController
+public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandler chatHandler) : BaseController(httpContextAccessor)
 {
 	/// <summary>
 	/// Invokes the chat agent asynchronous.

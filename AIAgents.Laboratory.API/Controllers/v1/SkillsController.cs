@@ -13,12 +13,13 @@ namespace AIAgents.Laboratory.API.Controllers.v1;
 /// <summary>
 /// The AI Skills controller.
 /// </summary>
+/// <param name="httpContextAccessor">The http context accessor.</param>
 /// <param name="skillsHandler">The skills handler adapter.</param>
 /// <seealso cref="AIAgents.Laboratory.API.Controllers.BaseController" />
 [ApiController]
 [ApiVersion(1.0)]
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
-public class SkillsController(ISkillsHandler skillsHandler) : BaseController
+public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsHandler skillsHandler) : BaseController(httpContextAccessor)
 {
 	/// <summary>
 	/// Detects the user intent asynchronous.

@@ -15,41 +15,65 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <seealso cref="AIAgents.Laboratory.API.Adapters.Contracts.IAgentsHandler" />
 public class AgentsHandler(IMapper mapper, IAgentsService agentsService) : IAgentsHandler
 {
-	/// <summary>
-	/// Creates the new agent asynchronous.
-	/// </summary>
-	/// <param name="agentData">The agent data.</param>
-	/// <returns>
-	/// The boolean for success/failure.
-	/// </returns>
-	public async Task<bool> CreateNewAgentAsync(CreateAgentDTO agentData)
-	{
-		var domainInput = mapper.Map<AgentDataDomain>(agentData);
-		return await agentsService.CreateNewAgentAsync(domainInput).ConfigureAwait(false);
-	}
+    /// <summary>
+    /// Creates the new agent asynchronous.
+    /// </summary>
+    /// <param name="agentData">The agent data.</param>
+    /// <param name="userEmail">The user email address.</param>
+    /// <returns>
+    /// The boolean for success/failure.
+    /// </returns>
+    public async Task<bool> CreateNewAgentAsync(CreateAgentDTO agentData, string userEmail)
+    {
+        var domainInput = mapper.Map<AgentDataDomain>(agentData);
+        return await agentsService.CreateNewAgentAsync(domainInput, userEmail).ConfigureAwait(false);
+    }
 
-	/// <summary>
-	/// Gets the agent data by identifier asynchronous.
-	/// </summary>
-	/// <param name="agentId">The agent identifier.</param>
-	/// <returns>
-	/// The agent data dto.
-	/// </returns>
-	public async Task<AgentDataDTO> GetAgentDataByIdAsync(string agentId)
-	{
-		var domainResult = await agentsService.GetAgentDataByIdAsync(agentId).ConfigureAwait(false);
-		return mapper.Map<AgentDataDTO>(domainResult);
-	}
+    /// <summary>
+    /// Gets the agent data by identifier asynchronous.
+    /// </summary>
+    /// <param name="agentId">The agent identifier.</param>
+    /// <returns>
+    /// The agent data dto.
+    /// </returns>
+    public async Task<AgentDataDTO> GetAgentDataByIdAsync(string agentId)
+    {
+        var domainResult = await agentsService.GetAgentDataByIdAsync(agentId).ConfigureAwait(false);
+        return mapper.Map<AgentDataDTO>(domainResult);
+    }
 
-	/// <summary>
-	/// Gets all agents data asynchronous.
-	/// </summary>
-	/// <returns>
-	/// The list of <see cref="AgentDataDTO" />
-	/// </returns>
-	public async Task<IEnumerable<AgentDataDTO>> GetAllAgentsDataAsync()
-	{
-		var domainResult = await agentsService.GetAllAgentsDataAsync().ConfigureAwait(false);
-		return mapper.Map<IEnumerable<AgentDataDTO>>(domainResult);
-	}
+    /// <summary>
+    /// Gets all agents data asynchronous.
+    /// </summary>
+    /// <returns>
+    /// The list of <see cref="AgentDataDTO" />
+    /// </returns>
+    public async Task<IEnumerable<AgentDataDTO>> GetAllAgentsDataAsync()
+    {
+        var domainResult = await agentsService.GetAllAgentsDataAsync().ConfigureAwait(false);
+        return mapper.Map<IEnumerable<AgentDataDTO>>(domainResult);
+    }
+
+    /// <summary>
+    /// Updates the existing agent data.
+    /// </summary>
+    /// <param name="updateAgentData">The update agent data DTO model.</param>
+    /// <returns>The updated agent data dto.</returns>
+    public async Task<AgentDataDTO> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData)
+    {
+        var domainRequest = mapper.Map<AgentDataDomain>(updateAgentData);
+        var domainResult = await agentsService.UpdateExistingAgentDataAsync(domainRequest).ConfigureAwait(false);
+        
+        return mapper.Map<AgentDataDTO>(domainResult);
+    }
+
+    /// <summary>
+    /// Deletes an existing agent data.
+    /// </summary>
+    /// <param name="agentId">The agent id.</param>
+    /// <returns>The boolean for success/failure.</returns>
+    public async Task<bool> DeleteExistingAgentDataAsync(string agentId)
+    {
+        return await agentsService.DeleteExistingAgentDataAsync(agentId).ConfigureAwait(false);
+    }
 }
