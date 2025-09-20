@@ -10,9 +10,9 @@ import { CreateAgentDTO } from "@/models/create-agent-dto";
 import { CreateAgentConstants } from "@/helpers/constants";
 import { CreateNewAgentAsync } from "@/store/agents/actions";
 import { useAuth } from "@/auth/AuthProvider";
-import { FullScreenLoading } from "../ui/loading-spinner";
+import { FullScreenLoading } from "@components/ui/loading-spinner";
 
-export default function CreateAgentPage() {
+export default function CreateAgentComponent() {
 	const dispatch = useAppDispatch();
 	const authContext = useAuth();
 

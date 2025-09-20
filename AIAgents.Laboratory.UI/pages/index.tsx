@@ -1,12 +1,14 @@
 import AuthenticatedApp from "@/components/common/authenticated-app";
-import CreateAgentPage from "@/components/create-agent";
+import CreateAgentComponent from "@/components/create-agent";
+import ManageAgentsComponent from "@/components/manage-agents";
 import DashboardComponent from "@pages/dashboard";
 
 export default function Home() {
 	return (
 		<AuthenticatedApp>
 			<DashboardComponent />
-			<CreateAgentPage />
+			<CreateAgentComponent />
+			<ManageAgentsComponent />
 		</AuthenticatedApp>
 	);
 }
