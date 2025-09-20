@@ -1,10 +1,3 @@
-// *********************************************************************************
-//	<copyright file="Program.cs" company="Personal">
-//		Copyright (options) 2025 Personal
-//	</copyright>
-// <summary>Program class from where the execution starts</summary>
-// *********************************************************************************
-
 using AIAgents.Laboratory.API.Helpers;
 using AIAgents.Laboratory.API.IOC;
 using AIAgents.Laboratory.API.Middleware;
@@ -49,6 +42,7 @@ builder.Services.AddSwaggerGen(options =>
 	options.EnableAnnotations();
 });
 builder.Services.AddProblemDetails();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

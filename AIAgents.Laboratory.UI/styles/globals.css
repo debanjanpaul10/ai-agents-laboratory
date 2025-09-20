@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@font-face {
+	font-family: "jetbrains-mono";
+	src: url("../public/fonts/JetBrainsMono-Regular.ttf") format("opentype");
+}
+
+* {
+	font-family: "jetbrains-mono";
+}

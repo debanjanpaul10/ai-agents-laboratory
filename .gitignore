@@ -7,3 +7,7 @@
 # BUILD TARGETS
 obj
 bin
+
+# UI
+node_modules
+.next
