@@ -116,7 +116,7 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
             updateAgent.AgentName = updateDataDomain.AgentName;
 
             return await mongoDatabaseService.UpdateDataFromCollectionAsync<AgentDataDomain, AgentDataDomain>(
-                updateDataDomain, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
+                updateAgent, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
