@@ -4,7 +4,10 @@ import {
 	DELETE_AGENT_DATA,
 	GET_AGENT_BY_ID,
 	GET_ALL_AGENTS_DATA,
+	GET_CHAT_RESPONSE,
 	TOGGLE_AGENT_CREATE_SPINNER,
+	TOGGLE_CHAT_RESPONSE_SPINNER,
+	TOGGLE_EDIT_AGENT_SPINNER,
 	UPDATE_AGENT_DATA,
 } from "./actionTypes";
 import {
@@ -12,15 +15,31 @@ import {
 	DeleteExistingAgentApiAsync,
 	GetAgentByIdApiAsync,
 	GetAgentsApiAsync,
+	InvokeChatAgentApiAsync,
 	UpdateExistingAgentApiAsync,
 } from "@/lib/ai-agents-api-service";
 import { CreateAgentDTO } from "@/models/create-agent-dto";
 import { AgentDataDTO } from "@/models/agent-data-dto";
-import { ToggleMainLoader } from "../common/actions";
+import { ToggleEditAgentDrawer, ToggleMainLoader } from "../common/actions";
+import { ChatRequestDTO } from "@/models/chat-request-dto";
 
 export function ToggleCreateAgentSpinner(isLoading: boolean) {
 	return {
 		type: TOGGLE_AGENT_CREATE_SPINNER,
+		payload: isLoading,
+	};
+}
+
+export function ToggleChatResponseSpinner(isLoading: boolean) {
+	return {
+		type: TOGGLE_CHAT_RESPONSE_SPINNER,
+		payload: isLoading,
+	};
+}
+
+export function ToggleEditAgentSpinner(isLoading: boolean) {
+	return {
+		type: TOGGLE_EDIT_AGENT_SPINNER,
 		payload: isLoading,
 	};
 }
@@ -99,7 +118,7 @@ export function UpdateExistingAgentDataAsync(
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
-			dispatch(ToggleMainLoader(true));
+			dispatch(ToggleEditAgentSpinner(true));
 			const response = await UpdateExistingAgentApiAsync(
 				existingAgentData,
 				accessToken
@@ -109,12 +128,13 @@ export function UpdateExistingAgentDataAsync(
 					type: UPDATE_AGENT_DATA,
 					payload: response.responseData,
 				});
+				dispatch(GetAllAgentsDataAsync(accessToken) as any);
 			}
 		} catch (error: any) {
 			console.error(error);
 			throw error;
 		} finally {
-			dispatch(ToggleMainLoader(false));
+			dispatch(ToggleEditAgentSpinner(false));
 		}
 	};
 }
@@ -141,6 +161,32 @@ export function DeleteExistingAgentDataAsync(
 			throw error;
 		} finally {
 			dispatch(ToggleMainLoader(false));
+		}
+	};
+}
+
+export function InvokeChatAgentAsync(
+	chatRequest: ChatRequestDTO,
+	accessToken: string
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleChatResponseSpinner(true));
+			const response = await InvokeChatAgentApiAsync(
+				chatRequest,
+				accessToken
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: GET_CHAT_RESPONSE,
+					payload: response.responseData,
+				});
+			}
+		} catch (error: any) {
+			console.error(error);
+			throw error;
+		} finally {
+			dispatch(ToggleChatResponseSpinner(false));
 		}
 	};
 }

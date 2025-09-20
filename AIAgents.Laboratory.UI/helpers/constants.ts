@@ -47,4 +47,10 @@ export const ManageAgentConstants = {
 	Headers: {
 		SubText: "Manage Existing AI Agents",
 	},
+	InputFields: {
+		AgentNamePlaceholder: "Enter agent name ...",
+		ApplicationNamePlaceholder: "Enter application name ...",
+		AgentMetaPromptPlaceholder:
+			"Define your agent's behavior, personality, and capabilities ...",
+	},
 };

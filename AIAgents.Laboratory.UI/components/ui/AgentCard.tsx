@@ -1,7 +1,7 @@
-import { AgentDataDTO } from "@lib/types";
+import { AgentData } from "@lib/types";
 import Link from "next/link";
 
-export default function AgentCard({ agent }: { agent: AgentDataDTO }) {
+export default function AgentCard({ agent }: { agent: AgentData }) {
 	return (
 		<div className="border p-4 rounded shadow hover:shadow-lg transition">
 			<h2 className="text-lg font-semibold">{agent.agentName}</h2>

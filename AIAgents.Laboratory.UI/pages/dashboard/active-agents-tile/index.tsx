@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { BrainCircuit } from "lucide-react";
 
-import { AgentDataDTO } from "@lib/types";
+import { AgentData } from "@lib/types";
 import { useAppSelector } from "@/store";
 import { DashboardConstants } from "@/helpers/constants";
 
 export default function ActiveAgentsTileComponent() {
-	const [agentsDataList, setAgentsDataList] = useState<AgentDataDTO[]>([]);
+	const [agentsDataList, setAgentsDataList] = useState<AgentData[]>([]);
 
 	const AgentsStoreData = useAppSelector(
 		(state) => state.AgentsReducer.agentsListData
@@ -43,7 +43,7 @@ export default function ActiveAgentsTileComponent() {
 					{agentsDataList.length > 0 ? (
 						agentsDataList
 							.slice(0, 3)
-							.map((agent: AgentDataDTO, index: number) => (
+							.map((agent: AgentData, index: number) => (
 								<div
 									key={agent.agentId || index}
 									className="bg-gray-700/50 backdrop-blur-sm rounded-lg p-2 border border-gray-600/30 hover:border-blue-500/30 transition-all duration-300"

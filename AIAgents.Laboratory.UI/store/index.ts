@@ -2,13 +2,11 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 
 import { AgentsReducer } from "./agents/reducers";
-import { ChatReducer } from "./chat/reducers";
 import { CommonReducer } from "./common/reducers";
 
 export const store = configureStore({
 	reducer: {
 		AgentsReducer: AgentsReducer,
-		ChatReducer: ChatReducer,
 		CommonReducer: CommonReducer,
 	},
 });

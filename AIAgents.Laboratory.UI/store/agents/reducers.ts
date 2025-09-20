@@ -4,7 +4,10 @@ import {
 	CREATE_NEW_AGENT,
 	DELETE_AGENT_DATA,
 	UPDATE_AGENT_DATA,
+	GET_CHAT_RESPONSE,
+	TOGGLE_CHAT_RESPONSE_SPINNER,
 	TOGGLE_AGENT_CREATE_SPINNER,
+	TOGGLE_EDIT_AGENT_SPINNER,
 } from "./actionTypes";
 
 const initialState: any = {
@@ -14,6 +17,9 @@ const initialState: any = {
 	agentCreatedResponse: false,
 	updateAgentResponse: {},
 	deleteAgentResponse: false,
+	chatResponse: {},
+	isChatDataLoading: false,
+	isEditAgentDataLoading: false,
 };
 
 export function AgentsReducer(state = initialState, action: any) {
@@ -52,6 +58,24 @@ export function AgentsReducer(state = initialState, action: any) {
 			return {
 				...state,
 				isAgentCreateSpinnerLoading: action.payload,
+			};
+		}
+		case GET_CHAT_RESPONSE: {
+			return {
+				...state,
+				chatResponse: action.payload,
+			};
+		}
+		case TOGGLE_CHAT_RESPONSE_SPINNER: {
+			return {
+				...state,
+				isChatDataLoading: action.payload,
+			};
+		}
+		case TOGGLE_EDIT_AGENT_SPINNER: {
+			return {
+				...state,
+				isEditAgentDataLoading: action.payload,
 			};
 		}
 
