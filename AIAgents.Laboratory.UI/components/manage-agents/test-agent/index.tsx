@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Input } from "@heroui/react";
-import { X, Send, MessageSquare, Bot, Zap } from "lucide-react";
+import { Send, MessageSquare, Bot, Zap, ArrowRight } from "lucide-react";
 import { AgentDataDTO } from "@/models/agent-data-dto";
 
 interface TestAgentComponentProps {
@@ -10,7 +10,6 @@ interface TestAgentComponentProps {
 }
 
 export default function TestAgentComponent({
-	selectedAgent,
 	editFormData,
 	onClose,
 }: TestAgentComponentProps) {
@@ -83,7 +82,7 @@ export default function TestAgentComponent({
 					className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-red-400"
 					title="Close test panel"
 				>
-					<X className="w-4 h-4" />
+					<ArrowRight className="w-4 h-4" />
 				</button>
 			</div>
 
