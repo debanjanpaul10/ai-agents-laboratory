@@ -238,7 +238,6 @@ export default function CreateAgentComponent() {
 					<div className="border-t border-white/10 p-6 flex-shrink-0">
 						<div className="flex items-center justify-start space-x-3">
 							<div className="relative group">
-								<div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
 								<Button
 									onPress={handleSubmit}
 									className="flex items-center bg-gradient-to-r from-purple-500 to-blue-600 text-white font-semibold hover:from-purple-600 hover:to-blue-700 transition-all duration-300 px-6 py-3 min-h-[44px]"
