@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { useMsal } from "@azure/msal-react";
-import { Bot, LogOut, Spotlight } from "lucide-react";
+import { LogOut, Spotlight } from "lucide-react";
+import Image from "next/image";
 
+import AppLogo from "@public/images/icon.png";
 import { useAuth } from "@auth/AuthProvider";
 import ActiveAgentsTileComponent from "@pages/dashboard/active-agents-tile";
 import { useAppDispatch, useAppSelector } from "@store/index";
@@ -10,6 +12,7 @@ import { FullScreenLoading } from "@components/ui/loading-spinner";
 import ManageAgentsTileComponent from "@pages/dashboard/manage-agents-tile";
 import CreateAgentsTileComponent from "@pages/dashboard/create-agents-tile";
 import StatsSectionTilesComponent from "@pages/dashboard/stats-section-tiles";
+import FooterComponent from "@components/common/footer";
 
 export default function DashboardComponent() {
 	const dispatch = useAppDispatch();
@@ -79,7 +82,12 @@ export default function DashboardComponent() {
 						<div className="flex justify-between items-center mb-8">
 							<div className="flex items-center space-x-4">
 								<div className="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-2xl">
-									<Bot />
+									<Image
+										src={AppLogo}
+										alt="App Icon"
+										height={50}
+										width={50}
+									/>
 								</div>
 								<div>
 									<h1 className="text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent drop-shadow-2xl">
@@ -153,6 +161,7 @@ export default function DashboardComponent() {
 					</div>
 				</div>
 			</div>
+			<FooterComponent />
 		</div>
 	);
 }

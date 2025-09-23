@@ -9,6 +9,7 @@ import {
 	Expand,
 	ArrowRight,
 	Trash,
+	ScrollText,
 } from "lucide-react";
 import { useMsal } from "@azure/msal-react";
 
@@ -92,7 +93,9 @@ export default function ModifyAgentComponent({
 					</p>
 					<p className="text-white/60">
 						<span className="text-white/80">Status:</span>{" "}
-						<span className="text-green-400">Active</span>
+						<span className="text-green-400 animate-pulse">
+							Active
+						</span>
 					</p>
 				</div>
 			</div>
@@ -288,8 +291,9 @@ export default function ModifyAgentComponent({
 						</div>
 						{/* Meta Prompt Field */}
 						<div className="space-y-2">
-							<label className="text-white/80 text-sm font-medium">
-								Agent Meta Prompt
+							<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+								<ScrollText className="w-4 h-4 text-green-400" />
+								<span>Agent Meta Prompt</span>
 							</label>
 							<div className="relative">
 								<textarea
