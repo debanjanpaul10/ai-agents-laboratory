@@ -5,8 +5,7 @@
 	"scripts": {
 		"dev": "next dev --turbopack",
 		"build": "next build --turbopack",
-		"start": "next start",
-		"export": "next export"
+		"start": "next start"
 	},
 	"dependencies": {
 		"@azure/msal-browser": "^4.23.0",

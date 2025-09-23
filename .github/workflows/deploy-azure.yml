@@ -94,7 +94,6 @@ jobs:
                   cd ${{ env.UI_PROJECT_PATH }}
                   npm install
                   npm run build
-                  npm run export
 
             - name: Deploy UI to Azure Web App
               uses: Azure/static-web-apps-deploy@v1
@@ -103,5 +102,3 @@ jobs:
                   action: "upload"
                   app_location: ${{ env.UI_PROJECT_PATH }}
                   output_location: "out"
-              env:
-                  NODE_VERSION: "22"
