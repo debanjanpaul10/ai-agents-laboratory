@@ -2,6 +2,7 @@ using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Helpers;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.Constants;
@@ -10,13 +11,15 @@ using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.PluginsController;
 namespace AIAgents.Laboratory.API.Controllers.v1;
 
 /// <summary>
-/// The Plugins Controller Class.
+/// The PluginsRoutes Controller Class.
 /// </summary>
+/// <param name="httpContextAccessor">The http context accessor.</param>
 /// <param name="pluginsHandler">The plugins api adapter class.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
+[ApiVersion(1.0)]
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
-public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
+public class PluginsController(IHttpContextAccessor httpContextAccessor, IPluginsHandler pluginsHandler) : BaseController(httpContextAccessor)
 {
 	/// <summary>
 	/// Rewrites the text async.
@@ -24,7 +27,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	/// <param name="requestDto">The rewrite request dto.</param>
 	/// <returns>The AI rewritten story.</returns>
 	/// <exception cref="Exception"></exception>
-	[HttpPost(RouteConstants.Plugins.RewriteText_Route)]
+	[HttpPost(RouteConstants.PluginsRoutes.RewriteText_Route)]
 	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -46,7 +49,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	/// </summary>
 	/// <param name="requestDto">The request dto.</param>
 	/// <returns>The tag response dto.</returns>
-	[HttpPost(RouteConstants.Plugins.GenerateTag_Route)]
+	[HttpPost(RouteConstants.PluginsRoutes.GenerateTag_Route)]
 	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -68,7 +71,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	/// </summary>
 	/// <param name="requestDto">The request dto.</param>
 	/// <returns>The moderation content response.</returns>
-	[HttpPost(RouteConstants.Plugins.ModerateContent_Route)]
+	[HttpPost(RouteConstants.PluginsRoutes.ModerateContent_Route)]
 	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -90,7 +93,7 @@ public class PluginsController(IPluginsHandler pluginsHandler) : BaseController
 	/// </summary>
 	/// <param name="bugSeverityInput">The bug severity input.</param>
 	/// <returns>The bug severity ai response dto.</returns>
-	[HttpPost(RouteConstants.Plugins.GetBugSeverity_Route)]
+	[HttpPost(RouteConstants.PluginsRoutes.GetBugSeverity_Route)]
 	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]

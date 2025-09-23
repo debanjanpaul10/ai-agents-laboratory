@@ -1,20 +1,14 @@
-﻿// *********************************************************************************
-//	<copyright file="DIContainer.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The DI Container Class.</summary>
-// *********************************************************************************
-
+﻿using System.Globalization;
+using System.Security.Claims;
 using AIAgents.Laboratory.API.Adapters.IOC;
 using AIAgents.Laboratory.API.Controllers;
 using AIAgents.Laboratory.Domain.IOC;
 using AIAgents.Laboratory.Messaging.Adapters.IOC;
+using AIAgents.Laboratory.Persistence.MongoDatabase.IOC;
 using AIAgents.Laboratory.SemanticKernel.Adapters.IOC;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
-using System.Globalization;
-using System.Security.Claims;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 
 namespace AIAgents.Laboratory.API.IOC;
@@ -58,7 +52,7 @@ public static class DIContainer
 	public static void ConfigureAiDependencies(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.ConfigureAuthenticationServices(configuration);
-		services.AddAPIHandlers().AddDomainDependencies().AddAIAgentDependencies(configuration).AddMessagingDependencies();
+		services.AddAPIHandlers().AddDomainDependencies().AddAIAgentDependencies(configuration).AddMessagingDependencies().AddMongoDbAdapterDependencies(configuration);
 		services.AddSignalR().AddAzureSignalR(configuration[AzureAppConfigurationConstants.AzureSignalRConnection]);
 	}
 
