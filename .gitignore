@@ -11,3 +11,4 @@ bin
 # UI
 node_modules
 .next
+out

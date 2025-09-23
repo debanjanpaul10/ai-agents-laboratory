@@ -3,6 +3,9 @@ import path from "path";
 
 const nextConfig: NextConfig = {
 	output: 'export',
+	images: {
+		unoptimized: true,
+	},
 	/* config options here */
 	webpack: (config, { isServer }) => {
 		// Add environment alias for webpack
