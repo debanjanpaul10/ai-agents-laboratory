@@ -2,6 +2,7 @@ name: Build and Deploy AI Agents Laboratory
 
 env:
     API_PROJECT_PATH: AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj
+    UI_PROJECT_PATH: AIAgents.Laboratory.UI
 
 on:
     workflow_dispatch:
@@ -9,6 +10,12 @@ on:
             deploy_api:
                 description: "AIAgents.Laboratory.API"
                 required: true
+                default: true
+                type: boolean
+
+            deploy_ui:
+                description: "AIAgents.Laboratory.UI"
+                required: false
                 default: true
                 type: boolean
 
@@ -66,3 +73,35 @@ jobs:
                   slot-name: production
                   publish-profile: ${{ secrets.AZURE_WEBAPI_PUBLISH_PROFILE }}
                   package: ./publish-api
+
+    build-and-deploy-web:
+        name: Build and Deploy AIAgents.Laboratory.UI
+        if: ${{ inputs.deploy_ui }}
+        runs-on: ubuntu-latest
+        environment: Production
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22.x"
+
+            - name: Install dependencies and build UI
+              run: |
+                  cd ${{ env.UI_PROJECT_PATH }}
+                  npm install
+                  npm run build
+                  npm run export
+
+            - name: Deploy UI to Azure Web App
+              uses: Azure/static-web-apps-deploy@v1
+              with:
+                  azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_TOKEN }}
+                  action: "upload"
+                  app_location: ${{ env.UI_PROJECT_PATH }}
+                  output_location: "out"
+              env:
+                  NODE_VERSION: "22"

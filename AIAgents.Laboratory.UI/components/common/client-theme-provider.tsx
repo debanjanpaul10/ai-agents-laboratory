@@ -1,27 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ThemeProvider } from "./theme-provider";
+import { ThemeProvider } from "@components/common/theme-provider";
 
 export function ClientThemeProvider({
-    children,
-    ...props
+	children,
+	...props
 }: React.ComponentProps<typeof ThemeProvider>) {
-    const [mounted, setMounted] = useState(false);
+	const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
-    // Always render the ThemeProvider but with suppressHydrationWarning
-    // This prevents the flash but still allows theme functionality
-    return (
-        <div suppressHydrationWarning>
-            {mounted ? (
-                <ThemeProvider {...props}>{children}</ThemeProvider>
-            ) : (
-                <div className="dark">{children}</div>
-            )}
-        </div>
-    );
+	// Always render the ThemeProvider but with suppressHydrationWarning
+	// This prevents the flash but still allows theme functionality
+	return (
+		<div suppressHydrationWarning>
+			{mounted ? (
+				<ThemeProvider {...props}>{children}</ThemeProvider>
+			) : (
+				<div className="dark">{children}</div>
+			)}
+		</div>
+	);
 }
