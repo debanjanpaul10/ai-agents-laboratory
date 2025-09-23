@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BrainCircuit, ChevronsRight } from "lucide-react";
+import { Bot, ChevronsRight } from "lucide-react";
 import { AgentData } from "@shared/types";
 import { useAppSelector } from "@store/index";
 import { DashboardConstants } from "@helpers/constants";
@@ -26,7 +26,7 @@ export default function ActiveAgentsTileComponent() {
 				<div className="flex items-center justify-between mb-4">
 					<div className="flex items-center space-x-3">
 						<div className="bg-blue-500/20 backdrop-blur-sm p-3 rounded-xl border border-blue-500/30">
-							<BrainCircuit />
+							<Bot />
 						</div>
 						<h3 className="text-xl font-bold text-white">
 							Top Active Agents

@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { Button, Input, Textarea } from "@heroui/react";
-import { X, Maximize2, Minimize2, Bot, Sparkles } from "lucide-react";
+import {
+	X,
+	Maximize2,
+	Minimize2,
+	Bot,
+	Sparkles,
+	ScrollText,
+} from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleNewAgentDrawer } from "@store/common/actions";
@@ -204,8 +211,9 @@ export default function CreateAgentComponent() {
 
 						{/* Meta Prompt Field */}
 						<div className="space-y-2">
-							<label className="text-white/80 text-sm font-medium">
-								Agent Meta Prompt
+							<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+								<ScrollText className="w-4 h-4 text-green-400" />
+								<span>Agent Meta Prompt</span>
 							</label>
 							<div className="relative group">
 								<div className="absolute -inset-0.5 bg-gradient-to-r from-green-500/20 to-purple-500/20 rounded-xl blur opacity-50 group-focus-within:opacity-75 transition duration-300"></div>

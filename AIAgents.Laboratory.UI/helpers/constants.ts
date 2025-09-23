@@ -33,6 +33,9 @@ export const DashboardConstants = {
 			"Modify and delete existing AI agents",
 		],
 	},
+	FooterConstants: {
+		FooterText: "AI Agents Laboratory - a product of Debanjan's Laboratory",
+	},
 };
 
 export const CreateAgentConstants = {
