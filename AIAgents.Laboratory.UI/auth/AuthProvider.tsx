@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useMsal } from "@azure/msal-react";
 import { InteractionStatus } from "@azure/msal-browser";
 
-import { AuthContextType, AuthProviderProps, User } from "../lib/types";
+import { AuthContextType, AuthProviderProps, User } from "../shared/types";
 
 const defaultAuthContext: AuthContextType = {
 	user: null,

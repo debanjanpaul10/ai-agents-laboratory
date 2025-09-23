@@ -113,7 +113,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
         {
             ArgumentNullException.ThrowIfNull(updateAgentData);
             var result = await agentsHandler.UpdateExistingAgentDataAsync(updateAgentData).ConfigureAwait(false);
-            if (result is not null)
+            if (result)
             {
                 return HandleSuccessRequestResponse(result);
             }

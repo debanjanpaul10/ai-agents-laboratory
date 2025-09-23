@@ -1,62 +1,84 @@
 import React, { useState } from "react";
 import { Button, Input } from "@heroui/react";
+import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { Send, MessageSquare, Bot, Zap, ArrowRight } from "lucide-react";
-import { AgentDataDTO } from "@/models/agent-data-dto";
 
-interface TestAgentComponentProps {
-	selectedAgent: AgentDataDTO | null;
-	editFormData: AgentDataDTO;
-	onClose: () => void;
-}
+import { ChatRequestDTO } from "@models/chat-request-dto";
+import { useAuth } from "@auth/AuthProvider";
+import { InvokeChatAgentAsync } from "@store/agents/actions";
+import { useAppDispatch } from "@store/index";
+import { ChatMessage, TestAgentComponentProps } from "@shared/types";
+import { ManageAgentConstants } from "@helpers/constants";
 
 export default function TestAgentComponent({
 	editFormData,
 	onClose,
 }: TestAgentComponentProps) {
-	const [testInput, setTestInput] = useState("");
-	const [testOutput, setTestOutput] = useState("");
+	const { getAccessToken } = useAuth();
+	const dispatch = useAppDispatch();
+
+	const [messages, setMessages] = useState<Array<ChatMessage>>([]);
+	const [userInput, setUserInput] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	const [conversationHistory, setConversationHistory] = useState<
-		Array<{ role: "user" | "agent"; message: string; timestamp: Date }>
-	>([]);
 
-	const handleTestSubmit = async () => {
-		if (!testInput.trim()) return;
+	const sendChatbotResponse = async () => {
+		if (!userInput.trim()) return;
 
-		setIsLoading(true);
-
-		// Add user message to conversation
-		const userMessage = {
-			role: "user" as const,
-			message: testInput,
+		const userMessage: ChatMessage = {
+			id: generateMessageId(),
+			type: "user" as const,
+			content: userInput,
 			timestamp: new Date(),
 		};
+		await SendChatbotMessageAsync(userMessage);
+	};
 
-		setConversationHistory((prev) => [...prev, userMessage]);
+	async function SendChatbotMessageAsync(userMessage: ChatMessage) {
+		setMessages((prev) => [...prev, userMessage]);
+		setUserInput("");
+		setIsLoading(true);
 
-		// Simulate API call - replace with actual agent testing logic
-		setTimeout(() => {
-			const agentResponse = {
-				role: "agent" as const,
-				message: `This is a simulated response from ${
-					editFormData.agentName || "the agent"
-				} based on the meta prompt: "${editFormData.agentMetaPrompt?.substring(
-					0,
-					100
-				)}..."`,
-				timestamp: new Date(),
+		try {
+			const chatRequest: ChatRequestDTO = {
+				userMessage: userMessage.content.trim(),
+				conversationId: generateMessageId(),
+				agentId: editFormData.agentId,
+				agentName: editFormData.agentName,
 			};
+			const accessToken = await getAccessToken();
+			if (accessToken) {
+				const aiResponse = (await (
+					dispatch as ThunkDispatch<any, any, Action>
+				)(InvokeChatAgentAsync(chatRequest, accessToken))) as
+					| string
+					| null;
 
-			setConversationHistory((prev) => [...prev, agentResponse]);
-			setTestInput("");
+				if (aiResponse) {
+					const botMessage = {
+						id: generateMessageId(),
+						type: "bot" as const,
+						content: aiResponse,
+						timestamp: new Date(),
+					};
+
+					setMessages((prev) => [...prev, botMessage]);
+				}
+			}
+		} catch (error) {
+			console.error(error);
+		} finally {
 			setIsLoading(false);
-		}, 1500);
+		}
+	}
+
+	// Generate a unique ID for messages
+	const generateMessageId = () => {
+		return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 	};
 
 	const clearConversation = () => {
-		setConversationHistory([]);
-		setTestInput("");
-		setTestOutput("");
+		setMessages([]);
+		setUserInput("");
 	};
 
 	return (
@@ -104,38 +126,43 @@ export default function TestAgentComponent({
 
 			{/* Conversation Area */}
 			<div className="flex-1 p-4 overflow-y-auto min-h-0">
-				{conversationHistory.length === 0 ? (
+				{messages.length === 0 ? (
 					<div className="flex flex-col items-center justify-center h-full text-center">
 						<div className="bg-white/5 backdrop-blur-sm rounded-full p-6 mb-4">
 							<MessageSquare className="w-12 h-12 text-white/40" />
 						</div>
 						<h3 className="text-white/80 text-lg font-medium mb-2">
-							Start Testing
+							{
+								ManageAgentConstants.TestAgentConstants
+									.PlaceHolders.ChatBodyHeader
+							}
 						</h3>
 						<p className="text-white/60 text-sm max-w-sm">
-							Send a message to test how your agent responds based
-							on its configuration.
+							{
+								ManageAgentConstants.TestAgentConstants
+									.PlaceHolders.SubText
+							}
 						</p>
 					</div>
 				) : (
 					<div className="space-y-4">
-						{conversationHistory.map((message, index) => (
+						{messages.map((message, index) => (
 							<div
 								key={index}
 								className={`flex ${
-									message.role === "user"
+									message.type === "user"
 										? "justify-end"
 										: "justify-start"
 								}`}
 							>
 								<div
 									className={`max-w-[80%] p-3 rounded-lg ${
-										message.role === "user"
+										message.type === "user"
 											? "bg-cyan-500/20 text-white border border-cyan-500/30"
 											: "bg-white/5 text-white border border-white/10"
 									}`}
 								>
-									<p className="text-sm">{message.message}</p>
+									<p className="text-sm">{message.content}</p>
 									<p className="text-xs text-white/40 mt-1">
 										{message.timestamp.toLocaleTimeString()}
 									</p>
@@ -148,7 +175,11 @@ export default function TestAgentComponent({
 									<div className="flex items-center space-x-2">
 										<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-400"></div>
 										<span className="text-sm">
-											Agent is thinking...
+											{
+												ManageAgentConstants
+													.TestAgentConstants.Loading
+													.AgentResponse
+											}
 										</span>
 									</div>
 								</div>
@@ -163,12 +194,18 @@ export default function TestAgentComponent({
 				<div className="flex space-x-2">
 					<div className="flex-1">
 						<Input
-							value={testInput}
-							onChange={(e) => setTestInput(e.target.value)}
-							placeholder="Type your test message..."
-							onKeyPress={(e) =>
-								e.key === "Enter" && handleTestSubmit()
+							value={userInput}
+							onChange={(e) => setUserInput(e.target.value)}
+							placeholder={
+								ManageAgentConstants.TestAgentConstants
+									.PlaceHolders.TypeMessage
 							}
+							onKeyDown={(event: any) => {
+								if (event.key === "Enter" && !event.shiftKey) {
+									sendChatbotResponse();
+								}
+							}}
+							radius="full"
 							disabled={isLoading}
 							classNames={{
 								input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
@@ -178,22 +215,26 @@ export default function TestAgentComponent({
 						/>
 					</div>
 					<Button
-						onPress={handleTestSubmit}
-						disabled={!testInput.trim() || isLoading}
+						onPress={sendChatbotResponse}
+						disabled={!userInput.trim() || isLoading}
+						radius="full"
 						className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 px-4 py-3"
 					>
 						<Send className="w-4 h-4" />
 					</Button>
 				</div>
 
-				{conversationHistory.length > 0 && (
+				{messages.length > 0 && (
 					<div className="mt-3 flex justify-center">
 						<Button
-							variant="light"
+							variant="solid"
 							onPress={clearConversation}
-							className="text-white/70 hover:text-white text-sm"
+							className="text-red/70 hover:text-red text-sm"
 						>
-							Clear Conversation
+							{
+								ManageAgentConstants.TestAgentConstants
+									.PlaceHolders.ClearConversation
+							}
 						</Button>
 					</div>
 				)}

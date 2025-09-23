@@ -1,7 +1,7 @@
-import { GetAsync, PostAsync } from "@/helpers/http-utility";
-import { AgentDataDTO } from "@/models/agent-data-dto";
-import { ChatRequestDTO } from "@/models/chat-request-dto";
-import { CreateAgentDTO } from "@/models/create-agent-dto";
+import { GetAsync, PostAsync } from "@helpers/http-utility";
+import { AgentDataDTO } from "@models/agent-data-dto";
+import { ChatRequestDTO } from "@models/chat-request-dto";
+import { CreateAgentDTO } from "@models/create-agent-dto";
 
 export async function GetAgentsApiAsync(accessToken: string) {
 	return await GetAsync("agents/getallagents", accessToken);

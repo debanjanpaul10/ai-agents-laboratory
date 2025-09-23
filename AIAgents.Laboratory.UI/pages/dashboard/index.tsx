@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { useMsal } from "@azure/msal-react";
 import { Bot, LogOut, Spotlight } from "lucide-react";
 
-import { useAuth } from "@/auth/AuthProvider";
-import ActiveAgentsTileComponent from "@/pages/dashboard/active-agents-tile";
-import { useAppDispatch, useAppSelector } from "@/store";
+import { useAuth } from "@auth/AuthProvider";
+import ActiveAgentsTileComponent from "@pages/dashboard/active-agents-tile";
+import { useAppDispatch, useAppSelector } from "@store/index";
 import { GetAllAgentsDataAsync } from "@store/agents/actions";
 import { FullScreenLoading } from "@components/ui/loading-spinner";
 import ManageAgentsTileComponent from "@pages/dashboard/manage-agents-tile";
@@ -29,6 +29,7 @@ export default function DashboardComponent() {
 		instance.logoutRedirect().catch((e) => {
 			console.error(e);
 		});
+		localStorage.clear();
 	};
 
 	const GetAllAgentsData = async () => {

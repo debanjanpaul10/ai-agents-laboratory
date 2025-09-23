@@ -7,9 +7,10 @@ import {
 	Calendar,
 	BotMessageSquare,
 } from "lucide-react";
-import { AgentDataDTO } from "@/models/agent-data-dto";
-import { ManageAgentConstants } from "@/helpers/constants";
-import { AgentsListComponentProps } from "@/lib/types";
+
+import { AgentDataDTO } from "@models/agent-data-dto";
+import { ManageAgentConstants } from "@helpers/constants";
+import { AgentsListComponentProps } from "@shared/types";
 
 export default function AgentsListComponent({
 	agentsDataList,

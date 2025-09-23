@@ -1,8 +1,7 @@
 import { Bolt, ChevronsRight } from "lucide-react";
-
-import { useAppDispatch } from "@/store";
-import { ToggleAgentsListDrawer } from "@/store/common/actions";
-import { DashboardConstants } from "@/helpers/constants";
+import { useAppDispatch } from "@store/index";
+import { ToggleAgentsListDrawer } from "@store/common/actions";
+import { DashboardConstants } from "@helpers/constants";
 
 export default function ManageAgentsTileComponent() {
 	const dispatch = useAppDispatch();
@@ -36,9 +35,12 @@ export default function ManageAgentsTileComponent() {
 				{/* Action indicators */}
 				<div className="space-y-2">
 					{DashboardConstants.ManageAgentsTile.Steps.map(
-						(item: string) => {
+						(item: string, index: number) => {
 							return (
-								<div className="flex items-center text-gray-400 text-xs">
+								<div
+									className="flex items-center text-gray-400 text-xs"
+									key={index}
+								>
 									<ChevronsRight className="text-green-400" />
 									&nbsp;
 									{item}

@@ -1,8 +1,7 @@
 import { ChevronsRight, FilePlus } from "lucide-react";
-import { useAppDispatch } from "@/store";
-
-import { ToggleNewAgentDrawer } from "@/store/common/actions";
-import { DashboardConstants } from "@/helpers/constants";
+import { useAppDispatch } from "@store/index";
+import { ToggleNewAgentDrawer } from "@store/common/actions";
+import { DashboardConstants } from "@helpers/constants";
 
 export default function CreateAgentsTileComponent() {
 	const dispatch = useAppDispatch();
@@ -34,9 +33,12 @@ export default function CreateAgentsTileComponent() {
 				</p>
 				<div className="space-y-2">
 					{DashboardConstants.CreateAgentTile.Steps.map(
-						(item: string) => {
+						(item: string, index: number) => {
 							return (
-								<div className="flex items-center text-gray-400 text-xs">
+								<div
+									className="flex items-center text-gray-400 text-xs"
+									key={index}
+								>
 									<ChevronsRight className="text-purple-400" />
 									&nbsp;
 									{item}

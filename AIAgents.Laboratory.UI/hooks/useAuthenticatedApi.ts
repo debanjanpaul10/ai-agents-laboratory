@@ -1,7 +1,8 @@
 import { useCallback } from "react";
-import { useAuth } from "@/auth/AuthProvider";
+
+import { useAuth } from "@auth/AuthProvider";
 import { GetAsync, PostAsync } from "@helpers/http-utility";
-import { ResponseDTO } from "@lib/types";
+import { ResponseDTO } from "@shared/types";
 
 export function useAuthenticatedApi() {
 	const { getAccessToken } = useAuth();

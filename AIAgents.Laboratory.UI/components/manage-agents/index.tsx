@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { Sparkles, Minimize2 } from "lucide-react";
-import { Textarea } from "@heroui/react";
 
-import { useAppDispatch, useAppSelector } from "@/store";
-import { ToggleAgentsListDrawer } from "@/store/common/actions";
-import { AgentDataDTO } from "@/models/agent-data-dto";
-import AgentsListComponent from "./agents-list";
-import ModifyAgentComponent from "./modify-agent";
-import TestAgentComponent from "./test-agent";
+import { useAppDispatch, useAppSelector } from "@store/index";
+import { ToggleAgentsListDrawer } from "@store/common/actions";
+import { AgentDataDTO } from "@models/agent-data-dto";
+import AgentsListComponent from "@components/manage-agents/agents-list";
+import ModifyAgentComponent from "@components/manage-agents/modify-agent";
+import TestAgentComponent from "@components/manage-agents/test-agent";
+import ExpandMetapromptEditorComponent from "@components/common/expand-meta-prompt-editor";
 
 export default function ManageAgentsComponent() {
 	const dispatch = useAppDispatch();
@@ -15,7 +14,6 @@ export default function ManageAgentsComponent() {
 	const [agentsListDrawerOpen, setAgentsListDrawerOpen] = useState(false);
 	const [agentsDataList, setAgentsDataList] = useState<AgentDataDTO[]>([]);
 
-	const [expandedPromptModal, setExpandedPromptModal] = useState(false);
 	const [selectedAgent, setSelectedAgent] = useState<AgentDataDTO | null>(
 		null
 	);
@@ -82,88 +80,12 @@ export default function ManageAgentsComponent() {
 		setIsEditDrawerOpen(true);
 	};
 
-	const handleInputChange = (field: string, value: string) => {
-		setEditFormData((prev) => ({ ...prev, [field]: value }));
-	};
-
-	const handleExpandPrompt = () => {
-		setExpandedPromptModal(true);
-	};
-
-	const handleCollapsePrompt = () => {
-		setExpandedPromptModal(false);
-	};
-
 	const handleEditClose = () => {
 		setIsEditDrawerOpen(false);
 		setSelectedAgent(null);
-		// Also close test drawer if it's open
 		if (isTestDrawerOpen) {
 			setIsTestDrawerOpen(false);
 		}
-	};
-
-	const renderExpandedMetapromptEditor = () => {
-		return (
-			expandedPromptModal && (
-				<>
-					{/* Modal Backdrop */}
-					<div
-						className="fixed inset-0 bg-black/80 backdrop-blur-sm z-70 transition-opacity duration-300"
-						onClick={handleCollapsePrompt}
-					/>
-
-					{/* Modal Content */}
-					<div className="fixed inset-0 flex items-center justify-center z-80 p-8">
-						<div className="w-full max-w-4xl h-full max-h-[90vh] bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl flex flex-col">
-							{/* Modal Header */}
-							<div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
-								<div className="flex items-center space-x-3">
-									<div className="bg-gradient-to-r from-orange-500 to-red-600 p-2 rounded-xl">
-										<Sparkles className="w-5 h-5 text-white" />
-									</div>
-									<div>
-										<h2 className="text-xl font-bold bg-gradient-to-r from-white via-orange-100 to-red-100 bg-clip-text text-transparent">
-											Agent Meta Prompt
-										</h2>
-									</div>
-								</div>
-								<button
-									onClick={handleCollapsePrompt}
-									className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-red-400"
-									title="Collapse prompt editor"
-								>
-									<Minimize2 className="w-4 h-4" />
-								</button>
-							</div>
-
-							{/* Modal Content */}
-							<div className="flex-1 p-6 min-h-0 flex flex-col">
-								<div className="flex-1 min-h-0">
-									<Textarea
-										value={editFormData.agentMetaPrompt}
-										onChange={(e) =>
-											handleInputChange(
-												"metaPrompt",
-												e.target.value
-											)
-										}
-										placeholder="Define your agent's behavior, personality, and capabilities in detail..."
-										className="h-full"
-										classNames={{
-											base: "h-full",
-											input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 resize-none px-4 py-3 h-full min-h-full",
-											inputWrapper:
-												"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-orange-500/50 h-full min-h-full",
-										}}
-									/>
-								</div>
-							</div>
-						</div>
-					</div>
-				</>
-			)
-		);
 	};
 
 	return agentsListDrawerOpen ? (
@@ -197,7 +119,6 @@ export default function ManageAgentsComponent() {
 					<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-x border-white/10 shadow-2xl">
 						<ModifyAgentComponent
 							editFormData={editFormData}
-							handleExpandPrompt={handleExpandPrompt}
 							selectedAgent={selectedAgent}
 							setEditFormData={setEditFormData}
 							setSelectedAgent={setSelectedAgent}
@@ -222,8 +143,6 @@ export default function ManageAgentsComponent() {
 					/>
 				</div>
 			</div>
-
-			{renderExpandedMetapromptEditor()}
 		</>
 	) : null;
 }

@@ -28,6 +28,10 @@ export const DashboardConstants = {
 		SubText: "The top 3 agents being actively used.",
 		NoAgentsText: "No active agents to view now.",
 		ReadyToDeployText: "Ready to deploy",
+		Steps: [
+			"Create and deploy new agents",
+			"Modify and delete existing AI agents",
+		],
 	},
 };
 
@@ -47,10 +51,27 @@ export const ManageAgentConstants = {
 	Headers: {
 		SubText: "Manage Existing AI Agents",
 	},
-	InputFields: {
-		AgentNamePlaceholder: "Enter agent name ...",
-		ApplicationNamePlaceholder: "Enter application name ...",
-		AgentMetaPromptPlaceholder:
-			"Define your agent's behavior, personality, and capabilities ...",
+	ModifyAgentConstants: {
+		MainHeader: "Modify AI Agent Configuration",
+		Placeholders: {
+			AgentName: "Enter agent name...",
+			ApplicationName: "Enter application name ...",
+			AgentMetaprompt:
+				"Define your agent's behavior, personality, and capabilities ...",
+		},
+		Info: "Describe how your agent should behave, what it should know, and how it should respond to users.",
+	},
+
+	TestAgentConstants: {
+		PlaceHolders: {
+			ChatBodyHeader: "Start Testing",
+			SubText:
+				"Send a message to test how your agent responds based on its configuration.",
+			TypeMessage: "Type your message...",
+			ClearConversation: "Clear Conversation",
+		},
+		Loading: {
+			AgentResponse: "Agent is thinking ...",
+		},
 	},
 };

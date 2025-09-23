@@ -1,5 +1,5 @@
-import { useAppSelector } from "@/store";
 import { useEffect, useState } from "react";
+import { useAppSelector } from "@store/index";
 
 export default function StatsSectionTilesComponent() {
 	const [agentsCount, setAgentsCount] = useState(0);

@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BrainCircuit } from "lucide-react";
-
-import { AgentData } from "@lib/types";
-import { useAppSelector } from "@/store";
-import { DashboardConstants } from "@/helpers/constants";
+import { BrainCircuit, ChevronsRight } from "lucide-react";
+import { AgentData } from "@shared/types";
+import { useAppSelector } from "@store/index";
+import { DashboardConstants } from "@helpers/constants";
 
 export default function ActiveAgentsTileComponent() {
 	const [agentsDataList, setAgentsDataList] = useState<AgentData[]>([]);
@@ -86,6 +85,23 @@ export default function ActiveAgentsTileComponent() {
 										.NoAgentsText
 								}
 							</p>
+
+							<div className="space-y-2 mt-3">
+								{DashboardConstants.ActiveAgentsTile.Steps.map(
+									(item: string, index: number) => {
+										return (
+											<div
+												className="flex items-center text-gray-400 text-xs"
+												key={index}
+											>
+												<ChevronsRight className="text-blue-400" />
+												&nbsp;
+												{item}
+											</div>
+										);
+									}
+								)}
+							</div>
 						</div>
 					)}
 				</div>

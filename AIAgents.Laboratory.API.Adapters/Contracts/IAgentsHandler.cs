@@ -33,8 +33,8 @@ public interface IAgentsHandler
     /// Updates the existing agent data.
     /// </summary>
     /// <param name="updateAgentData">The update agent data DTO model.</param>
-    /// <returns>The updated agent data dto.</returns>
-    Task<AgentDataDTO> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData);
+    /// <returns>The boolean for success/failure.</returns>
+    Task<bool> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData);
 
     /// <summary>
     /// Deletes an existing agent data.

@@ -9,7 +9,7 @@ import {
 	TOGGLE_CHAT_RESPONSE_SPINNER,
 	TOGGLE_EDIT_AGENT_SPINNER,
 	UPDATE_AGENT_DATA,
-} from "./actionTypes";
+} from "@store/agents/actionTypes";
 import {
 	CreateNewAgentApiAsync,
 	DeleteExistingAgentApiAsync,
@@ -17,11 +17,11 @@ import {
 	GetAgentsApiAsync,
 	InvokeChatAgentApiAsync,
 	UpdateExistingAgentApiAsync,
-} from "@/lib/ai-agents-api-service";
-import { CreateAgentDTO } from "@/models/create-agent-dto";
-import { AgentDataDTO } from "@/models/agent-data-dto";
-import { ToggleEditAgentDrawer, ToggleMainLoader } from "../common/actions";
-import { ChatRequestDTO } from "@/models/chat-request-dto";
+} from "@shared/api-service";
+import { CreateAgentDTO } from "@models/create-agent-dto";
+import { AgentDataDTO } from "@models/agent-data-dto";
+import { ToggleMainLoader } from "@store/common/actions";
+import { ChatRequestDTO } from "@models/chat-request-dto";
 
 export function ToggleCreateAgentSpinner(isLoading: boolean) {
 	return {
@@ -181,7 +181,11 @@ export function InvokeChatAgentAsync(
 					type: GET_CHAT_RESPONSE,
 					payload: response.responseData,
 				});
+
+				return response.responseData as string;
 			}
+
+			return null;
 		} catch (error: any) {
 			console.error(error);
 			throw error;

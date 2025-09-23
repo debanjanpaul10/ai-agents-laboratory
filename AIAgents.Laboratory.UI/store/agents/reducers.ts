@@ -8,7 +8,7 @@ import {
 	TOGGLE_CHAT_RESPONSE_SPINNER,
 	TOGGLE_AGENT_CREATE_SPINNER,
 	TOGGLE_EDIT_AGENT_SPINNER,
-} from "./actionTypes";
+} from "@store/agents/actionTypes";
 
 const initialState: any = {
 	agentsListData: [],

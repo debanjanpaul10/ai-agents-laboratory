@@ -1,5 +1,5 @@
-import { AgentData } from "@lib/types";
 import Link from "next/link";
+import { AgentData } from "@shared/types";
 
 export default function AgentCard({ agent }: { agent: AgentData }) {
 	return (

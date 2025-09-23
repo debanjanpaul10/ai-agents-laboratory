@@ -2,9 +2,8 @@
 
 import { useMsal } from "@azure/msal-react";
 import { Button } from "@heroui/react";
-
-import { loginRequest } from "@/auth/authConfig";
-import styles from "./styles.module.css";
+import { loginRequest } from "@auth/authConfig";
+import styles from "@pages/login/styles.module.css";
 
 export default function LoginPage() {
 	const { instance } = useMsal();

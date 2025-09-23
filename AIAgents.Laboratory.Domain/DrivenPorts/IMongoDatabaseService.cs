@@ -28,10 +28,9 @@ public interface IMongoDatabaseService
     /// Updates the data from collection asynchronous.
     /// </summary>
     /// <typeparam name="TInput">The type of the input.</typeparam>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
     /// <param name="input">The input.</param>
     /// <param name="databaseName">Name of the database.</param>
     /// <param name="collectionName">Name of the collection.</param>
-    /// <returns>The mongodb updated collection.</returns>
-    Task<TResult> UpdateDataFromCollectionAsync<TInput, TResult>(TInput input, string databaseName, string collectionName);
+    /// <returns>The boolean for success/failure.</returns>
+    Task<bool> UpdateDataFromCollectionAsync<TInput>(TInput input, string databaseName, string collectionName);
 }

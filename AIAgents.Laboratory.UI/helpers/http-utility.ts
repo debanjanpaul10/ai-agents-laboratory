@@ -1,6 +1,7 @@
-import { ResponseDTO } from "@lib/types";
-import { environment } from "@environments/environment";
 import axios from "axios";
+
+import { ResponseDTO } from "@shared/types";
+import { environment } from "@environments/environment";
 
 const BASE_API_URL: string = environment.apiBaseUrl;
 

@@ -84,7 +84,6 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, string.Empty));
             var allAgents = await mongoDatabaseService.GetDataFromCollectionAsync<AgentDataDomain>(MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
-
             return allAgents.Where(agent => agent.IsActive);
         }
         catch (Exception ex)
@@ -102,8 +101,8 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
     /// Updates the existing agent data.
     /// </summary>
     /// <param name="updateDataDomain">The update agent data DTO model.</param>
-    /// <returns>The updated agent data dto.</returns>
-    public async Task<AgentDataDomain> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain)
+    /// <returns>The boolean for success/failure.</returns>
+    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain)
     {
         try
         {
@@ -115,8 +114,7 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
             updateAgent.AgentMetaPrompt = updateDataDomain.AgentMetaPrompt;
             updateAgent.AgentName = updateDataDomain.AgentName;
 
-            return await mongoDatabaseService.UpdateDataFromCollectionAsync<AgentDataDomain, AgentDataDomain>(
-                updateAgent, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.UpdateDataFromCollectionAsync(updateAgent, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -144,10 +142,8 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
             var updateAgent = allAgents.FirstOrDefault(x => x.AgentId == agentId) ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
 
             updateAgent.IsActive = false;
-            await mongoDatabaseService.UpdateDataFromCollectionAsync<AgentDataDomain, AgentDataDomain>(
-                updateAgent, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.UpdateDataFromCollectionAsync(updateAgent, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
 
-            return true;
         }
         catch (Exception ex)
         {

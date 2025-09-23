@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { Button, Input, Textarea } from "@heroui/react";
 import { X, Maximize2, Minimize2, Bot, Sparkles } from "lucide-react";
 
-import { useAppDispatch, useAppSelector } from "@/store";
-import { ToggleNewAgentDrawer } from "@/store/common/actions";
-import { CreateAgentDTO } from "@/models/create-agent-dto";
-import { CreateAgentConstants } from "@/helpers/constants";
-import { CreateNewAgentAsync } from "@/store/agents/actions";
-import { useAuth } from "@/auth/AuthProvider";
+import { useAppDispatch, useAppSelector } from "@store/index";
+import { ToggleNewAgentDrawer } from "@store/common/actions";
+import { CreateAgentDTO } from "@models/create-agent-dto";
+import { CreateAgentConstants } from "@helpers/constants";
+import { CreateNewAgentAsync } from "@store/agents/actions";
+import { useAuth } from "@auth/AuthProvider";
 import { FullScreenLoading } from "@components/ui/loading-spinner";
 
 export default function CreateAgentComponent() {
@@ -161,6 +161,7 @@ export default function CreateAgentComponent() {
 											.AgentNamePlaceholder
 									}
 									className="relative"
+									radius="full"
 									classNames={{
 										input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
 										inputWrapper:
@@ -191,6 +192,7 @@ export default function CreateAgentComponent() {
 											.ApplicationNamePlaceholder
 									}
 									className="relative"
+									radius="full"
 									classNames={{
 										input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
 										inputWrapper:

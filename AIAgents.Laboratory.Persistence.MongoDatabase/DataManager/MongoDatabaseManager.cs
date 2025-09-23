@@ -85,12 +85,11 @@ public class MongoDatabaseManager(IMongoClient mongoClient, ILogger<MongoDatabas
     /// Updates the data from collection asynchronous.
     /// </summary>
     /// <typeparam name="TInput">The type of the input.</typeparam>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
     /// <param name="input">The input.</param>
     /// <param name="databaseName">Name of the database.</param>
     /// <param name="collectionName">Name of the collection.</param>
-    /// <returns>The mongodb updated collection.</returns>
-    public async Task<TResult> UpdateDataFromCollectionAsync<TInput, TResult>(TInput input, string databaseName, string collectionName)
+    /// <returns>The boolean for success/failure.</returns>
+    public async Task<bool> UpdateDataFromCollectionAsync<TInput>(TInput input, string databaseName, string collectionName)
     {
         try
         {
@@ -113,7 +112,7 @@ public class MongoDatabaseManager(IMongoClient mongoClient, ILogger<MongoDatabas
                 throw new Exception("No document was updated. Document may not exist.");
             }
 
-            return (TResult)(object)input!;
+            return true;
         }
         catch (Exception ex)
         {

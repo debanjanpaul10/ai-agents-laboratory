@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 
-import AppLogo from "@/public/images/icon.png";
+import AppLogo from "@public/images/icon.png";
 
 interface LoadingSpinnerProps {
 	size?: "sm" | "md" | "lg" | "xl";

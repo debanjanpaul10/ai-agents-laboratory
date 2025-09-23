@@ -4,7 +4,7 @@ import {
 	TOGGLE_EDIT_AGENT_DRAWER,
 	TOGGLE_MAIN_SPINNER,
 	TOGGLE_NEW_AGENT_DRAWER,
-} from "./actionTypes";
+} from "@store/common/actionTypes";
 
 const initialState: any = {
 	isNewAgentDrawerOpen: false,

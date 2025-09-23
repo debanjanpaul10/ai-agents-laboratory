@@ -1,5 +1,5 @@
-import { AgentDataDTO } from "@/models/agent-data-dto";
 import { ReactNode } from "react";
+import { AgentDataDTO } from "@models/agent-data-dto";
 
 export interface Environment {
 	production: boolean;
@@ -51,7 +51,6 @@ export interface AuthContextType {
 
 export interface ModifyAgentComponentProps {
 	editFormData: AgentDataDTO;
-	handleExpandPrompt: () => void;
 	selectedAgent: AgentDataDTO | null;
 	setEditFormData: React.Dispatch<React.SetStateAction<AgentDataDTO>>;
 	setSelectedAgent: React.Dispatch<React.SetStateAction<AgentDataDTO | null>>;
@@ -65,20 +64,22 @@ export interface AuthenticatedAppProps {
 	children: React.ReactNode;
 }
 
-export interface ModifyAgentComponentProps {
-	editFormData: AgentDataDTO;
-	handleExpandPrompt: () => void;
-	selectedAgent: AgentDataDTO | null;
-	setEditFormData: React.Dispatch<React.SetStateAction<AgentDataDTO>>;
-	setSelectedAgent: React.Dispatch<React.SetStateAction<AgentDataDTO | null>>;
-	isEditDrawerOpen: boolean;
-	onTestAgent: () => void;
-	isDisabled: boolean;
-}
-
 export interface AgentsListComponentProps {
 	agentsDataList: AgentDataDTO[];
 	handleAgentClick: (agent: AgentDataDTO) => void;
 	onClose: () => void;
 	isDisabled: boolean;
+}
+
+export interface ChatMessage {
+	id: string;
+	type: "user" | "bot";
+	content: string;
+	timestamp: Date;
+}
+
+export interface TestAgentComponentProps {
+	selectedAgent: AgentDataDTO | null;
+	editFormData: AgentDataDTO;
+	onClose: () => void;
 }
