@@ -125,6 +125,11 @@ internal static class Constants
 		/// The invalid token exception constant.
 		/// </summary>
 		public const string InvalidTokenExceptionConstant = "Invalid token: Identity is not authenticated.";
+
+		/// <summary>
+		/// The unauthorized access message exception constant.
+		/// </summary>
+		internal const string UnauthorizedAccessMessageConstant = "Unauthorized access. Please log in to continue.";
 	}
 
 	/// <summary>
@@ -181,5 +186,21 @@ internal static class Constants
 		/// The azure signal r connection
 		/// </summary>
 		internal const string AzureSignalRConnection = "AzureSignalRConnection";
+	}
+
+	/// <summary>
+	/// The Header constants class.
+	/// </summary>
+	internal static class HeaderConstants
+	{
+		/// <summary>
+		/// The user full name claim constant.
+		/// </summary>
+		public const string NotApplicableStringConstant = "NA";
+
+		/// <summary>
+		/// The user email claim constant.
+		/// </summary>
+		public const string UserEmailClaimConstant = "preferred_username";
 	}
 }
