@@ -21,7 +21,7 @@ on:
 
 jobs:
     build-api:
-        name: Build AIAgents.Laboratory
+        name: Build AIAgents.Laboratory.API
         runs-on: ubuntu-latest
         if: ${{ inputs.deploy_api }}
         outputs:
@@ -55,7 +55,7 @@ jobs:
                   path: ./publish-api
 
     deploy-api:
-        name: Deploy AIAgents.Laboratory
+        name: Deploy AIAgents.Laboratory.API
         runs-on: ubuntu-latest
         needs: build-api
         environment: Production
