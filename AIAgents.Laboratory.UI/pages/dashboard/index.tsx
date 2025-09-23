@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useMsal } from "@azure/msal-react";
 import { LogOut, Spotlight } from "lucide-react";
+import Image from "next/image";
 
 import AppLogo from "@public/images/icon.png";
 import { useAuth } from "@auth/AuthProvider";
@@ -12,7 +13,6 @@ import ManageAgentsTileComponent from "@pages/dashboard/manage-agents-tile";
 import CreateAgentsTileComponent from "@pages/dashboard/create-agents-tile";
 import StatsSectionTilesComponent from "@pages/dashboard/stats-section-tiles";
 import FooterComponent from "@components/common/footer";
-import Image from "next/image";
 
 export default function DashboardComponent() {
 	const dispatch = useAppDispatch();
