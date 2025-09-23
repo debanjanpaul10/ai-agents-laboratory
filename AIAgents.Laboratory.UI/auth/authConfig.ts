@@ -1,5 +1,5 @@
 import { Configuration, PopupRequest } from "@azure/msal-browser";
-import { environment } from "../environments/environment";
+import { environment } from "@environments/environment.base";
 
 // MSAL configuration
 export const msalConfig: Configuration = {

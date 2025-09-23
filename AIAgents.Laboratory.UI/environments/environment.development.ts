@@ -1,6 +1,4 @@
-import { Environment } from "../app/lib/types";
-
-export const environment: Environment = {
+export const environment = {
 	production: false,
 	apiBaseUrl: "https://localhost:8190/aiagentsapi/",
 	msalConfig: {

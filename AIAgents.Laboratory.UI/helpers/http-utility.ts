@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { ResponseDTO } from "@shared/types";
-import { environment } from "@environments/environment";
+import { environment } from "@environments/environment.base";
 
 const BASE_API_URL: string = environment.apiBaseUrl;
 
