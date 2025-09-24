@@ -36,6 +36,17 @@ export const DashboardConstants = {
 	FooterConstants: {
 		FooterText: "AI Agents Laboratory - a product of Debanjan's Laboratory",
 	},
+	DirectChatConstants: {
+		Header: {
+			MainHeader: "Chat with AI Agent",
+			SubHeader: "Try out a sample AI chatbot",
+		},
+		ConversationContent: {
+			Heading: "Start a conversation",
+			SubText:
+				"Send a message to the AI agent to see how the functionality works",
+		},
+	},
 };
 
 export const CreateAgentConstants = {

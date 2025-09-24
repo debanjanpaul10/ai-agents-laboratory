@@ -9,6 +9,7 @@ import { InvokeChatAgentAsync } from "@store/agents/actions";
 import { useAppDispatch } from "@store/index";
 import { ChatMessage, TestAgentComponentProps } from "@shared/types";
 import { ManageAgentConstants } from "@helpers/constants";
+import { generateMessageId } from "@shared/utils";
 
 export default function TestAgentComponent({
 	editFormData,
@@ -70,11 +71,6 @@ export default function TestAgentComponent({
 			setIsLoading(false);
 		}
 	}
-
-	// Generate a unique ID for messages
-	const generateMessageId = () => {
-		return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-	};
 
 	const clearConversation = () => {
 		setMessages([]);

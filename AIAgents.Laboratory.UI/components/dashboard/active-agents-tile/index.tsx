@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Bot, ChevronsRight } from "lucide-react";
 import { AgentData } from "@shared/types";

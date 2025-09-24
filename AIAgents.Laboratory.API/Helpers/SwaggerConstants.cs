@@ -239,6 +239,16 @@ internal static class SwaggerConstants
 			internal const string Description = "Invokes an agent via chat with the user prompt and agent metadata.";
 			internal const string OperationId = nameof(InvokeAgentAction);
 		}
+
+		/// <summary>
+		/// Swagger documentation for GetDirectChatResponseAsync.
+		/// </summary>
+		internal static class GetDirectChatResponseAction
+		{
+			internal const string Summary = "Gets the direct chat response data.";
+			internal const string Description = "Calls the LLM directly with user message.";
+			internal const string OperationId = nameof(GetDirectChatResponseAction);
+		}
 	}
 
 }
