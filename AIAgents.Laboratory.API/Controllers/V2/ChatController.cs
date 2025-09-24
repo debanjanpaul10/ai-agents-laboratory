@@ -44,4 +44,27 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
 
 		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 	}
+
+	/// <summary>
+	/// Gets the direct chat response from chatbot async.
+	/// </summary>
+	/// <param name="userChatMessage">The user chat request dto model.</param>
+	/// <returns>The AI response string.</returns>
+	[HttpPost(RouteConstants.ChatRoutes.GetDirectChatResponse_Route)]
+	[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetDirectChatResponseAction.Summary, Description = GetDirectChatResponseAction.Description, OperationId = GetDirectChatResponseAction.OperationId)]
+	public async Task<ResponseDTO> GetDirectChatResponseAsync([FromBody] DirectChatRequestDTO userChatMessage)
+	{
+		ArgumentException.ThrowIfNullOrEmpty(userChatMessage.UserMessage);
+		var result = await chatHandler.GetDirectChatResponseAsync(userChatMessage.UserMessage).ConfigureAwait(false);
+		if (!string.IsNullOrEmpty(result))
+		{
+			return HandleSuccessRequestResponse(result);
+		}
+
+		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+	}
 }

@@ -157,5 +157,10 @@ public static class RouteConstants
 		/// The invoke agent route
 		/// </summary>
 		internal const string InvokeAgent_Route = "invokeagent";
+
+		/// <summary>
+		/// The get direct chat response route.
+		/// </summary>
+		internal const string GetDirectChatResponse_Route = "directchat";
 	}
 }

@@ -15,7 +15,6 @@ namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 /// <seealso cref="IAiServices" />
 public class AiServices(ILogger<AiServices> logger, Kernel kernel) : IAiServices
 {
-
 	/// <summary>
 	/// Gets the ai function response asynchronous.
 	/// </summary>

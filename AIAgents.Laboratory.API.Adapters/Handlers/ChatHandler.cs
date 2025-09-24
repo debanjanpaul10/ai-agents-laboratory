@@ -15,6 +15,16 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 public class ChatHandler(IMapper mapper, IChatService chatService) : IChatHandler
 {
 	/// <summary>
+	/// Gets the chatbot response.
+	/// </summary>
+	/// <param name="userQuery">The user query.</param>
+	/// <returns>The AI response.</returns>
+	public async Task<string> GetDirectChatResponseAsync(string userQuery)
+	{
+		return await chatService.GetDirectChatResponseAsync(userQuery).ConfigureAwait(false);
+	}
+
+	/// <summary>
 	/// Invokes the chat agent asynchronous.
 	/// </summary>
 	/// <param name="chatRequestDTO">The chat request dto.</param>

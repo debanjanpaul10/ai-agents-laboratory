@@ -1,5 +1,3 @@
-"use client";
-
 import { useMsal } from "@azure/msal-react";
 import { Button } from "@heroui/react";
 import { loginRequest } from "@auth/authConfig";

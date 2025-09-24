@@ -42,4 +42,29 @@ public class ChatService(ILogger<ChatService> logger, IAgentsService agentsServi
 		};
 		return await aiServices.GetAiFunctionResponseAsync(chatMessage, ApplicationPluginsHelpers.PluginName, ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
 	}
+
+	/// <summary>
+	/// Gets the chatbot response.
+	/// </summary>
+	/// <param name="userQuery">The user query.</param>
+	/// <returns>The AI response.</returns>
+	public async Task<string> GetDirectChatResponseAsync(string userQuery)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery));
+
+			ArgumentException.ThrowIfNullOrEmpty(userQuery);
+			return await aiServices.GetAiFunctionResponseAsync(userQuery, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.ConversationAgentFunction.FunctionName).ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery));
+		}
+	}
 }

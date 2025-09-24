@@ -20,7 +20,7 @@ import {
 	DeleteExistingAgentDataAsync,
 	UpdateExistingAgentDataAsync,
 } from "@store/agents/actions";
-import { FullScreenLoading } from "@components/ui/loading-spinner";
+import { FullScreenLoading } from "@components/common/loading-spinner";
 import { ManageAgentConstants } from "@helpers/constants";
 import { AgentDataDTO } from "@models/agent-data-dto";
 import ExpandMetapromptEditorComponent from "@components/common/expand-meta-prompt-editor";

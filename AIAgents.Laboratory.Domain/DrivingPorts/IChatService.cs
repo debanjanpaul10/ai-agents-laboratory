@@ -13,4 +13,11 @@ public interface IChatService
 	/// <param name="chatRequest">The chat request.</param>
 	/// <returns>The AI response.</returns>
 	Task<string> GetAgentChatResponseAsync(ChatRequestDomain chatRequest);
+
+	/// <summary>
+	/// Gets the direct chat response.
+	/// </summary>
+	/// <param name="userQuery">The user query.</param>
+	/// <returns>The AI response.</returns>
+	Task<string> GetDirectChatResponseAsync(string userQuery);
 }

@@ -1,5 +1,3 @@
-"use client";
-
 import { DashboardConstants } from "@helpers/constants";
 import { Bot } from "lucide-react";
 
