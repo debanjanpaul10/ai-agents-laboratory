@@ -1,4 +1,4 @@
-import AuthenticatedApp from "@components/common/authenticated-app";
+import AuthenticatedApp from "@components/common/providers/authenticated-app";
 import CreateAgentComponent from "@components/create-agent";
 import ManageAgentsComponent from "@components/manage-agents";
 import DashboardComponent from "@pages/dashboard";

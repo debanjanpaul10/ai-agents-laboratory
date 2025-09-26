@@ -9,12 +9,14 @@ export default function ExpandMetapromptEditorComponent({
 	agentMetaprompt,
 	handleInputChange,
 	createdBy,
+	isNewAgent,
 }: {
 	expandedPromptModal: boolean;
 	handleCollapsePrompt: MouseEventHandler;
 	agentMetaprompt: string;
 	handleInputChange: any;
 	createdBy: string;
+	isNewAgent: boolean;
 }) {
 	const { accounts } = useMsal();
 
@@ -66,6 +68,7 @@ export default function ExpandMetapromptEditorComponent({
 									placeholder="Define your agent's behavior, personality, and capabilities in detail..."
 									className="w-full h-full bg-black/40 backdrop-blur-xl text-white placeholder:text-white/40 p-6 rounded-xl border border-white/10 hover:border-white/20 focus:border-orange-500/50 focus:outline-none resize-none font-mono relative z-10"
 									disabled={
+										!isNewAgent &&
 										accounts[0].username !== createdBy
 									}
 								/>

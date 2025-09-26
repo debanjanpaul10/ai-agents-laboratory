@@ -34,7 +34,7 @@ export default function AgentsListComponent({
 
 	return (
 		<div className="fixed inset-0 w-full h-full max-w-full max-h-full z-[100] bg-gray-900 flex items-center justify-center">
-			<div className="w-full h-full md:w-[420px] md:h-auto bg-gradient-to-b from-gray-900 via-slate-900 to-black rounded-none md:rounded-2xl shadow-xl overflow-y-auto">
+			<div className="w-full h-full md:w-auto md:h-auto bg-gradient-to-b from-gray-900 via-slate-900 to-black rounded-none md:rounded-2xl shadow-xl overflow-y-auto">
 				{/* Header */}
 				<div className="flex items-center justify-between md:p-6 p-4 border-b border-white/10 flex-shrink-0">
 					<div className="flex items-center space-x-3">

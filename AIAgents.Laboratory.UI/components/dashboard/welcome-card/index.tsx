@@ -3,6 +3,7 @@ import { MessageCircleDashed, Spotlight } from "lucide-react";
 
 import { ToggleDirectChatDrawer } from "@store/common/actions";
 import { useAppDispatch } from "@store/index";
+import { Button } from "@heroui/react";
 
 export default function WelcomeCardComponent() {
 	const { accounts } = useMsal();
@@ -41,15 +42,16 @@ export default function WelcomeCardComponent() {
 						{/* DIRECT AGENT CHAT BUTTON */}
 						<div className="relative group/button w-full md:w-auto">
 							<div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl blur opacity-75 group-hover/button:opacity-100 transition duration-300"></div>
-							<button
-								onClick={toggleDirectChatDrawer}
-								className="relative w-full md:w-auto bg-cyan-500/20 backdrop-blur-sm hover:bg-cyan-500/30 text-white font-semibold py-3 px-6 rounded-xl border border-blue-500/30 hover:border-blue-400/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/25 text-base md:text-lg"
+							<Button
+								onPress={toggleDirectChatDrawer}
+								title="Chat with an exemplary AI conversation agent"
+								className="relative w-full md:w-auto bg-cyan-500/20 backdrop-blur-sm hover:bg-cyan-500/30 text-white font-semibold rounded-xl border border-blue-500/30 hover:border-blue-400/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/25 text-base md:text-lg"
 							>
 								<span className="flex items-center justify-center space-x-2">
 									<MessageCircleDashed />
 									<span>Chat with AI Agent</span>
 								</span>
-							</button>
+							</Button>
 						</div>
 					</div>
 				</div>

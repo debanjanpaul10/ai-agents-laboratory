@@ -95,3 +95,9 @@ export const ManageAgentConstants = {
 		},
 	},
 };
+
+export const LoginPageConstants = {
+	LoginButton: "Sign-In with SSO",
+	HeaderText: "AI Agents Laboratory",
+	Subtext: "Welcome to the future of AI development",
+};
