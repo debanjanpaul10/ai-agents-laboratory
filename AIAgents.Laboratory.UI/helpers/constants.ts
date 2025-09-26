@@ -47,6 +47,12 @@ export const DashboardConstants = {
 				"Send a message to the AI agent to see how the functionality works",
 		},
 	},
+	LoadingConstants: {
+		MainLoader: "Loading AI Agents Data ...",
+		SaveNewAgentLoader: "Saving New Agent ...",
+		LoginRedirectLoader: "Redirecting to Login ...",
+		SaveAgentDataLoader: "Saving agent data ...",
+	},
 };
 
 export const CreateAgentConstants = {

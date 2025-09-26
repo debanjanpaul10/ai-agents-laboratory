@@ -20,10 +20,10 @@ import {
 	DeleteExistingAgentDataAsync,
 	UpdateExistingAgentDataAsync,
 } from "@store/agents/actions";
-import { FullScreenLoading } from "@components/common/loading-spinner";
-import { ManageAgentConstants } from "@helpers/constants";
+import { FullScreenLoading } from "@components/common/spinner";
+import { DashboardConstants, ManageAgentConstants } from "@helpers/constants";
 import { AgentDataDTO } from "@models/agent-data-dto";
-import ExpandMetapromptEditorComponent from "@components/common/expand-meta-prompt-editor";
+import ExpandMetapromptEditorComponent from "@components/common/expand-metaprompt-editor";
 
 export default function ModifyAgentComponent({
 	editFormData,
@@ -351,7 +351,10 @@ export default function ModifyAgentComponent({
 	};
 
 	return IsEditAgentDataLoading ? (
-		<FullScreenLoading isLoading={true} message="Saving agent data ..." />
+		<FullScreenLoading
+			isLoading={true}
+			message={DashboardConstants.LoadingConstants.SaveAgentDataLoader}
+		/>
 	) : (
 		renderEditAgentsData()
 	);

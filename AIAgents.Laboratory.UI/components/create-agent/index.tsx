@@ -12,10 +12,10 @@ import {
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleNewAgentDrawer } from "@store/common/actions";
 import { CreateAgentDTO } from "@models/create-agent-dto";
-import { CreateAgentConstants } from "@helpers/constants";
+import { CreateAgentConstants, DashboardConstants } from "@helpers/constants";
 import { CreateNewAgentAsync } from "@store/agents/actions";
 import { useAuth } from "@auth/AuthProvider";
-import { FullScreenLoading } from "@components/common/loading-spinner";
+import { FullScreenLoading } from "@components/common/spinner";
 
 export default function CreateAgentComponent() {
 	const dispatch = useAppDispatch();
@@ -87,7 +87,7 @@ export default function CreateAgentComponent() {
 		(IsCreateAgentLoading ? (
 			<FullScreenLoading
 				isLoading={IsCreateAgentLoading}
-				message={"Saving new agent..."}
+				message={DashboardConstants.LoadingConstants.SaveNewAgentLoader}
 			/>
 		) : (
 			<>

@@ -112,7 +112,7 @@ export default function DirectChatComponent() {
 					onClick={onClose}
 				/>
 
-				<div className="fixed right-0 top-0 w-1/3 h-screen z-50 transition-all duration-500 ease-in-out">
+				<div className="fixed right-0 top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out">
 					<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 					<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 						<div className="h-full flex flex-col">

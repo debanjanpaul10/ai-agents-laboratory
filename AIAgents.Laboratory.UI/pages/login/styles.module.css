@@ -1,12 +1,11 @@
 .loginBackground {
 	height: 100vh;
 	width: 100vw;
-	background: url("/images/minmalist-background.png") no-repeat center center
-		fixed;
+	background-color: #000e2d;
 	background-size: cover;
 	display: flex;
 	align-items: center;
-	justify-content: flex-end;
+	justify-content: center;
 	position: relative;
 	margin: 0;
 	padding: 0;
@@ -17,11 +16,46 @@
 	z-index: 2;
 	display: flex;
 	flex-direction: column;
-	align-items: flex-end;
+	align-items: center;
 	justify-content: center;
-	padding-right: 5rem;
+	padding: 0 1rem;
 	height: 100%;
 	width: 100%;
+}
+
+/* show mobile layout for viewports under 1500px, hide on >=1500px */
+.mobileOnly {
+	display: block;
+	align-items: center;
+}
+
+/* hide desktop layout by default */
+.desktopOnly {
+	display: none;
+}
+
+/* Mobile responsive styles */
+@media (min-width: 1500px) {
+	/* Hide mobile version on desktop */
+	.mobileOnly {
+		display: none;
+	}
+	/* Show desktop version with background image */
+	.desktopOnly {
+		display: block;
+	}
+	/* Add background image only in desktop mode */
+	.loginBackground {
+		background: url("/images/minmalist-background.png") no-repeat center
+			center;
+		background-size: cover;
+		justify-content: flex-end;
+	}
+	/* Adjust content alignment for desktop */
+	.loginContent {
+		align-items: flex-end;
+		padding-right: 5rem;
+	}
 }
 
 .loginContent img {
