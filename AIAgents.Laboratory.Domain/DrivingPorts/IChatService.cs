@@ -1,4 +1,5 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+﻿using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 
 namespace AIAgents.Laboratory.Domain.DrivingPorts;
 
@@ -18,6 +19,7 @@ public interface IChatService
 	/// Gets the direct chat response.
 	/// </summary>
 	/// <param name="userQuery">The user query.</param>
+	/// <param name="userEmail">The user email address.</param>
 	/// <returns>The AI response.</returns>
-	Task<string> GetDirectChatResponseAsync(string userQuery);
+	Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail);
 }

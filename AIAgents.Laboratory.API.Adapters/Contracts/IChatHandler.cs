@@ -18,6 +18,7 @@ public interface IChatHandler
 	/// Gets the direct chat response.
 	/// </summary>
 	/// <param name="userQuery">The user query.</param>
+	/// <param name="userEmail">The user email address.</param>
 	/// <returns>The AI response.</returns>
-	Task<string> GetDirectChatResponseAsync(string userQuery);
+	Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail);
 }

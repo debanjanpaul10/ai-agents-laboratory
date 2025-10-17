@@ -18,10 +18,11 @@ public class ChatHandler(IMapper mapper, IChatService chatService) : IChatHandle
 	/// Gets the chatbot response.
 	/// </summary>
 	/// <param name="userQuery">The user query.</param>
+	/// <param name="userEmail">The user email address.</param>
 	/// <returns>The AI response.</returns>
-	public async Task<string> GetDirectChatResponseAsync(string userQuery)
+	public async Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail)
 	{
-		return await chatService.GetDirectChatResponseAsync(userQuery).ConfigureAwait(false);
+		return await chatService.GetDirectChatResponseAsync(userQuery, userEmail).ConfigureAwait(false);
 	}
 
 	/// <summary>

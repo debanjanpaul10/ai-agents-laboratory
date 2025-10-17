@@ -397,12 +397,21 @@ public static class ChatbotPluginHelpers
 				- Respond to user in natural language like having a conversation.
 				- Keep the responses concise and humorous.
 				- Always reply in normal conversational human like tone.
+				- You will also receive the conversation history and make sure to refer to them while answering.
+				- DO NOT DEVIATE FROM THE CONTEXT BASED ON THE CONVERSATION HISTORY.
 				- DO NOT ADD ANY CITATIONS LIKE [1][2] etc. IF THEY ARE PRESENT REMOVE THEM.
 					
 			Input:
 			++++++++++++
 
 			{{$user_message}}
+
+			+++++++++++	
+
+			History:
+			++++++++++++
+
+			{{$conversation_history}}
 
 			+++++++++++	
 

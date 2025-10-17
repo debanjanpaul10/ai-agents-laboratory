@@ -61,6 +61,16 @@ internal static class Constants
 		/// The user message input constant.
 		/// </summary>
 		internal const string UserMessageInputConstant = "user_message";
+
+		/// <summary>
+		/// The user role constant.
+		/// </summary>
+		internal const string UserRoleConstant = "user";
+
+		/// <summary>
+		/// The assistant role constant.
+		/// </summary>
+		internal const string AssistantRoleConstant = "assistant";
 	}
 
 	/// <summary>

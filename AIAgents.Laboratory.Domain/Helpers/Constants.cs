@@ -62,6 +62,11 @@ internal static class Constants
 		/// The agent not found exception message
 		/// </summary>
 		internal const string AgentNotFoundExceptionMessage = "Oops! It seems the AI agent you are looking for does not exists!";
+
+		/// <summary>
+		/// The data not found exception message constant.
+		/// </summary>
+		internal const string DataNotFoundExceptionMessage = "Oops! The requested data could not be found!";
 	}
 
 	/// <summary>
@@ -104,6 +109,27 @@ internal static class Constants
 		/// The agents collection name
 		/// </summary>
 		internal const string AgentsCollectionName = "agents";
+
+		/// <summary>
+		/// The conversation history collection name.
+		/// </summary>
+		internal const string ConversationHistoryCollectionName = "conversation-history";
+	}
+
+	/// <summary>
+	/// The chatbot helper constants.
+	/// </summary>
+	internal static class ChatbotHelperConstants
+	{
+		/// <summary>
+		/// The user role constant.
+		/// </summary>
+		internal const string UserRoleConstant = "user";
+
+		/// <summary>
+		/// The assistant role constant.
+		/// </summary>
+		internal const string AssistantRoleConstant = "assistant";
 	}
 
 }
