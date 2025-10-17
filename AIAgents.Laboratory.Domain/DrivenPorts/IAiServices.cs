@@ -1,4 +1,6 @@
-﻿namespace AIAgents.Laboratory.Domain.DrivenPorts;
+﻿using AIAgents.Laboratory.Domain.DomainEntities;
+
+namespace AIAgents.Laboratory.Domain.DrivenPorts;
 
 /// <summary>
 /// The AI Services interface.
@@ -14,4 +16,12 @@ public interface IAiServices
 	/// <param name="functionName">Name of the function.</param>
 	/// <returns>The AI response.</returns>
 	Task<string> GetAiFunctionResponseAsync<TInput>(TInput input, string pluginName, string functionName);
+
+	/// <summary>
+	/// Gets the chatbot response.
+	/// </summary>
+	/// <param name="userMessage">The user message data.</param>
+	/// <param name="conversationDataDomain">The conversation history data domain.</param>
+	/// <returns>The AI chatbot response.</returns>
+	Task<string> GetChatbotResponseAsync(ConversationHistoryDomain conversationDataDomain, string userMessage);
 }

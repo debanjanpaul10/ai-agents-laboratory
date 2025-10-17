@@ -14,14 +14,17 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <seealso cref="AIAgents.Laboratory.API.Adapters.Contracts.IChatHandler" />
 public class ChatHandler(IMapper mapper, IChatService chatService) : IChatHandler
 {
+
+
 	/// <summary>
 	/// Gets the chatbot response.
 	/// </summary>
 	/// <param name="userQuery">The user query.</param>
+	/// <param name="userEmail">The user email address.</param>
 	/// <returns>The AI response.</returns>
-	public async Task<string> GetDirectChatResponseAsync(string userQuery)
+	public async Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail)
 	{
-		return await chatService.GetDirectChatResponseAsync(userQuery).ConfigureAwait(false);
+		return await chatService.GetDirectChatResponseAsync(userQuery, userEmail).ConfigureAwait(false);
 	}
 
 	/// <summary>
@@ -35,5 +38,15 @@ public class ChatHandler(IMapper mapper, IChatService chatService) : IChatHandle
 	{
 		var domainInput = mapper.Map<ChatRequestDomain>(chatRequestDTO);
 		return await chatService.GetAgentChatResponseAsync(domainInput).ConfigureAwait(false);
+	}
+
+	/// <summary>
+	/// Clears the conversation history data for the user.
+	/// </summary>
+	/// <param name="userName">The user name for user.</param>
+	/// <returns>The boolean for success/failure.</returns>
+	public async Task<bool> ClearConversationHistoryForUserAsync(string userName)
+	{
+		return await chatService.ClearConversationHistoryForUserAsync(userName).ConfigureAwait(false);
 	}
 }

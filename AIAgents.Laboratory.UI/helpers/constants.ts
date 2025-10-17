@@ -47,6 +47,12 @@ export const DashboardConstants = {
 				"Send a message to the AI agent to see how the functionality works",
 		},
 	},
+	LoadingConstants: {
+		MainLoader: "Loading AI Agents Data ...",
+		SaveNewAgentLoader: "Saving New Agent ...",
+		LoginRedirectLoader: "Redirecting to Login ...",
+		SaveAgentDataLoader: "Saving agent data ...",
+	},
 };
 
 export const CreateAgentConstants = {
@@ -88,4 +94,10 @@ export const ManageAgentConstants = {
 			AgentResponse: "Agent is thinking ...",
 		},
 	},
+};
+
+export const LoginPageConstants = {
+	LoginButton: "Sign-In with SSO",
+	HeaderText: "AI Agents Laboratory",
+	Subtext: "Welcome to the future of AI development",
 };

@@ -4,9 +4,10 @@ import { PublicClientApplication } from "@azure/msal-browser";
 import { Provider } from "react-redux";
 import type { AppProps } from "next/app";
 import Head from "next/head";
+
 import "../styles/globals.css";
 import { msalConfig } from "@auth/authConfig";
-import { ClientThemeProvider } from "@components/common/client-theme-provider";
+import { ClientThemeProvider } from "@components/common/providers/client-theme-provider";
 import { AuthProvider } from "@auth/AuthProvider";
 import { metadata } from "@helpers/constants";
 import { store } from "@store/index";

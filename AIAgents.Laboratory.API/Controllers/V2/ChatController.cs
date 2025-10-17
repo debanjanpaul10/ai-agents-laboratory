@@ -36,13 +36,11 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
 	public async Task<ResponseDTO> InvokeChatAgentAsync([FromBody] ChatRequestDTO chatRequestDTO)
 	{
 		ArgumentNullException.ThrowIfNull(chatRequestDTO);
-		var result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
-		if (!string.IsNullOrEmpty(result))
-		{
-			return HandleSuccessRequestResponse(result);
-		}
 
-		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		var result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
+		if (!string.IsNullOrEmpty(result)) return base.HandleSuccessRequestResponse(result);
+
+		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 	}
 
 	/// <summary>
@@ -58,13 +56,30 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
 	[SwaggerOperation(Summary = GetDirectChatResponseAction.Summary, Description = GetDirectChatResponseAction.Description, OperationId = GetDirectChatResponseAction.OperationId)]
 	public async Task<ResponseDTO> GetDirectChatResponseAsync([FromBody] DirectChatRequestDTO userChatMessage)
 	{
+		ArgumentNullException.ThrowIfNull(userChatMessage);
 		ArgumentException.ThrowIfNullOrEmpty(userChatMessage.UserMessage);
-		var result = await chatHandler.GetDirectChatResponseAsync(userChatMessage.UserMessage).ConfigureAwait(false);
-		if (!string.IsNullOrEmpty(result))
-		{
-			return HandleSuccessRequestResponse(result);
-		}
 
-		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		var result = await chatHandler.GetDirectChatResponseAsync(userChatMessage.UserMessage, UserEmail).ConfigureAwait(false);
+		if (!string.IsNullOrEmpty(result)) return base.HandleSuccessRequestResponse(result);
+
+		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+	}
+
+	/// <summary>
+	/// Clears the conversation history data for user.
+	/// </summary>
+	/// <returns>The boolean for success/failure.</returns>
+	[HttpPost(RouteConstants.ChatRoutes.ClearConversationHistory_Route)]
+	[ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = ClearConversationHistoryForUserAction.Summary, Description = ClearConversationHistoryForUserAction.Description, OperationId = ClearConversationHistoryForUserAction.OperationId)]
+	public async Task<ResponseDTO> ClearConversationHistoryForUserAsync()
+	{
+		var result = await chatHandler.ClearConversationHistoryForUserAsync(base.UserEmail).ConfigureAwait(false);
+		if (result) return base.HandleSuccessRequestResponse(result);
+
+		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 	}
 }

@@ -96,7 +96,7 @@ export default function ManageAgentsComponent() {
 				/>
 				{/* Test Agent Drawer - Leftmost only when test is open) */}
 				{isTestDrawerOpen && (
-					<div className="fixed left-0 top-0 w-1/3 h-screen z-50 transition-all duration-500 ease-in-out">
+					<div className="fixed left-0 top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out">
 						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-r border-white/10 shadow-2xl">
 							<TestAgentComponent
@@ -111,7 +111,7 @@ export default function ManageAgentsComponent() {
 				{/* Modify Agent Drawer - Middle (when edit is open) */}
 				{isEditDrawerOpen && (
 					<div
-						className={`fixed top-0 w-1/3 h-screen z-50 transition-all duration-500 ease-in-out ${
+						className={`fixed top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out ${
 							isTestDrawerOpen ? "left-1/3" : "right-1/3"
 						}`}
 					>
@@ -132,7 +132,7 @@ export default function ManageAgentsComponent() {
 				)}
 
 				{/* Agents List Drawer - Rightmost (always visible when main drawer is open) */}
-				<div className="fixed right-0 top-0 w-1/3 h-screen z-50 transition-all duration-500 ease-in-out">
+				<div className="fixed right-0 top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out">
 					<div className="absolute inset-0 bg-gradient-to-l from-purple-600/20 via-blue-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
 					<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 						<AgentsListComponent

@@ -20,10 +20,10 @@ import {
 	DeleteExistingAgentDataAsync,
 	UpdateExistingAgentDataAsync,
 } from "@store/agents/actions";
-import { FullScreenLoading } from "@components/common/loading-spinner";
-import { ManageAgentConstants } from "@helpers/constants";
+import { FullScreenLoading } from "@components/common/spinner";
+import { DashboardConstants, ManageAgentConstants } from "@helpers/constants";
 import { AgentDataDTO } from "@models/agent-data-dto";
-import ExpandMetapromptEditorComponent from "@components/common/expand-meta-prompt-editor";
+import ExpandMetapromptEditorComponent from "@components/common/expand-metaprompt-editor";
 
 export default function ModifyAgentComponent({
 	editFormData,
@@ -50,22 +50,22 @@ export default function ModifyAgentComponent({
 		setEditFormData((prev: any) => ({ ...prev, [field]: value }));
 	};
 
-	const handleEditSave = async () => {
+	async function handleEditSave() {
 		const accessToken = await auth.getAccessToken();
 		accessToken &&
 			dispatch(UpdateExistingAgentDataAsync(editFormData, accessToken));
-	};
+	}
 
 	const handleEditClose = () => {
 		setSelectedAgent(null);
 		onEditClose();
 	};
 
-	const handleAgentDelete = async () => {
+	async function handleAgentDelete() {
 		const token = await auth.getAccessToken();
 		token &&
 			dispatch(DeleteExistingAgentDataAsync(editFormData.agentId, token));
-	};
+	}
 
 	const handleExpandPrompt = () => {
 		setExpandedPromptModal(true);
@@ -117,7 +117,7 @@ export default function ModifyAgentComponent({
 							radius="full"
 							className="group relative bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 text-white font-semibold hover:from-emerald-500 hover:via-green-600 hover:to-teal-600 shadow-lg hover:shadow-green-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
 						>
-							<div className="flex items-center px-3 py-3">
+							<div className="flex items-center">
 								<Save className="w-4 h-4 flex-shrink-0" />
 								<span className="max-w-0 overflow-hidden group-hover:max-w-[100px] transition-all duration-300 ease-in-out ml-0 group-hover:ml-2">
 									Save
@@ -134,7 +134,7 @@ export default function ModifyAgentComponent({
 							radius="full"
 							className="group relative bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 text-white font-semibold hover:from-blue-500 hover:via-indigo-600 hover:to-purple-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
 						>
-							<div className="flex items-center px-3 py-3">
+							<div className="flex items-center">
 								<Play className="w-4 h-4 flex-shrink-0" />
 								<span className="max-w-0 overflow-hidden group-hover:max-w-[100px] transition-all duration-300 ease-in-out ml-0 group-hover:ml-2">
 									Test
@@ -153,7 +153,7 @@ export default function ModifyAgentComponent({
 							radius="full"
 							className="group relative bg-gradient-to-r from-red-400 via-rose-500 to-pink-500 text-white font-semibold hover:from-red-500 hover:via-rose-600 hover:to-pink-600 shadow-lg hover:shadow-rose-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
 						>
-							<div className="flex items-center px-3 py-3">
+							<div className="flex items-center">
 								<Trash className="w-4 h-4 flex-shrink-0" />
 								<span className="max-w-0 overflow-hidden group-hover:max-w-[100px] transition-all duration-300 ease-in-out ml-0 group-hover:ml-2">
 									Delete
@@ -235,6 +235,7 @@ export default function ModifyAgentComponent({
 								}}
 							/>
 						</div>
+
 						{/* Application Name Field */}
 						<div className="space-y-2">
 							<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
@@ -266,6 +267,7 @@ export default function ModifyAgentComponent({
 								}}
 							/>
 						</div>
+
 						{/* Author Field */}
 						<div className="space-y-2">
 							<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
@@ -289,6 +291,7 @@ export default function ModifyAgentComponent({
 								}}
 							/>
 						</div>
+
 						{/* Meta Prompt Field */}
 						<div className="space-y-2">
 							<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
@@ -344,6 +347,7 @@ export default function ModifyAgentComponent({
 						handleCollapsePrompt={handleCollapsePrompt}
 						handleInputChange={handleInputChange}
 						createdBy={editFormData.createdBy}
+						isNewAgent={false}
 					/>
 				</div>
 			)
@@ -351,7 +355,10 @@ export default function ModifyAgentComponent({
 	};
 
 	return IsEditAgentDataLoading ? (
-		<FullScreenLoading isLoading={true} message="Saving agent data ..." />
+		<FullScreenLoading
+			isLoading={true}
+			message={DashboardConstants.LoadingConstants.SaveAgentDataLoader}
+		/>
 	) : (
 		renderEditAgentsData()
 	);

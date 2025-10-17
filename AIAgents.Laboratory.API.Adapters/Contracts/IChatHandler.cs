@@ -18,6 +18,14 @@ public interface IChatHandler
 	/// Gets the direct chat response.
 	/// </summary>
 	/// <param name="userQuery">The user query.</param>
+	/// <param name="userEmail">The user email address.</param>
 	/// <returns>The AI response.</returns>
-	Task<string> GetDirectChatResponseAsync(string userQuery);
+	Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail);
+
+	/// <summary>
+	/// Clears the conversation history data for the user.
+	/// </summary>
+	/// <param name="userName">The user name for user.</param>
+	/// <returns>The boolean for success/failure.</returns>
+	Task<bool> ClearConversationHistoryForUserAsync(string userName);
 }

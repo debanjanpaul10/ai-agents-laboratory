@@ -1,28 +1,23 @@
 import { useEffect, useState } from "react";
-import { Button, Input, Textarea } from "@heroui/react";
-import {
-	X,
-	Maximize2,
-	Minimize2,
-	Bot,
-	Sparkles,
-	ScrollText,
-} from "lucide-react";
+import { Button, Input } from "@heroui/react";
+import { X, Bot, Sparkles, ScrollText, Expand } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleNewAgentDrawer } from "@store/common/actions";
 import { CreateAgentDTO } from "@models/create-agent-dto";
-import { CreateAgentConstants } from "@helpers/constants";
+import { CreateAgentConstants, DashboardConstants } from "@helpers/constants";
 import { CreateNewAgentAsync } from "@store/agents/actions";
 import { useAuth } from "@auth/AuthProvider";
-import { FullScreenLoading } from "@components/common/loading-spinner";
+import { FullScreenLoading } from "@components/common/spinner";
+import ExpandMetapromptEditorComponent from "@components/common/expand-metaprompt-editor";
 
 export default function CreateAgentComponent() {
 	const dispatch = useAppDispatch();
 	const authContext = useAuth();
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	const [isExpanded, setIsExpanded] = useState(false);
+	const [expandedPromptModal, setExpandedPromptModal] =
+		useState<boolean>(false);
 	const [formData, setFormData] = useState<CreateAgentDTO>({
 		agentName: "",
 		agentMetaPrompt: "",
@@ -58,7 +53,6 @@ export default function CreateAgentComponent() {
 
 	const onClose = () => {
 		dispatch(ToggleNewAgentDrawer(false));
-		setIsExpanded(false);
 	};
 
 	const handleSubmit = async () => {
@@ -82,12 +76,20 @@ export default function CreateAgentComponent() {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
 
+	const handleCollapsePrompt = () => {
+		setExpandedPromptModal(false);
+	};
+
+	const handleExpandPrompt = () => {
+		setExpandedPromptModal(true);
+	};
+
 	return (
 		isDrawerOpen &&
 		(IsCreateAgentLoading ? (
 			<FullScreenLoading
 				isLoading={IsCreateAgentLoading}
-				message={"Saving new agent..."}
+				message={DashboardConstants.LoadingConstants.SaveNewAgentLoader}
 			/>
 		) : (
 			<>
@@ -98,11 +100,7 @@ export default function CreateAgentComponent() {
 				/>
 
 				{/* Drawer */}
-				<div
-					className={`fixed right-0 top-0 h-screen z-50 transition-all duration-500 ease-in-out ${
-						isExpanded ? "w-full max-w-4xl" : "w-full max-w-md"
-					}`}
-				>
+				<div className="fixed right-0 top-0 h-screen z-50 transition-all duration-500 ease-in-out w-full max-w-md">
 					{/* Glow effect */}
 					<div className="absolute -inset-1 bg-gradient-to-l from-purple-600/20 via-blue-600/20 to-cyan-600/20 blur-lg opacity-75"></div>
 
@@ -121,25 +119,13 @@ export default function CreateAgentComponent() {
 								</div>
 							</div>
 							<div className="flex items-center space-x-2">
-								{/* Expand/Collapse button */}
-								<button
-									onClick={() => setIsExpanded(!isExpanded)}
-									className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-200 text-white/70 hover:text-white"
-								>
-									{isExpanded ? (
-										<Minimize2 className="w-4 h-4" />
-									) : (
-										<Maximize2 className="w-4 h-4" />
-									)}
-								</button>
-
-								{/* Close button */}
-								<button
-									onClick={onClose}
+								<Button
+									onPress={onClose}
+									title="Close window"
 									className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-red-400"
 								>
 									<X className="w-4 h-4" />
-								</button>
+								</Button>
 							</div>
 						</div>
 
@@ -201,7 +187,7 @@ export default function CreateAgentComponent() {
 										classNames={{
 											input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
 											inputWrapper:
-												"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-blue-500/50 min-h-[48px]",
+												"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-purple-500/50 min-h-[48px]",
 										}}
 									/>
 								</div>
@@ -213,9 +199,8 @@ export default function CreateAgentComponent() {
 									<ScrollText className="w-4 h-4 text-green-400" />
 									<span>Agent Meta Prompt</span>
 								</label>
-								<div className="relative group">
-									<div className="absolute -inset-0.5 bg-gradient-to-r from-green-500/20 to-purple-500/20 rounded-xl blur opacity-50 group-focus-within:opacity-75 transition duration-300"></div>
-									<Textarea
+								<div className="relative">
+									<textarea
 										value={formData.agentMetaPrompt}
 										onChange={(e) =>
 											handleInputChange(
@@ -227,15 +212,18 @@ export default function CreateAgentComponent() {
 											CreateAgentConstants.InputFields
 												.AgentMetaPromptPlaceholder
 										}
-										minRows={isExpanded ? 12 : 6}
-										maxRows={isExpanded ? 20 : 10}
-										className="relative"
-										classNames={{
-											input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 resize-none px-4 py-3",
-											inputWrapper:
-												"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-green-500/50",
-										}}
+										rows={6}
+										className="w-full bg-white/5 border border-white/10 text-white placeholder:text-white/40 resize-none px-4 py-3 pr-12 rounded-xl hover:border-white/20 focus:border-orange-500/50 focus:outline-none transition-colors duration-200"
 									/>
+
+									{/* Expand Button */}
+									<button
+										onClick={handleExpandPrompt}
+										className="absolute top-2 right-2 p-2 rounded-lg bg-gray-800/90 hover:bg-orange-500/80 border border-orange-500/50 hover:border-orange-400 transition-all duration-200 text-orange-400 hover:text-white z-20 shadow-lg hover:shadow-orange-500/25 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+										title="Expand prompt editor"
+									>
+										<Expand className="w-4 h-4" />
+									</button>
 								</div>
 							</div>
 						</div>
@@ -246,6 +234,7 @@ export default function CreateAgentComponent() {
 								<div className="relative group">
 									<Button
 										onPress={handleSubmit}
+										title="Create AI Agent"
 										className="flex items-center bg-gradient-to-r from-purple-500 to-blue-600 text-white font-semibold hover:from-purple-600 hover:to-blue-700 transition-all duration-300 px-6 py-3 min-h-[44px]"
 										radius="full"
 										disabled={
@@ -260,6 +249,15 @@ export default function CreateAgentComponent() {
 								</div>
 							</div>
 						</div>
+
+						<ExpandMetapromptEditorComponent
+							agentMetaprompt={formData.agentMetaPrompt}
+							expandedPromptModal={expandedPromptModal}
+							handleCollapsePrompt={handleCollapsePrompt}
+							handleInputChange={handleInputChange}
+							createdBy={""}
+							isNewAgent={true}
+						/>
 					</div>
 				</div>
 			</>

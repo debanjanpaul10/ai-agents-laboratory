@@ -162,5 +162,10 @@ public static class RouteConstants
 		/// The get direct chat response route.
 		/// </summary>
 		internal const string GetDirectChatResponse_Route = "directchat";
+
+		/// <summary>
+		/// The clear conversation history route.
+		/// </summary>
+		internal const string ClearConversationHistory_Route = "clearconversation";
 	}
 }

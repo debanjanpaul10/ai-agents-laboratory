@@ -2,19 +2,21 @@ import { useEffect } from "react";
 import { useMsal } from "@azure/msal-react";
 import { LogOut } from "lucide-react";
 import Image from "next/image";
+import { Button } from "@heroui/react";
 
 import AppLogo from "@public/images/icon.png";
 import { useAuth } from "@auth/AuthProvider";
 import ActiveAgentsTileComponent from "@components/dashboard/active-agents-tile";
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { GetAllAgentsDataAsync } from "@store/agents/actions";
-import { FullScreenLoading } from "@components/common/loading-spinner";
+import { FullScreenLoading } from "@components/common/spinner";
 import ManageAgentsTileComponent from "@components/dashboard/manage-agents-tile";
 import CreateAgentsTileComponent from "@components/dashboard/create-agents-tile";
 import StatsSectionTilesComponent from "@components/dashboard/stats-section-tiles";
-import FooterComponent from "@components/common/footer-component";
+import FooterComponent from "@components/common/footer";
 import WelcomeCardComponent from "@components/dashboard/welcome-card";
-import DirectChatComponent from "@components/common/direct-chat-component";
+import DirectChatComponent from "@components/direct-chat";
+import { DashboardConstants } from "@helpers/constants";
 
 export default function DashboardComponent() {
 	const dispatch = useAppDispatch();
@@ -55,7 +57,9 @@ export default function DashboardComponent() {
 		return (
 			<FullScreenLoading
 				isLoading={true}
-				message="Redirecting to login..."
+				message={
+					DashboardConstants.LoadingConstants.LoginRedirectLoader
+				}
 			/>
 		);
 	};
@@ -76,7 +80,7 @@ export default function DashboardComponent() {
 
 						<div className="relative bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8">
 							{/* Header */}
-							<div className="flex justify-between items-center mb-8">
+							<div className="flex justify-between items-start mb-8">
 								<div className="flex items-center space-x-4">
 									<div className="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-2xl">
 										<Image
@@ -87,31 +91,34 @@ export default function DashboardComponent() {
 										/>
 									</div>
 									<div>
-										<h1 className="text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent drop-shadow-2xl">
+										<h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent drop-shadow-2xl">
 											AI Agents Laboratory
 										</h1>
-										<p className="text-white/60 text-sm mt-1">
+										<p className="text-white/60 text-xs md:text-sm mt-1">
 											Advanced AI Management Platform
 										</p>
 									</div>
 								</div>
 
-								{/* Logout button with glassmorphic effect */}
+								{/* Logout button with glassmorphic effect - responsive sizing */}
 								<div className="relative group/button">
 									<div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl blur opacity-75 group-hover/button:opacity-100 transition duration-300"></div>
-									<button
-										onClick={handleLogout}
-										className="relative bg-red-500/20 backdrop-blur-sm hover:bg-red-500/30 text-white font-semibold py-3 px-6 rounded-xl border border-red-500/30 hover:border-red-400/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25"
+									<Button
+										onPress={handleLogout}
+										radius="full"
+										title="Logout from application"
+										className="relative bg-red-500/20 backdrop-blur-sm hover:bg-red-500/30 text-white font-semibold rounded-xl border border-red-500/30 hover:border-red-400/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25"
 									>
-										<span className="flex items-center space-x-2">
-											<LogOut />
-											<span>Logout</span>
+										<span className="flex items-center space-x-1 md:space-x-2">
+											<LogOut className="w-4 h-4 md:w-5 md:h-5" />
+											<span className="text-xs md:text-base">
+												Logout
+											</span>
 										</span>
-									</button>
+									</Button>
 								</div>
 							</div>
 
-							{/* Welcome card */}
 							<WelcomeCardComponent />
 
 							{/* Feature cards grid */}
@@ -137,7 +144,7 @@ export default function DashboardComponent() {
 	) : IsLoadingStoreData ? (
 		<FullScreenLoading
 			isLoading={IsLoadingStoreData}
-			message={"Loading AI Agents Data..."}
+			message={DashboardConstants.LoadingConstants.MainLoader}
 		/>
 	) : (
 		renderAuthorizedDashboard()
