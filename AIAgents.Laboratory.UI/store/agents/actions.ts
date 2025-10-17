@@ -3,6 +3,7 @@ import {
 	CLEAR_CONVERSATION_HISTORY,
 	CREATE_NEW_AGENT,
 	DELETE_AGENT_DATA,
+	DIRECT_CHAT_REQUEST,
 	GET_AGENT_BY_ID,
 	GET_ALL_AGENTS_DATA,
 	GET_CHAT_RESPONSE,
@@ -17,6 +18,7 @@ import {
 	DeleteExistingAgentApiAsync,
 	GetAgentByIdApiAsync,
 	GetAgentsApiAsync,
+	GetDirectChatResponseApiAsync,
 	InvokeChatAgentApiAsync,
 	UpdateExistingAgentApiAsync,
 } from "@shared/api-service";
@@ -24,6 +26,7 @@ import { CreateAgentDTO } from "@models/create-agent-dto";
 import { AgentDataDTO } from "@models/agent-data-dto";
 import { ToggleMainLoader } from "@store/common/actions";
 import { ChatRequestDTO } from "@models/chat-request-dto";
+import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
 
 export function ToggleCreateAgentSpinner(isLoading: boolean) {
 	return {
@@ -216,6 +219,30 @@ export function ClearConversationHistoryAsync(accessToken: string) {
 		} catch (error: any) {
 			console.error(error);
 			throw error;
+		}
+	};
+}
+
+export function GetDirectChatResponseAsync(
+	userMessage: DirectChatRequestDTO,
+	accessToken: string
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			const response = await GetDirectChatResponseApiAsync(
+				userMessage,
+				accessToken
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: DIRECT_CHAT_REQUEST,
+					payload: response.responseData,
+				});
+
+				return response.responseData;
+			}
+		} catch (error: any) {
+			console.error(error);
 		}
 	};
 }

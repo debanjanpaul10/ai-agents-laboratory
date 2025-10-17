@@ -16,8 +16,10 @@ import { generateMessageId } from "@shared/utils";
 import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
 import { useAuth } from "@auth/AuthProvider";
 import { useAppDispatch } from "@store/index";
-import { GetDirectChatResponseAsync } from "@store/common/actions";
-import { ClearConversationHistoryAsync } from "@store/agents/actions";
+import {
+	ClearConversationHistoryAsync,
+	GetDirectChatResponseAsync,
+} from "@store/agents/actions";
 
 export default function AgentChatComponent({
 	toggleChatbotInformation,

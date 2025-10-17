@@ -9,6 +9,7 @@ import {
 	TOGGLE_AGENT_CREATE_SPINNER,
 	TOGGLE_EDIT_AGENT_SPINNER,
 	CLEAR_CONVERSATION_HISTORY,
+	DIRECT_CHAT_REQUEST,
 } from "@store/agents/actionTypes";
 
 const initialState: any = {
@@ -22,6 +23,7 @@ const initialState: any = {
 	isChatDataLoading: false,
 	isEditAgentDataLoading: false,
 	isConversationHistoryClear: false,
+	directChatResponse: "",
 };
 
 export function AgentsReducer(state = initialState, action: any) {
@@ -84,6 +86,12 @@ export function AgentsReducer(state = initialState, action: any) {
 			return {
 				...state,
 				isConversationHistoryClear: action.payload,
+			};
+		}
+		case DIRECT_CHAT_REQUEST: {
+			return {
+				...state,
+				directChatResponse: action.payload,
 			};
 		}
 

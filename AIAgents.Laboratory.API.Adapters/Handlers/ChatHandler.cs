@@ -14,8 +14,6 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <seealso cref="AIAgents.Laboratory.API.Adapters.Contracts.IChatHandler" />
 public class ChatHandler(IMapper mapper, IChatService chatService) : IChatHandler
 {
-
-
 	/// <summary>
 	/// Gets the chatbot response.
 	/// </summary>
