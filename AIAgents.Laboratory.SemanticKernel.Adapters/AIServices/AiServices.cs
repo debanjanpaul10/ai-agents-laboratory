@@ -118,7 +118,5 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel) : IAiServices
         }
     }
 
-
-
     #endregion
 }

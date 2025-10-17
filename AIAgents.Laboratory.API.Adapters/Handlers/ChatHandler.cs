@@ -14,6 +14,8 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <seealso cref="AIAgents.Laboratory.API.Adapters.Contracts.IChatHandler" />
 public class ChatHandler(IMapper mapper, IChatService chatService) : IChatHandler
 {
+
+
 	/// <summary>
 	/// Gets the chatbot response.
 	/// </summary>
@@ -36,5 +38,15 @@ public class ChatHandler(IMapper mapper, IChatService chatService) : IChatHandle
 	{
 		var domainInput = mapper.Map<ChatRequestDomain>(chatRequestDTO);
 		return await chatService.GetAgentChatResponseAsync(domainInput).ConfigureAwait(false);
+	}
+
+	/// <summary>
+	/// Clears the conversation history data for the user.
+	/// </summary>
+	/// <param name="userName">The user name for user.</param>
+	/// <returns>The boolean for success/failure.</returns>
+	public async Task<bool> ClearConversationHistoryForUserAsync(string userName)
+	{
+		return await chatService.ClearConversationHistoryForUserAsync(userName).ConfigureAwait(false);
 	}
 }

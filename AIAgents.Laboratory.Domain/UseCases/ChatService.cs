@@ -19,6 +19,8 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.IChatService" />
 public class ChatService(ILogger<ChatService> logger, IAgentsService agentsService, IAiServices aiServices, IConversationHistoryService conversationHistoryService) : IChatService
 {
+
+
     /// <summary>
     /// Gets the agent chat response asynchronous.
     /// </summary>
@@ -87,6 +89,29 @@ public class ChatService(ILogger<ChatService> logger, IAgentsService agentsServi
         finally
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery));
+        }
+    }
+
+    /// <summary>
+    /// Clears the conversation history data for the user.
+    /// </summary>
+    /// <param name="userName">The user name for user.</param>
+    /// <returns>The boolean for success/failure.</returns>
+    public async Task<bool> ClearConversationHistoryForUserAsync(string userName)
+    {
+        try
+        {
+            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
+            return await conversationHistoryService.ClearConversationHistoryForUserAsync(userName).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message));
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
         }
     }
 }

@@ -249,6 +249,16 @@ internal static class SwaggerConstants
 			internal const string Description = "Calls the LLM directly with user message.";
 			internal const string OperationId = nameof(GetDirectChatResponseAction);
 		}
+
+		/// <summary>
+		/// Swagger documentation for ClearConversationHistoryForUserAsync.
+		/// </summary>
+		internal static class ClearConversationHistoryForUserAction
+		{
+			internal const string Summary = "Clears the conversation history data.";
+			internal const string Description = "Clears the conversation history data for user.";
+			internal const string OperationId = nameof(ClearConversationHistoryForUserAction);
+		}
 	}
 
 }

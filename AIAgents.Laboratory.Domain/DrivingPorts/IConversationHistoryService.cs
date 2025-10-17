@@ -20,4 +20,11 @@ public interface IConversationHistoryService
     /// <param name="conversationHistory">The conversation history.</param>
     /// <returns>The boolean for success/failure.</returns>
     Task<bool> SaveMessageToConversationHistoryAsync(ConversationHistoryDomain conversationHistory);
+
+    /// <summary>
+    /// Clears the conversation history data for the user.
+    /// </summary>
+    /// <param name="userName">The user name for user.</param>
+    /// <returns>The boolean for success/failure.</returns>
+    Task<bool> ClearConversationHistoryForUserAsync(string userName);
 }

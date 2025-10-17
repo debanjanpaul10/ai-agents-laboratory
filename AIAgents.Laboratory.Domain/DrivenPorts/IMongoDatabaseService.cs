@@ -18,15 +18,6 @@ public interface IMongoDatabaseService
     Task<bool> SaveDataAsync<TInput>(TInput data, string databaseName, string collectionName);
 
     /// <summary>
-    /// Gets the data from collection asynchronous.
-    /// </summary>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
-    /// <param name="databaseName">Name of the database.</param>
-    /// <param name="collectionName">Name of the collection.</param>
-    /// <returns>The mongo db collection.</returns>
-    Task<IEnumerable<TResult>> GetDataFromCollectionAsync<TResult>(string databaseName, string collectionName);
-
-    /// <summary>
     /// Gets the data from collection asynchronous with a filter condition.
     /// </summary>
     /// <typeparam name="TResult">The type of the result.</typeparam>
@@ -46,4 +37,14 @@ public interface IMongoDatabaseService
     /// <param name="collectionName">Name of the collection.</param>
     /// <returns>The boolean for success/failure.</returns>
     Task<bool> UpdateDataInCollectionAsync<TDocument>(FilterDefinition<TDocument> filter, UpdateDefinition<TDocument> update, string databaseName, string collectionName);
+
+    /// <summary>
+    /// Deletes the data from mongo db collection using filter.
+    /// </summary>
+    /// <typeparam name="TDocument">The type of document.</typeparam>
+    /// <param name="filter">The filter.</param>
+    /// <param name="databaseName">The database name.</param>
+    /// <param name="collectionName">The collection name.</param>
+    /// <returns>The boolean for success/failure.</returns>
+    Task<bool> DeleteDataFromCollectionAsync<TDocument>(FilterDefinition<TDocument> filter, string databaseName, string collectionName);
 }

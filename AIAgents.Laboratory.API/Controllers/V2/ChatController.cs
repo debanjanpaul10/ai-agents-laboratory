@@ -64,4 +64,22 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
 
 		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 	}
+
+	/// <summary>
+	/// Clears the conversation history data for user.
+	/// </summary>
+	/// <returns>The boolean for success/failure.</returns>
+	[HttpPost(RouteConstants.ChatRoutes.ClearConversationHistory_Route)]
+	[ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = ClearConversationHistoryForUserAction.Summary, Description = ClearConversationHistoryForUserAction.Description, OperationId = ClearConversationHistoryForUserAction.OperationId)]
+	public async Task<ResponseDTO> ClearConversationHistoryForUserAsync()
+	{
+		var result = await chatHandler.ClearConversationHistoryForUserAsync(base.UserEmail).ConfigureAwait(false);
+		if (result) return base.HandleSuccessRequestResponse(result);
+
+		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+	}
 }

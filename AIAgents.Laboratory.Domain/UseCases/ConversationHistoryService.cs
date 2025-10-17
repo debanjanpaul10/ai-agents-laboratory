@@ -8,14 +8,20 @@ using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
 
+/// <summary>
+/// The conversation history service.
+/// </summary>
+/// <param name="logger">The logger service.</param>
+/// <param name="mongoDatabaseService">The mongo database service.</param>
+/// <seealso cref="IConversationHistoryService"/>
 public class ConversationHistoryService(ILogger<ConversationHistoryService> logger, IMongoDatabaseService mongoDatabaseService) : IConversationHistoryService
 {
     /// <summary>
-	/// Gets the conversation history data for current chat.
-	/// </summary>
-	/// <param name="userName">The user name.</param>
-	/// <returns>The conversation history domain.</returns>
-	public async Task<ConversationHistoryDomain> GetConversationHistoryAsync(string userName)
+    /// Gets the conversation history data for current chat.
+    /// </summary>
+    /// <param name="userName">The user name.</param>
+    /// <returns>The conversation history domain.</returns>
+    public async Task<ConversationHistoryDomain> GetConversationHistoryAsync(string userName)
     {
         try
         {
@@ -23,10 +29,7 @@ public class ConversationHistoryService(ILogger<ConversationHistoryService> logg
             var allConversationHistoryData = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.ConversationHistoryCollectionName,
                 Builders<ConversationHistoryDomain>.Filter.Where(x => x.UserName == userName && x.IsActive)).ConfigureAwait(false);
 
-            if (allConversationHistoryData.Any())
-            {
-                return allConversationHistoryData.First();
-            }
+            if (allConversationHistoryData.Any()) return allConversationHistoryData.First();
             else
             {
                 var newConversationHistory = new ConversationHistoryDomain()
@@ -89,6 +92,36 @@ public class ConversationHistoryService(ILogger<ConversationHistoryService> logg
         finally
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, conversationHistory.ConversationId));
+        }
+    }
+
+    /// <summary>
+    /// Clears the conversation history data for the user.
+    /// </summary>
+    /// <param name="userName">The user name for user.</param>
+    /// <returns>The boolean for success/failure.</returns>
+    public async Task<bool> ClearConversationHistoryForUserAsync(string userName)
+    {
+        try
+        {
+            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
+            ArgumentException.ThrowIfNullOrEmpty(userName);
+
+            var filter = Builders<ConversationHistoryDomain>.Filter.Where(x => x.UserName == userName);
+            var allConversationHistoryData = await mongoDatabaseService.GetDataFromCollectionAsync(
+                MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.ConversationHistoryCollectionName, filter).ConfigureAwait(false);
+
+            var conversationHistoryData = allConversationHistoryData.FirstOrDefault() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+            return await mongoDatabaseService.DeleteDataFromCollectionAsync(filter, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.ConversationHistoryCollectionName).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message));
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
         }
     }
 }
