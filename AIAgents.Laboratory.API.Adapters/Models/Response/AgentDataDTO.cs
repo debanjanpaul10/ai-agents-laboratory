@@ -23,4 +23,12 @@ public class AgentDataDTO : CreateAgentDTO
     /// The created by.
     /// </value>
     public string CreatedBy { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the date created on.
+    /// </summary>
+    /// <value>
+    /// The date created.
+    /// </value>
+    public DateTime DateCreated { get; set; }
 }
