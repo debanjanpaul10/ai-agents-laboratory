@@ -1,11 +1,4 @@
-﻿// *********************************************************************************
-//	<copyright file="ChatbotPluginHelpers.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>Chatbot Plugin helpers.</summary>
-// *********************************************************************************
-
-namespace AIAgents.Laboratory.Domain.Helpers;
+﻿namespace AIAgents.Laboratory.Domain.Helpers;
 
 /// <summary>
 /// The Chatbot Plugin Helpers class.
