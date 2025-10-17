@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Input } from "@heroui/react";
+import { Button, Input, Tooltip } from "@heroui/react";
 import {
 	BotMessageSquare,
 	Info,
@@ -17,6 +17,7 @@ import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
 import { useAuth } from "@auth/AuthProvider";
 import { useAppDispatch } from "@store/index";
 import { GetDirectChatResponseAsync } from "@store/common/actions";
+import { ClearConversationHistoryAsync } from "@store/agents/actions";
 
 export default function AgentChatComponent({
 	toggleChatbotInformation,
@@ -32,10 +33,13 @@ export default function AgentChatComponent({
 	const [userInput, setUserInput] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 
-	const clearConversation = () => {
+	async function clearConversation() {
 		setMessages([]);
 		setUserInput("");
-	};
+
+		const accessToken = await getAccessToken();
+		accessToken && dispatch(ClearConversationHistoryAsync(accessToken));
+	}
 
 	async function sendChatbotRequest() {
 		if (!userInput.trim()) return;
@@ -106,27 +110,31 @@ export default function AgentChatComponent({
 						</div>
 					</div>
 					<div className="flex items-center space-x-2">
-						<Button
-							onPress={toggleChatbotInformation}
-							className="p-2 rounded-lg bg-white/5 hover:bg-green-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-green-400"
-							title="Chatbot information"
-						>
-							<Info className="w-4 h-4" />
-						</Button>
-						<Button
-							onPress={clearConversation}
-							className="p-2 rounded-lg bg-white/5 hover:bg-yellow-500/20 border border-white/10 hover:border-yellow-500/30 transition-all duration-200 text-white/70 hover:text-yellow-400"
-							title="Clear conversation history"
-						>
-							<RefreshCcw className="w-4 h-4" />
-						</Button>
-						<Button
-							onPress={onClose}
-							className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-red-400"
-							title="Close chat window"
-						>
-							<X className="w-4 h-4" />
-						</Button>
+						<Tooltip content="Chatbot information">
+							<Button
+								onPress={toggleChatbotInformation}
+								className="p-2 rounded-lg bg-white/5 hover:bg-green-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-green-400"
+							>
+								<Info className="w-4 h-4" />
+							</Button>
+						</Tooltip>
+
+						<Tooltip content="Clear conversation history">
+							<Button
+								onPress={clearConversation}
+								className="p-2 rounded-lg bg-white/5 hover:bg-yellow-500/20 border border-white/10 hover:border-yellow-500/30 transition-all duration-200 text-white/70 hover:text-yellow-400"
+							>
+								<RefreshCcw className="w-4 h-4" />
+							</Button>
+						</Tooltip>
+						<Tooltip content="Close chat">
+							<Button
+								onPress={onClose}
+								className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-red-400"
+							>
+								<X className="w-4 h-4" />
+							</Button>
+						</Tooltip>
 					</div>
 				</div>
 
@@ -219,7 +227,7 @@ export default function AgentChatComponent({
 								radius="full"
 								disabled={isLoading}
 								classNames={{
-									input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
+									input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-2 py-2",
 									inputWrapper:
 										"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-cyan-500/50",
 								}}

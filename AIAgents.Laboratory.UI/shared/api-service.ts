@@ -49,3 +49,9 @@ export async function GetDirectChatResponseApiAsync(
 ) {
 	return await PostAsync("chat/directchat", chatRequest, accessToken);
 }
+
+export async function ClearConversationHistoryForUserApiAsync(
+	accessToken: string
+) {
+	return await PostAsync("chat/clearconversation", null, accessToken);
+}

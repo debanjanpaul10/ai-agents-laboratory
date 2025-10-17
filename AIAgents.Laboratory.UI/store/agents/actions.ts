@@ -1,5 +1,6 @@
 import { Action, Dispatch } from "redux";
 import {
+	CLEAR_CONVERSATION_HISTORY,
 	CREATE_NEW_AGENT,
 	DELETE_AGENT_DATA,
 	GET_AGENT_BY_ID,
@@ -11,6 +12,7 @@ import {
 	UPDATE_AGENT_DATA,
 } from "@store/agents/actionTypes";
 import {
+	ClearConversationHistoryForUserApiAsync,
 	CreateNewAgentApiAsync,
 	DeleteExistingAgentApiAsync,
 	GetAgentByIdApiAsync,
@@ -191,6 +193,29 @@ export function InvokeChatAgentAsync(
 			throw error;
 		} finally {
 			dispatch(ToggleChatResponseSpinner(false));
+		}
+	};
+}
+
+export function ClearConversationHistoryAsync(accessToken: string) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			const response = await ClearConversationHistoryForUserApiAsync(
+				accessToken
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: CLEAR_CONVERSATION_HISTORY,
+					payload: response.responseData,
+				});
+
+				return response.responseData as boolean;
+			}
+
+			return null;
+		} catch (error: any) {
+			console.error(error);
+			throw error;
 		}
 	};
 }
