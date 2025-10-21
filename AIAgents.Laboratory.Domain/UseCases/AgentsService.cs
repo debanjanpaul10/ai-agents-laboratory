@@ -30,6 +30,12 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow, agentData.AgentName));
 
+            if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Length > 0)
+            {
+                agentData.ValidateUploadedFile();
+                await agentData.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
+            }
+
             agentData.AgentId = Guid.NewGuid().ToString();
             agentData.IsActive = true;
             agentData.DateCreated = DateTime.UtcNow;
@@ -116,6 +122,12 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
             var filter = Builders<AgentDataDomain>.Filter.Where(x => x.IsActive && x.AgentId == updateDataDomain.AgentId);
             var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
             var updateAgent = agentsData.FirstOrDefault() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
+
+            if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Length > 0)
+            {
+                updateDataDomain.ValidateUploadedFile();
+                await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
+            }
 
             var update = Builders<AgentDataDomain>.Update
                 .Set(x => x.AgentMetaPrompt, updateDataDomain.AgentMetaPrompt)
