@@ -16,14 +16,14 @@ export async function GetAgentByIdApiAsync(
 }
 
 export async function CreateNewAgentApiAsync(
-	newAgentData: CreateAgentDTO,
+	newAgentData: CreateAgentDTO | FormData,
 	accessToken: string
 ) {
 	return await PostAsync("agents/createagent", newAgentData, accessToken);
 }
 
 export async function UpdateExistingAgentApiAsync(
-	updateAgentData: AgentDataDTO,
+	updateAgentData: AgentDataDTO | FormData,
 	accessToken: string
 ) {
 	return await PostAsync("agents/updateagent", updateAgentData, accessToken);

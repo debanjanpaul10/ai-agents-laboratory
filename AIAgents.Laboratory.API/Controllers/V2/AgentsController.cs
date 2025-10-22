@@ -1,4 +1,5 @@
-﻿using AIAgents.Laboratory.API.Adapters.Contracts;
+﻿using System.Net.Mime;
+using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Helpers;
@@ -23,117 +24,118 @@ namespace AIAgents.Laboratory.API.Controllers.V2;
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
 public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler agentsHandler) : BaseController(httpContext)
 {
-    /// <summary>
-    /// Creates the new agent asynchronous.
-    /// </summary>
-    /// <param name="agentData">The agent data.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    [HttpPost(RouteConstants.AgentsRoutes.CreateNewAgent_Route)]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = CreateNewAgentAction.Summary, Description = CreateNewAgentAction.Description, OperationId = CreateNewAgentAction.OperationId)]
-    public async Task<ResponseDTO> CreateNewAgentAsync([FromBody] CreateAgentDTO agentData)
-    {
-        if (IsRequestAuthorized())
-        {
-            ArgumentNullException.ThrowIfNull(agentData);
+	/// <summary>
+	/// Creates the new agent asynchronous.
+	/// </summary>
+	/// <param name="agentData">The agent data.</param>
+	/// <returns>The boolean for success/failure.</returns>
+	/// <exception cref="ArgumentNullException"></exception>
+	[HttpPost(RouteConstants.AgentsRoutes.CreateNewAgent_Route)]
+	[Consumes(MediaTypeNames.Multipart.FormData)]
+	[ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = CreateNewAgentAction.Summary, Description = CreateNewAgentAction.Description, OperationId = CreateNewAgentAction.OperationId)]
+	public async Task<ResponseDTO> CreateNewAgentAsync([FromForm] CreateAgentDTO agentData)
+	{
+		if (IsRequestAuthorized())
+		{
+			ArgumentNullException.ThrowIfNull(agentData);
 
-            var result = await agentsHandler.CreateNewAgentAsync(agentData, UserEmail).ConfigureAwait(false);
-            if (result) return HandleSuccessRequestResponse(result);
+			var result = await agentsHandler.CreateNewAgentAsync(agentData, UserEmail).ConfigureAwait(false);
+			if (result) return HandleSuccessRequestResponse(result);
 
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-        }
+			return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		}
 
-        return HandleUnAuthorizedRequestResponse();
-    }
+		return HandleUnAuthorizedRequestResponse();
+	}
 
-    /// <summary>
-    /// Gets all agents data asynchronous.
-    /// </summary>
-    /// <returns>The list of <see cref="CreateAgentDTO"/></returns>
-    [HttpGet(RouteConstants.AgentsRoutes.GetAllAgents_Route)]
-    [ProducesResponseType(typeof(IEnumerable<AgentDataDTO>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetAllAgentsDataAction.Summary, Description = GetAllAgentsDataAction.Description, OperationId = GetAllAgentsDataAction.OperationId)]
-    public async Task<ResponseDTO> GetAllAgentsDataAsync()
-    {
-        var result = await agentsHandler.GetAllAgentsDataAsync().ConfigureAwait(false);
-        if (result is not null && result.Any()) return HandleSuccessRequestResponse(result);
+	/// <summary>
+	/// Gets all agents data asynchronous.
+	/// </summary>
+	/// <returns>The list of <see cref="CreateAgentDTO"/></returns>
+	[HttpGet(RouteConstants.AgentsRoutes.GetAllAgents_Route)]
+	[ProducesResponseType(typeof(IEnumerable<AgentDataDTO>), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetAllAgentsDataAction.Summary, Description = GetAllAgentsDataAction.Description, OperationId = GetAllAgentsDataAction.OperationId)]
+	public async Task<ResponseDTO> GetAllAgentsDataAsync()
+	{
+		var result = await agentsHandler.GetAllAgentsDataAsync().ConfigureAwait(false);
+		if (result is not null && result.Any()) return HandleSuccessRequestResponse(result);
 
-        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-    }
+		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+	}
 
-    /// <summary>
-    /// Gets the agent data by identifier asynchronous.
-    /// </summary>
-    /// <param name="agentId">The agent identifier.</param>
-    /// <returns>The agent data dto model.</returns>
-    [HttpGet(RouteConstants.AgentsRoutes.GetAgentById_Route)]
-    [ProducesResponseType(typeof(AgentDataDTO), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetAllAgentsDataAction.Summary, Description = GetAllAgentsDataAction.Description, OperationId = GetAllAgentsDataAction.OperationId)]
-    public async Task<ResponseDTO> GetAgentDataByIdAsync([FromRoute] string agentId)
-    {
-        var result = await agentsHandler.GetAgentDataByIdAsync(agentId).ConfigureAwait(false);
-        if (result is not null) return HandleSuccessRequestResponse(result);
+	/// <summary>
+	/// Gets the agent data by identifier asynchronous.
+	/// </summary>
+	/// <param name="agentId">The agent identifier.</param>
+	/// <returns>The agent data dto model.</returns>
+	[HttpGet(RouteConstants.AgentsRoutes.GetAgentById_Route)]
+	[ProducesResponseType(typeof(AgentDataDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetAllAgentsDataAction.Summary, Description = GetAllAgentsDataAction.Description, OperationId = GetAllAgentsDataAction.OperationId)]
+	public async Task<ResponseDTO> GetAgentDataByIdAsync([FromRoute] string agentId)
+	{
+		var result = await agentsHandler.GetAgentDataByIdAsync(agentId).ConfigureAwait(false);
+		if (result is not null) return HandleSuccessRequestResponse(result);
 
-        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-    }
+		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+	}
 
-    /// <summary>
-    /// Updates the existing agent data asynchronous.
-    /// </summary>
-    /// <param name="updateAgentData">The update agent data.</param>
-    /// <returns>The agent data dto.</returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    [HttpPost(RouteConstants.AgentsRoutes.UpdateExistingAgent_Route)]
-    [ProducesResponseType(typeof(AgentDataDTO), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = UpdateExistingAgentDataAction.Summary, Description = UpdateExistingAgentDataAction.Description, OperationId = UpdateExistingAgentDataAction.OperationId)]
-    public async Task<ResponseDTO> UpdateExistingAgentDataAsync([FromBody] AgentDataDTO updateAgentData)
-    {
-        if (IsRequestAuthorized())
-        {
-            ArgumentNullException.ThrowIfNull(updateAgentData);
-            var result = await agentsHandler.UpdateExistingAgentDataAsync(updateAgentData).ConfigureAwait(false);
-            if (result) return HandleSuccessRequestResponse(result);
+	/// <summary>
+	/// Updates the existing agent data asynchronous.
+	/// </summary>
+	/// <param name="updateAgentData">The update agent data.</param>
+	/// <returns>The agent data dto.</returns>
+	/// <exception cref="ArgumentNullException"></exception>
+	[HttpPost(RouteConstants.AgentsRoutes.UpdateExistingAgent_Route)]
+	[ProducesResponseType(typeof(AgentDataDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = UpdateExistingAgentDataAction.Summary, Description = UpdateExistingAgentDataAction.Description, OperationId = UpdateExistingAgentDataAction.OperationId)]
+	public async Task<ResponseDTO> UpdateExistingAgentDataAsync([FromForm] AgentDataDTO updateAgentData)
+	{
+		if (IsRequestAuthorized())
+		{
+			ArgumentNullException.ThrowIfNull(updateAgentData);
+			var result = await agentsHandler.UpdateExistingAgentDataAsync(updateAgentData).ConfigureAwait(false);
+			if (result) return HandleSuccessRequestResponse(result);
 
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-        }
+			return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		}
 
-        return HandleUnAuthorizedRequestResponse();
-    }
+		return HandleUnAuthorizedRequestResponse();
+	}
 
-    /// <summary>
-    /// Deletes the existing agent data asynchronous.
-    /// </summary>
-    /// <param name="agentId">The agent identifier.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    [HttpPost(RouteConstants.AgentsRoutes.DeleteExistingAgent_Route)]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = DeleteExistingAgentDataAction.Summary, Description = DeleteExistingAgentDataAction.Description, OperationId = DeleteExistingAgentDataAction.OperationId)]
-    public async Task<ResponseDTO> DeleteExistingAgentDataAsync([FromRoute] string agentId)
-    {
-        if (IsRequestAuthorized())
-        {
-            var result = await agentsHandler.DeleteExistingAgentDataAsync(agentId).ConfigureAwait(false);
-            if (result) return HandleSuccessRequestResponse(result);
+	/// <summary>
+	/// Deletes the existing agent data asynchronous.
+	/// </summary>
+	/// <param name="agentId">The agent identifier.</param>
+	/// <returns>The boolean for success/failure.</returns>
+	[HttpPost(RouteConstants.AgentsRoutes.DeleteExistingAgent_Route)]
+	[ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = DeleteExistingAgentDataAction.Summary, Description = DeleteExistingAgentDataAction.Description, OperationId = DeleteExistingAgentDataAction.OperationId)]
+	public async Task<ResponseDTO> DeleteExistingAgentDataAsync([FromRoute] string agentId)
+	{
+		if (IsRequestAuthorized())
+		{
+			var result = await agentsHandler.DeleteExistingAgentDataAsync(agentId).ConfigureAwait(false);
+			if (result) return HandleSuccessRequestResponse(result);
 
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-        }
+			return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		}
 
-        return HandleUnAuthorizedRequestResponse();
-    }
+		return HandleUnAuthorizedRequestResponse();
+	}
 }

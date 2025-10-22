@@ -80,6 +80,7 @@ export const ManageAgentConstants = {
 				"Define your agent's behavior, personality, and capabilities ...",
 		},
 		Info: "Describe how your agent should behave, what it should know, and how it should respond to users.",
+		KBInfo: "You can upload knowledge base data to the agent. Available file formats: .pdf, .docx, .xlsx, .txt",
 	},
 
 	TestAgentConstants: {

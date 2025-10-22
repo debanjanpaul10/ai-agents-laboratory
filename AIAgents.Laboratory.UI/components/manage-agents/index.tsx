@@ -22,6 +22,8 @@ export default function ManageAgentsComponent() {
 		agentMetaPrompt: "",
 		createdBy: "",
 		agentId: "",
+		dateCreated: new Date(),
+		knowledgeBaseDocument: null,
 	});
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 	const [isTestDrawerOpen, setIsTestDrawerOpen] = useState(false);
@@ -75,6 +77,8 @@ export default function ManageAgentsComponent() {
 			agentMetaPrompt: agent.agentMetaPrompt || "",
 			createdBy: agent.createdBy || "",
 			agentId: agent.agentId || "",
+			dateCreated: agent.dateCreated,
+			knowledgeBaseDocument: agent.knowledgeBaseDocument || null,
 		});
 		setIsEditDrawerOpen(true);
 	};

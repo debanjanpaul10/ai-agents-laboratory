@@ -90,7 +90,7 @@ export function GetAgentDataByIdAsync(agentId: string, accessToken: string) {
 }
 
 export function CreateNewAgentAsync(
-	newAgentData: CreateAgentDTO,
+	newAgentData: CreateAgentDTO | FormData,
 	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
@@ -118,7 +118,7 @@ export function CreateNewAgentAsync(
 }
 
 export function UpdateExistingAgentDataAsync(
-	existingAgentData: AgentDataDTO,
+	existingAgentData: AgentDataDTO | FormData,
 	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {

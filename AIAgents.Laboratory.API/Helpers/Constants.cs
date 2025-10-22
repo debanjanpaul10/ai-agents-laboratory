@@ -130,6 +130,11 @@ internal static class Constants
 		/// The unauthorized access message exception constant.
 		/// </summary>
 		internal const string UnauthorizedAccessMessageConstant = "Unauthorized access. Please log in to continue.";
+
+		/// <summary>
+		/// The file not found exception message constant.
+		/// </summary>
+		internal const string FileNotFoundExceptionMessageConstant = "Oops! The file could not be downloaded at this moment!";
 	}
 
 	/// <summary>
