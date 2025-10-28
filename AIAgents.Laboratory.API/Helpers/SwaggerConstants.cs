@@ -259,6 +259,16 @@ internal static class SwaggerConstants
 			internal const string Description = "Clears the conversation history data for user.";
 			internal const string OperationId = nameof(ClearConversationHistoryForUserAction);
 		}
+
+		/// <summary>
+		/// Swagger documentation for GetConversationHistoryDataForUserAsync.
+		/// </summary>
+		internal static class GetConversationHistoryDataForUserAction
+		{
+			internal const string Summary = "Gets the conversation history data.";
+			internal const string Description = "Gets the conversation history data for user.";
+			internal const string OperationId = nameof(GetConversationHistoryDataForUserAction);
+		}
 	}
 
 }

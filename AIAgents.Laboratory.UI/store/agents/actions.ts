@@ -1,32 +1,24 @@
 import { Action, Dispatch } from "redux";
 import {
-	CLEAR_CONVERSATION_HISTORY,
 	CREATE_NEW_AGENT,
 	DELETE_AGENT_DATA,
-	DIRECT_CHAT_REQUEST,
 	GET_AGENT_BY_ID,
 	GET_ALL_AGENTS_DATA,
-	GET_CHAT_RESPONSE,
 	TOGGLE_AGENT_CREATE_SPINNER,
 	TOGGLE_CHAT_RESPONSE_SPINNER,
 	TOGGLE_EDIT_AGENT_SPINNER,
 	UPDATE_AGENT_DATA,
 } from "@store/agents/actionTypes";
 import {
-	ClearConversationHistoryForUserApiAsync,
 	CreateNewAgentApiAsync,
 	DeleteExistingAgentApiAsync,
 	GetAgentByIdApiAsync,
 	GetAgentsApiAsync,
-	GetDirectChatResponseApiAsync,
-	InvokeChatAgentApiAsync,
 	UpdateExistingAgentApiAsync,
 } from "@shared/api-service";
 import { CreateAgentDTO } from "@models/create-agent-dto";
 import { AgentDataDTO } from "@models/agent-data-dto";
 import { ToggleMainLoader } from "@store/common/actions";
-import { ChatRequestDTO } from "@models/chat-request-dto";
-import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
 
 export function ToggleCreateAgentSpinner(isLoading: boolean) {
 	return {
@@ -90,7 +82,7 @@ export function GetAgentDataByIdAsync(agentId: string, accessToken: string) {
 }
 
 export function CreateNewAgentAsync(
-	newAgentData: CreateAgentDTO,
+	newAgentData: CreateAgentDTO | FormData,
 	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
@@ -118,7 +110,7 @@ export function CreateNewAgentAsync(
 }
 
 export function UpdateExistingAgentDataAsync(
-	existingAgentData: AgentDataDTO,
+	existingAgentData: AgentDataDTO | FormData,
 	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
@@ -166,83 +158,6 @@ export function DeleteExistingAgentDataAsync(
 			throw error;
 		} finally {
 			dispatch(ToggleMainLoader(false));
-		}
-	};
-}
-
-export function InvokeChatAgentAsync(
-	chatRequest: ChatRequestDTO,
-	accessToken: string
-) {
-	return async (dispatch: Dispatch<Action>) => {
-		try {
-			dispatch(ToggleChatResponseSpinner(true));
-			const response = await InvokeChatAgentApiAsync(
-				chatRequest,
-				accessToken
-			);
-			if (response?.isSuccess && response?.responseData) {
-				dispatch({
-					type: GET_CHAT_RESPONSE,
-					payload: response.responseData,
-				});
-
-				return response.responseData as string;
-			}
-
-			return null;
-		} catch (error: any) {
-			console.error(error);
-			throw error;
-		} finally {
-			dispatch(ToggleChatResponseSpinner(false));
-		}
-	};
-}
-
-export function ClearConversationHistoryAsync(accessToken: string) {
-	return async (dispatch: Dispatch<Action>) => {
-		try {
-			const response = await ClearConversationHistoryForUserApiAsync(
-				accessToken
-			);
-			if (response?.isSuccess && response?.responseData) {
-				dispatch({
-					type: CLEAR_CONVERSATION_HISTORY,
-					payload: response.responseData,
-				});
-
-				return response.responseData as boolean;
-			}
-
-			return null;
-		} catch (error: any) {
-			console.error(error);
-			throw error;
-		}
-	};
-}
-
-export function GetDirectChatResponseAsync(
-	userMessage: DirectChatRequestDTO,
-	accessToken: string
-) {
-	return async (dispatch: Dispatch<Action>) => {
-		try {
-			const response = await GetDirectChatResponseApiAsync(
-				userMessage,
-				accessToken
-			);
-			if (response?.isSuccess && response?.responseData) {
-				dispatch({
-					type: DIRECT_CHAT_REQUEST,
-					payload: response.responseData,
-				});
-
-				return response.responseData;
-			}
-		} catch (error: any) {
-			console.error(error);
 		}
 	};
 }

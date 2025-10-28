@@ -4,9 +4,12 @@ import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleDirectChatDrawer } from "@store/common/actions";
 import AgentChatComponent from "@components/direct-chat/agent-chat";
 import ChatbotInformationComponent from "@components/direct-chat/chatbot-information";
+import { useAuth } from "@auth/AuthProvider";
+import { GetConversationHistoryDataForUserAsync } from "@store/chat/actions";
 
 export default function DirectChatComponent() {
 	const dispatch = useAppDispatch();
+	const authContext = useAuth();
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 	const [isAgentInfoDrawerOpen, setIsAgentInfoDrawerOpen] =
@@ -23,13 +26,23 @@ export default function DirectChatComponent() {
 	}, [IsDrawerOpenStoreData]);
 
 	useEffect(() => {
-		if (isDrawerOpen) {
-			document.body.style.overflow = "hidden";
-		} else {
-			document.body.style.overflow = "unset";
-		}
+		let isMounted = true;
+		const loadData = async () => {
+			if (isDrawerOpen) {
+				document.body.style.overflow = "hidden";
+				const token = await fetchToken();
+				if (token && isMounted) {
+					dispatch(GetConversationHistoryDataForUserAsync(token));
+				}
+			} else {
+				document.body.style.overflow = "unset";
+			}
+		};
+
+		loadData();
 
 		return () => {
+			isMounted = false;
 			document.body.style.overflow = "unset";
 		};
 	}, [isDrawerOpen]);
@@ -44,6 +57,15 @@ export default function DirectChatComponent() {
 
 	const onAgentInfoDrawerClose = () => {
 		setIsAgentInfoDrawerOpen(false);
+	};
+
+	const fetchToken = async () => {
+		try {
+			if (authContext.isAuthenticated && !authContext.isLoading)
+				return await authContext.getAccessToken();
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	return (

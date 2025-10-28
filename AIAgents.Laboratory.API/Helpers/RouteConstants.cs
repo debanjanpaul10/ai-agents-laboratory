@@ -167,5 +167,10 @@ public static class RouteConstants
 		/// The clear conversation history route.
 		/// </summary>
 		internal const string ClearConversationHistory_Route = "clearconversation";
+
+		/// <summary>
+		/// The get conversation history for user route.
+		/// </summary>
+		internal const string GetConversationHistoryUser_Route = "getconversationhistory";
 	}
 }

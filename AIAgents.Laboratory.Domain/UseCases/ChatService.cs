@@ -19,99 +19,121 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.IChatService" />
 public class ChatService(ILogger<ChatService> logger, IAgentsService agentsService, IAiServices aiServices, IConversationHistoryService conversationHistoryService) : IChatService
 {
+	/// <summary>
+	/// Gets the agent chat response asynchronous.
+	/// </summary>
+	/// <param name="chatRequest">The chat request.</param>
+	/// <returns>
+	/// The AI response.
+	/// </returns>
+	/// <exception cref="System.NotImplementedException"></exception>
+	public async Task<string> GetAgentChatResponseAsync(ChatRequestDomain chatRequest)
+	{
+		var agentData = await agentsService.GetAgentDataByIdAsync(chatRequest.AgentId).ConfigureAwait(false);
+		if (agentData is null || string.IsNullOrEmpty(agentData.AgentMetaPrompt))
+		{
+			var ex = new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
+			logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message));
+			throw ex;
+		}
 
+		var chatMessage = new ChatMessageDomain()
+		{
+			AgentMetaPrompt = agentData.AgentMetaPrompt,
+			AgentName = agentData.AgentName,
+			UserMessage = chatRequest.UserMessage,
+		};
+		return await aiServices.GetAiFunctionResponseAsync(chatMessage, ApplicationPluginsHelpers.PluginName, ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+	}
 
-    /// <summary>
-    /// Gets the agent chat response asynchronous.
-    /// </summary>
-    /// <param name="chatRequest">The chat request.</param>
-    /// <returns>
-    /// The AI response.
-    /// </returns>
-    /// <exception cref="System.NotImplementedException"></exception>
-    public async Task<string> GetAgentChatResponseAsync(ChatRequestDomain chatRequest)
-    {
-        var agentData = await agentsService.GetAgentDataByIdAsync(chatRequest.AgentId).ConfigureAwait(false);
-        if (agentData is null || string.IsNullOrEmpty(agentData.AgentMetaPrompt))
-        {
-            var ex = new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message));
-            throw ex;
-        }
+	/// <summary>
+	/// Gets the chatbot response.
+	/// </summary>
+	/// <param name="userQuery">The user query.</param>
+	/// <param name="userEmail">The user email address.</param>
+	/// <returns>The AI response.</returns>
+	public async Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery));
 
-        var chatMessage = new ChatMessageDomain()
-        {
-            AgentMetaPrompt = agentData.AgentMetaPrompt,
-            AgentName = agentData.AgentName,
-            UserMessage = chatRequest.UserMessage,
-        };
-        return await aiServices.GetAiFunctionResponseAsync(chatMessage, ApplicationPluginsHelpers.PluginName, ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
-    }
+			ArgumentException.ThrowIfNullOrEmpty(userQuery);
+			var conversationHistoryData = await conversationHistoryService.GetConversationHistoryAsync(userEmail).ConfigureAwait(false);
+			var chatHistoryList = conversationHistoryData.ChatHistory.ToList();
+			chatHistoryList.Add(new ChatHistoryDomain
+			{
+				Role = ChatbotHelperConstants.UserRoleConstant,
+				Content = userQuery
+			});
+			conversationHistoryData.ChatHistory = chatHistoryList;
+			await conversationHistoryService.SaveMessageToConversationHistoryAsync(conversationHistoryData).ConfigureAwait(false);
 
-    /// <summary>
-    /// Gets the chatbot response.
-    /// </summary>
-    /// <param name="userQuery">The user query.</param>
-    /// <param name="userEmail">The user email address.</param>
-    /// <returns>The AI response.</returns>
-    public async Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail)
-    {
-        try
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery));
+			var aiResponse = await aiServices.GetChatbotResponseAsync(conversationHistoryData, userQuery).ConfigureAwait(false);
+			chatHistoryList.Add(new ChatHistoryDomain
+			{
+				Role = ChatbotHelperConstants.AssistantRoleConstant,
+				Content = aiResponse
+			});
+			conversationHistoryData.ChatHistory = chatHistoryList;
+			await conversationHistoryService.SaveMessageToConversationHistoryAsync(conversationHistoryData).ConfigureAwait(false);
+			return aiResponse;
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery));
+		}
+	}
 
-            ArgumentException.ThrowIfNullOrEmpty(userQuery);
-            var conversationHistoryData = await conversationHistoryService.GetConversationHistoryAsync(userEmail).ConfigureAwait(false);
-            var chatHistoryList = conversationHistoryData.ChatHistory.ToList();
-            chatHistoryList.Add(new ChatHistoryDomain
-            {
-                Role = ChatbotHelperConstants.UserRoleConstant,
-                Content = userQuery
-            });
-            conversationHistoryData.ChatHistory = chatHistoryList;
-            await conversationHistoryService.SaveMessageToConversationHistoryAsync(conversationHistoryData).ConfigureAwait(false);
+	/// <summary>
+	/// Clears the conversation history data for the user.
+	/// </summary>
+	/// <param name="userName">The user name for user.</param>
+	/// <returns>The boolean for success/failure.</returns>
+	public async Task<bool> ClearConversationHistoryForUserAsync(string userName)
+	{
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
+			return await conversationHistoryService.ClearConversationHistoryForUserAsync(userName).ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
+		}
+	}
 
-            var aiResponse = await aiServices.GetChatbotResponseAsync(conversationHistoryData, userQuery).ConfigureAwait(false);
-            chatHistoryList.Add(new ChatHistoryDomain
-            {
-                Role = ChatbotHelperConstants.AssistantRoleConstant,
-                Content = aiResponse
-            });
-            conversationHistoryData.ChatHistory = chatHistoryList;
-            await conversationHistoryService.SaveMessageToConversationHistoryAsync(conversationHistoryData).ConfigureAwait(false);
-            return aiResponse;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery));
-        }
-    }
+	/// <summary>
+	/// Gets the conversation history data for user.
+	/// </summary>
+	/// <param name="userName">The current user name.</param>
+	/// <returns>The conversation history data domain model.</returns>
+	public async Task<ConversationHistoryDomain> GetConversationHistoryDataAsync(string userName)
+	{
 
-    /// <summary>
-    /// Clears the conversation history data for the user.
-    /// </summary>
-    /// <param name="userName">The user name for user.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> ClearConversationHistoryForUserAsync(string userName)
-    {
-        try
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
-            return await conversationHistoryService.ClearConversationHistoryForUserAsync(userName).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
-        }
-    }
+		try
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, userName));
+			return await conversationHistoryService.GetConversationHistoryAsync(userName).ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, ex.Message));
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, userName));
+		}
+	}
 }

@@ -31,6 +31,8 @@ public class DomainMapperProfile : Profile
 		CreateMap<AgentStatus, AgentStatusDTO>();
 		CreateMap<BugSeverityResponse, BugSeverityResponseDTO>();
 		CreateMap<AIAgentResponseDomain, AIAgentResponseDTO>();
+		CreateMap<ChatHistoryDomain, ChatHistoryDTO>();
+		CreateMap<ConversationHistoryDomain, ConversationHistoryDTO>();
 
 		CreateMap<AgentDataDomain, AgentDataDTO>().ReverseMap()
 			.ForMember(dest => dest.AgentId, opt => opt.MapFrom(src => src.AgentId));

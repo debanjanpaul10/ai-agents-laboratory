@@ -1,11 +1,15 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Button, Input } from "@heroui/react";
-import { X, Bot, Sparkles, ScrollText, Expand } from "lucide-react";
+import { X, Bot, Sparkles, ScrollText, Expand, Files } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleNewAgentDrawer } from "@store/common/actions";
 import { CreateAgentDTO } from "@models/create-agent-dto";
-import { CreateAgentConstants, DashboardConstants } from "@helpers/constants";
+import {
+	CreateAgentConstants,
+	DashboardConstants,
+	ManageAgentConstants,
+} from "@helpers/constants";
 import { CreateNewAgentAsync } from "@store/agents/actions";
 import { useAuth } from "@auth/AuthProvider";
 import { FullScreenLoading } from "@components/common/spinner";
@@ -22,6 +26,8 @@ export default function CreateAgentComponent() {
 		agentName: "",
 		agentMetaPrompt: "",
 		applicationName: "",
+		knowledgeBaseDocument: null,
+		isPrivate: false,
 	});
 
 	const IsDrawerOpenStoreData = useAppSelector(
@@ -56,23 +62,30 @@ export default function CreateAgentComponent() {
 	};
 
 	const handleSubmit = async () => {
-		const newAgentData: CreateAgentDTO = {
-			agentMetaPrompt: formData.agentMetaPrompt,
-			agentName: formData.agentName,
-			applicationName: formData.applicationName,
-		};
+		const form = new FormData();
+		form.append("agentMetaPrompt", formData.agentMetaPrompt);
+		form.append("agentName", formData.agentName);
+		form.append("applicationName", formData.applicationName);
+		if (formData.knowledgeBaseDocument) {
+			form.append(
+				"knowledgeBaseDocument",
+				formData.knowledgeBaseDocument
+			);
+		}
 
 		const token = await authContext.getAccessToken();
-		token && dispatch(CreateNewAgentAsync(newAgentData, token));
+		token && dispatch(CreateNewAgentAsync(form, token));
 		dispatch(ToggleNewAgentDrawer(false));
 		setFormData({
 			agentName: "",
 			agentMetaPrompt: "",
 			applicationName: "",
+			knowledgeBaseDocument: null,
+			isPrivate: false,
 		});
 	};
 
-	const handleInputChange = (field: string, value: string) => {
+	const handleInputChange = (field: string, value: string | File | null) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
 
@@ -82,6 +95,20 @@ export default function CreateAgentComponent() {
 
 	const handleExpandPrompt = () => {
 		setExpandedPromptModal(true);
+	};
+
+	const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+		const fileInput = e.target as HTMLInputElement;
+		const file = fileInput.files?.[0] || null;
+
+		if (file && file.size > 10 * 1024 * 1024) {
+			alert("File size cannot exceed 10MB.");
+			fileInput.value = "";
+			handleInputChange("knowledgeBaseDocument", null);
+			return;
+		}
+
+		handleInputChange("knowledgeBaseDocument", file);
 	};
 
 	return (
@@ -226,6 +253,37 @@ export default function CreateAgentComponent() {
 									</button>
 								</div>
 							</div>
+
+							{/* Knowledge Base */}
+							<div className="space-y-2">
+								<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+									<Files className="w-4 h-4 text-pink-400" />
+									<span>Agent Knowledge Base</span>
+								</label>
+								<div className="relative group">
+									<div className="absolute -inset-0.5 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur opacity-50 group-focus-within:opacity-75 transition duration-300"></div>
+									<Input
+										onChange={(e) => {
+											handleFileUpload(e);
+										}}
+										type="file"
+										accept=".txt,.pdf,.doc,.docx"
+										className="relative"
+										radius="full"
+										classNames={{
+											input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 py-2 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-500/20 file:text-green-400 hover:file:bg-green-500/30",
+											inputWrapper:
+												"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-green-500/50 min-h-[48px] cursor-pointer",
+										}}
+									/>
+								</div>
+								<p className="text-white/40 text-xs">
+									{
+										ManageAgentConstants
+											.ModifyAgentConstants.KBInfo
+									}
+								</p>
+							</div>
 						</div>
 
 						{/* Footer with buttons */}
@@ -243,7 +301,7 @@ export default function CreateAgentComponent() {
 											!formData.applicationName.trim()
 										}
 									>
-										<Sparkles className="w-4 h-4" />
+										<Sparkles className="w-4 h-4" /> &nbsp;
 										<span>Create Agent</span>
 									</Button>
 								</div>

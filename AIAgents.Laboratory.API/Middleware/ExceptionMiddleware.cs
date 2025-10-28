@@ -60,8 +60,5 @@ public static class ExceptionMiddlewareExtensions
 	/// </summary>
 	/// <param name="builder">The builder.</param>
 	/// <returns>The application builder.</returns>
-	public static IApplicationBuilder UseExceptionMiddleware(this IApplicationBuilder builder)
-	{
-		return builder.UseMiddleware<ExceptionMiddleware>();
-	}
+	public static IApplicationBuilder UseExceptionMiddleware(this IApplicationBuilder builder) => builder.UseMiddleware<ExceptionMiddleware>();
 }

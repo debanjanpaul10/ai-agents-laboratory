@@ -124,7 +124,9 @@ export default function AgentsListComponent({
 										<div className="flex items-center justify-between pt-3 border-t border-white/10">
 											<div className="text-white/40 text-xs">
 												<Calendar className="w-3 h-3 inline mr-1" />
-												{new Date().toLocaleDateString()}
+												<span>{`${new Date(
+													agent.dateCreated
+												).toDateString()}`}</span>
 											</div>
 										</div>
 									</div>

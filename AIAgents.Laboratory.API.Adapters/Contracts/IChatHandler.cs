@@ -1,4 +1,5 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Models.Request;
+using AIAgents.Laboratory.API.Adapters.Models.Response;
 
 namespace AIAgents.Laboratory.API.Adapters.Contracts;
 
@@ -28,4 +29,11 @@ public interface IChatHandler
 	/// <param name="userName">The user name for user.</param>
 	/// <returns>The boolean for success/failure.</returns>
 	Task<bool> ClearConversationHistoryForUserAsync(string userName);
+
+	/// <summary>
+	/// Gets the conversation history data for user.
+	/// </summary>
+	/// <param name="userName">The current user name.</param>
+	/// <returns>The conversation history data domain model.</returns>
+	Task<ConversationHistoryDTO> GetConversationHistoryDataAsync(string userName);
 }

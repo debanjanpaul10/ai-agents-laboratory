@@ -2,6 +2,7 @@ import {
 	TOGGLE_AGENT_TEST_DRAWER,
 	TOGGLE_AGENTS_LIST_DRAWER,
 	TOGGLE_DIRECT_CHAT_DRAWER,
+	TOGGLE_DIRECT_CHAT_LOADER,
 	TOGGLE_EDIT_AGENT_DRAWER,
 	TOGGLE_MAIN_SPINNER,
 	TOGGLE_NEW_AGENT_DRAWER,
@@ -46,5 +47,12 @@ export function ToggleDirectChatDrawer(isOpen: boolean) {
 	return {
 		type: TOGGLE_DIRECT_CHAT_DRAWER,
 		payload: isOpen,
+	};
+}
+
+export function ToggleDirectChatLoader(isLoading: boolean) {
+	return {
+		type: TOGGLE_DIRECT_CHAT_LOADER,
+		payload: isLoading,
 	};
 }

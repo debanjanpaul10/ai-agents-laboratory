@@ -28,8 +28,9 @@ export default function DashboardComponent() {
 	);
 
 	useEffect(() => {
-		if (authContext.isAuthenticated && !authContext.isLoading)
+		if (authContext.isAuthenticated && !authContext.isLoading) {
 			GetAllAgentsData();
+		}
 	}, [authContext.isAuthenticated, authContext.isLoading]);
 
 	const handleLogout = () => {

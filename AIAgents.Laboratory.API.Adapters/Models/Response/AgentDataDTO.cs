@@ -8,19 +8,27 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 /// <seealso cref="AIAgents.Laboratory.API.Adapters.Models.Request.CreateAgentDTO" />
 public class AgentDataDTO : CreateAgentDTO
 {
-    /// <summary>
-    /// Gets or sets the agent identifier.
-    /// </summary>
-    /// <value>
-    /// The agent identifier.
-    /// </value>
-    public string AgentId { get; set; } = string.Empty;
+	/// <summary>
+	/// Gets or sets the agent identifier.
+	/// </summary>
+	/// <value>
+	/// The agent identifier.
+	/// </value>
+	public string AgentId { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Gets or sets the created by.
-    /// </summary>
-    /// <value>
-    /// The created by.
-    /// </value>
-    public string CreatedBy { get; set; } = string.Empty;
+	/// <summary>
+	/// Gets or sets the created by.
+	/// </summary>
+	/// <value>
+	/// The created by.
+	/// </value>
+	public string CreatedBy { get; set; } = string.Empty;
+
+	/// <summary>
+	/// Gets or sets the date created on.
+	/// </summary>
+	/// <value>
+	/// The date created.
+	/// </value>
+	public DateTime DateCreated { get; set; }
 }

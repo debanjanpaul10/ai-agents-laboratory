@@ -8,7 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ChatController;
 
-namespace AIAgents.Laboratory.API.Controllers.V2;
+namespace AIAgents.Laboratory.API.Controllers.v2;
 
 /// <summary>
 /// The Chat API Controller class.
@@ -80,6 +80,24 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
 		var result = await chatHandler.ClearConversationHistoryForUserAsync(base.UserEmail).ConfigureAwait(false);
 		if (result) return base.HandleSuccessRequestResponse(result);
 
-		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeClearedMessageConstant);
+	}
+
+	/// <summary>
+	/// Gets the conversation history data for user.
+	/// </summary>
+	/// <returns>The conversation history data for user.</returns>
+	[HttpGet(RouteConstants.ChatRoutes.GetConversationHistoryUser_Route)]
+	[ProducesResponseType(typeof(ConversationHistoryDTO), StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status404NotFound)]
+	[SwaggerOperation(Summary = GetConversationHistoryDataForUserAction.Summary, Description = GetConversationHistoryDataForUserAction.Description, OperationId = GetConversationHistoryDataForUserAction.OperationId)]
+	public async Task<ResponseDTO> GetConversationHistoryDataForUserAsync()
+	{
+		var result = await chatHandler.GetConversationHistoryDataAsync(base.UserEmail).ConfigureAwait(false);
+		if (result is not null) return base.HandleSuccessRequestResponse(result);
+
+		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeFetchedMessageConstant);
 	}
 }

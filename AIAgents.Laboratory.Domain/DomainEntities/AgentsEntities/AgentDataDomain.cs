@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using Microsoft.AspNetCore.Http;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
@@ -65,4 +66,29 @@ public class AgentDataDomain
 	/// Gets or sets the date created.
 	/// </summary>
 	public DateTime DateCreated { get; set; }
+
+	/// <summary>
+	/// Gets or sets the knowledge base document.
+	/// </summary>
+	/// <value>
+	/// The knowledge base document.
+	/// </value>
+	[BsonIgnore]
+	public IFormFile? KnowledgeBaseDocument { get; set; }
+
+	/// <summary>
+	/// Gets or sets the stored knowledge base document.
+	/// </summary>
+	/// <value>
+	/// The knowledge base document domain.
+	/// </value>
+	public KnowledgeBaseDocumentDomain? StoredKnowledgeBase { get; set; }
+
+	/// <summary>
+	/// Gets or sets the is private boolean flag.
+	/// </summary>
+	/// <value>
+	/// The boolean flag for private agent.
+	/// </value>
+	public bool IsPrivate { get; set; } = false;
 }
