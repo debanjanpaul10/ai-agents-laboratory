@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Input, Tooltip } from "@heroui/react";
 import {
 	BotMessageSquare,
@@ -15,7 +15,7 @@ import { ChatMessage } from "@shared/types";
 import { generateMessageId } from "@shared/utils";
 import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
 import { useAuth } from "@auth/AuthProvider";
-import { useAppDispatch } from "@store/index";
+import { useAppDispatch, useAppSelector } from "@store/index";
 import {
 	ClearConversationHistoryAsync,
 	GetDirectChatResponseAsync,
@@ -35,6 +35,20 @@ export default function AgentChatComponent({
 	const [userInput, setUserInput] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 
+	const ConversationHistoryStoreData = useAppSelector(
+		(state) => state.AgentsReducer.conversationHistory
+	);
+
+	useEffect(() => {
+		if (
+			ConversationHistoryStoreData !== null &&
+			ConversationHistoryStoreData !== undefined &&
+			Object.values(ConversationHistoryStoreData.chatHistory).length > 0
+		) {
+			console.log(ConversationHistoryStoreData?.chatHistory);
+		}
+	}, [ConversationHistoryStoreData]);
+
 	async function clearConversation() {
 		setMessages([]);
 		setUserInput("");
@@ -50,7 +64,6 @@ export default function AgentChatComponent({
 			id: generateMessageId(),
 			type: "user" as const,
 			content: userInput,
-			timestamp: new Date(),
 		};
 
 		setMessages((prev) => [...prev, userMessage]);
@@ -180,9 +193,6 @@ export default function AgentChatComponent({
 									>
 										<p className="text-sm">
 											{message.content}
-										</p>
-										<p className="text-xs text-white/40 mt-1">
-											{message.timestamp.toLocaleTimeString()}
 										</p>
 									</div>
 								</div>

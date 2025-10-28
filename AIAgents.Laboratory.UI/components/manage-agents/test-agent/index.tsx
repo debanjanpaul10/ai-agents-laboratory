@@ -29,7 +29,6 @@ export default function TestAgentComponent({
 			id: generateMessageId(),
 			type: "user" as const,
 			content: userInput,
-			timestamp: new Date(),
 		};
 		await SendChatbotMessageAsync(userMessage);
 	};
@@ -159,9 +158,6 @@ export default function TestAgentComponent({
 									}`}
 								>
 									<p className="text-sm">{message.content}</p>
-									<p className="text-xs text-white/40 mt-1">
-										{message.timestamp.toLocaleTimeString()}
-									</p>
 								</div>
 							</div>
 						))}

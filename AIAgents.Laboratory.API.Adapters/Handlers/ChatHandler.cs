@@ -1,5 +1,6 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
+using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AutoMapper;
@@ -46,5 +47,16 @@ public class ChatHandler(IMapper mapper, IChatService chatService) : IChatHandle
 	public async Task<bool> ClearConversationHistoryForUserAsync(string userName)
 	{
 		return await chatService.ClearConversationHistoryForUserAsync(userName).ConfigureAwait(false);
+	}
+
+	/// <summary>
+	/// Gets the conversation history data for user.
+	/// </summary>
+	/// <param name="userName">The current user name.</param>
+	/// <returns>The conversation history data domain model.</returns>
+	public async Task<ConversationHistoryDTO> GetConversationHistoryDataAsync(string userName)
+	{
+		var domainResult = await chatService.GetConversationHistoryDataAsync(userName).ConfigureAwait(false);
+		return mapper.Map<ConversationHistoryDTO>(domainResult);
 	}
 }

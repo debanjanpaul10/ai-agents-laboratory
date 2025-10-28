@@ -3,4 +3,5 @@ export class CreateAgentDTO {
 	agentMetaPrompt: string = "";
 	applicationName: string = "";
 	knowledgeBaseDocument: File | null = null;
+	isPrivate: boolean = false;
 }

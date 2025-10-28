@@ -38,4 +38,12 @@ public class CreateAgentDTO
 	/// The knowledge base document.
 	/// </value>
 	public IFormFile? KnowledgeBaseDocument { get; set; }
+
+	/// <summary>
+	/// Gets or sets the is private boolean flag.
+	/// </summary>
+	/// <value>
+	/// The boolean flag for private agent.
+	/// </value>
+	public bool IsPrivate { get; set; } = false;
 }

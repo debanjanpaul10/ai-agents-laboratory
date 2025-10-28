@@ -10,6 +10,7 @@ import {
 	TOGGLE_EDIT_AGENT_SPINNER,
 	CLEAR_CONVERSATION_HISTORY,
 	DIRECT_CHAT_REQUEST,
+	GET_CONVERSATION_HISTORY,
 } from "@store/agents/actionTypes";
 
 const initialState: any = {
@@ -24,6 +25,7 @@ const initialState: any = {
 	isEditAgentDataLoading: false,
 	isConversationHistoryClear: false,
 	directChatResponse: "",
+	conversationHistory: {},
 };
 
 export function AgentsReducer(state = initialState, action: any) {
@@ -92,6 +94,12 @@ export function AgentsReducer(state = initialState, action: any) {
 			return {
 				...state,
 				directChatResponse: action.payload,
+			};
+		}
+		case GET_CONVERSATION_HISTORY: {
+			return {
+				...state,
+				conversationHistory: action.payload,
 			};
 		}
 

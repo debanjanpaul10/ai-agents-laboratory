@@ -24,6 +24,7 @@ export default function ManageAgentsComponent() {
 		agentId: "",
 		dateCreated: new Date(),
 		knowledgeBaseDocument: null,
+		isPrivate: false,
 	});
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 	const [isTestDrawerOpen, setIsTestDrawerOpen] = useState(false);
@@ -79,6 +80,7 @@ export default function ManageAgentsComponent() {
 			agentId: agent.agentId || "",
 			dateCreated: agent.dateCreated,
 			knowledgeBaseDocument: agent.knowledgeBaseDocument || null,
+			isPrivate: agent.isPrivate,
 		});
 		setIsEditDrawerOpen(true);
 	};

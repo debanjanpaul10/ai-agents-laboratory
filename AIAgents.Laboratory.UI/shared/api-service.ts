@@ -55,3 +55,9 @@ export async function ClearConversationHistoryForUserApiAsync(
 ) {
 	return await PostAsync("chat/clearconversation", null, accessToken);
 }
+
+export async function GetConversationHistoryDataForUserApiAsync(
+	accessToken: string
+) {
+	return await GetAsync("chat/getconversationhistory", accessToken);
+}

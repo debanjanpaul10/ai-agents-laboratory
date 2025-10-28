@@ -7,6 +7,7 @@ import {
 	GET_AGENT_BY_ID,
 	GET_ALL_AGENTS_DATA,
 	GET_CHAT_RESPONSE,
+	GET_CONVERSATION_HISTORY,
 	TOGGLE_AGENT_CREATE_SPINNER,
 	TOGGLE_CHAT_RESPONSE_SPINNER,
 	TOGGLE_EDIT_AGENT_SPINNER,
@@ -18,6 +19,7 @@ import {
 	DeleteExistingAgentApiAsync,
 	GetAgentByIdApiAsync,
 	GetAgentsApiAsync,
+	GetConversationHistoryDataForUserApiAsync,
 	GetDirectChatResponseApiAsync,
 	InvokeChatAgentApiAsync,
 	UpdateExistingAgentApiAsync,
@@ -27,6 +29,7 @@ import { AgentDataDTO } from "@models/agent-data-dto";
 import { ToggleMainLoader } from "@store/common/actions";
 import { ChatRequestDTO } from "@models/chat-request-dto";
 import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
+import { ConversationHistoryDTO } from "@models/conversation-history-dto";
 
 export function ToggleCreateAgentSpinner(isLoading: boolean) {
 	return {
@@ -214,7 +217,6 @@ export function ClearConversationHistoryAsync(accessToken: string) {
 
 				return response.responseData as boolean;
 			}
-
 			return null;
 		} catch (error: any) {
 			console.error(error);
@@ -243,6 +245,29 @@ export function GetDirectChatResponseAsync(
 			}
 		} catch (error: any) {
 			console.error(error);
+		}
+	};
+}
+
+export function GetConversationHistoryDataForUserAsync(accessToken: string) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleMainLoader(true));
+			const response = await GetConversationHistoryDataForUserApiAsync(
+				accessToken
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: GET_CONVERSATION_HISTORY,
+					payload: response.responseData,
+				});
+
+				return response.responseData as ConversationHistoryDTO;
+			}
+		} catch (error: any) {
+			console.error(error);
+		} finally {
+			dispatch(ToggleMainLoader(false));
 		}
 	};
 }
