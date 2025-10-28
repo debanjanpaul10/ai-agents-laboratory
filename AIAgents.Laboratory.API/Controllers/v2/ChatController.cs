@@ -8,7 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ChatController;
 
-namespace AIAgents.Laboratory.API.Controllers.V2;
+namespace AIAgents.Laboratory.API.Controllers.v2;
 
 /// <summary>
 /// The Chat API Controller class.
