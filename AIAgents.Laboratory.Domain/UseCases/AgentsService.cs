@@ -127,17 +127,17 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
 	public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain)
 	{
 		ArgumentNullException.ThrowIfNull(updateDataDomain);
-		if (string.IsNullOrWhiteSpace(updateDataDomain.AgentId)) throw new ArgumentException("AgentId is required.", nameof(updateDataDomain));
+		ArgumentException.ThrowIfNullOrWhiteSpace(updateDataDomain.AgentId);
 
 		try
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, updateDataDomain.AgentId));
 
 			var filter = Builders<AgentDataDomain>.Filter.And(
-				Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
-				Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
+				Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
 
-			var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
+			var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(
+				MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
 			var existingAgent = agentsData.FirstOrDefault() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
 
 			var updates = new List<UpdateDefinition<AgentDataDomain>>
