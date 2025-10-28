@@ -51,10 +51,6 @@ public static class KnowledgebaseHandlerService
 		if (agentData.StoredKnowledgeBase?.FileContent == null) return;
 
 		var stream = new MemoryStream(agentData.StoredKnowledgeBase.FileContent);
-		var formFile = new MemoryStream();
-		stream.CopyTo(formFile);
-		formFile.Position = 0;
-
-		agentData.KnowledgeBaseDocument = new FormFileImplementation(formFile, agentData.StoredKnowledgeBase.FileContent.Length, agentData.StoredKnowledgeBase.FileName, agentData.StoredKnowledgeBase.FileName);
+		agentData.KnowledgeBaseDocument = new FormFileImplementation(stream, agentData.StoredKnowledgeBase.FileContent.Length, agentData.StoredKnowledgeBase.FileName, agentData.StoredKnowledgeBase.FileName);
 	}
 }

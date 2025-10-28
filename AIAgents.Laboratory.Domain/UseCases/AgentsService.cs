@@ -69,9 +69,8 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
 			var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
 				MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName,
 				Builders<AgentDataDomain>.Filter.Where(x => x.AgentId == agentId && x.IsActive)).ConfigureAwait(false);
-			if (allData.FirstOrDefault() is null) throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
 
-			var agentData = allData.First();
+			var agentData = allData.First() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
 			agentData.ConvertKnowledgebaseBinaryDataToFile();
 			return agentData;
 		}
@@ -150,8 +149,6 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
 			{
 				updateDataDomain.ValidateUploadedFile();
 				await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
-
-				updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.KnowledgeBaseDocument, updateDataDomain.KnowledgeBaseDocument));
 				updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, updateDataDomain.StoredKnowledgeBase));
 			}
 			else if (existingAgent.StoredKnowledgeBase is not null)

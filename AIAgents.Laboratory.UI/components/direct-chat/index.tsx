@@ -26,14 +26,23 @@ export default function DirectChatComponent() {
 	}, [IsDrawerOpenStoreData]);
 
 	useEffect(() => {
-		if (isDrawerOpen) {
-			document.body.style.overflow = "hidden";
-			LoadConversationHistory();
-		} else {
-			document.body.style.overflow = "unset";
-		}
+		let isMounted = true;
+		const loadData = async () => {
+			if (isDrawerOpen) {
+				document.body.style.overflow = "hidden";
+				const token = await fetchToken();
+				if (token && isMounted) {
+					dispatch(GetConversationHistoryDataForUserAsync(token));
+				}
+			} else {
+				document.body.style.overflow = "unset";
+			}
+		};
+
+		loadData();
 
 		return () => {
+			isMounted = false;
 			document.body.style.overflow = "unset";
 		};
 	}, [isDrawerOpen]);
@@ -48,11 +57,6 @@ export default function DirectChatComponent() {
 
 	const onAgentInfoDrawerClose = () => {
 		setIsAgentInfoDrawerOpen(false);
-	};
-
-	const LoadConversationHistory = async () => {
-		const token = await fetchToken();
-		token && dispatch(GetConversationHistoryDataForUserAsync(token));
 	};
 
 	const fetchToken = async () => {

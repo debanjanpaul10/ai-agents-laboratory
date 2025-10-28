@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Button, Input } from "@heroui/react";
 import { X, Bot, Sparkles, ScrollText, Expand, Files } from "lucide-react";
 
@@ -27,6 +27,7 @@ export default function CreateAgentComponent() {
 		agentMetaPrompt: "",
 		applicationName: "",
 		knowledgeBaseDocument: null,
+		isPrivate: false,
 	});
 
 	const IsDrawerOpenStoreData = useAppSelector(
@@ -80,6 +81,7 @@ export default function CreateAgentComponent() {
 			agentMetaPrompt: "",
 			applicationName: "",
 			knowledgeBaseDocument: null,
+			isPrivate: false,
 		});
 	};
 
@@ -93,6 +95,20 @@ export default function CreateAgentComponent() {
 
 	const handleExpandPrompt = () => {
 		setExpandedPromptModal(true);
+	};
+
+	const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+		const fileInput = e.target as HTMLInputElement;
+		const file = fileInput.files?.[0] || null;
+
+		if (file && file.size > 10 * 1024 * 1024) {
+			alert("File size cannot exceed 10MB.");
+			fileInput.value = "";
+			handleInputChange("knowledgeBaseDocument", null);
+			return;
+		}
+
+		handleInputChange("knowledgeBaseDocument", file);
 	};
 
 	return (
@@ -248,14 +264,7 @@ export default function CreateAgentComponent() {
 									<div className="absolute -inset-0.5 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur opacity-50 group-focus-within:opacity-75 transition duration-300"></div>
 									<Input
 										onChange={(e) => {
-											const fileInput =
-												e.target as HTMLInputElement;
-											const file =
-												fileInput.files?.[0] || null;
-											handleInputChange(
-												"knowledgeBaseDocument",
-												file
-											);
+											handleFileUpload(e);
 										}}
 										type="file"
 										accept=".txt,.pdf,.doc,.docx"
