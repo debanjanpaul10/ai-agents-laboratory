@@ -8,10 +8,7 @@ import AppLogo from "@public/images/icon.png";
 import { useAuth } from "@auth/AuthProvider";
 import ActiveAgentsTileComponent from "@components/dashboard/active-agents-tile";
 import { useAppDispatch, useAppSelector } from "@store/index";
-import {
-	GetAllAgentsDataAsync,
-	GetConversationHistoryDataForUserAsync,
-} from "@store/agents/actions";
+import { GetAllAgentsDataAsync } from "@store/agents/actions";
 import { FullScreenLoading } from "@components/common/spinner";
 import ManageAgentsTileComponent from "@components/dashboard/manage-agents-tile";
 import CreateAgentsTileComponent from "@components/dashboard/create-agents-tile";
@@ -33,7 +30,6 @@ export default function DashboardComponent() {
 	useEffect(() => {
 		if (authContext.isAuthenticated && !authContext.isLoading) {
 			GetAllAgentsData();
-			LoadConversationHistory();
 		}
 	}, [authContext.isAuthenticated, authContext.isLoading]);
 
@@ -47,11 +43,6 @@ export default function DashboardComponent() {
 	const GetAllAgentsData = async () => {
 		const token = await fetchToken();
 		token && dispatch(GetAllAgentsDataAsync(token));
-	};
-
-	const LoadConversationHistory = async () => {
-		const token = await fetchToken();
-		token && dispatch(GetConversationHistoryDataForUserAsync(token));
 	};
 
 	const fetchToken = async () => {

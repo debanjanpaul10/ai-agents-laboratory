@@ -80,7 +80,7 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
 		var result = await chatHandler.ClearConversationHistoryForUserAsync(base.UserEmail).ConfigureAwait(false);
 		if (result) return base.HandleSuccessRequestResponse(result);
 
-		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeClearedMessageConstant);
 	}
 
 	/// <summary>
@@ -98,6 +98,6 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
 		var result = await chatHandler.GetConversationHistoryDataAsync(base.UserEmail).ConfigureAwait(false);
 		if (result is not null) return base.HandleSuccessRequestResponse(result);
 
-		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeFetchedMessageConstant);
 	}
 }

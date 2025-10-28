@@ -26,7 +26,10 @@ import {
 } from "@shared/api-service";
 import { CreateAgentDTO } from "@models/create-agent-dto";
 import { AgentDataDTO } from "@models/agent-data-dto";
-import { ToggleMainLoader } from "@store/common/actions";
+import {
+	ToggleDirectChatLoader,
+	ToggleMainLoader,
+} from "@store/common/actions";
 import { ChatRequestDTO } from "@models/chat-request-dto";
 import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
 import { ConversationHistoryDTO } from "@models/conversation-history-dto";
@@ -206,6 +209,7 @@ export function InvokeChatAgentAsync(
 export function ClearConversationHistoryAsync(accessToken: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
+			dispatch(ToggleDirectChatLoader(true));
 			const response = await ClearConversationHistoryForUserApiAsync(
 				accessToken
 			);
@@ -221,6 +225,8 @@ export function ClearConversationHistoryAsync(accessToken: string) {
 		} catch (error: any) {
 			console.error(error);
 			throw error;
+		} finally {
+			dispatch(ToggleDirectChatLoader(false));
 		}
 	};
 }
@@ -252,7 +258,7 @@ export function GetDirectChatResponseAsync(
 export function GetConversationHistoryDataForUserAsync(accessToken: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
-			dispatch(ToggleMainLoader(true));
+			dispatch(ToggleDirectChatLoader(true));
 			const response = await GetConversationHistoryDataForUserApiAsync(
 				accessToken
 			);
@@ -267,7 +273,7 @@ export function GetConversationHistoryDataForUserAsync(accessToken: string) {
 		} catch (error: any) {
 			console.error(error);
 		} finally {
-			dispatch(ToggleMainLoader(false));
+			dispatch(ToggleDirectChatLoader(false));
 		}
 	};
 }

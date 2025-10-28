@@ -2,6 +2,7 @@ import {
 	TOGGLE_AGENT_TEST_DRAWER,
 	TOGGLE_AGENTS_LIST_DRAWER,
 	TOGGLE_DIRECT_CHAT_DRAWER,
+	TOGGLE_DIRECT_CHAT_LOADER,
 	TOGGLE_EDIT_AGENT_DRAWER,
 	TOGGLE_MAIN_SPINNER,
 	TOGGLE_NEW_AGENT_DRAWER,
@@ -14,6 +15,7 @@ const initialState: any = {
 	isTestAgentDrawerOpen: false,
 	isLoading: false,
 	isDirectChatOpen: false,
+	isDirectChatLoading: false,
 };
 
 export function CommonReducer(state = initialState, action: any) {
@@ -52,6 +54,12 @@ export function CommonReducer(state = initialState, action: any) {
 			return {
 				...state,
 				isDirectChatOpen: action.payload,
+			};
+		}
+		case TOGGLE_DIRECT_CHAT_LOADER: {
+			return {
+				...state,
+				isDirectChatLoading: action.payload,
 			};
 		}
 

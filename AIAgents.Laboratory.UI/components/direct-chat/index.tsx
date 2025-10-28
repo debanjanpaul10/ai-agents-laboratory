@@ -4,9 +4,13 @@ import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleDirectChatDrawer } from "@store/common/actions";
 import AgentChatComponent from "@components/direct-chat/agent-chat";
 import ChatbotInformationComponent from "@components/direct-chat/chatbot-information";
+import { FullScreenLoading } from "@components/common/spinner";
+import { useAuth } from "@auth/AuthProvider";
+import { GetConversationHistoryDataForUserAsync } from "@store/agents/actions";
 
 export default function DirectChatComponent() {
 	const dispatch = useAppDispatch();
+	const authContext = useAuth();
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 	const [isAgentInfoDrawerOpen, setIsAgentInfoDrawerOpen] =
@@ -25,6 +29,7 @@ export default function DirectChatComponent() {
 	useEffect(() => {
 		if (isDrawerOpen) {
 			document.body.style.overflow = "hidden";
+			LoadConversationHistory();
 		} else {
 			document.body.style.overflow = "unset";
 		}
@@ -44,6 +49,20 @@ export default function DirectChatComponent() {
 
 	const onAgentInfoDrawerClose = () => {
 		setIsAgentInfoDrawerOpen(false);
+	};
+
+	const LoadConversationHistory = async () => {
+		const token = await fetchToken();
+		token && dispatch(GetConversationHistoryDataForUserAsync(token));
+	};
+
+	const fetchToken = async () => {
+		try {
+			if (authContext.isAuthenticated && !authContext.isLoading)
+				return await authContext.getAccessToken();
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	return (
