@@ -19,7 +19,7 @@ import { useAppDispatch, useAppSelector } from "@store/index";
 import {
 	ClearConversationHistoryAsync,
 	GetDirectChatResponseAsync,
-} from "@store/agents/actions";
+} from "@store/chat/actions";
 import { FullScreenLoading } from "@components/common/spinner";
 
 export default function AgentChatComponent({
@@ -37,7 +37,7 @@ export default function AgentChatComponent({
 	const [isLoading, setIsLoading] = useState(false);
 
 	const ConversationHistoryStoreData = useAppSelector(
-		(state) => state.AgentsReducer.conversationHistory
+		(state) => state.ChatReducer.conversationHistory
 	);
 	const IsDirectChatLoadingStoreData = useAppSelector(
 		(state) => state.CommonReducer.isDirectChatLoading

@@ -4,13 +4,9 @@ import {
 	CREATE_NEW_AGENT,
 	DELETE_AGENT_DATA,
 	UPDATE_AGENT_DATA,
-	GET_CHAT_RESPONSE,
 	TOGGLE_CHAT_RESPONSE_SPINNER,
 	TOGGLE_AGENT_CREATE_SPINNER,
 	TOGGLE_EDIT_AGENT_SPINNER,
-	CLEAR_CONVERSATION_HISTORY,
-	DIRECT_CHAT_REQUEST,
-	GET_CONVERSATION_HISTORY,
 } from "@store/agents/actionTypes";
 
 const initialState: any = {
@@ -20,12 +16,8 @@ const initialState: any = {
 	agentCreatedResponse: false,
 	updateAgentResponse: {},
 	deleteAgentResponse: false,
-	chatResponse: {},
 	isChatDataLoading: false,
 	isEditAgentDataLoading: false,
-	isConversationHistoryClear: false,
-	directChatResponse: "",
-	conversationHistory: {},
 };
 
 export function AgentsReducer(state = initialState, action: any) {
@@ -66,12 +58,7 @@ export function AgentsReducer(state = initialState, action: any) {
 				isAgentCreateSpinnerLoading: action.payload,
 			};
 		}
-		case GET_CHAT_RESPONSE: {
-			return {
-				...state,
-				chatResponse: action.payload,
-			};
-		}
+
 		case TOGGLE_CHAT_RESPONSE_SPINNER: {
 			return {
 				...state,
@@ -82,24 +69,6 @@ export function AgentsReducer(state = initialState, action: any) {
 			return {
 				...state,
 				isEditAgentDataLoading: action.payload,
-			};
-		}
-		case CLEAR_CONVERSATION_HISTORY: {
-			return {
-				...state,
-				isConversationHistoryClear: action.payload,
-			};
-		}
-		case DIRECT_CHAT_REQUEST: {
-			return {
-				...state,
-				directChatResponse: action.payload,
-			};
-		}
-		case GET_CONVERSATION_HISTORY: {
-			return {
-				...state,
-				conversationHistory: action.payload,
 			};
 		}
 

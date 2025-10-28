@@ -4,9 +4,8 @@ import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleDirectChatDrawer } from "@store/common/actions";
 import AgentChatComponent from "@components/direct-chat/agent-chat";
 import ChatbotInformationComponent from "@components/direct-chat/chatbot-information";
-import { FullScreenLoading } from "@components/common/spinner";
 import { useAuth } from "@auth/AuthProvider";
-import { GetConversationHistoryDataForUserAsync } from "@store/agents/actions";
+import { GetConversationHistoryDataForUserAsync } from "@store/chat/actions";
 
 export default function DirectChatComponent() {
 	const dispatch = useAppDispatch();

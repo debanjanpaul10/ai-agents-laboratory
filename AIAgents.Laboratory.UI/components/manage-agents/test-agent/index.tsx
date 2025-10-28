@@ -5,7 +5,7 @@ import { Send, MessageSquare, Bot, Zap, ArrowRight } from "lucide-react";
 
 import { ChatRequestDTO } from "@models/chat-request-dto";
 import { useAuth } from "@auth/AuthProvider";
-import { InvokeChatAgentAsync } from "@store/agents/actions";
+import { InvokeChatAgentAsync } from "@store/chat/actions";
 import { useAppDispatch } from "@store/index";
 import { ChatMessage, TestAgentComponentProps } from "@shared/types";
 import { ManageAgentConstants } from "@helpers/constants";
