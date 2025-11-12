@@ -157,7 +157,9 @@ export default function ModifyAgentComponent({
 					</p>
 					<p className="text-white/60">
 						<span className="text-white/80">Created:</span>{" "}
-						{new Date().toLocaleDateString()}
+						{`${new Date(
+							selectedAgent.dateCreated
+						).toDateString()}`}
 					</p>
 					<p className="text-white/60">
 						<span className="text-white/80">Status:</span>{" "}
