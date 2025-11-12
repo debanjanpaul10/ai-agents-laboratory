@@ -19,7 +19,6 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="agentsHandler">The agents handler service.</param>
 /// <seealso cref="BaseController" />
 [ApiController]
-[AllowAnonymous]
 [ApiVersion(2.0)]
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
 public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler agentsHandler) : BaseController(httpContext)
@@ -39,23 +38,25 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
 	[SwaggerOperation(Summary = CreateNewAgentAction.Summary, Description = CreateNewAgentAction.Description, OperationId = CreateNewAgentAction.OperationId)]
 	public async Task<ResponseDTO> CreateNewAgentAsync([FromForm] CreateAgentDTO agentData)
 	{
-		if (IsRequestAuthorized())
+		if (base.IsRequestAuthorized())
 		{
 			ArgumentNullException.ThrowIfNull(agentData);
 
 			var result = await agentsHandler.CreateNewAgentAsync(agentData, UserEmail).ConfigureAwait(false);
-			if (result) return HandleSuccessRequestResponse(result);
+			if (result)
+				return base.HandleSuccessRequestResponse(result);
 
-			return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+			return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 		}
 
-		return HandleUnAuthorizedRequestResponse();
+		return base.HandleUnAuthorizedRequestResponse();
 	}
 
 	/// <summary>
 	/// Gets all agents data asynchronous.
 	/// </summary>
 	/// <returns>The list of <see cref="CreateAgentDTO"/></returns>
+	[AllowAnonymous]
 	[HttpGet(RouteConstants.AgentsRoutes.GetAllAgents_Route)]
 	[ProducesResponseType(typeof(IEnumerable<AgentDataDTO>), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -65,9 +66,10 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
 	public async Task<ResponseDTO> GetAllAgentsDataAsync()
 	{
 		var result = await agentsHandler.GetAllAgentsDataAsync().ConfigureAwait(false);
-		if (result is not null && result.Any()) return HandleSuccessRequestResponse(result);
+		if (result is not null && result.Any())
+			return base.HandleSuccessRequestResponse(result);
 
-		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 	}
 
 	/// <summary>
@@ -84,9 +86,10 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
 	public async Task<ResponseDTO> GetAgentDataByIdAsync([FromRoute] string agentId)
 	{
 		var result = await agentsHandler.GetAgentDataByIdAsync(agentId).ConfigureAwait(false);
-		if (result is not null) return HandleSuccessRequestResponse(result);
+		if (result is not null)
+			return base.HandleSuccessRequestResponse(result);
 
-		return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+		return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 	}
 
 	/// <summary>
@@ -107,12 +110,13 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
 		{
 			ArgumentNullException.ThrowIfNull(updateAgentData);
 			var result = await agentsHandler.UpdateExistingAgentDataAsync(updateAgentData).ConfigureAwait(false);
-			if (result) return HandleSuccessRequestResponse(result);
+			if (result)
+				return base.HandleSuccessRequestResponse(result);
 
-			return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+			return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 		}
 
-		return HandleUnAuthorizedRequestResponse();
+		return base.HandleUnAuthorizedRequestResponse();
 	}
 
 	/// <summary>
@@ -131,11 +135,12 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
 		if (IsRequestAuthorized())
 		{
 			var result = await agentsHandler.DeleteExistingAgentDataAsync(agentId).ConfigureAwait(false);
-			if (result) return HandleSuccessRequestResponse(result);
+			if (result)
+				return base.HandleSuccessRequestResponse(result);
 
-			return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+			return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
 		}
 
-		return HandleUnAuthorizedRequestResponse();
+		return base.HandleUnAuthorizedRequestResponse();
 	}
 }

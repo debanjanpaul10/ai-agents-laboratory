@@ -4,6 +4,7 @@ using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Processor.Contracts;
 using Microsoft.Extensions.Logging;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
@@ -16,8 +17,9 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="logger">The logger service.</param>
 /// <param name="aiServices">The Ai services.</param>
 /// <param name="conversationHistoryService">The conversation history service.</param>
+/// <param name="knowledgeBaseProcessor">The knowledge base processor service.</param>
 /// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.IChatService" />
-public class ChatService(ILogger<ChatService> logger, IAgentsService agentsService, IAiServices aiServices, IConversationHistoryService conversationHistoryService) : IChatService
+public class ChatService(ILogger<ChatService> logger, IAgentsService agentsService, IAiServices aiServices, IConversationHistoryService conversationHistoryService, IKnowledgeBaseProcessor knowledgeBaseProcessor) : IChatService
 {
 	/// <summary>
 	/// Gets the agent chat response asynchronous.
@@ -29,21 +31,43 @@ public class ChatService(ILogger<ChatService> logger, IAgentsService agentsServi
 	/// <exception cref="System.NotImplementedException"></exception>
 	public async Task<string> GetAgentChatResponseAsync(ChatRequestDomain chatRequest)
 	{
-		var agentData = await agentsService.GetAgentDataByIdAsync(chatRequest.AgentId).ConfigureAwait(false);
-		if (agentData is null || string.IsNullOrEmpty(agentData.AgentMetaPrompt))
+		try
 		{
-			var ex = new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, chatRequest.AgentId));
+
+			var agentData = await agentsService.GetAgentDataByIdAsync(chatRequest.AgentId).ConfigureAwait(false);
+			if (agentData is null || string.IsNullOrEmpty(agentData.AgentMetaPrompt))
+			{
+				var ex = new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
+				logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message));
+				throw ex;
+			}
+
+			var chatMessage = new ChatMessageDomain()
+			{
+				AgentMetaPrompt = agentData.AgentMetaPrompt,
+				AgentName = agentData.AgentName,
+				UserMessage = chatRequest.UserMessage,
+			};
+
+			if (agentData.KnowledgeBaseDocument is not null || agentData.StoredKnowledgeBase is not null)
+			{
+				var relevantKnowledge = await knowledgeBaseProcessor.GetRelevantKnowledgeAsync(chatRequest.UserMessage, agentData.AgentId).ConfigureAwait(false);
+				chatMessage.KnowledgeBase = relevantKnowledge;
+			}
+
+			return await aiServices.GetAiFunctionResponseAsync(chatMessage, ApplicationPluginsHelpers.PluginName, ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
 			logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message));
-			throw ex;
+			throw;
+		}
+		finally
+		{
+			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, chatRequest.AgentId));
 		}
 
-		var chatMessage = new ChatMessageDomain()
-		{
-			AgentMetaPrompt = agentData.AgentMetaPrompt,
-			AgentName = agentData.AgentName,
-			UserMessage = chatRequest.UserMessage,
-		};
-		return await aiServices.GetAiFunctionResponseAsync(chatMessage, ApplicationPluginsHelpers.PluginName, ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
 	}
 
 	/// <summary>

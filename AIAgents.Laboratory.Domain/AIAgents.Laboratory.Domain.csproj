@@ -12,4 +12,8 @@
     <PackageReference Include="MongoDB.Driver" Version="3.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AIAgents.Laboratory.Processor\AIAgents.Laboratory.Processor.csproj" />
+  </ItemGroup>
+
 </Project>

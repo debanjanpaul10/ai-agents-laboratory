@@ -6,6 +6,7 @@ import {
 	TOGGLE_EDIT_AGENT_DRAWER,
 	TOGGLE_MAIN_SPINNER,
 	TOGGLE_NEW_AGENT_DRAWER,
+	GET_ALL_CONFIGURATIONS,
 } from "@store/common/actionTypes";
 
 const initialState: any = {
@@ -16,6 +17,7 @@ const initialState: any = {
 	isLoading: false,
 	isDirectChatOpen: false,
 	isDirectChatLoading: false,
+	configurations: {},
 };
 
 export function CommonReducer(state = initialState, action: any) {
@@ -60,6 +62,12 @@ export function CommonReducer(state = initialState, action: any) {
 			return {
 				...state,
 				isDirectChatLoading: action.payload,
+			};
+		}
+		case GET_ALL_CONFIGURATIONS: {
+			return {
+				...state,
+				configurations: action.payload,
 			};
 		}
 

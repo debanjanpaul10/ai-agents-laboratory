@@ -1,3 +1,5 @@
+import { Action, Dispatch } from "redux";
+
 import { ChatRequestDTO } from "@models/chat-request-dto";
 import {
 	ClearConversationHistoryForUserApiAsync,
@@ -6,7 +8,6 @@ import {
 	InvokeChatAgentApiAsync,
 } from "@shared/api-service";
 import { ToggleChatResponseSpinner } from "@store/agents/actions";
-import { Action, Dispatch } from "redux";
 import {
 	CLEAR_CONVERSATION_HISTORY,
 	DIRECT_CHAT_REQUEST,
@@ -16,6 +17,7 @@ import {
 import { ToggleDirectChatLoader } from "@store/common/actions";
 import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
 import { ConversationHistoryDTO } from "@models/conversation-history-dto";
+import { ShowErrorToaster } from "@shared/toaster";
 
 export function InvokeChatAgentAsync(
 	chatRequest: ChatRequestDTO,
@@ -40,6 +42,7 @@ export function InvokeChatAgentAsync(
 			return null;
 		} catch (error: any) {
 			console.error(error);
+			ShowErrorToaster(error);
 			throw error;
 		} finally {
 			dispatch(ToggleChatResponseSpinner(false));
@@ -65,6 +68,7 @@ export function ClearConversationHistoryAsync(accessToken: string) {
 			return null;
 		} catch (error: any) {
 			console.error(error);
+			ShowErrorToaster(error);
 			throw error;
 		} finally {
 			dispatch(ToggleDirectChatLoader(false));
@@ -92,6 +96,7 @@ export function GetDirectChatResponseAsync(
 			}
 		} catch (error: any) {
 			console.error(error);
+			ShowErrorToaster(error);
 		}
 	};
 }
@@ -113,6 +118,7 @@ export function GetConversationHistoryDataForUserAsync(accessToken: string) {
 			}
 		} catch (error: any) {
 			console.error(error);
+			ShowErrorToaster(error);
 		} finally {
 			dispatch(ToggleDirectChatLoader(false));
 		}

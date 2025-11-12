@@ -49,6 +49,9 @@ export default function ModifyAgentComponent({
 	const IsEditAgentDataLoading = useAppSelector(
 		(state) => state.AgentsReducer.isEditAgentDataLoading
 	);
+	const ConfigurationStoreData = useAppSelector(
+		(state) => state.CommonReducer.configurations
+	);
 
 	const handleInputChange = (field: string, value: string | File | null) => {
 		setEditFormData((prev: any) => ({ ...prev, [field]: value }));
@@ -154,7 +157,9 @@ export default function ModifyAgentComponent({
 					</p>
 					<p className="text-white/60">
 						<span className="text-white/80">Created:</span>{" "}
-						{new Date().toLocaleDateString()}
+						{`${new Date(
+							selectedAgent.dateCreated
+						).toDateString()}`}
 					</p>
 					<p className="text-white/60">
 						<span className="text-white/80">Status:</span>{" "}
@@ -518,7 +523,8 @@ export default function ModifyAgentComponent({
 						</div>
 
 						{/* Agent Knowledge Base */}
-						{renderAgentKnowledgeBaseData()}
+						{ConfigurationStoreData.IsKnowledgeBaseServiceEnabled ===
+							"true" && renderAgentKnowledgeBaseData()}
 
 						{/* Agent Info Display */}
 						{renderAgentInformationTile(selectedAgent)}

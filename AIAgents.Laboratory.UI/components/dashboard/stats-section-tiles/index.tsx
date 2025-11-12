@@ -7,6 +7,9 @@ export default function StatsSectionTilesComponent() {
 	const AgentsListStoreData = useAppSelector(
 		(state) => state.AgentsReducer.agentsListData
 	);
+	const ConfigurationsStoreData = useAppSelector(
+		(state) => state.CommonReducer.configurations
+	);
 
 	useEffect(() => {
 		setAgentsCount(AgentsListStoreData.length);
@@ -49,7 +52,7 @@ export default function StatsSectionTilesComponent() {
 							Current AI Service provider
 						</p>
 						<p className="text-white font-semibold">
-							Perplexity AI
+							{ConfigurationsStoreData.CurrentAiServiceProvider}
 						</p>
 					</div>
 				</div>

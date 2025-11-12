@@ -186,6 +186,16 @@ internal static class Constants
 		/// The invalid service provider message.
 		/// </summary>
 		internal const string InvalidServiceProvider = "Unsupported AI service provider: {0}";
+
+		/// <summary>
+		/// The no valid chunks generated
+		/// </summary>
+		internal const string NoValidChunksGenerated = "No valid chunks were generated from the content.";
+
+		/// <summary>
+		/// The number of embeddings mismatch
+		/// </summary>
+		internal const string NumberOfEmbeddingsMismatch = "The number of embeddings generated does not match the number of text chunks.";
 	}
 
 	/// <summary>
