@@ -4,6 +4,7 @@ import { PublicClientApplication } from "@azure/msal-browser";
 import { Provider } from "react-redux";
 import type { AppProps } from "next/app";
 import Head from "next/head";
+import { ToastProvider } from "@heroui/toast";
 
 import "../styles/globals.css";
 import { msalConfig } from "@auth/authConfig";
@@ -16,6 +17,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 // Create MSAL instance
 const msalInstance = new PublicClientApplication(msalConfig);
+
+// ToasterBridge was removed. Use the addToast API from @heroui/toast in non-React code.
 
 export default function App({ Component, pageProps }: AppProps) {
 	return (
@@ -34,6 +37,7 @@ export default function App({ Component, pageProps }: AppProps) {
 					<MsalProvider instance={msalInstance}>
 						<Provider store={store}>
 							<AuthProvider>
+								<ToastProvider />
 								<Component {...pageProps} />
 							</AuthProvider>
 						</Provider>

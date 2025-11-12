@@ -19,6 +19,7 @@ import {
 import { CreateAgentDTO } from "@models/create-agent-dto";
 import { AgentDataDTO } from "@models/agent-data-dto";
 import { ToggleMainLoader, ToggleNewAgentDrawer } from "@store/common/actions";
+import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 
 export function ToggleCreateAgentSpinner(isLoading: boolean) {
 	return {
@@ -54,6 +55,7 @@ export function GetAllAgentsDataAsync(accessToken: string) {
 			}
 		} catch (error: any) {
 			console.error(error);
+			ShowErrorToaster(error);
 			throw error;
 		} finally {
 			dispatch(ToggleMainLoader(false));
@@ -74,6 +76,7 @@ export function GetAgentDataByIdAsync(agentId: string, accessToken: string) {
 			}
 		} catch (error: any) {
 			console.error(error);
+			ShowErrorToaster(error);
 			throw error;
 		} finally {
 			dispatch(ToggleMainLoader(false));
@@ -100,9 +103,11 @@ export function CreateNewAgentAsync(
 
 				dispatch(ToggleNewAgentDrawer(false));
 				dispatch(GetAllAgentsDataAsync(accessToken) as any);
+				ShowSuccessToaster("Agent created successfully");
 			}
 		} catch (error: any) {
 			console.error(error);
+			ShowErrorToaster(error);
 			throw error;
 		} finally {
 			dispatch(ToggleCreateAgentSpinner(false));
@@ -130,6 +135,7 @@ export function UpdateExistingAgentDataAsync(
 			}
 		} catch (error: any) {
 			console.error(error);
+			ShowErrorToaster(error);
 			throw error;
 		} finally {
 			dispatch(ToggleEditAgentSpinner(false));
@@ -156,6 +162,7 @@ export function DeleteExistingAgentDataAsync(
 			}
 		} catch (error: any) {
 			console.error(error);
+			ShowErrorToaster(error);
 			throw error;
 		} finally {
 			dispatch(ToggleMainLoader(false));

@@ -1,6 +1,7 @@
 import { Action, Dispatch } from "redux";
 
 import { GetConfigurationsDataApiAsync } from "@shared/api-service";
+import { addToast } from "@heroui/toast";
 import {
 	GET_ALL_CONFIGURATIONS,
 	TOGGLE_AGENT_TEST_DRAWER,
@@ -11,6 +12,7 @@ import {
 	TOGGLE_MAIN_SPINNER,
 	TOGGLE_NEW_AGENT_DRAWER,
 } from "@store/common/actionTypes";
+import { ShowErrorToaster } from "@shared/toaster";
 
 export function ToggleNewAgentDrawer(isOpen: boolean) {
 	return {
@@ -75,6 +77,7 @@ export function GetAllConfigurations(accessToken: string) {
 			}
 		} catch (error: any) {
 			console.error(error);
+			ShowErrorToaster(error);
 		}
 	};
 }
