@@ -49,6 +49,9 @@ export default function ModifyAgentComponent({
 	const IsEditAgentDataLoading = useAppSelector(
 		(state) => state.AgentsReducer.isEditAgentDataLoading
 	);
+	const ConfigurationStoreData = useAppSelector(
+		(state) => state.CommonReducer.configurations
+	);
 
 	const handleInputChange = (field: string, value: string | File | null) => {
 		setEditFormData((prev: any) => ({ ...prev, [field]: value }));
@@ -518,7 +521,8 @@ export default function ModifyAgentComponent({
 						</div>
 
 						{/* Agent Knowledge Base */}
-						{renderAgentKnowledgeBaseData()}
+						{ConfigurationStoreData.IsKnowledgeBaseServiceEnabled ===
+							"true" && renderAgentKnowledgeBaseData()}
 
 						{/* Agent Info Display */}
 						{renderAgentInformationTile(selectedAgent)}

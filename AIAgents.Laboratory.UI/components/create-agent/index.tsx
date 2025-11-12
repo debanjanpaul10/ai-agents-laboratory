@@ -36,6 +36,9 @@ export default function CreateAgentComponent() {
 	const IsCreateAgentLoading = useAppSelector(
 		(state) => state.AgentsReducer.isAgentCreateSpinnerLoading
 	);
+	const ConfigurationsStoreData = useAppSelector(
+		(state) => state.CommonReducer.configurations
+	);
 
 	useEffect(() => {
 		if (isDrawerOpen !== IsDrawerOpenStoreData) {
@@ -101,6 +104,37 @@ export default function CreateAgentComponent() {
 		}
 
 		handleInputChange("knowledgeBaseDocument", file);
+	};
+
+	const renderAgentKnowledgeBaseData = () => {
+		return (
+			<div className="space-y-2">
+				<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+					<Files className="w-4 h-4 text-pink-400" />
+					<span>Agent Knowledge Base</span>
+				</label>
+				<div className="relative group">
+					<div className="absolute -inset-0.5 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur opacity-50 group-focus-within:opacity-75 transition duration-300"></div>
+					<Input
+						onChange={(e) => {
+							handleFileUpload(e);
+						}}
+						type="file"
+						accept=".txt,.pdf,.doc,.docx"
+						className="relative"
+						radius="full"
+						classNames={{
+							input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 py-2 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-500/20 file:text-green-400 hover:file:bg-green-500/30",
+							inputWrapper:
+								"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-green-500/50 min-h-[48px] cursor-pointer",
+						}}
+					/>
+				</div>
+				<p className="text-white/40 text-xs">
+					{ManageAgentConstants.ModifyAgentConstants.KBInfo}
+				</p>
+			</div>
+		);
 	};
 
 	return (
@@ -247,35 +281,8 @@ export default function CreateAgentComponent() {
 							</div>
 
 							{/* Knowledge Base */}
-							<div className="space-y-2">
-								<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
-									<Files className="w-4 h-4 text-pink-400" />
-									<span>Agent Knowledge Base</span>
-								</label>
-								<div className="relative group">
-									<div className="absolute -inset-0.5 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur opacity-50 group-focus-within:opacity-75 transition duration-300"></div>
-									<Input
-										onChange={(e) => {
-											handleFileUpload(e);
-										}}
-										type="file"
-										accept=".txt,.pdf,.doc,.docx"
-										className="relative"
-										radius="full"
-										classNames={{
-											input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 py-2 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-500/20 file:text-green-400 hover:file:bg-green-500/30",
-											inputWrapper:
-												"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-green-500/50 min-h-[48px] cursor-pointer",
-										}}
-									/>
-								</div>
-								<p className="text-white/40 text-xs">
-									{
-										ManageAgentConstants
-											.ModifyAgentConstants.KBInfo
-									}
-								</p>
-							</div>
+							{ConfigurationsStoreData.IsKnowledgeBaseServiceEnabled ===
+								"true" && renderAgentKnowledgeBaseData()}
 						</div>
 
 						{/* Footer with buttons */}

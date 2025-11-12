@@ -1,3 +1,5 @@
+import { Action, Dispatch } from "redux";
+
 import { ChatRequestDTO } from "@models/chat-request-dto";
 import {
 	ClearConversationHistoryForUserApiAsync,
@@ -6,7 +8,6 @@ import {
 	InvokeChatAgentApiAsync,
 } from "@shared/api-service";
 import { ToggleChatResponseSpinner } from "@store/agents/actions";
-import { Action, Dispatch } from "redux";
 import {
 	CLEAR_CONVERSATION_HISTORY,
 	DIRECT_CHAT_REQUEST,

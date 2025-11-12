@@ -61,3 +61,7 @@ export async function GetConversationHistoryDataForUserApiAsync(
 ) {
 	return await GetAsync("chat/getconversationhistory", accessToken);
 }
+
+export async function GetConfigurationsDataApiAsync(accessToken: string) {
+	return await GetAsync("configuration/getconfigurations", accessToken);
+}

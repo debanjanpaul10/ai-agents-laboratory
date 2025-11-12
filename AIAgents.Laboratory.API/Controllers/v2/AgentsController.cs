@@ -19,7 +19,6 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="agentsHandler">The agents handler service.</param>
 /// <seealso cref="BaseController" />
 [ApiController]
-[AllowAnonymous]
 [ApiVersion(2.0)]
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
 public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler agentsHandler) : BaseController(httpContext)
@@ -57,6 +56,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
 	/// Gets all agents data asynchronous.
 	/// </summary>
 	/// <returns>The list of <see cref="CreateAgentDTO"/></returns>
+	[AllowAnonymous]
 	[HttpGet(RouteConstants.AgentsRoutes.GetAllAgents_Route)]
 	[ProducesResponseType(typeof(IEnumerable<AgentDataDTO>), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]

@@ -1,4 +1,8 @@
+import { Action, Dispatch } from "redux";
+
+import { GetConfigurationsDataApiAsync } from "@shared/api-service";
 import {
+	GET_ALL_CONFIGURATIONS,
 	TOGGLE_AGENT_TEST_DRAWER,
 	TOGGLE_AGENTS_LIST_DRAWER,
 	TOGGLE_DIRECT_CHAT_DRAWER,
@@ -54,5 +58,23 @@ export function ToggleDirectChatLoader(isLoading: boolean) {
 	return {
 		type: TOGGLE_DIRECT_CHAT_LOADER,
 		payload: isLoading,
+	};
+}
+
+export function GetAllConfigurations(accessToken: string) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			const response = await GetConfigurationsDataApiAsync(accessToken);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: GET_ALL_CONFIGURATIONS,
+					payload: response.responseData,
+				});
+
+				return response.responseData as {};
+			}
+		} catch (error: any) {
+			console.error(error);
+		}
 	};
 }

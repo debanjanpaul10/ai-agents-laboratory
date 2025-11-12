@@ -98,6 +98,11 @@ internal static class Constants
 		/// The is knowledge base service enabled constant
 		/// </summary>
 		internal const string IsKnowledgeBaseServiceEnabledConstant = "IsKnowledgeBaseServiceEnabled";
+
+		/// <summary>
+		/// The current ai service provider
+		/// </summary>
+		internal const string CurrentAiServiceProvider = "CurrentAiServiceProvider";
 	}
 
 	/// <summary>

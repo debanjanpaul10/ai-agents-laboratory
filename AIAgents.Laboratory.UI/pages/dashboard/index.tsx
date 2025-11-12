@@ -17,6 +17,7 @@ import FooterComponent from "@components/common/footer";
 import WelcomeCardComponent from "@components/dashboard/welcome-card";
 import DirectChatComponent from "@components/direct-chat";
 import { DashboardConstants } from "@helpers/constants";
+import { GetAllConfigurations } from "@store/common/actions";
 
 export default function DashboardComponent() {
 	const dispatch = useAppDispatch();
@@ -30,6 +31,7 @@ export default function DashboardComponent() {
 	useEffect(() => {
 		if (authContext.isAuthenticated && !authContext.isLoading) {
 			GetAllAgentsData();
+			GetAllConfigurationsData();
 		}
 	}, [authContext.isAuthenticated, authContext.isLoading]);
 
@@ -43,6 +45,11 @@ export default function DashboardComponent() {
 	const GetAllAgentsData = async () => {
 		const token = await fetchToken();
 		token && dispatch(GetAllAgentsDataAsync(token));
+	};
+
+	const GetAllConfigurationsData = async () => {
+		const token = await fetchToken();
+		token && dispatch(GetAllConfigurations(token));
 	};
 
 	const fetchToken = async () => {
