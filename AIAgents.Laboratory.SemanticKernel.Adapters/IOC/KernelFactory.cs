@@ -1,8 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
@@ -14,8 +13,6 @@ namespace AIAgents.Laboratory.SemanticKernel.Adapters.IOC;
 [ExcludeFromCodeCoverage]
 public static class KernelFactory
 {
-#pragma warning disable SKEXP0010
-
 	/// <summary>
 	/// Creates the kernel.
 	/// </summary>
@@ -57,43 +54,4 @@ public static class KernelFactory
 		kernel.Plugins.AddFromType<ChatbotPlugins>(ChatbotPluginHelpers.PluginName, provider);
 		return kernel;
 	};
-
-	/// <summary>
-	/// Registers the text embedding generation service.
-	/// </summary>
-	/// <param name="services">The service collection.</param>
-	/// <param name="configuration">The configuration.</param>
-	internal static void RegisterTextEmbeddingGenerationService(IServiceCollection services, IConfiguration configuration)
-	{
-		var currentAiServiceProvider = configuration[AzureAppConfigurationConstants.CurrentAiServiceProvider];
-		if (string.IsNullOrEmpty(currentAiServiceProvider))
-			throw new InvalidOperationException($"Configuration key '{AzureAppConfigurationConstants.CurrentAiServiceProvider}' is missing or empty. Please check your Azure App Configuration.");
-
-		switch (currentAiServiceProvider)
-		{
-			case GoogleGeminiAiConstants.ServiceProviderName:
-				var isProModelEnabled = bool.TryParse(configuration[GoogleGeminiAiConstants.IsProModelEnabledFlag], out bool parsedValue) && parsedValue;
-				var geminiAiModel = isProModelEnabled ? GoogleGeminiAiConstants.GeminiProModel : GoogleGeminiAiConstants.GeminiFlashModel;
-				var modelId = configuration[geminiAiModel];
-				var apiKey = configuration[GoogleGeminiAiConstants.GeminiAPIKeyConstant];
-				if (string.IsNullOrEmpty(modelId) || string.IsNullOrEmpty(apiKey))
-					throw new InvalidOperationException($"{ExceptionConstants.AiAPIKeyMissingMessage} Provider: {currentAiServiceProvider}, ModelId: {modelId ?? "null"}, ApiKey: {(string.IsNullOrEmpty(apiKey) ? "null" : "***")}");
-
-				services.AddGoogleAIEmbeddingGenerator(modelId, apiKey);
-				break;
-
-			case PerplexityAiConstants.ServiceProviderName:
-				var perplexityModelId = configuration[PerplexityAiConstants.ModelId];
-				var perplexityApiKey = configuration[PerplexityAiConstants.ApiKey];
-				var perplexityEndpoint = configuration[PerplexityAiConstants.ApiEndpoint];
-				if (string.IsNullOrEmpty(perplexityModelId) || string.IsNullOrEmpty(perplexityApiKey) || string.IsNullOrEmpty(perplexityEndpoint))
-					throw new InvalidOperationException($"{ExceptionConstants.AiAPIKeyMissingMessage} Provider: {currentAiServiceProvider}, ModelId: {perplexityModelId ?? "null"}, ApiKey: {(string.IsNullOrEmpty(perplexityApiKey) ? "null" : "***")}");
-
-				services.AddOpenAIEmbeddingGenerator(modelId: perplexityModelId, apiKey: perplexityApiKey);
-				break;
-
-			default:
-				throw new InvalidOperationException(string.Format(ExceptionConstants.InvalidServiceProvider, currentAiServiceProvider));
-		}
-	}
 }

@@ -75,14 +75,6 @@ export default function CreateAgentComponent() {
 
 		const token = await authContext.getAccessToken();
 		token && dispatch(CreateNewAgentAsync(form, token));
-		dispatch(ToggleNewAgentDrawer(false));
-		setFormData({
-			agentName: "",
-			agentMetaPrompt: "",
-			applicationName: "",
-			knowledgeBaseDocument: null,
-			isPrivate: false,
-		});
 	};
 
 	const handleInputChange = (field: string, value: string | File | null) => {

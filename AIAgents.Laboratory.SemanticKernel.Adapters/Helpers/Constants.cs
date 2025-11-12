@@ -285,15 +285,4 @@ internal static class Constants
 		internal const string LocalFGToolBaseUrl = "LocalFGToolBaseUrl";
 	}
 
-	/// <summary>
-	/// The knowledge base constants.
-	/// </summary>
-	internal static class KnowledgeBaseConstants
-	{
-		/// <summary>
-		/// The chunk description template
-		/// </summary>
-		internal const string ChunkDescriptionTemplate = "Knowledge base chunk {0} of {1}";
-	}
-
 }

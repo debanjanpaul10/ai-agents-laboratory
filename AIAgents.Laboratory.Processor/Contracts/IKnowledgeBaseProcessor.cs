@@ -1,4 +1,4 @@
-﻿namespace AIAgents.Laboratory.Domain.DrivingPorts;
+﻿namespace AIAgents.Laboratory.Processor.Contracts;
 
 /// <summary>
 /// The interface for processing knowledge base documents and retrieving relevant knowledge.

@@ -1,6 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
 using Microsoft.Extensions.Configuration;
@@ -29,14 +28,9 @@ public static class DIContainer
 		// Register Kernel first (factory) so other services that rely on Kernel can resolve it.
 		services.AddSingleton(KernelFactory.CreateKernel(configuration));
 
-		// Register the embedding generation service BEFORE registering KnowledgeBaseProcessor.
-		// KnowledgeBaseProcessor depends on ITextEmbeddingGenerationService, so it must be available
-		// when the container validates/constructs scoped services.
-		KernelFactory.RegisterTextEmbeddingGenerationService(services, configuration);
-
 		// Register memory store and other AI-related services.
 		services.AddSingleton<IMemoryStore, VolatileMemoryStore>()
-			.AddSingleton<ChatbotPlugins>().AddScoped<IAiServices, AiServices>().AddScoped<IKnowledgeBaseProcessor, KnowledgeBaseProcessor>();
+			.AddSingleton<ChatbotPlugins>().AddScoped<IAiServices, AiServices>();
 
 		return services;
 	}

@@ -2,6 +2,8 @@
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Processor.Contracts;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
@@ -14,9 +16,15 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="knowledgeBaseProcessor">The knowledge base processor service.</param>
 /// <param name="logger">The logger service.</param>
 /// <param name="mongoDatabaseService">The mongo db database service.</param>
+/// <param name="configuration">The configuration service.</param>
 /// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.IAgentsService" />
-public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService mongoDatabaseService, IKnowledgeBaseProcessor knowledgeBaseProcessor) : IAgentsService
+public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService mongoDatabaseService, IKnowledgeBaseProcessor knowledgeBaseProcessor, IConfiguration configuration) : IAgentsService
 {
+	/// <summary>
+	/// The is knowledge base service allowed
+	/// </summary>
+	private readonly bool IsKnowledgeBaseServiceAllowed = bool.TryParse(configuration[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant], out var value) && value;
+
 	/// <summary>
 	/// Creates the new agent asynchronous.
 	/// </summary>
@@ -32,13 +40,11 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow, agentData.AgentName));
 
 			agentData.AgentId = Guid.NewGuid().ToString();
-
-			if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Length > 0)
+			if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Length > 0 && IsKnowledgeBaseServiceAllowed)
 			{
 				agentData.ValidateUploadedFile();
 				await agentData.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
-
-				if (agentData.StoredKnowledgeBase?.FileContent != null)
+				if (agentData.StoredKnowledgeBase?.FileContent is not null)
 				{
 					var content = System.Text.Encoding.UTF8.GetString(agentData.StoredKnowledgeBase.FileContent);
 					await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, agentData.AgentId).ConfigureAwait(false);
@@ -154,21 +160,25 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
 				Builders<AgentDataDomain>.Update.Set(x => x.AgentName, updateDataDomain.AgentName)
 			};
 
-			if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Length > 0)
+			if (IsKnowledgeBaseServiceAllowed)
 			{
-				updateDataDomain.ValidateUploadedFile();
-				await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
-
-				if (updateDataDomain.StoredKnowledgeBase?.FileContent is not null)
+				if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Length > 0)
 				{
-					var content = System.Text.Encoding.UTF8.GetString(updateDataDomain.StoredKnowledgeBase.FileContent);
-					await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, updateDataDomain.AgentId).ConfigureAwait(false);
-				}
+					updateDataDomain.ValidateUploadedFile();
+					await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
+					if (updateDataDomain.StoredKnowledgeBase?.FileContent is not null)
+					{
+						var content = System.Text.Encoding.UTF8.GetString(updateDataDomain.StoredKnowledgeBase.FileContent);
+						await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, updateDataDomain.AgentId).ConfigureAwait(false);
+					}
 
-				updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, updateDataDomain.StoredKnowledgeBase));
+					updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, updateDataDomain.StoredKnowledgeBase));
+				}
+				else if (existingAgent.StoredKnowledgeBase is not null)
+				{
+					updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, null));
+				}
 			}
-			else if (existingAgent.StoredKnowledgeBase is not null)
-				updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, null));
 
 			var update = Builders<AgentDataDomain>.Update.Combine(updates);
 			return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);

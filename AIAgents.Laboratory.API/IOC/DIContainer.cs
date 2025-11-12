@@ -6,6 +6,7 @@ using AIAgents.Laboratory.API.Controllers;
 using AIAgents.Laboratory.Domain.IOC;
 using AIAgents.Laboratory.Messaging.Adapters.IOC;
 using AIAgents.Laboratory.Persistence.MongoDatabase.IOC;
+using AIAgents.Laboratory.Processor.IOC;
 using AIAgents.Laboratory.SemanticKernel.Adapters.IOC;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -49,7 +50,8 @@ public static class DIContainer
 	public static void ConfigureApplicationDependencies(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.ConfigureAuthenticationServices(configuration);
-		services.AddAPIHandlers().AddDomainDependencies().AddAIAgentDependencies(configuration).AddMessagingDependencies().AddMongoDbAdapterDependencies(configuration);
+		services.AddAPIHandlers().AddDomainDependencies().AddAIAgentDependencies(configuration).AddProcessorDependencies(configuration)
+			.AddMessagingDependencies().AddMongoDbAdapterDependencies(configuration);
 		services.AddSignalR().AddAzureSignalR(configuration[AzureAppConfigurationConstants.AzureSignalRConnection]);
 	}
 

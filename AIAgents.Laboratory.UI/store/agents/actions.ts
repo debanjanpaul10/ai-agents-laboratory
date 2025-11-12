@@ -18,7 +18,7 @@ import {
 } from "@shared/api-service";
 import { CreateAgentDTO } from "@models/create-agent-dto";
 import { AgentDataDTO } from "@models/agent-data-dto";
-import { ToggleMainLoader } from "@store/common/actions";
+import { ToggleMainLoader, ToggleNewAgentDrawer } from "@store/common/actions";
 
 export function ToggleCreateAgentSpinner(isLoading: boolean) {
 	return {
@@ -98,6 +98,7 @@ export function CreateNewAgentAsync(
 					payload: response.responseData,
 				});
 
+				dispatch(ToggleNewAgentDrawer(false));
 				dispatch(GetAllAgentsDataAsync(accessToken) as any);
 			}
 		} catch (error: any) {

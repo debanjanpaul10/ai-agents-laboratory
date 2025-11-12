@@ -93,6 +93,11 @@ internal static class Constants
 		/// The azure application configuration constant
 		/// </summary>
 		internal const string AzureAppConfigurationConstant = "AzureAppConfiguration";
+
+		/// <summary>
+		/// The is knowledge base service enabled constant
+		/// </summary>
+		internal const string IsKnowledgeBaseServiceEnabledConstant = "IsKnowledgeBaseServiceEnabled";
 	}
 
 	/// <summary>
