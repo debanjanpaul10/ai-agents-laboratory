@@ -11,10 +11,11 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <summary>
 /// The Agents Service class.
 /// </summary>
+/// <param name="knowledgeBaseProcessor">The knowledge base processor service.</param>
 /// <param name="logger">The logger service.</param>
-/// <param name="mongoDatabaseService">The mongo database service.</param>
-/// <seealso cref="IAgentsService" />
-public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService mongoDatabaseService) : IAgentsService
+/// <param name="mongoDatabaseService">The mongo db database service.</param>
+/// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.IAgentsService" />
+public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService mongoDatabaseService, IKnowledgeBaseProcessor knowledgeBaseProcessor) : IAgentsService
 {
 	/// <summary>
 	/// Creates the new agent asynchronous.
@@ -30,13 +31,20 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
 		{
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow, agentData.AgentName));
 
+			agentData.AgentId = Guid.NewGuid().ToString();
+
 			if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Length > 0)
 			{
 				agentData.ValidateUploadedFile();
 				await agentData.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
+
+				if (agentData.StoredKnowledgeBase?.FileContent != null)
+				{
+					var content = System.Text.Encoding.UTF8.GetString(agentData.StoredKnowledgeBase.FileContent);
+					await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, agentData.AgentId).ConfigureAwait(false);
+				}
 			}
 
-			agentData.AgentId = Guid.NewGuid().ToString();
 			agentData.IsActive = true;
 			agentData.DateCreated = DateTime.UtcNow;
 			agentData.CreatedBy = userEmail;
@@ -133,7 +141,8 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
 			logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, updateDataDomain.AgentId));
 
 			var filter = Builders<AgentDataDomain>.Filter.And(
-				Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
+				Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
+				Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
 
 			var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(
 				MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
@@ -149,12 +158,17 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
 			{
 				updateDataDomain.ValidateUploadedFile();
 				await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
+
+				if (updateDataDomain.StoredKnowledgeBase?.FileContent is not null)
+				{
+					var content = System.Text.Encoding.UTF8.GetString(updateDataDomain.StoredKnowledgeBase.FileContent);
+					await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, updateDataDomain.AgentId).ConfigureAwait(false);
+				}
+
 				updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, updateDataDomain.StoredKnowledgeBase));
 			}
 			else if (existingAgent.StoredKnowledgeBase is not null)
-			{
 				updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, null));
-			}
 
 			var update = Builders<AgentDataDomain>.Update.Combine(updates);
 			return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);

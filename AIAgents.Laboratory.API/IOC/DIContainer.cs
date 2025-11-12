@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Security.Claims;
 using AIAgents.Laboratory.API.Adapters.IOC;
 using AIAgents.Laboratory.API.Controllers;
@@ -16,6 +17,7 @@ namespace AIAgents.Laboratory.API.IOC;
 /// <summary>
 /// The Dependency Injection Container Class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class DIContainer
 {
 	/// <summary>
@@ -29,27 +31,22 @@ public static class DIContainer
 		var configuration = builder.Configuration;
 		var appConfigurationEndpoint = configuration[EnvironmentConfigurationConstants.AppConfigurationEndpointKeyConstant];
 		if (string.IsNullOrEmpty(appConfigurationEndpoint))
-		{
 			throw new InvalidOperationException(ExceptionConstants.MissingConfigurationMessage);
-		}
 
 		builder.Configuration.AddAzureAppConfiguration(options =>
 		{
 			options.Connect(new Uri(appConfigurationEndpoint), credentials)
 			.Select(KeyFilter.Any).Select(KeyFilter.Any, AzureAppConfigurationConstants.BaseConfigurationAppConfigKeyConstant)
-			.ConfigureKeyVault(configure =>
-			{
-				configure.SetCredential(credentials);
-			});
+			.ConfigureKeyVault(configure => configure.SetCredential(credentials));
 		});
 	}
 
 	/// <summary>
-	/// Configures the ai dependencies.
+	/// Configures the application dependencies.
 	/// </summary>
 	/// <param name="services">The services.</param>
 	/// <param name="configuration">The configuration.</param>
-	public static void ConfigureAiDependencies(this IServiceCollection services, IConfiguration configuration)
+	public static void ConfigureApplicationDependencies(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.ConfigureAuthenticationServices(configuration);
 		services.AddAPIHandlers().AddDomainDependencies().AddAIAgentDependencies(configuration).AddMessagingDependencies().AddMongoDbAdapterDependencies(configuration);

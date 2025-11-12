@@ -186,6 +186,16 @@ internal static class Constants
 		/// The invalid service provider message.
 		/// </summary>
 		internal const string InvalidServiceProvider = "Unsupported AI service provider: {0}";
+
+		/// <summary>
+		/// The no valid chunks generated
+		/// </summary>
+		internal const string NoValidChunksGenerated = "No valid chunks were generated from the content.";
+
+		/// <summary>
+		/// The number of embeddings mismatch
+		/// </summary>
+		internal const string NumberOfEmbeddingsMismatch = "The number of embeddings generated does not match the number of text chunks.";
 	}
 
 	/// <summary>
@@ -273,6 +283,17 @@ internal static class Constants
 		/// The local fg tool base URL
 		/// </summary>
 		internal const string LocalFGToolBaseUrl = "LocalFGToolBaseUrl";
+	}
+
+	/// <summary>
+	/// The knowledge base constants.
+	/// </summary>
+	internal static class KnowledgeBaseConstants
+	{
+		/// <summary>
+		/// The chunk description template
+		/// </summary>
+		internal const string ChunkDescriptionTemplate = "Knowledge base chunk {0} of {1}";
 	}
 
 }
