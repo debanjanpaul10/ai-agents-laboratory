@@ -26,7 +26,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.API", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.Processor", "AIAgents.Laboratory.Processor\AIAgents.Laboratory.Processor.csproj", "{6199BD60-5A48-4371-8FF0-B8A3660316D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.Caching", "AIAgents.Laboratory.Caching\AIAgents.Laboratory.Caching.csproj", "{D941D082-199B-4F8F-93DD-334CAD7E9195}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.Persistence.Caching", "AIAgents.Laboratory.Persistence.Caching\AIAgents.Laboratory.Persistence.Caching.csproj", "{D941D082-199B-4F8F-93DD-334CAD7E9195}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
