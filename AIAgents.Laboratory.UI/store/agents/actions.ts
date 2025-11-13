@@ -56,7 +56,6 @@ export function GetAllAgentsDataAsync(accessToken: string) {
 		} catch (error: any) {
 			console.error(error);
 			ShowErrorToaster(error);
-			throw error;
 		} finally {
 			dispatch(ToggleMainLoader(false));
 		}
@@ -77,7 +76,6 @@ export function GetAgentDataByIdAsync(agentId: string, accessToken: string) {
 		} catch (error: any) {
 			console.error(error);
 			ShowErrorToaster(error);
-			throw error;
 		} finally {
 			dispatch(ToggleMainLoader(false));
 		}
@@ -108,7 +106,6 @@ export function CreateNewAgentAsync(
 		} catch (error: any) {
 			console.error(error);
 			ShowErrorToaster(error);
-			throw error;
 		} finally {
 			dispatch(ToggleCreateAgentSpinner(false));
 		}
@@ -136,7 +133,6 @@ export function UpdateExistingAgentDataAsync(
 		} catch (error: any) {
 			console.error(error);
 			ShowErrorToaster(error);
-			throw error;
 		} finally {
 			dispatch(ToggleEditAgentSpinner(false));
 		}
@@ -163,7 +159,6 @@ export function DeleteExistingAgentDataAsync(
 		} catch (error: any) {
 			console.error(error);
 			ShowErrorToaster(error);
-			throw error;
 		} finally {
 			dispatch(ToggleMainLoader(false));
 		}

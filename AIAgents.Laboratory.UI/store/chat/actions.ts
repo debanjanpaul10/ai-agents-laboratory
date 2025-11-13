@@ -43,7 +43,6 @@ export function InvokeChatAgentAsync(
 		} catch (error: any) {
 			console.error(error);
 			ShowErrorToaster(error);
-			throw error;
 		} finally {
 			dispatch(ToggleChatResponseSpinner(false));
 		}
@@ -69,7 +68,6 @@ export function ClearConversationHistoryAsync(accessToken: string) {
 		} catch (error: any) {
 			console.error(error);
 			ShowErrorToaster(error);
-			throw error;
 		} finally {
 			dispatch(ToggleDirectChatLoader(false));
 		}

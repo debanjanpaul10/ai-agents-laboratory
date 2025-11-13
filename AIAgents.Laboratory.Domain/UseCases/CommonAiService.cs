@@ -2,6 +2,7 @@ using System.Globalization;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
@@ -14,8 +15,9 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="configuration">The configuration.</param>
 /// <param name="agentStatusStore">THe agent status store.</param>
 /// <param name="logger">The logger service.</param>
+/// <param name="cacheService">The cache service.</param>
 /// <seealso cref="ICommonAiService"/>
-public class CommonAiService(IConfiguration configuration, ILogger<CommonAiService> logger, IAgentStatusStore agentStatusStore) : ICommonAiService
+public class CommonAiService(IConfiguration configuration, ILogger<CommonAiService> logger, IAgentStatusStore agentStatusStore, ICacheService cacheService) : ICommonAiService
 {
     /// <summary>
     /// Gets the current model identifier.
@@ -30,7 +32,7 @@ public class CommonAiService(IConfiguration configuration, ILogger<CommonAiServi
 
     /// <summary>
     /// Gets the agent current status.
-    /// </summary>
+    /// </summary> 
     /// <returns>
     /// The agent status data.
     /// </returns>
@@ -63,11 +65,22 @@ public class CommonAiService(IConfiguration configuration, ILogger<CommonAiServi
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationsData), DateTime.UtcNow, userName));
 
-            return new Dictionary<string, string>
+            var cachedValues = cacheService.GetCachedData<Dictionary<string, string>>(CacheKeys.AllAppSettingsKeyName);
+            if (cachedValues is not null && cachedValues.Count > 0)
             {
-                { AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant, configuration[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant]! },
-                { AzureAppConfigurationConstants.CurrentAiServiceProvider, configuration[AzureAppConfigurationConstants.CurrentAiServiceProvider]! },
-            };
+                return cachedValues;
+            }
+            else
+            {
+                var existingCacheData = new Dictionary<string, string>
+                {
+                    { AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant, configuration[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant]! },
+                    { AzureAppConfigurationConstants.CurrentAiServiceProvider, configuration[AzureAppConfigurationConstants.CurrentAiServiceProvider]! },
+                };
+
+                cacheService.SetCacheData(CacheKeys.AllAppSettingsKeyName, existingCacheData, CacheKeys.CacheExpirationTimeout);
+                return existingCacheData;
+            }
         }
         catch (Exception ex)
         {
@@ -91,10 +104,16 @@ public class CommonAiService(IConfiguration configuration, ILogger<CommonAiServi
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationByKeyName), DateTime.UtcNow, key));
 
-            return new Dictionary<string, string>
+            var cachedkeyValue = cacheService.GetCachedData<Dictionary<string, string>>(key);
+            if (cachedkeyValue is not null && cachedkeyValue.Count > 0)
             {
-                { key, configuration[key]! }
-            };
+                return cachedkeyValue;
+            }
+            else
+            {
+                cacheService.SetCacheData(key, new Dictionary<string, string> { { key, configuration[key]! } }, CacheKeys.CacheExpirationTimeout);
+                return new Dictionary<string, string> { { key, configuration[key]! } };
+            }
         }
         catch (Exception ex)
         {

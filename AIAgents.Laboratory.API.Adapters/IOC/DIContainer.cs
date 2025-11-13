@@ -12,19 +12,19 @@ namespace AIAgents.Laboratory.API.Adapters.IOC;
 [ExcludeFromCodeCoverage]
 public static class DIContainer
 {
-	/// <summary>
-	/// Adds the API handlers.
-	/// </summary>
-	/// <param name="services">The services.</param>
-	/// <returns>The service collection.</returns>
-	public static IServiceCollection AddAPIHandlers(this IServiceCollection services) =>
-		services.AddScoped<IPluginsHandler, PluginsHandler>()
-		.AddScoped<ICommonAiHandler, CommonAiHandler>()
-		.AddScoped<ISkillsHandler, SkillsHandler>()
-		.AddScoped<IAgentsHandler, AgentsHandler>()
-		.AddScoped<IChatHandler, ChatHandler>()
-		.AddAutoMapper(config =>
-		{
-			config.AddProfile<DomainMapperProfile>();
-		});
+    /// <summary>
+    /// Adds the API adapter dependencies.
+    /// </summary>
+    /// <param name="services">The services.</param>
+    /// <returns>The service collection.</returns>
+    public static IServiceCollection AddAPIAdapterDependencies(this IServiceCollection services) =>
+        services.AddScoped<IPluginsHandler, PluginsHandler>()
+        .AddScoped<ICommonAiHandler, CommonAiHandler>()
+        .AddScoped<ISkillsHandler, SkillsHandler>()
+        .AddScoped<IAgentsHandler, AgentsHandler>()
+        .AddScoped<IChatHandler, ChatHandler>()
+        .AddAutoMapper(config =>
+        {
+            config.AddProfile<DomainMapperProfile>();
+        });
 }

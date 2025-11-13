@@ -65,3 +65,13 @@ export async function GetConversationHistoryDataForUserApiAsync(
 export async function GetConfigurationsDataApiAsync(accessToken: string) {
 	return await GetAsync("configuration/getconfigurations", accessToken);
 }
+
+export async function GetConfigurationByKeyNameApiAsync(
+	keyName: string,
+	accessToken: string
+) {
+	return await GetAsync(
+		`configuration/getconfigurationbykey/${keyName}`,
+		accessToken
+	);
+}

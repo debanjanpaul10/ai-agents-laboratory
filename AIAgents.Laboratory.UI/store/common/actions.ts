@@ -1,9 +1,12 @@
 import { Action, Dispatch } from "redux";
 
-import { GetConfigurationsDataApiAsync } from "@shared/api-service";
-import { addToast } from "@heroui/toast";
+import {
+	GetConfigurationByKeyNameApiAsync,
+	GetConfigurationsDataApiAsync,
+} from "@shared/api-service";
 import {
 	GET_ALL_CONFIGURATIONS,
+	GET_CONFIGURATION_BY_KEY_NAME,
 	TOGGLE_AGENT_TEST_DRAWER,
 	TOGGLE_AGENTS_LIST_DRAWER,
 	TOGGLE_DIRECT_CHAT_DRAWER,
@@ -70,6 +73,31 @@ export function GetAllConfigurations(accessToken: string) {
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: GET_ALL_CONFIGURATIONS,
+					payload: response.responseData,
+				});
+
+				return response.responseData as {};
+			}
+		} catch (error: any) {
+			console.error(error);
+			ShowErrorToaster(error);
+		}
+	};
+}
+
+export function GetConfigurationByKeyName(
+	keyName: string,
+	accessToken: string
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			const response = await GetConfigurationByKeyNameApiAsync(
+				keyName,
+				accessToken
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: GET_CONFIGURATION_BY_KEY_NAME,
 					payload: response.responseData,
 				});
 
