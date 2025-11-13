@@ -129,6 +129,7 @@ export function UpdateExistingAgentDataAsync(
 					payload: response.responseData,
 				});
 				dispatch(GetAllAgentsDataAsync(accessToken) as any);
+				ShowSuccessToaster("Agent updated successfully!");
 			}
 		} catch (error: any) {
 			console.error(error);
@@ -155,6 +156,9 @@ export function DeleteExistingAgentDataAsync(
 					type: DELETE_AGENT_DATA,
 					payload: response.responseData,
 				});
+
+				dispatch(GetAllAgentsDataAsync(accessToken) as any);
+				ShowSuccessToaster("Agent deleted successfully!");
 			}
 		} catch (error: any) {
 			console.error(error);
