@@ -64,8 +64,10 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel) : IAiServices
             {
                 foreach (var message in conversationDataDomain.ChatHistory)
                 {
-                    if (message.Role.Equals(ArgumentsConstants.UserRoleConstant, StringComparison.OrdinalIgnoreCase)) chatHistory.AddUserMessage(message.Content);
-                    else if (message.Role.Equals(ArgumentsConstants.AssistantRoleConstant, StringComparison.OrdinalIgnoreCase)) chatHistory.AddAssistantMessage(message.Content);
+                    if (message.Role.Equals(ArgumentsConstants.UserRoleConstant, StringComparison.OrdinalIgnoreCase))
+                        chatHistory.AddUserMessage(message.Content);
+                    else if (message.Role.Equals(ArgumentsConstants.AssistantRoleConstant, StringComparison.OrdinalIgnoreCase))
+                        chatHistory.AddAssistantMessage(message.Content);
                 }
             }
 

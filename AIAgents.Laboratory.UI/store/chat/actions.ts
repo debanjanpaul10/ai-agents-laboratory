@@ -17,7 +17,7 @@ import {
 import { ToggleDirectChatLoader } from "@store/common/actions";
 import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
 import { ConversationHistoryDTO } from "@models/conversation-history-dto";
-import { ShowErrorToaster } from "@shared/toaster";
+import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 
 export function InvokeChatAgentAsync(
 	chatRequest: ChatRequestDTO,
@@ -43,7 +43,6 @@ export function InvokeChatAgentAsync(
 		} catch (error: any) {
 			console.error(error);
 			ShowErrorToaster(error);
-			throw error;
 		} finally {
 			dispatch(ToggleChatResponseSpinner(false));
 		}
@@ -63,13 +62,13 @@ export function ClearConversationHistoryAsync(accessToken: string) {
 					payload: response.responseData,
 				});
 
+				ShowSuccessToaster("Conversation history cleared succesfully!");
 				return response.responseData as boolean;
 			}
 			return null;
 		} catch (error: any) {
 			console.error(error);
 			ShowErrorToaster(error);
-			throw error;
 		} finally {
 			dispatch(ToggleDirectChatLoader(false));
 		}
