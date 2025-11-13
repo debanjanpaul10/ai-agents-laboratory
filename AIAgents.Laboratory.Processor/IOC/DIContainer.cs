@@ -1,4 +1,5 @@
 ﻿using System.ClientModel;
+using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Processor.Contracts;
 using AIAgents.Laboratory.Processor.Services;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +11,7 @@ namespace AIAgents.Laboratory.Processor.IOC;
 /// <summary>
 /// The DI Container Class.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class DIContainer
 {
 #pragma warning disable SKEXP0010

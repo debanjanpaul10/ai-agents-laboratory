@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
-  </ItemGroup>
-
 </Project>
