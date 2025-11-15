@@ -58,39 +58,19 @@ internal static class Constants
 		internal const string AIResponseInputConstant = "ai_response";
 
 		/// <summary>
-		/// The total tokens count constant.
+		/// The user message input constant.
 		/// </summary>
-		internal const string TotalTokenCountConstant = "TotalTokenCount";
+		internal const string UserMessageInputConstant = "user_message";
 
 		/// <summary>
-		/// The candidates token count constant.
+		/// The user role constant.
 		/// </summary>
-		internal const string CandidatesTokenCountConstant = "CandidatesTokenCount";
+		internal const string UserRoleConstant = "user";
 
 		/// <summary>
-		/// The prompt token count constant.
+		/// The assistant role constant.
 		/// </summary>
-		internal const string PromptTokenCountConstant = "PromptTokenCount";
-
-		/// <summary>
-		/// The agent name constant
-		/// </summary>
-		internal const string AgentNameConstant = "agent_name";
-
-		/// <summary>
-		/// The user message constant
-		/// </summary>
-		internal const string UserMessageConstant = "user_message";
-
-		/// <summary>
-		/// The agent metaprompt constant
-		/// </summary>
-		internal const string AgentMetapromptConstant = "agent_metaprompt";
-
-		/// <summary>
-		/// The agent skills constant
-		/// </summary>
-		internal const string AgentSkillsConstant = "agent_skills";
+		internal const string AssistantRoleConstant = "assistant";
 	}
 
 	/// <summary>
@@ -206,6 +186,16 @@ internal static class Constants
 		/// The invalid service provider message.
 		/// </summary>
 		internal const string InvalidServiceProvider = "Unsupported AI service provider: {0}";
+
+		/// <summary>
+		/// The no valid chunks generated
+		/// </summary>
+		internal const string NoValidChunksGenerated = "No valid chunks were generated from the content.";
+
+		/// <summary>
+		/// The number of embeddings mismatch
+		/// </summary>
+		internal const string NumberOfEmbeddingsMismatch = "The number of embeddings generated does not match the number of text chunks.";
 	}
 
 	/// <summary>

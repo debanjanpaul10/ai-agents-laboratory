@@ -5,10 +5,11 @@ import { Send, MessageSquare, Bot, Zap, ArrowRight } from "lucide-react";
 
 import { ChatRequestDTO } from "@models/chat-request-dto";
 import { useAuth } from "@auth/AuthProvider";
-import { InvokeChatAgentAsync } from "@store/agents/actions";
+import { InvokeChatAgentAsync } from "@store/chat/actions";
 import { useAppDispatch } from "@store/index";
 import { ChatMessage, TestAgentComponentProps } from "@shared/types";
 import { ManageAgentConstants } from "@helpers/constants";
+import { generateMessageId } from "@shared/utils";
 
 export default function TestAgentComponent({
 	editFormData,
@@ -28,7 +29,6 @@ export default function TestAgentComponent({
 			id: generateMessageId(),
 			type: "user" as const,
 			content: userInput,
-			timestamp: new Date(),
 		};
 		await SendChatbotMessageAsync(userMessage);
 	};
@@ -70,11 +70,6 @@ export default function TestAgentComponent({
 			setIsLoading(false);
 		}
 	}
-
-	// Generate a unique ID for messages
-	const generateMessageId = () => {
-		return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-	};
 
 	const clearConversation = () => {
 		setMessages([]);
@@ -163,9 +158,6 @@ export default function TestAgentComponent({
 									}`}
 								>
 									<p className="text-sm">{message.content}</p>
-									<p className="text-xs text-white/40 mt-1">
-										{message.timestamp.toLocaleTimeString()}
-									</p>
 								</div>
 							</div>
 						))}

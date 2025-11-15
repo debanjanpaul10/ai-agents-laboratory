@@ -2,6 +2,7 @@ import { GetAsync, PostAsync } from "@helpers/http-utility";
 import { AgentDataDTO } from "@models/agent-data-dto";
 import { ChatRequestDTO } from "@models/chat-request-dto";
 import { CreateAgentDTO } from "@models/create-agent-dto";
+import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
 
 export async function GetAgentsApiAsync(accessToken: string) {
 	return await GetAsync("agents/getallagents", accessToken);
@@ -15,14 +16,14 @@ export async function GetAgentByIdApiAsync(
 }
 
 export async function CreateNewAgentApiAsync(
-	newAgentData: CreateAgentDTO,
+	newAgentData: CreateAgentDTO | FormData,
 	accessToken: string
 ) {
 	return await PostAsync("agents/createagent", newAgentData, accessToken);
 }
 
 export async function UpdateExistingAgentApiAsync(
-	updateAgentData: AgentDataDTO,
+	updateAgentData: AgentDataDTO | FormData,
 	accessToken: string
 ) {
 	return await PostAsync("agents/updateagent", updateAgentData, accessToken);
@@ -40,4 +41,37 @@ export async function InvokeChatAgentApiAsync(
 	accessToken: string
 ) {
 	return await PostAsync("chat/invokeagent", chatRequest, accessToken);
+}
+
+export async function GetDirectChatResponseApiAsync(
+	chatRequest: DirectChatRequestDTO,
+	accessToken: string
+) {
+	return await PostAsync("chat/directchat", chatRequest, accessToken);
+}
+
+export async function ClearConversationHistoryForUserApiAsync(
+	accessToken: string
+) {
+	return await PostAsync("chat/clearconversation", null, accessToken);
+}
+
+export async function GetConversationHistoryDataForUserApiAsync(
+	accessToken: string
+) {
+	return await GetAsync("chat/getconversationhistory", accessToken);
+}
+
+export async function GetConfigurationsDataApiAsync(accessToken: string) {
+	return await GetAsync("configuration/getconfigurations", accessToken);
+}
+
+export async function GetConfigurationByKeyNameApiAsync(
+	keyName: string,
+	accessToken: string
+) {
+	return await GetAsync(
+		`configuration/getconfigurationbykey/${keyName}`,
+		accessToken
+	);
 }

@@ -3,11 +3,13 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import { AgentsReducer } from "@store/agents/reducers";
 import { CommonReducer } from "@store/common/reducers";
+import { ChatReducer } from "./chat/reducers";
 
 export const store = configureStore({
 	reducer: {
 		AgentsReducer: AgentsReducer,
 		CommonReducer: CommonReducer,
+		ChatReducer: ChatReducer,
 	},
 });
 

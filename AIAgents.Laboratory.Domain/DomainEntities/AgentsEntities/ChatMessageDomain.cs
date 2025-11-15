@@ -28,4 +28,12 @@ public class ChatMessageDomain
 	/// The agent meta prompt.
 	/// </value>
 	public string AgentMetaPrompt { get; set; } = string.Empty;
+
+	/// <summary>
+	/// Gets or sets the knowledge base data.
+	/// </summary>
+	/// <value>
+	/// The knowledge base domain data.
+	/// </value>
+	public string? KnowledgeBase { get; set; } = string.Empty;
 }

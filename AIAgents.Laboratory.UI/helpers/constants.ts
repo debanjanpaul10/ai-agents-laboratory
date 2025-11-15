@@ -33,6 +33,26 @@ export const DashboardConstants = {
 			"Modify and delete existing AI agents",
 		],
 	},
+	FooterConstants: {
+		FooterText: "AI Agents Laboratory - a product of Debanjan's Laboratory",
+	},
+	DirectChatConstants: {
+		Header: {
+			MainHeader: "Chat with AI Agent",
+			SubHeader: "Try out a sample AI chatbot",
+		},
+		ConversationContent: {
+			Heading: "Start a conversation",
+			SubText:
+				"Send a message to the AI agent to see how the functionality works",
+		},
+	},
+	LoadingConstants: {
+		MainLoader: "Loading AI Agents Data ...",
+		SaveNewAgentLoader: "Saving New Agent ...",
+		LoginRedirectLoader: "Redirecting to Login ...",
+		SaveAgentDataLoader: "Saving agent data ...",
+	},
 };
 
 export const CreateAgentConstants = {
@@ -60,6 +80,7 @@ export const ManageAgentConstants = {
 				"Define your agent's behavior, personality, and capabilities ...",
 		},
 		Info: "Describe how your agent should behave, what it should know, and how it should respond to users.",
+		KBInfo: "You can upload knowledge base data to the agent. Available file formats: .pdf, .docx, .xlsx, .txt",
 	},
 
 	TestAgentConstants: {
@@ -74,4 +95,10 @@ export const ManageAgentConstants = {
 			AgentResponse: "Agent is thinking ...",
 		},
 	},
+};
+
+export const LoginPageConstants = {
+	LoginButton: "Sign-In with SSO",
+	HeaderText: "AI Agents Laboratory",
+	Subtext: "Welcome to the future of AI development",
 };

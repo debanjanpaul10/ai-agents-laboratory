@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button, Input } from "@heroui/react";
+import React, { useState, useRef } from "react";
+import { Button, Input, Tooltip } from "@heroui/react";
 import {
 	Save,
 	Play,
@@ -9,6 +9,10 @@ import {
 	Expand,
 	ArrowRight,
 	Trash,
+	ScrollText,
+	Files,
+	Upload,
+	Download,
 } from "lucide-react";
 import { useMsal } from "@azure/msal-react";
 
@@ -19,10 +23,11 @@ import {
 	DeleteExistingAgentDataAsync,
 	UpdateExistingAgentDataAsync,
 } from "@store/agents/actions";
-import { FullScreenLoading } from "@components/ui/loading-spinner";
-import { ManageAgentConstants } from "@helpers/constants";
+import { FullScreenLoading } from "@components/common/spinner";
+import { DashboardConstants, ManageAgentConstants } from "@helpers/constants";
 import { AgentDataDTO } from "@models/agent-data-dto";
-import ExpandMetapromptEditorComponent from "@components/common/expand-meta-prompt-editor";
+import ExpandMetapromptEditorComponent from "@components/common/expand-metaprompt-editor";
+import { ToggleAgentsListDrawer } from "@store/common/actions";
 
 export default function ModifyAgentComponent({
 	editFormData,
@@ -35,7 +40,7 @@ export default function ModifyAgentComponent({
 	isDisabled,
 }: ModifyAgentComponentProps) {
 	const dispatch = useAppDispatch();
-	const auth = useAuth();
+	const authContext = useAuth();
 	const { accounts } = useMsal();
 
 	const [expandedPromptModal, setExpandedPromptModal] =
@@ -44,27 +49,91 @@ export default function ModifyAgentComponent({
 	const IsEditAgentDataLoading = useAppSelector(
 		(state) => state.AgentsReducer.isEditAgentDataLoading
 	);
+	const ConfigurationStoreData = useAppSelector(
+		(state) => state.CommonReducer.configurations
+	);
 
-	const handleInputChange = (field: string, value: string) => {
+	const handleInputChange = (field: string, value: string | File | null) => {
 		setEditFormData((prev: any) => ({ ...prev, [field]: value }));
 	};
 
-	const handleEditSave = async () => {
-		const accessToken = await auth.getAccessToken();
-		accessToken &&
-			dispatch(UpdateExistingAgentDataAsync(editFormData, accessToken));
+	const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+	const handleUploadClick = () => {
+		fileInputRef.current?.click();
 	};
+
+	const handleDownloadFile = () => {
+		const fileData = editFormData.knowledgeBaseDocument;
+		if (!fileData) return;
+
+		const fileName = fileData.name;
+
+		try {
+			// If it's already a File object
+			if (fileData instanceof File) {
+				const url = URL.createObjectURL(fileData);
+				const link = document.createElement("a");
+				link.href = url;
+				link.download = fileName || "knowledgeBaseDocument";
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				URL.revokeObjectURL(url);
+				return;
+			}
+
+			// Create a new blob from the data
+			const blob = new Blob([fileData], {
+				type: "application/octet-stream",
+			});
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = fileName || "knowledgeBaseDocument";
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error("Error downloading file:", error);
+		}
+	};
+
+	const handleDeleteFile = () => {
+		handleInputChange("knowledgeBaseDocument", null);
+	};
+
+	async function handleEditSave() {
+		const form = new FormData();
+		form.append("agentId", editFormData.agentId);
+		form.append("agentMetaPrompt", editFormData.agentMetaPrompt);
+		form.append("agentName", editFormData.agentName);
+		form.append("applicationName", editFormData.applicationName);
+		if (editFormData.knowledgeBaseDocument) {
+			form.append(
+				"knowledgeBaseDocument",
+				editFormData.knowledgeBaseDocument
+			);
+		}
+
+		const accessToken = await authContext.getAccessToken();
+		accessToken &&
+			dispatch(UpdateExistingAgentDataAsync(form, accessToken));
+	}
 
 	const handleEditClose = () => {
 		setSelectedAgent(null);
 		onEditClose();
 	};
 
-	const handleAgentDelete = async () => {
-		const token = await auth.getAccessToken();
+	async function handleAgentDelete() {
+		const token = await authContext.getAccessToken();
 		token &&
 			dispatch(DeleteExistingAgentDataAsync(editFormData.agentId, token));
-	};
+		dispatch(ToggleAgentsListDrawer(false));
+		handleEditClose();
+	}
 
 	const handleExpandPrompt = () => {
 		setExpandedPromptModal(true);
@@ -88,11 +157,15 @@ export default function ModifyAgentComponent({
 					</p>
 					<p className="text-white/60">
 						<span className="text-white/80">Created:</span>{" "}
-						{new Date().toLocaleDateString()}
+						{`${new Date(
+							selectedAgent.dateCreated
+						).toDateString()}`}
 					</p>
 					<p className="text-white/60">
 						<span className="text-white/80">Status:</span>{" "}
-						<span className="text-green-400">Active</span>
+						<span className="text-green-400 animate-pulse">
+							Active
+						</span>
 					</p>
 				</div>
 			</div>
@@ -114,7 +187,7 @@ export default function ModifyAgentComponent({
 							radius="full"
 							className="group relative bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 text-white font-semibold hover:from-emerald-500 hover:via-green-600 hover:to-teal-600 shadow-lg hover:shadow-green-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
 						>
-							<div className="flex items-center px-3 py-3">
+							<div className="flex items-center">
 								<Save className="w-4 h-4 flex-shrink-0" />
 								<span className="max-w-0 overflow-hidden group-hover:max-w-[100px] transition-all duration-300 ease-in-out ml-0 group-hover:ml-2">
 									Save
@@ -131,7 +204,7 @@ export default function ModifyAgentComponent({
 							radius="full"
 							className="group relative bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 text-white font-semibold hover:from-blue-500 hover:via-indigo-600 hover:to-purple-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
 						>
-							<div className="flex items-center px-3 py-3">
+							<div className="flex items-center">
 								<Play className="w-4 h-4 flex-shrink-0" />
 								<span className="max-w-0 overflow-hidden group-hover:max-w-[100px] transition-all duration-300 ease-in-out ml-0 group-hover:ml-2">
 									Test
@@ -150,7 +223,7 @@ export default function ModifyAgentComponent({
 							radius="full"
 							className="group relative bg-gradient-to-r from-red-400 via-rose-500 to-pink-500 text-white font-semibold hover:from-red-500 hover:via-rose-600 hover:to-pink-600 shadow-lg hover:shadow-rose-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
 						>
-							<div className="flex items-center px-3 py-3">
+							<div className="flex items-center">
 								<Trash className="w-4 h-4 flex-shrink-0" />
 								<span className="max-w-0 overflow-hidden group-hover:max-w-[100px] transition-all duration-300 ease-in-out ml-0 group-hover:ml-2">
 									Delete
@@ -160,6 +233,123 @@ export default function ModifyAgentComponent({
 					</div>
 				</div>
 			</div>
+		);
+	};
+
+	const renderAgentKnowledgeBaseData = () => {
+		return (
+			<>
+				<div className="space-y-2">
+					<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+						<Files className="w-4 h-4 text-pink-400" />
+						<span>Agent Knowledge Base</span>
+					</label>
+					<div className="flex items-center space-x-2">
+						<Tooltip
+							content={
+								editFormData.knowledgeBaseDocument?.name || ""
+							}
+							placement="left"
+						>
+							<Input
+								value={
+									editFormData.knowledgeBaseDocument?.name ||
+									""
+								}
+								radius="full"
+								disabled={true}
+								classNames={{
+									input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
+									inputWrapper:
+										"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-purple-500/50 min-h-[48px]",
+								}}
+							/>
+						</Tooltip>
+
+						<div className="flex items-center space-x-2">
+							{editFormData.knowledgeBaseDocument ? (
+								<>
+									{/* DOWNLOAD */}
+									<div className="relative">
+										<Tooltip content="Download">
+											<Button
+												onPress={handleDownloadFile}
+												radius="full"
+												className="group relative bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 text-white font-semibold hover:from-emerald-500 hover:via-green-600 hover:to-teal-600 shadow-lg hover:shadow-green-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
+											>
+												<div className="flex items-center">
+													<Download className="w-4 h-4 flex-shrink-0" />
+												</div>
+											</Button>
+										</Tooltip>
+									</div>
+
+									{/* UPLOAD */}
+									<div className="relative">
+										<Tooltip content="Upload">
+											<Button
+												onPress={handleUploadClick}
+												disabled={
+													isDisabled ||
+													accounts[0].username !==
+														editFormData.createdBy
+												}
+												radius="full"
+												className="group relative bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 text-white font-semibold hover:from-blue-500 hover:via-indigo-600 hover:to-purple-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
+											>
+												<div className="flex items-center">
+													<Upload className="w-4 h-4 flex-shrink-0" />
+												</div>
+											</Button>
+										</Tooltip>
+									</div>
+
+									{/* DELETE */}
+									<div className="relative">
+										<Tooltip content="Delete">
+											<Button
+												onPress={handleDeleteFile}
+												disabled={
+													accounts[0].username !==
+													editFormData.createdBy
+												}
+												radius="full"
+												className="group relative bg-gradient-to-r from-red-400 via-rose-500 to-pink-500 text-white font-semibold hover:from-red-500 hover:via-rose-600 hover:to-pink-600 shadow-lg hover:shadow-rose-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
+											>
+												<div className="flex items-center">
+													<Trash className="w-4 h-4 flex-shrink-0" />
+												</div>
+											</Button>
+										</Tooltip>
+									</div>
+								</>
+							) : (
+								<div className="relative">
+									<Tooltip content="Upload">
+										<Button
+											onPress={handleUploadClick}
+											disabled={
+												isDisabled ||
+												accounts[0].username !==
+													editFormData.createdBy
+											}
+											radius="full"
+											className="group relative bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 text-white font-semibold hover:from-blue-500 hover:via-indigo-600 hover:to-purple-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
+										>
+											<div className="flex items-center">
+												<Upload className="w-4 h-4 flex-shrink-0" />
+											</div>
+										</Button>
+									</Tooltip>
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
+				<p className="text-white/40 text-xs">
+					{ManageAgentConstants.ModifyAgentConstants.KBInfo}
+				</p>
+			</>
 		);
 	};
 
@@ -232,6 +422,7 @@ export default function ModifyAgentComponent({
 								}}
 							/>
 						</div>
+
 						{/* Application Name Field */}
 						<div className="space-y-2">
 							<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
@@ -263,6 +454,7 @@ export default function ModifyAgentComponent({
 								}}
 							/>
 						</div>
+
 						{/* Author Field */}
 						<div className="space-y-2">
 							<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
@@ -286,10 +478,12 @@ export default function ModifyAgentComponent({
 								}}
 							/>
 						</div>
+
 						{/* Meta Prompt Field */}
 						<div className="space-y-2">
-							<label className="text-white/80 text-sm font-medium">
-								Agent Meta Prompt
+							<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+								<ScrollText className="w-4 h-4 text-green-400" />
+								<span>Agent Meta Prompt</span>
 							</label>
 							<div className="relative">
 								<textarea
@@ -328,6 +522,10 @@ export default function ModifyAgentComponent({
 							</p>
 						</div>
 
+						{/* Agent Knowledge Base */}
+						{ConfigurationStoreData.IsKnowledgeBaseServiceEnabled ===
+							"true" && renderAgentKnowledgeBaseData()}
+
 						{/* Agent Info Display */}
 						{renderAgentInformationTile(selectedAgent)}
 					</div>
@@ -340,6 +538,7 @@ export default function ModifyAgentComponent({
 						handleCollapsePrompt={handleCollapsePrompt}
 						handleInputChange={handleInputChange}
 						createdBy={editFormData.createdBy}
+						isNewAgent={false}
 					/>
 				</div>
 			)
@@ -347,7 +546,10 @@ export default function ModifyAgentComponent({
 	};
 
 	return IsEditAgentDataLoading ? (
-		<FullScreenLoading isLoading={true} message="Saving agent data ..." />
+		<FullScreenLoading
+			isLoading={true}
+			message={DashboardConstants.LoadingConstants.SaveAgentDataLoader}
+		/>
 	) : (
 		renderEditAgentsData()
 	);

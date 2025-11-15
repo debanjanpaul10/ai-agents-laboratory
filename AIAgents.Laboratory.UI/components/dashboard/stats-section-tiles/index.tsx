@@ -7,6 +7,9 @@ export default function StatsSectionTilesComponent() {
 	const AgentsListStoreData = useAppSelector(
 		(state) => state.AgentsReducer.agentsListData
 	);
+	const ConfigurationsStoreData = useAppSelector(
+		(state) => state.CommonReducer.configurations
+	);
 
 	useEffect(() => {
 		setAgentsCount(AgentsListStoreData.length);
@@ -14,6 +17,7 @@ export default function StatsSectionTilesComponent() {
 
 	return (
 		<div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+			{/* System Status */}
 			<div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
 				<div className="flex items-center space-x-3">
 					<div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -25,6 +29,8 @@ export default function StatsSectionTilesComponent() {
 					</div>
 				</div>
 			</div>
+
+			{/* Active Agents Count */}
 			<div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
 				<div className="flex items-center space-x-3">
 					<div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
@@ -36,12 +42,18 @@ export default function StatsSectionTilesComponent() {
 					</div>
 				</div>
 			</div>
+
+			{/* AI Service Provider */}
 			<div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
 				<div className="flex items-center space-x-3">
 					<div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse"></div>
 					<div>
-						<p className="text-white/60 text-xs">API Calls Today</p>
-						<p className="text-white font-semibold">1,247</p>
+						<p className="text-white/60 text-xs">
+							Current AI Service provider
+						</p>
+						<p className="text-white font-semibold">
+							{ConfigurationsStoreData.CurrentAiServiceProvider}
+						</p>
 					</div>
 				</div>
 			</div>

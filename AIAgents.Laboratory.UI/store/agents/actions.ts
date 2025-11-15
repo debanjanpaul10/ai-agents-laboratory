@@ -4,7 +4,6 @@ import {
 	DELETE_AGENT_DATA,
 	GET_AGENT_BY_ID,
 	GET_ALL_AGENTS_DATA,
-	GET_CHAT_RESPONSE,
 	TOGGLE_AGENT_CREATE_SPINNER,
 	TOGGLE_CHAT_RESPONSE_SPINNER,
 	TOGGLE_EDIT_AGENT_SPINNER,
@@ -15,13 +14,12 @@ import {
 	DeleteExistingAgentApiAsync,
 	GetAgentByIdApiAsync,
 	GetAgentsApiAsync,
-	InvokeChatAgentApiAsync,
 	UpdateExistingAgentApiAsync,
 } from "@shared/api-service";
 import { CreateAgentDTO } from "@models/create-agent-dto";
 import { AgentDataDTO } from "@models/agent-data-dto";
-import { ToggleMainLoader } from "@store/common/actions";
-import { ChatRequestDTO } from "@models/chat-request-dto";
+import { ToggleMainLoader, ToggleNewAgentDrawer } from "@store/common/actions";
+import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 
 export function ToggleCreateAgentSpinner(isLoading: boolean) {
 	return {
@@ -57,7 +55,7 @@ export function GetAllAgentsDataAsync(accessToken: string) {
 			}
 		} catch (error: any) {
 			console.error(error);
-			throw error;
+			ShowErrorToaster(error);
 		} finally {
 			dispatch(ToggleMainLoader(false));
 		}
@@ -77,7 +75,7 @@ export function GetAgentDataByIdAsync(agentId: string, accessToken: string) {
 			}
 		} catch (error: any) {
 			console.error(error);
-			throw error;
+			ShowErrorToaster(error);
 		} finally {
 			dispatch(ToggleMainLoader(false));
 		}
@@ -85,7 +83,7 @@ export function GetAgentDataByIdAsync(agentId: string, accessToken: string) {
 }
 
 export function CreateNewAgentAsync(
-	newAgentData: CreateAgentDTO,
+	newAgentData: CreateAgentDTO | FormData,
 	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
@@ -101,11 +99,13 @@ export function CreateNewAgentAsync(
 					payload: response.responseData,
 				});
 
+				dispatch(ToggleNewAgentDrawer(false));
 				dispatch(GetAllAgentsDataAsync(accessToken) as any);
+				ShowSuccessToaster("Agent created successfully");
 			}
 		} catch (error: any) {
 			console.error(error);
-			throw error;
+			ShowErrorToaster(error);
 		} finally {
 			dispatch(ToggleCreateAgentSpinner(false));
 		}
@@ -113,7 +113,7 @@ export function CreateNewAgentAsync(
 }
 
 export function UpdateExistingAgentDataAsync(
-	existingAgentData: AgentDataDTO,
+	existingAgentData: AgentDataDTO | FormData,
 	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
@@ -129,10 +129,11 @@ export function UpdateExistingAgentDataAsync(
 					payload: response.responseData,
 				});
 				dispatch(GetAllAgentsDataAsync(accessToken) as any);
+				ShowSuccessToaster("Agent updated successfully!");
 			}
 		} catch (error: any) {
 			console.error(error);
-			throw error;
+			ShowErrorToaster(error);
 		} finally {
 			dispatch(ToggleEditAgentSpinner(false));
 		}
@@ -155,42 +156,15 @@ export function DeleteExistingAgentDataAsync(
 					type: DELETE_AGENT_DATA,
 					payload: response.responseData,
 				});
+
+				dispatch(GetAllAgentsDataAsync(accessToken) as any);
+				ShowSuccessToaster("Agent deleted successfully!");
 			}
 		} catch (error: any) {
 			console.error(error);
-			throw error;
+			ShowErrorToaster(error);
 		} finally {
 			dispatch(ToggleMainLoader(false));
-		}
-	};
-}
-
-export function InvokeChatAgentAsync(
-	chatRequest: ChatRequestDTO,
-	accessToken: string
-) {
-	return async (dispatch: Dispatch<Action>) => {
-		try {
-			dispatch(ToggleChatResponseSpinner(true));
-			const response = await InvokeChatAgentApiAsync(
-				chatRequest,
-				accessToken
-			);
-			if (response?.isSuccess && response?.responseData) {
-				dispatch({
-					type: GET_CHAT_RESPONSE,
-					payload: response.responseData,
-				});
-
-				return response.responseData as string;
-			}
-
-			return null;
-		} catch (error: any) {
-			console.error(error);
-			throw error;
-		} finally {
-			dispatch(ToggleChatResponseSpinner(false));
 		}
 	};
 }

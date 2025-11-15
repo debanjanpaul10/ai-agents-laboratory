@@ -1,5 +1,3 @@
-"use client";
-
 import { useIsAuthenticated } from "@azure/msal-react";
 
 import LoginPage from "@pages/login";

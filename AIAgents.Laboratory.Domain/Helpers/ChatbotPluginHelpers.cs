@@ -1,11 +1,4 @@
-﻿// *********************************************************************************
-//	<copyright file="ChatbotPluginHelpers.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>Chatbot Plugin helpers.</summary>
-// *********************************************************************************
-
-namespace AIAgents.Laboratory.Domain.Helpers;
+﻿namespace AIAgents.Laboratory.Domain.Helpers;
 
 /// <summary>
 /// The Chatbot Plugin Helpers class.
@@ -371,5 +364,55 @@ public static class ChatbotPluginHelpers
 		/// The input description
 		/// </summary>
 		public const string InputDescription = "The input is a JSON string containing a FollowupQuestionsRequestDomain object with `UserIntent`, `UserQuery` and `AiResponseData` properties";
+	}
+
+	/// <summary>
+	/// The conversation agent function.
+	/// </summary>
+	public static class ConversationAgentFunction
+	{
+		/// <summary>
+		/// The function name
+		/// </summary>
+		public const string FunctionName = nameof(ConversationAgentFunction);
+
+		/// <summary>
+		/// The function description
+		/// </summary>
+		public const string FunctionDescription = "Conversational agent to handle user chat message and reply to user in natural language.";
+
+		/// <summary>
+		/// The function instructions
+		/// </summary>
+		public const string FunctionInstructions =
+			"""
+			You are an AI assistant whose sole responsibility is to interact in a normal conversation with the user following these rules:
+				- Respond to user in natural language like having a conversation.
+				- Keep the responses concise and humorous.
+				- Always reply in normal conversational human like tone.
+				- You will also receive the conversation history and make sure to refer to them while answering.
+				- DO NOT DEVIATE FROM THE CONTEXT BASED ON THE CONVERSATION HISTORY.
+				- DO NOT ADD ANY CITATIONS LIKE [1][2] etc. IF THEY ARE PRESENT REMOVE THEM.
+					
+			Input:
+			++++++++++++
+
+			{{$user_message}}
+
+			+++++++++++	
+
+			History:
+			++++++++++++
+
+			{{$conversation_history}}
+
+			+++++++++++	
+
+			""";
+
+		/// <summary>
+		/// The input description
+		/// </summary>
+		public const string InputDescription = "The string containing the user message.";
 	}
 }

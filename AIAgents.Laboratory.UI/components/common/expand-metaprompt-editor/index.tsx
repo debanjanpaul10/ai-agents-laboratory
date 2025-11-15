@@ -1,6 +1,6 @@
 import { MouseEventHandler } from "react";
 import { Modal } from "@heroui/react";
-import { Minimize2, Sparkles } from "lucide-react";
+import { Minimize2, ScrollText } from "lucide-react";
 import { useMsal } from "@azure/msal-react";
 
 export default function ExpandMetapromptEditorComponent({
@@ -9,12 +9,14 @@ export default function ExpandMetapromptEditorComponent({
 	agentMetaprompt,
 	handleInputChange,
 	createdBy,
+	isNewAgent,
 }: {
 	expandedPromptModal: boolean;
 	handleCollapsePrompt: MouseEventHandler;
 	agentMetaprompt: string;
 	handleInputChange: any;
 	createdBy: string;
+	isNewAgent: boolean;
 }) {
 	const { accounts } = useMsal();
 
@@ -29,8 +31,8 @@ export default function ExpandMetapromptEditorComponent({
 					{/* Modal Header */}
 					<div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
 						<div className="flex items-center space-x-3">
-							<div className="bg-gradient-to-r from-orange-500 to-red-600 p-2 rounded-xl">
-								<Sparkles className="w-5 h-5 text-white" />
+							<div className="bg-green-400 rounded-full p-2 rounded-xl">
+								<ScrollText className="w-5 h-5 text-white-400" />
 							</div>
 							<div>
 								<h2 className="text-xl font-bold bg-gradient-to-r from-white via-orange-100 to-red-100 bg-clip-text text-transparent">
@@ -66,6 +68,7 @@ export default function ExpandMetapromptEditorComponent({
 									placeholder="Define your agent's behavior, personality, and capabilities in detail..."
 									className="w-full h-full bg-black/40 backdrop-blur-xl text-white placeholder:text-white/40 p-6 rounded-xl border border-white/10 hover:border-white/20 focus:border-orange-500/50 focus:outline-none resize-none font-mono relative z-10"
 									disabled={
+										!isNewAgent &&
 										accounts[0].username !== createdBy
 									}
 								/>
