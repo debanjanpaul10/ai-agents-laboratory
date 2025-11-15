@@ -9,6 +9,7 @@
     <TargetDatabaseSet>True</TargetDatabaseSet>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="PostDeploymentScripts" />
     <Folder Include="Tables\" />
   </ItemGroup>
   <Target Name="BeforeBuild">
