@@ -19,7 +19,7 @@ var credentials = builder.Environment.IsDevelopment()
 	});
 
 builder.ConfigureAzureAppConfiguration(credentials);
-builder.Services.ConfigureApplicationDependencies(builder.Configuration);
+builder.Services.ConfigureApplicationDependencies(builder.Configuration, builder.Environment.IsDevelopment());
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddOpenApi();

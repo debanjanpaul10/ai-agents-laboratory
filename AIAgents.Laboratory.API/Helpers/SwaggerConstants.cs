@@ -295,5 +295,25 @@ internal static class SwaggerConstants
             internal const string Description = "Gets the configuration data by key name.";
             internal const string OperationId = nameof(GetConfigurationByKeyNameAction);
         }
+
+        /// <summary>
+		/// Swagger documentation for AddBugReportDataAsync
+		/// </summary>
+		internal static class AddBugReportDataAction
+        {
+            internal const string Summary = "Adds the bug report data asynchronous.";
+            internal const string Description = "Creates a new bug report documentation by user/member to be reviewed by devs and fixed.";
+            internal const string OperationId = nameof(AddBugReportDataAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for SubmitFeatureRequestDataAsync.
+        /// </summary>
+        internal static class SubmitFeatureRequestDataAction
+        {
+            internal const string Summary = "Submits the feature request data asynchronous.";
+            internal const string Description = "Creates a new feature request documentation by user/member to be reviewed by devs and implemented.";
+            internal const string OperationId = nameof(SubmitFeatureRequestDataAction);
+        }
     }
 }

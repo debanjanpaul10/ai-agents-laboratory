@@ -36,9 +36,9 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     {
         var result = await skillsHandler.DetectUserIntentAsync(userQueryRequest).ConfigureAwait(false);
         if (!string.IsNullOrEmpty(result))
-            return base.HandleSuccessRequestResponse(result);
+            return HandleSuccessRequestResponse(result);
 
-        return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -55,9 +55,9 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     {
         var result = await skillsHandler.GetUserGreetingResponseAsync().ConfigureAwait(false);
         if (!string.IsNullOrEmpty(result))
-            return base.HandleSuccessRequestResponse(result);
+            return HandleSuccessRequestResponse(result);
 
-        return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -75,9 +75,9 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     {
         var result = await skillsHandler.GetRAGTextResponseAsync(ragTextInput).ConfigureAwait(false);
         if (!string.IsNullOrEmpty(result))
-            return base.HandleSuccessRequestResponse(result);
+            return HandleSuccessRequestResponse(result);
 
-        return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -95,9 +95,9 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     {
         var result = await skillsHandler.GetNLToSQLResponseAsync(nltosqlInput).ConfigureAwait(false);
         if (!string.IsNullOrEmpty(result))
-            return base.HandleSuccessRequestResponse(result);
+            return HandleSuccessRequestResponse(result);
 
-        return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -115,9 +115,9 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     {
         var result = await skillsHandler.GetSQLQueryMarkdownResponseAsync(sqlQueryResult.JsonQuery).ConfigureAwait(false);
         if (!string.IsNullOrEmpty(result))
-            return base.HandleSuccessRequestResponse(result);
+            return HandleSuccessRequestResponse(result);
 
-        return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -135,9 +135,9 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     {
         var result = await skillsHandler.GetFollowupQuestionsResponseAsync(followupQuestionsRequest).ConfigureAwait(false);
         if (result is not null && result.Any())
-            return base.HandleSuccessRequestResponse(result);
+            return HandleSuccessRequestResponse(result);
 
-        return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 }
 

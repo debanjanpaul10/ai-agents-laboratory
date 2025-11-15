@@ -1,4 +1,5 @@
 using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 
 namespace AIAgents.Laboratory.Domain.DrivingPorts;
 

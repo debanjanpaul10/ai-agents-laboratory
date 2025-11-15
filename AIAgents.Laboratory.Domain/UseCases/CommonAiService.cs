@@ -76,6 +76,7 @@ public class CommonAiService(IConfiguration configuration, ILogger<CommonAiServi
                 {
                     { AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant, configuration[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant]! },
                     { AzureAppConfigurationConstants.CurrentAiServiceProvider, configuration[AzureAppConfigurationConstants.CurrentAiServiceProvider]! },
+                    { AzureAppConfigurationConstants.IsFeedbackFeatureEnabled, configuration[AzureAppConfigurationConstants.IsFeedbackFeatureEnabled]! },
                 };
 
                 cacheService.SetCacheData(CacheKeys.AllAppSettingsKeyName, existingCacheData, CacheKeys.CacheExpirationTimeout);

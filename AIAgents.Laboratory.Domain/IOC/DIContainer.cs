@@ -22,5 +22,6 @@ public static class DIContainer
 		.AddScoped<ISkillsService, SkillsService>()
 		.AddScoped<IAgentsService, AgentsService>()
 		.AddScoped<IChatService, ChatService>()
-		.AddScoped<IConversationHistoryService, ConversationHistoryService>();
+		.AddScoped<IConversationHistoryService, ConversationHistoryService>()
+		.AddScoped<IFeedbackService, FeedbackService>();
 }
