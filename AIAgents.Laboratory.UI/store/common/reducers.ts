@@ -8,6 +8,10 @@ import {
 	TOGGLE_NEW_AGENT_DRAWER,
 	GET_ALL_CONFIGURATIONS,
 	GET_CONFIGURATION_BY_KEY_NAME,
+	ADD_NEW_BUG_REPORT,
+	TOGGLE_FEEDBACK_DRAWER,
+	TOGGLE_FEEDBACK_LOADER,
+	ADD_NEW_FEATURE_REQUEST,
 } from "@store/common/actionTypes";
 
 const initialState: any = {
@@ -20,6 +24,10 @@ const initialState: any = {
 	isDirectChatLoading: false,
 	configurations: {},
 	configurationValue: {},
+	newBugReport: {},
+	featureRequest: {},
+	isFeedbackDrawerOpen: false,
+	isFeedbackDrawerLoading: false,
 };
 
 export function CommonReducer(state = initialState, action: any) {
@@ -76,6 +84,30 @@ export function CommonReducer(state = initialState, action: any) {
 			return {
 				...state,
 				configurationValue: action.payload,
+			};
+		}
+		case ADD_NEW_BUG_REPORT: {
+			return {
+				...state,
+				newBugReport: action.payload,
+			};
+		}
+		case ADD_NEW_FEATURE_REQUEST: {
+			return {
+				...state,
+				featureRequest: action.payload,
+			};
+		}
+		case TOGGLE_FEEDBACK_DRAWER: {
+			return {
+				...state,
+				isFeedbackDrawerOpen: action.payload,
+			};
+		}
+		case TOGGLE_FEEDBACK_LOADER: {
+			return {
+				...state,
+				isFeedbackDrawerLoading: action.payload,
 			};
 		}
 

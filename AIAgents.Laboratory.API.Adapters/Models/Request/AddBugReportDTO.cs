@@ -38,10 +38,10 @@ public class AddBugReportDTO
     public string CreatedBy { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the page URL.
+    /// Gets or sets the Agent Details
     /// </summary>
     /// <value>
-    /// The page URL.
+    /// The Agent Details
     /// </value>
-    public string PageUrl { get; set; } = string.Empty;
+    public string AgentDetails { get; set; } = string.Empty;
 }

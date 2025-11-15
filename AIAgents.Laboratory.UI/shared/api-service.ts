@@ -1,8 +1,10 @@
 import { GetAsync, PostAsync } from "@helpers/http-utility";
+import { AddBugReportDTO } from "@models/add-bug-report-dto";
 import { AgentDataDTO } from "@models/agent-data-dto";
 import { ChatRequestDTO } from "@models/chat-request-dto";
 import { CreateAgentDTO } from "@models/create-agent-dto";
 import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
+import { NewFeatureRequestDTO } from "@models/new-feature-request-dto";
 
 export async function GetAgentsApiAsync(accessToken: string) {
 	return await GetAsync("agents/getallagents", accessToken);
@@ -63,7 +65,7 @@ export async function GetConversationHistoryDataForUserApiAsync(
 }
 
 export async function GetConfigurationsDataApiAsync(accessToken: string) {
-	return await GetAsync("configuration/getconfigurations", accessToken);
+	return await GetAsync("aiagentslab/getconfigurations", accessToken);
 }
 
 export async function GetConfigurationByKeyNameApiAsync(
@@ -71,7 +73,29 @@ export async function GetConfigurationByKeyNameApiAsync(
 	accessToken: string
 ) {
 	return await GetAsync(
-		`configuration/getconfigurationbykey/${keyName}`,
+		`aiagentslab/getconfigurationbykey/${keyName}`,
+		accessToken
+	);
+}
+
+export async function AddBugReportDataApiAsync(
+	addBugReport: AddBugReportDTO,
+	accessToken: string
+) {
+	return await PostAsync(
+		"aiagentslab/addbugreport",
+		addBugReport,
+		accessToken
+	);
+}
+
+export async function SubmitFeatureRequestDataApiAsync(
+	newFeatureRequest: NewFeatureRequestDTO,
+	accessToken: string
+) {
+	return await PostAsync(
+		"aiagents/submitfeaturerequest",
+		newFeatureRequest,
 		accessToken
 	);
 }

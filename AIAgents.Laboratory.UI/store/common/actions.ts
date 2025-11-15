@@ -1,10 +1,14 @@
 import { Action, Dispatch } from "redux";
 
 import {
+	AddBugReportDataApiAsync,
 	GetConfigurationByKeyNameApiAsync,
 	GetConfigurationsDataApiAsync,
+	SubmitFeatureRequestDataApiAsync,
 } from "@shared/api-service";
 import {
+	ADD_NEW_BUG_REPORT,
+	ADD_NEW_FEATURE_REQUEST,
 	GET_ALL_CONFIGURATIONS,
 	GET_CONFIGURATION_BY_KEY_NAME,
 	TOGGLE_AGENT_TEST_DRAWER,
@@ -12,10 +16,15 @@ import {
 	TOGGLE_DIRECT_CHAT_DRAWER,
 	TOGGLE_DIRECT_CHAT_LOADER,
 	TOGGLE_EDIT_AGENT_DRAWER,
+	TOGGLE_FEEDBACK_DRAWER,
+	TOGGLE_FEEDBACK_LOADER,
 	TOGGLE_MAIN_SPINNER,
 	TOGGLE_NEW_AGENT_DRAWER,
 } from "@store/common/actionTypes";
-import { ShowErrorToaster } from "@shared/toaster";
+import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
+import { AddBugReportDTO } from "@models/add-bug-report-dto";
+import { FEEDBACK_TYPES } from "@shared/types";
+import { NewFeatureRequestDTO } from "@models/new-feature-request-dto";
 
 export function ToggleNewAgentDrawer(isOpen: boolean) {
 	return {
@@ -66,6 +75,32 @@ export function ToggleDirectChatLoader(isLoading: boolean) {
 	};
 }
 
+export function ToggleFeedbackDrawer(
+	isDrawerOpen: boolean,
+	drawerType: FEEDBACK_TYPES
+) {
+	return {
+		type: TOGGLE_FEEDBACK_DRAWER,
+		payload: {
+			isDrawerOpen,
+			drawerType,
+		},
+	};
+}
+
+export function ToggleFeedbackLoader(
+	isDrawerLoading: boolean,
+	drawerType: FEEDBACK_TYPES
+) {
+	return {
+		type: TOGGLE_FEEDBACK_LOADER,
+		payload: {
+			isDrawerLoading,
+			drawerType,
+		},
+	};
+}
+
 export function GetAllConfigurations(accessToken: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
@@ -80,7 +115,7 @@ export function GetAllConfigurations(accessToken: string) {
 			}
 		} catch (error: any) {
 			console.error(error);
-			ShowErrorToaster(error);
+			if (error.message) ShowErrorToaster(error.message);
 		}
 	};
 }
@@ -105,7 +140,69 @@ export function GetConfigurationByKeyName(
 			}
 		} catch (error: any) {
 			console.error(error);
-			ShowErrorToaster(error);
+			if (error.message) ShowErrorToaster(error.message);
+		}
+	};
+}
+
+export function AddBugReportDataAsync(
+	bugReportData: AddBugReportDTO,
+	accessToken: string
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleFeedbackLoader(true, FEEDBACK_TYPES.BUGREPORT));
+			const response = await AddBugReportDataApiAsync(
+				bugReportData,
+				accessToken
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: ADD_NEW_BUG_REPORT,
+					payload: response.responseData,
+				});
+				ShowSuccessToaster("New Bug report created successfully");
+				dispatch(ToggleFeedbackDrawer(false, FEEDBACK_TYPES.BUGREPORT));
+
+				return response.responseData as {};
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleFeedbackLoader(false, FEEDBACK_TYPES.BUGREPORT));
+		}
+	};
+}
+
+export function SubmitFeatureRequestDataAsync(
+	newFeatureRequest: NewFeatureRequestDTO,
+	accessToken: string
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleFeedbackLoader(true, FEEDBACK_TYPES.NEWFEATURE));
+			const response = await SubmitFeatureRequestDataApiAsync(
+				newFeatureRequest,
+				accessToken
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: ADD_NEW_FEATURE_REQUEST,
+					payload: response.responseData,
+				});
+				ShowSuccessToaster("New Feature Request sent successfully");
+				dispatch(
+					ToggleFeedbackDrawer(false, FEEDBACK_TYPES.NEWFEATURE)
+				);
+
+				return response.responseData as {};
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleFeedbackLoader(false, FEEDBACK_TYPES.NEWFEATURE));
 		}
 	};
 }

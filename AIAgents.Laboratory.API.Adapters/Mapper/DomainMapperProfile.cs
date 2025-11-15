@@ -30,7 +30,8 @@ public class DomainMapperProfile : Profile
             .ForMember(destination => destination.BugStatusId, options => options.Ignore())
             .ForMember(destination => destination.BugSeverityId, option => option.MapFrom(source => source.BugSeverity))
             .ForMember(destination => destination.Title, option => option.MapFrom(source => source.BugTitle))
-            .ForMember(destination => destination.Description, option => option.MapFrom(source => source.BugDescription));
+            .ForMember(destination => destination.Description, option => option.MapFrom(source => source.BugDescription))
+            .ForMember(destination => destination.AgentDetails, option => option.MapFrom(source => source.AgentDetails));
         CreateMap<NewFeatureRequestDTO, NewFeatureRequestData>()
             .ForMember(destination => destination.Id, options => options.Ignore())
             .ForMember(destination => destination.Title, options => options.MapFrom(source => source.Title))

@@ -102,3 +102,10 @@ export const LoginPageConstants = {
 	HeaderText: "AI Agents Laboratory",
 	Subtext: "Welcome to the future of AI development",
 };
+
+export const SeverityOptions = [
+	{ value: 1, label: "Low", color: "text-green-400" },
+	{ value: 2, label: "Medium", color: "text-yellow-400" },
+	{ value: 3, label: "High", color: "text-orange-400" },
+	{ value: 4, label: "Critical", color: "text-red-400" },
+];

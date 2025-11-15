@@ -5,7 +5,7 @@ CREATE TABLE [dbo].[BugReportDetails]
   [Description] NVARCHAR(MAX) NOT NULL,
   [BugSeverityId] INT NOT NULL,
   [BugStatusId] INT NOT NULL,
-  [PageUrl] NVARCHAR(MAX) NULL,
+  [AgentDetails] NVARCHAR(MAX) NULL,
   [DateCreated] DATETIME NOT NULL DEFAULT GETUTCDATE(),
   [CreatedBy] NVARCHAR(MAX) NOT NULL,
   [DateModified] DATETIME NOT NULL DEFAULT GETUTCDATE(),

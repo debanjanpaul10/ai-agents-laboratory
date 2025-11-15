@@ -49,5 +49,5 @@ public class BugReportData : BaseEntity
     /// <summary>
     /// The agent id
     /// </summary>
-    public string AgentId { get; set; } = string.Empty;
+    public string AgentDetails { get; set; } = string.Empty;
 }
