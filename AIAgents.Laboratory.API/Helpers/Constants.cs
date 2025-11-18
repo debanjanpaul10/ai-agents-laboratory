@@ -168,6 +168,11 @@ internal static class Constants
         internal const string BaseConfigurationAppConfigKeyConstant = "BaseConfiguration";
 
         /// <summary>
+        /// The feature flag application configuration key constant.
+        /// </summary>
+        internal const string FeatureFlagAppConfigKeyConstant = "FeatureFlag";
+
+        /// <summary>
         /// The azure ad tenant identifier constant
         /// </summary>
         internal const string AzureAdTenantIdConstant = "TenantId";
