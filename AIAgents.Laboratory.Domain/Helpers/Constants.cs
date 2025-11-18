@@ -108,6 +108,11 @@ internal static class Constants
         /// The is feedback feature enabled
         /// </summary>
         internal const string IsFeedbackFeatureEnabled = "IsFeedbackFeatureEnabled";
+
+        /// <summary>
+        /// The is email notification enabled
+        /// </summary>
+        internal const string IsEmailNotificationEnabled = "IsEmailNotificationEnabled";
     }
 
     /// <summary>

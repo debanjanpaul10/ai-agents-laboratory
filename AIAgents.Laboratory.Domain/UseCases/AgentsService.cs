@@ -119,7 +119,9 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
                 Builders<AgentDataDomain>.Filter.Where(x => x.IsActive)).ConfigureAwait(false);
 
             // Process stored knowledge base data if available
-            foreach (var agent in agents) agent.ConvertKnowledgebaseBinaryDataToFile();
+            foreach (var agent in agents)
+                agent.ConvertKnowledgebaseBinaryDataToFile();
+
             return agents;
         }
         catch (Exception ex)
@@ -148,13 +150,11 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, updateDataDomain.AgentId));
 
             var filter = Builders<AgentDataDomain>.Filter.And(
-                Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
-                Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
+                Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
 
             var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(
                 MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
             var existingAgent = agentsData.FirstOrDefault() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
-
             var updates = new List<UpdateDefinition<AgentDataDomain>>
             {
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentMetaPrompt, updateDataDomain.AgentMetaPrompt),
