@@ -47,4 +47,15 @@ internal class Constants
         /// </summary>
         internal const string KeyNameIsNullMessageConstant = "Key name is null or empty";
     }
+
+    /// <summary>
+    /// The azure application configuration constants class.
+    /// </summary>
+    internal static class AzureAppConfigurationConstants
+    {
+        /// <summary>
+        /// The is cache service enabled.
+        /// </summary>
+        internal const string IsCacheServiceEnabled = "IsCacheServiceEnabled";
+    }
 }

@@ -113,6 +113,11 @@ internal static class Constants
         /// The is email notification enabled
         /// </summary>
         internal const string IsEmailNotificationEnabled = "IsEmailNotificationEnabled";
+
+        /// <summary>
+        /// The is cache service enabled.
+        /// </summary>
+        internal const string IsCacheServiceEnabled = "IsCacheServiceEnabled";
     }
 
     /// <summary>

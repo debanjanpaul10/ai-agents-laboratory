@@ -1,17 +1,10 @@
 import { useState } from "react";
 import { Button, Input, Select, SelectItem } from "@heroui/react";
-import {
-	Bug,
-	FileText,
-	AlertTriangle,
-	Link as LinkIcon,
-	Send,
-	X,
-} from "lucide-react";
+import { Bug, FileText, AlertTriangle, Send, X, Info, Bot } from "lucide-react";
 
 import { AddBugReportDTO } from "@models/add-bug-report-dto";
 import { useAuth } from "@auth/AuthProvider";
-import { SeverityOptions } from "@helpers/constants";
+import { BugReportConstants, SeverityOptions } from "@helpers/constants";
 import { useAppDispatch } from "@store/index";
 import { ShowErrorToaster } from "@shared/toaster";
 import { AddBugReportDataAsync } from "@store/common/actions";
@@ -76,10 +69,10 @@ export default function BugReportComponent({
 					</div>
 					<div>
 						<h2 className="text-xl font-bold bg-gradient-to-r from-white via-red-100 to-orange-100 bg-clip-text text-transparent">
-							Report a Bug
+							{BugReportConstants.Headers.Heading}
 						</h2>
 						<p className="text-white/50 text-sm">
-							Help us improve by reporting issues
+							{BugReportConstants.Headers.SubHeading}
 						</p>
 					</div>
 				</div>
@@ -109,7 +102,9 @@ export default function BugReportComponent({
 							onChange={(e) =>
 								handleInputChange("bugTitle", e.target.value)
 							}
-							placeholder="Brief description of the bug"
+							placeholder={
+								BugReportConstants.Placeholders.BugTitle
+							}
 							className="relative"
 							radius="full"
 							classNames={{
@@ -148,7 +143,9 @@ export default function BugReportComponent({
 									value ? parseInt(value as string) : 0
 								);
 							}}
-							placeholder="Select severity level"
+							placeholder={
+								BugReportConstants.Placeholders.BugSeverity
+							}
 							className="relative"
 							radius="full"
 							disallowEmptySelection={false}
@@ -193,7 +190,9 @@ export default function BugReportComponent({
 									e.target.value
 								)
 							}
-							placeholder="Describe the bug in detail. Include steps to reproduce, expected behavior, and actual behavior."
+							placeholder={
+								BugReportConstants.Placeholders.BugDescription
+							}
 							rows={8}
 							className="w-full bg-white/5 border border-white/10 text-white placeholder:text-white/40 resize-none px-4 py-3 rounded-xl hover:border-white/20 focus:border-blue-500/50 focus:outline-none transition-colors duration-200"
 						/>
@@ -203,7 +202,7 @@ export default function BugReportComponent({
 				{/* Agent Details Field */}
 				<div className="space-y-2">
 					<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
-						<LinkIcon className="w-4 h-4 text-purple-400" />
+						<Bot className="w-4 h-4 text-purple-400" />
 						<span>Agent Name or Agent ID (Optional)</span>
 					</label>
 					<div className="relative group">
@@ -216,7 +215,9 @@ export default function BugReportComponent({
 									e.target.value
 								)
 							}
-							placeholder="The name or ID of Agent"
+							placeholder={
+								BugReportConstants.Placeholders.AgentName
+							}
 							className="relative"
 							radius="full"
 							classNames={{
@@ -226,6 +227,14 @@ export default function BugReportComponent({
 							}}
 						/>
 					</div>
+				</div>
+
+				{/* SubText */}
+				<div className="space-y-2">
+					<p className="text-white/50 text-sm font-medium flex items-center space-x-2">
+						<Info className="w-4 h-4 text-yellow-400" />
+						<span>{BugReportConstants.PIIMessage}</span>
+					</p>
 				</div>
 			</div>
 
@@ -244,7 +253,7 @@ export default function BugReportComponent({
 						className="flex items-center bg-gradient-to-r from-red-500 to-orange-600 text-white font-semibold hover:from-red-600 hover:to-orange-700 transition-all duration-300 px-6 py-3 min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
 						radius="full"
 					>
-						<Send className="w-4 h-4" />
+						{!isSubmitting && <Send className="w-4 h-4" />}
 						<span className="ml-2">Submit Bug Report</span>
 					</Button>
 				</div>
