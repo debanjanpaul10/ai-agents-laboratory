@@ -34,7 +34,7 @@ jobs:
     build-api:
         name: Build API solution
         runs-on: ubuntu-latest
-        if: ${{ inputs.deploy_api }}
+        if: ${{ github.event_name == 'push' || inputs.deploy_api }}
         outputs:
             artifact_path: ${{ steps.set-artifact-path.outputs.path }}
         steps:
@@ -87,7 +87,7 @@ jobs:
 
     build-and-deploy-web:
         name: Build and Deploy UI solution
-        if: ${{ inputs.deploy_ui }}
+        if: ${{ github.event_name == 'push' || inputs.deploy_ui }}
         runs-on: ubuntu-latest
         environment: Production
 
@@ -117,7 +117,7 @@ jobs:
     build-database:
         name: Build Database project
         runs-on: windows-latest
-        if: ${{ inputs.deploy_db }}
+        if: ${{ github.event_name == 'push' || inputs.deploy_db }}
         outputs:
             artifact_path: ${{ steps.set-artifact-path.outputs.path }}
 
