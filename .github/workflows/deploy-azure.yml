@@ -6,6 +6,10 @@ env:
     DATABASE_PROJECT_PATH: AIAgents.Laboratory.Database/AIAgents.Laboratory.Database.sqlproj
 
 on:
+    push:
+        branches:
+            - main
+            - dev
     workflow_dispatch:
         inputs:
             deploy_api:
