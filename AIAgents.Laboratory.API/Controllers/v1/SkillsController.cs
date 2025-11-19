@@ -2,7 +2,6 @@ using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Helpers;
-using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.Constants;
@@ -17,8 +16,8 @@ namespace AIAgents.Laboratory.API.Controllers.v1;
 /// <param name="skillsHandler">The skills handler adapter.</param>
 /// <seealso cref="AIAgents.Laboratory.API.Controllers.BaseController" />
 [ApiController]
-[ApiVersion(1.0)]
-[Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
+[ApiVersion("1")]
+[Route("aiagentsapi/v{version:apiVersion}/[controller]")]
 public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsHandler skillsHandler) : BaseController(httpContextAccessor)
 {
     /// <summary>
