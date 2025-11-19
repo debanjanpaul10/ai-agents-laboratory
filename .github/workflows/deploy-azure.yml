@@ -3,6 +3,7 @@ name: Build and Deploy AI Agents Laboratory
 env:
     API_PROJECT_PATH: AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj
     UI_PROJECT_PATH: AIAgents.Laboratory.UI
+    DATABASE_PROJECT_PATH: AIAgents.Laboratory.Database/AIAgents.Laboratory.Database.sqlproj
 
 on:
     workflow_dispatch:
@@ -15,6 +16,12 @@ on:
 
             deploy_ui:
                 description: "AIAgents.Laboratory.UI"
+                required: false
+                default: true
+                type: boolean
+
+            deploy_db:
+                description: "AIAgents.Laboratory.Database"
                 required: false
                 default: true
                 type: boolean
@@ -102,3 +109,70 @@ jobs:
                   action: "upload"
                   app_location: ${{ env.UI_PROJECT_PATH }}
                   output_location: "out"
+
+    build-database:
+        name: Build AIAgents.Laboratory.Database
+        runs-on: windows-latest
+        if: ${{ inputs.deploy_db }}
+        outputs:
+            artifact_path: ${{ steps.set-artifact-path.outputs.path }}
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Setup .NET 10
+              uses: actions/setup-dotnet@v3
+              with:
+                  dotnet-version: "10.0.x"
+
+            - name: Install dependencies and build DB solution
+              run: |
+                  dotnet restore ${{ env.DATABASE_PROJECT_PATH }}
+                  dotnet build ${{ env.DATABASE_PROJECT_PATH }} --configuration Release --no-restore
+
+            - name: Publish the dacpac file
+              run: |
+                  dotnet publish ${{ env.DATABASE_PROJECT_PATH }} --configuration Release --output ./publish-db
+
+            - name: Set datbase objects artifact path
+              id: set-artifact-path
+              run: echo "path=./publish-db" >> $GITHUB_OUTPUT
+
+            - name: Upload Database Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: db-artifact
+                  path: ./publish-db
+
+    deploy-database:
+        name: Deploy AIAgents.Laboratory.Database
+        runs-on: windows-latest
+        needs: build-database
+        environment: Production
+        permissions:
+            id-token: write
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Azure Login
+              uses: azure/login@v2
+              with:
+                  client-id: ${{ secrets.AZURE_CLIENT_ID }}
+                  tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                  subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+            - name: Download database artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: db-artifact
+                  path: ./publish-db
+
+            - name: Deploy to Azure SQL Database
+              uses: azure/sql-action@v2.3
+              with:
+                  connection-string: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
+                  path: "./publish-db/AIAgents.Laboratory.Database.dacpac"
+                  action: "publish"
+                  arguments: "/p:DropObjectsNotInSource=true /p:BlockOnPossibleDataLoss=false /p:IgnoreUserSettingsObjects=true /p:IgnoreLoginSids=true /p:IgnorePermissions=true /p:IgnoreRoleMembership=true"
