@@ -31,4 +31,12 @@ public class AgentDataDTO : CreateAgentDTO
 	/// The date created.
 	/// </value>
 	public DateTime DateCreated { get; set; }
+
+	/// <summary>
+	/// Gets or sets the is default chatbot boolean flag.
+	/// </summary>
+	/// <value>
+	/// The boolean flag for is default chat bot.
+	/// </value>
+	public bool IsDefaultChatbot { get; set; } = false;
 }

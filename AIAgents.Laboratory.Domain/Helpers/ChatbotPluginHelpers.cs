@@ -5,31 +5,31 @@
 /// </summary>
 public static class ChatbotPluginHelpers
 {
-	/// <summary>
-	/// The plugin name
-	/// </summary>
-	public const string PluginName = "ChatbotPlugin";
+    /// <summary>
+    /// The plugin name
+    /// </summary>
+    public const string PluginName = "ChatbotPlugin";
 
-	/// <summary>
-	/// The Determine user intent function.
-	/// </summary>
-	public static class DetermineUserIntentFunction
-	{
-		/// <summary>
-		/// The function name
-		/// </summary>
-		public const string FunctionName = nameof(DetermineUserIntentFunction);
+    /// <summary>
+    /// The Determine user intent function.
+    /// </summary>
+    public static class DetermineUserIntentFunction
+    {
+        /// <summary>
+        /// The function name
+        /// </summary>
+        public const string FunctionName = nameof(DetermineUserIntentFunction);
 
-		/// <summary>
-		/// The function description
-		/// </summary>
-		public const string FunctionDescription = "Determines the user's intent based on the query asked by user.";
+        /// <summary>
+        /// The function description
+        /// </summary>
+        public const string FunctionDescription = "Determines the user's intent based on the query asked by user.";
 
-		/// <summary>
-		/// The function instructions
-		/// </summary>
-		public const string FunctionInstructions =
-			"""
+        /// <summary>
+        /// The function instructions
+        /// </summary>
+        public const string FunctionInstructions =
+            """
 			You are an AI assistant tasked with analyzing user queries to determine their intent. Follow the below instructions strictly:
 				1. Users will provide you with a question or query and you need to carefully analyze the content, context, and keywords to understand what they are trying to accomplish.
 				2. Classify the user's intent into one of the following categories based on the analysis:
@@ -50,32 +50,32 @@ public static class ChatbotPluginHelpers
 
 			""";
 
-		/// <summary>
-		/// The input description
-		/// </summary>
-		public const string InputDescription = "The string containing the user's question from which intent needs to be determined.";
-	}
+        /// <summary>
+        /// The input description
+        /// </summary>
+        public const string InputDescription = "The string containing the user's question from which intent needs to be determined.";
+    }
 
-	/// <summary>
-	/// The greeting function.
-	/// </summary>
-	public static class GreetingFunction
-	{
-		/// <summary>
-		/// The function name
-		/// </summary>
-		public const string FunctionName = nameof(GreetingFunction);
+    /// <summary>
+    /// The greeting function.
+    /// </summary>
+    public static class GreetingFunction
+    {
+        /// <summary>
+        /// The function name
+        /// </summary>
+        public const string FunctionName = nameof(GreetingFunction);
 
-		/// <summary>
-		/// The function description
-		/// </summary>
-		public const string FunctionDescription = "Gets a greeting for the user.";
+        /// <summary>
+        /// The function description
+        /// </summary>
+        public const string FunctionDescription = "Gets a greeting for the user.";
 
-		/// <summary>
-		/// The function instructions
-		/// </summary>
-		public const string FunctionInstructions =
-			"""
+        /// <summary>
+        /// The function instructions
+        /// </summary>
+        public const string FunctionInstructions =
+            """
 			You are solely responsible for greeting the user based on the type of message user has greeted you with.
 				- Return a greeting like "Hello how are you, I am your Assistant AI Agent" or simply "Good morning" or "Good Evening" based on the user's greeting.
 				- Understand the context and only return the greeting and nothing else. Do not give any explanations or anything.
@@ -88,32 +88,32 @@ public static class ChatbotPluginHelpers
 			+++++++++++
 			""";
 
-		/// <summary>
-		/// The input description
-		/// </summary>
-		public const string InputDescription = "The string containing the user's query or question.";
-	}
+        /// <summary>
+        /// The input description
+        /// </summary>
+        public const string InputDescription = "The string containing the user's query or question.";
+    }
 
-	/// <summary>
-	/// The NL to SQL function.
-	/// </summary>
-	public static class NLToSqlSkillFunction
-	{
-		/// <summary>
-		/// The function name
-		/// </summary>
-		public const string FunctionName = nameof(NLToSqlSkillFunction);
+    /// <summary>
+    /// The NL to SQL function.
+    /// </summary>
+    public static class NLToSqlSkillFunction
+    {
+        /// <summary>
+        /// The function name
+        /// </summary>
+        public const string FunctionName = nameof(NLToSqlSkillFunction);
 
-		/// <summary>
-		/// The function description
-		/// </summary>
-		public const string FunctionDescription = "Creates a SQL query based on the user input and the knowledge base.";
+        /// <summary>
+        /// The function description
+        /// </summary>
+        public const string FunctionDescription = "Creates a SQL query based on the user input and the knowledge base.";
 
-		/// <summary>
-		/// The function instructions
-		/// </summary>
-		public const string FunctionInstructions =
-			"""
+        /// <summary>
+        /// The function instructions
+        /// </summary>
+        public const string FunctionInstructions =
+            """
 			You are an AI assistant specialized in converting natural language queries into SQL statements. Follow the below instructions strictly:
 				1. Users will provide you with a natural language question that requires data retrieval from a database, and you need to generate the appropriate SQL query.
 				2. You will be provided with three key components to help you create accurate SQL queries:
@@ -167,16 +167,16 @@ public static class ChatbotPluginHelpers
 			
 			""";
 
-		/// <summary>
-		/// The input description
-		/// </summary>
-		public const string InputDescription = "The string containing the user's question from which SQL query needs to be created.";
+        /// <summary>
+        /// The input description
+        /// </summary>
+        public const string InputDescription = "The string containing the user's question from which SQL query needs to be created.";
 
-		/// <summary>
-		/// The format SQL response to markdown instructions
-		/// </summary>
-		public const string FormatSQLResponseToMarkdownInstructions =
-			"""
+        /// <summary>
+        /// The format SQL response to markdown instructions
+        /// </summary>
+        public const string FormatSQLResponseToMarkdownInstructions =
+            """
 			You are an AI assistant specialized in converting the given SQL data from JSON Format to a clean markdown format. Follow the instructions:
 				- Do not add any justifications or comments, take the input as is and provide a clean output in markdown format that has table format.
 				- Take the json data and properly arrange them in clean tabular format so that it will be dumped to the UI for user to read.
@@ -190,28 +190,28 @@ public static class ChatbotPluginHelpers
 			+++++++++++
 
 			""";
-	}
+    }
 
-	/// <summary>
-	/// The RAG Text Skill Function.
-	/// </summary>
-	public static class RAGTextSkillFunction
-	{
-		/// <summary>
-		/// The function name
-		/// </summary>
-		public const string FunctionName = nameof(RAGTextSkillFunction);
+    /// <summary>
+    /// The RAG Text Skill Function.
+    /// </summary>
+    public static class RAGTextSkillFunction
+    {
+        /// <summary>
+        /// The function name
+        /// </summary>
+        public const string FunctionName = nameof(RAGTextSkillFunction);
 
-		/// <summary>
-		/// The function description
-		/// </summary>
-		public const string FunctionDescription = "Gets a text data from the passed user question and the knowledge base.";
+        /// <summary>
+        /// The function description
+        /// </summary>
+        public const string FunctionDescription = "Gets a text data from the passed user question and the knowledge base.";
 
-		/// <summary>
-		/// The function instructions
-		/// </summary>
-		public const string FunctionInstructions =
-			"""
+        /// <summary>
+        /// The function instructions
+        /// </summary>
+        public const string FunctionInstructions =
+            """
 			You are an AI assistant specialized in Retrieval-Augmented Generation (RAG) for answering user questions using a provided knowledge base. Follow the below instructions strictly:
 				1. Users will provide you with a question or query that requires information retrieval and text generation, and you need to generate a comprehensive, well-formatted answer.
 				2. You will be provided with two key components to help you create accurate responses:
@@ -258,32 +258,32 @@ public static class ChatbotPluginHelpers
 					
 			""";
 
-		/// <summary>
-		/// The input description
-		/// </summary>
-		public const string InputDescription = "The string containing user's question or query from which RAG text needs to be gotten.";
-	}
+        /// <summary>
+        /// The input description
+        /// </summary>
+        public const string InputDescription = "The string containing user's question or query from which RAG text needs to be gotten.";
+    }
 
-	/// <summary>
-	/// The SQL query markdown response function.
-	/// </summary>
-	public static class SQLQueryMarkdownResponseFunction
-	{
-		/// <summary>
-		/// The function name
-		/// </summary>
-		public const string FunctionName = nameof(SQLQueryMarkdownResponseFunction);
+    /// <summary>
+    /// The SQL query markdown response function.
+    /// </summary>
+    public static class SQLQueryMarkdownResponseFunction
+    {
+        /// <summary>
+        /// The function name
+        /// </summary>
+        public const string FunctionName = nameof(SQLQueryMarkdownResponseFunction);
 
-		/// <summary>
-		/// The function description
-		/// </summary>
-		public const string FunctionDescription = "Takes the json input of database and turns into a table readable format for user in markdown format";
+        /// <summary>
+        /// The function description
+        /// </summary>
+        public const string FunctionDescription = "Takes the json input of database and turns into a table readable format for user in markdown format";
 
-		/// <summary>
-		/// The function instructions
-		/// </summary>
-		public const string FunctionInstructions =
-			"""
+        /// <summary>
+        /// The function instructions
+        /// </summary>
+        public const string FunctionInstructions =
+            """
 			You are an AI assistant whose sole responsibility is to show the JSON in a presentable format back to the user. Strictly ahere to the following rules:
 				- The input you will receive will contain unstructured JSON data which will contain SQL response.
 				- You will be creating a markdown format from this JSON that will be presented back to the UI for user.
@@ -299,31 +299,31 @@ public static class ChatbotPluginHelpers
 
 			""";
 
-		/// <summary>
-		/// The input description
-		/// </summary>
-		public const string InputDescription = "The json containing the data that will be formatted.";
-	}
+        /// <summary>
+        /// The input description
+        /// </summary>
+        public const string InputDescription = "The json containing the data that will be formatted.";
+    }
 
-	/// <summary>
-	/// The generate followup questions function.
-	/// </summary>
-	public static class GenerateFollowupQuestionsFunction
-	{
-		/// <summary>
-		/// The function name
-		/// </summary>
-		public const string FunctionName = nameof(GenerateFollowupQuestionsFunction);
+    /// <summary>
+    /// The generate followup questions function.
+    /// </summary>
+    public static class GenerateFollowupQuestionsFunction
+    {
+        /// <summary>
+        /// The function name
+        /// </summary>
+        public const string FunctionName = nameof(GenerateFollowupQuestionsFunction);
 
-		/// <summary>
-		/// The function description
-		/// </summary>
-		public const string FunctionDescription = "Generates followup questions based on the AI response.";
+        /// <summary>
+        /// The function description
+        /// </summary>
+        public const string FunctionDescription = "Generates followup questions based on the AI response.";
 
-		/// <summary>
-		/// The function instructions
-		/// </summary>
-		public const string FunctionInstructions = """
+        /// <summary>
+        /// The function instructions
+        /// </summary>
+        public const string FunctionInstructions = """
 			You are an AI assitant whose sole responsibility is to generate exactly three followup questions based on the passed parameters. Strictly adhere to the following rules:
 				- You will not use any pre-trained knowledge when creating the questions.
 				- These questions will be some questions that user will ask you back based on your previous response.
@@ -360,59 +360,9 @@ public static class ChatbotPluginHelpers
 			+++++++++++	
 			""";
 
-		/// <summary>
-		/// The input description
-		/// </summary>
-		public const string InputDescription = "The input is a JSON string containing a FollowupQuestionsRequestDomain object with `UserIntent`, `UserQuery` and `AiResponseData` properties";
-	}
-
-	/// <summary>
-	/// The conversation agent function.
-	/// </summary>
-	public static class ConversationAgentFunction
-	{
-		/// <summary>
-		/// The function name
-		/// </summary>
-		public const string FunctionName = nameof(ConversationAgentFunction);
-
-		/// <summary>
-		/// The function description
-		/// </summary>
-		public const string FunctionDescription = "Conversational agent to handle user chat message and reply to user in natural language.";
-
-		/// <summary>
-		/// The function instructions
-		/// </summary>
-		public const string FunctionInstructions =
-			"""
-			You are an AI assistant whose sole responsibility is to interact in a normal conversation with the user following these rules:
-				- Respond to user in natural language like having a conversation.
-				- Keep the responses concise and humorous.
-				- Always reply in normal conversational human like tone.
-				- You will also receive the conversation history and make sure to refer to them while answering.
-				- DO NOT DEVIATE FROM THE CONTEXT BASED ON THE CONVERSATION HISTORY.
-				- DO NOT ADD ANY CITATIONS LIKE [1][2] etc. IF THEY ARE PRESENT REMOVE THEM.
-					
-			Input:
-			++++++++++++
-
-			{{$user_message}}
-
-			+++++++++++	
-
-			History:
-			++++++++++++
-
-			{{$conversation_history}}
-
-			+++++++++++	
-
-			""";
-
-		/// <summary>
-		/// The input description
-		/// </summary>
-		public const string InputDescription = "The string containing the user message.";
-	}
+        /// <summary>
+        /// The input description
+        /// </summary>
+        public const string InputDescription = "The input is a JSON string containing a FollowupQuestionsRequestDomain object with `UserIntent`, `UserQuery` and `AiResponseData` properties";
+    }
 }

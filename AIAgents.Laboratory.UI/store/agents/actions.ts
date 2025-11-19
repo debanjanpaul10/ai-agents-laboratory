@@ -65,7 +65,6 @@ export function GetAllAgentsDataAsync(accessToken: string) {
 export function GetAgentDataByIdAsync(agentId: string, accessToken: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
-			dispatch(ToggleMainLoader(true));
 			const response = await GetAgentByIdApiAsync(agentId, accessToken);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -76,8 +75,6 @@ export function GetAgentDataByIdAsync(agentId: string, accessToken: string) {
 		} catch (error: any) {
 			console.error(error);
 			ShowErrorToaster(error);
-		} finally {
-			dispatch(ToggleMainLoader(false));
 		}
 	};
 }

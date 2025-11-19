@@ -91,4 +91,12 @@ public class AgentDataDomain
 	/// The boolean flag for private agent.
 	/// </value>
 	public bool IsPrivate { get; set; } = false;
+
+	/// <summary>
+	/// Gets or sets the is default chatbot boolean flag.
+	/// </summary>
+	/// <value>
+	/// The boolean flag for is default chat bot.
+	/// </value>
+	public bool IsDefaultChatbot { get; set; } = false;
 }

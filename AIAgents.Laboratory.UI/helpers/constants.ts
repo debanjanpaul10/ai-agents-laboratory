@@ -139,3 +139,7 @@ export const NewFeatureRequestConstants = {
 	PIIMessage:
 		"Please do not add any PII (Personally Identifiable Information)",
 };
+
+export const ApplicationConstants = {
+	ChatbotAgentConfigKeyName: "AIChatbotAgentId",
+};
