@@ -19,18 +19,18 @@ namespace AIAgents.Laboratory.API.Controllers.v1;
 [Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
 public class HealthCheckController(IHttpContextAccessor httpContextAccessor, ICommonAiHandler commonAiHandler) : BaseController(httpContextAccessor)
 {
-	/// <summary>
-	/// Gets the agent status.
-	/// </summary>
-	/// <returns>The agent status data dto.</returns>
-	[HttpGet(RouteConstants.HealthCheckRoutes.GetAgentStatus_Route)]
-	[ProducesResponseType(typeof(AgentStatusDTO), StatusCodes.Status200OK)]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	[SwaggerOperation(Summary = GetAgentStatusAction.Summary, Description = GetAgentStatusAction.Description, OperationId = GetAgentStatusAction.OperationId)]
-	public IActionResult GetAgentStatus()
-	{
-		return Ok(commonAiHandler.GetAgentCurrentStatus());
-	}
+    /// <summary>
+    /// Gets the agent status.
+    /// </summary>
+    /// <returns>The agent status data dto.</returns>
+    [HttpGet(RouteConstants.HealthCheckRoutes.GetAgentStatus_Route)]
+    [ProducesResponseType(typeof(AgentStatusDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = GetAgentStatusAction.Summary, Description = GetAgentStatusAction.Description, OperationId = GetAgentStatusAction.OperationId)]
+    public IActionResult GetAgentStatus()
+    {
+        return base.Ok(commonAiHandler.GetAgentCurrentStatus());
+    }
 }

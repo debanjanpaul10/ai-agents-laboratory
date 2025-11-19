@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build">
+  <Sdk Name="Microsoft.Build.Sql" Version="1.0.0" />
+  <PropertyGroup>
+    <Name>AIAgents.Laboratory.Database</Name>
+    <ProjectGuid>{9c60d98f-ade9-44fc-86a1-c3acdf3e54cf}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
+    <ModelCollation>1033, CI</ModelCollation>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <IncludeSchemaNameInFileName>True</IncludeSchemaNameInFileName>
+    <EnableDefaultSqlItems>false</EnableDefaultSqlItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="PostDeploymentScripts" />
+    <Folder Include="Tables\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\BugReportDetails.sql" />
+    <Build Include="Tables\BugItemStatusMapping.sql" />
+    <Build Include="Tables\BugSeverityMapping.sql" />
+    <Build Include="Tables\NewFeatureRequests.sql" />
+  </ItemGroup>
+</Project>

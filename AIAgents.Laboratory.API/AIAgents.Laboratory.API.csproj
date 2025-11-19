@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Controllers\v2\AIAgentsLabController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Asp.Versioning.Abstractions" Version="8.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
@@ -21,6 +25,7 @@
     <ProjectReference Include="..\AIAgents.Laboratory.Messaging.Adapters\AIAgents.Laboratory.Messaging.Adapters.csproj" />
     <ProjectReference Include="..\AIAgents.Laboratory.Persistence.Caching\AIAgents.Laboratory.Persistence.Caching.csproj" />
     <ProjectReference Include="..\AIAgents.Laboratory.Persistence.MongoDatabase\AIAgents.Laboratory.Persistence.MongoDatabase.csproj" />
+    <ProjectReference Include="..\AIAgents.Laboratory.Persistence.SQLDatabase\AIAgents.Laboratory.Persistence.SQLDatabase.csproj" />
     <ProjectReference Include="..\AIAgents.Laboratory.Processor\AIAgents.Laboratory.Processor.csproj" />
     <ProjectReference Include="..\AIAgents.Laboratory.SemanticKernel.Adapters\AIAgents.Laboratory.SemanticKernel.Adapters.csproj" />
   </ItemGroup>

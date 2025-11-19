@@ -35,11 +35,13 @@ public class PluginsController(IHttpContextAccessor httpContextAccessor, IPlugin
     [SwaggerOperation(Summary = RewriteTextAction.Summary, Description = RewriteTextAction.Description, OperationId = RewriteTextAction.OperationId)]
     public async Task<ResponseDTO> RewriteTextAsync(UserStoryRequestDTO requestDto)
     {
+        ArgumentNullException.ThrowIfNull(requestDto);
+
         var result = await pluginsHandler.RewriteTextAsync(requestDto.Story).ConfigureAwait(false);
         if (!string.IsNullOrEmpty(result))
-            return base.HandleSuccessRequestResponse(result);
+            return HandleSuccessRequestResponse(result);
 
-        return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -55,11 +57,13 @@ public class PluginsController(IHttpContextAccessor httpContextAccessor, IPlugin
     [SwaggerOperation(Summary = GenerateTagForStoryAction.Summary, Description = GenerateTagForStoryAction.Description, OperationId = GenerateTagForStoryAction.OperationId)]
     public async Task<ResponseDTO> GenerateTagForStoryAsync(UserStoryRequestDTO requestDto)
     {
+        ArgumentNullException.ThrowIfNull(requestDto);
+
         var result = await pluginsHandler.GenerateTagForStoryAsync(requestDto.Story).ConfigureAwait(false);
         if (!string.IsNullOrEmpty(result))
-            return base.HandleSuccessRequestResponse(result);
+            return HandleSuccessRequestResponse(result);
 
-        return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -75,11 +79,13 @@ public class PluginsController(IHttpContextAccessor httpContextAccessor, IPlugin
     [SwaggerOperation(Summary = ModerateContentDataAction.Summary, Description = ModerateContentDataAction.Description, OperationId = ModerateContentDataAction.OperationId)]
     public async Task<ResponseDTO> ModerateContentDataAsync(UserStoryRequestDTO requestDto)
     {
+        ArgumentNullException.ThrowIfNull(requestDto);
+
         var result = await pluginsHandler.ModerateContentDataAsync(requestDto.Story).ConfigureAwait(false);
         if (!string.IsNullOrEmpty(result))
-            return base.HandleSuccessRequestResponse(result);
+            return HandleSuccessRequestResponse(result);
 
-        return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -95,10 +101,12 @@ public class PluginsController(IHttpContextAccessor httpContextAccessor, IPlugin
     [SwaggerOperation(Summary = GetBugSeverityAction.Summary, Description = GetBugSeverityAction.Description, OperationId = GetBugSeverityAction.OperationId)]
     public async Task<ResponseDTO> GetBugSeverityAsync([FromBody] BugSeverityInputDTO bugSeverityInput)
     {
+        ArgumentNullException.ThrowIfNull(bugSeverityInput);
+
         var result = await pluginsHandler.GetBugSeverityAsync(bugSeverityInput).ConfigureAwait(false);
         if (!string.IsNullOrEmpty(result))
-            return base.HandleSuccessRequestResponse(result);
+            return HandleSuccessRequestResponse(result);
 
-        return base.HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 }

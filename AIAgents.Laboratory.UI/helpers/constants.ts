@@ -102,3 +102,40 @@ export const LoginPageConstants = {
 	HeaderText: "AI Agents Laboratory",
 	Subtext: "Welcome to the future of AI development",
 };
+
+export const SeverityOptions = [
+	{ value: 1, label: "Low", color: "text-green-400" },
+	{ value: 2, label: "Medium", color: "text-yellow-400" },
+	{ value: 3, label: "High", color: "text-orange-400" },
+	{ value: 4, label: "Critical", color: "text-red-400" },
+];
+
+export const BugReportConstants = {
+	Headers: {
+		Heading: "Report a Bug",
+		SubHeading: "Help us improve by reporting issues",
+	},
+	Placeholders: {
+		BugTitle: "Brief description of the bug",
+		BugDescription:
+			"Describe the bug in detail. Include steps to reproduce, expected behavior, and actual behavior.",
+		AgentName: "The name or ID of Agent",
+		BugSeverity: "Select severity level",
+	},
+	PIIMessage:
+		"Please do not add any PII (Personally Identifiable Information)",
+};
+
+export const NewFeatureRequestConstants = {
+	Headers: {
+		Heading: "Request a Feature",
+		SubHeading: "Share your ideas to help us improve",
+	},
+	Placeholders: {
+		FeatureTitle: "Brief title for your feature request",
+		FeatureDescription:
+			"Describe your feature request in detail. What problem does it solve? How would it work?",
+	},
+	PIIMessage:
+		"Please do not add any PII (Personally Identifiable Information)",
+};

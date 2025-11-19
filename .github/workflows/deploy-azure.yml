@@ -3,8 +3,13 @@ name: Build and Deploy AI Agents Laboratory
 env:
     API_PROJECT_PATH: AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj
     UI_PROJECT_PATH: AIAgents.Laboratory.UI
+    DATABASE_PROJECT_PATH: AIAgents.Laboratory.Database/AIAgents.Laboratory.Database.sqlproj
 
 on:
+    push:
+        branches:
+            - main
+            - dev
     workflow_dispatch:
         inputs:
             deploy_api:
@@ -19,9 +24,15 @@ on:
                 default: true
                 type: boolean
 
+            deploy_db:
+                description: "AIAgents.Laboratory.Database"
+                required: false
+                default: true
+                type: boolean
+
 jobs:
     build-api:
-        name: Build AIAgents.Laboratory.API
+        name: Build API solution
         runs-on: ubuntu-latest
         if: ${{ inputs.deploy_api }}
         outputs:
@@ -33,7 +44,7 @@ jobs:
             - name: Setup .NET
               uses: actions/setup-dotnet@v3
               with:
-                  dotnet-version: 9.0.x
+                  dotnet-version: 10.0.x
 
             - name: Install dependencies and build solution
               run: |
@@ -55,7 +66,7 @@ jobs:
                   path: ./publish-api
 
     deploy-api:
-        name: Deploy AIAgents.Laboratory.API
+        name: Deploy API solution
         runs-on: ubuntu-latest
         needs: build-api
         environment: Production
@@ -75,7 +86,7 @@ jobs:
                   package: ./publish-api
 
     build-and-deploy-web:
-        name: Build and Deploy AIAgents.Laboratory.UI
+        name: Build and Deploy UI solution
         if: ${{ inputs.deploy_ui }}
         runs-on: ubuntu-latest
         environment: Production
@@ -102,3 +113,70 @@ jobs:
                   action: "upload"
                   app_location: ${{ env.UI_PROJECT_PATH }}
                   output_location: "out"
+
+    build-database:
+        name: Build Database project
+        runs-on: windows-latest
+        if: ${{ inputs.deploy_db }}
+        outputs:
+            artifact_path: ${{ steps.set-artifact-path.outputs.path }}
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Setup .NET 8
+              uses: actions/setup-dotnet@v3
+              with:
+                  dotnet-version: "8.0.x"
+
+            - name: Install dependencies and build DB solution
+              run: |
+                  dotnet restore ${{ env.DATABASE_PROJECT_PATH }}
+                  dotnet build ${{ env.DATABASE_PROJECT_PATH }} --configuration Release --no-restore
+
+            - name: Publish the dacpac file
+              run: |
+                  dotnet publish ${{ env.DATABASE_PROJECT_PATH }} --configuration Release --output ./publish-db
+
+            - name: Set datbase objects artifact path
+              id: set-artifact-path
+              run: echo "path=./publish-db" >> $GITHUB_OUTPUT
+
+            - name: Upload Database Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: db-artifact
+                  path: ./publish-db
+
+    deploy-database:
+        name: Deploy Database project
+        runs-on: windows-latest
+        needs: build-database
+        environment: Production
+        permissions:
+            id-token: write
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Azure Login
+              uses: azure/login@v2
+              with:
+                  client-id: ${{ secrets.AZURE_CLIENT_ID }}
+                  tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                  subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+            - name: Download database artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: db-artifact
+                  path: ./publish-db
+
+            - name: Deploy to Azure SQL Database
+              uses: azure/sql-action@v2.3
+              with:
+                  connection-string: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
+                  path: "./publish-db/AIAgents.Laboratory.Database.dacpac"
+                  action: "publish"
+                  arguments: "/p:DropObjectsNotInSource=true /p:BlockOnPossibleDataLoss=false /p:IgnoreUserSettingsObjects=true /p:IgnoreLoginSids=true /p:IgnorePermissions=true /p:IgnoreRoleMembership=true"
