@@ -1,6 +1,6 @@
 export const environment = {
 	production: false,
-	apiBaseUrl: "https://localhost:8190/aiagentsapi/",
+	apiBaseUrl: "https://localhost:8190/aiagentsapi/v2/",
 	msalConfig: {
 		auth: {
 			clientId: "7df8eeab-dbed-4467-8675-05249f74170b",

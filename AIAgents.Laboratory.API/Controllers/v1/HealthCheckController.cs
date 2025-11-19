@@ -1,7 +1,6 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.API.Helpers;
-using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.HealthCheckController;
@@ -15,8 +14,8 @@ namespace AIAgents.Laboratory.API.Controllers.v1;
 /// <param name="httpContextAccessor">The http context accessor.</param>
 /// <seealso cref="BaseController" />
 [ApiController]
-[ApiVersion(1.0)]
-[Route($"{RouteConstants.AiBase_RoutePrefix}/[controller]")]
+[ApiVersion("1")]
+[Route("aiagentsapi/v{version:apiVersion}/[controller]")]
 public class HealthCheckController(IHttpContextAccessor httpContextAccessor, ICommonAiHandler commonAiHandler) : BaseController(httpContextAccessor)
 {
     /// <summary>

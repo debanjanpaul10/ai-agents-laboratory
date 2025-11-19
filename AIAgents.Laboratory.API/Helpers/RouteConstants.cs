@@ -1,22 +1,10 @@
-﻿// *********************************************************************************
-//	<copyright file="RouteConstants.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The Route Constants Class.</summary>
-// *********************************************************************************
-
-namespace AIAgents.Laboratory.API.Helpers;
+﻿namespace AIAgents.Laboratory.API.Helpers;
 
 /// <summary>
 /// The Route Constants Class.
 /// </summary>
 public static class RouteConstants
 {
-    /// <summary>
-    /// The ai base route prefix
-    /// </summary>
-    internal const string AiBase_RoutePrefix = "aiagentsapi";
-
     /// <summary>
     /// The agent status hub route
     /// </summary>

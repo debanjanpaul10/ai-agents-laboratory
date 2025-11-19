@@ -12,6 +12,7 @@ using AIAgents.Laboratory.Processor.IOC;
 using AIAgents.Laboratory.SemanticKernel.Adapters.IOC;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 
@@ -62,6 +63,20 @@ public static class DIContainer
         services.AddMemoryCache().AddCacheDependencies();
 
         services.AddSignalR().AddAzureSignalR(configuration[AzureAppConfigurationConstants.AzureSignalRConnection]);
+    }
+
+    /// <summary>
+    /// Adds API versioning to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    internal static void AddApiVersions(this IServiceCollection services)
+    {
+        services.AddApiVersioning(configuration =>
+        {
+            configuration.AssumeDefaultVersionWhenUnspecified = true;
+            configuration.DefaultApiVersion = new ApiVersion(1, 0);
+            configuration.ReportApiVersions = true;
+        });
     }
 
     #region PRIVATE METHODS
