@@ -7,12 +7,19 @@
     <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
     <ModelCollation>1033, CI</ModelCollation>
     <TargetDatabaseSet>True</TargetDatabaseSet>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <IncludeSchemaNameInFileName>True</IncludeSchemaNameInFileName>
+    <EnableDefaultSqlItems>false</EnableDefaultSqlItems>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="PostDeploymentScripts" />
     <Folder Include="Tables\" />
   </ItemGroup>
-  <Target Name="BeforeBuild">
-    <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />
-  </Target>
+  <ItemGroup>
+    <Build Include="Tables\BugReportDetails.sql" />
+    <Build Include="Tables\BugItemStatusMapping.sql" />
+    <Build Include="Tables\BugSeverityMapping.sql" />
+    <Build Include="Tables\NewFeatureRequests.sql" />
+  </ItemGroup>
 </Project>
