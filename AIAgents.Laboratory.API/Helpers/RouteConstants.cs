@@ -188,5 +188,15 @@ public static class RouteConstants
         /// The get configuration by key route.
         /// </summary>
         internal const string GetConfigurationByKey_Route = "getconfigurationbykey/{configKey}";
+
+        /// <summary>
+        /// The add bug report route.
+        /// </summary>
+        internal const string AddBugReport_Route = "addbugreport";
+
+        /// <summary>
+        /// The submit feature request route.
+        /// </summary>
+        internal const string SubmitFeatureRequest_Route = "submitfeaturerequest";
     }
 }

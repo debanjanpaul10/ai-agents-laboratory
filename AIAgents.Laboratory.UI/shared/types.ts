@@ -82,3 +82,8 @@ export interface TestAgentComponentProps {
 	editFormData: AgentDataDTO;
 	onClose: () => void;
 }
+
+export enum FEEDBACK_TYPES {
+	BUGREPORT,
+	NEWFEATURE,
+}

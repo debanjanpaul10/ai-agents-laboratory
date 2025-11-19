@@ -23,6 +23,7 @@ public static class DIContainer
         .AddScoped<ISkillsHandler, SkillsHandler>()
         .AddScoped<IAgentsHandler, AgentsHandler>()
         .AddScoped<IChatHandler, ChatHandler>()
+        .AddScoped<IFeedbackHandler, FeedbackHandler>()
         .AddAutoMapper(config =>
         {
             config.AddProfile<DomainMapperProfile>();

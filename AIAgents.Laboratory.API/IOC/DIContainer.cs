@@ -7,6 +7,7 @@ using AIAgents.Laboratory.Domain.IOC;
 using AIAgents.Laboratory.Messaging.Adapters.IOC;
 using AIAgents.Laboratory.Persistence.Caching.IOC;
 using AIAgents.Laboratory.Persistence.MongoDatabase.IOC;
+using AIAgents.Laboratory.Persistence.SQLDatabase.IOC;
 using AIAgents.Laboratory.Processor.IOC;
 using AIAgents.Laboratory.SemanticKernel.Adapters.IOC;
 using Azure.Identity;
@@ -39,6 +40,7 @@ public static class DIContainer
         {
             options.Connect(new Uri(appConfigurationEndpoint), credentials)
             .Select(KeyFilter.Any).Select(KeyFilter.Any, AzureAppConfigurationConstants.BaseConfigurationAppConfigKeyConstant)
+            .Select(KeyFilter.Any, AzureAppConfigurationConstants.FeatureFlagAppConfigKeyConstant)
             .ConfigureKeyVault(configure => configure.SetCredential(credentials));
         });
     }
@@ -48,12 +50,13 @@ public static class DIContainer
     /// </summary>
     /// <param name="services">The services.</param>
     /// <param name="configuration">The configuration.</param>
-    internal static void ConfigureApplicationDependencies(this IServiceCollection services, IConfiguration configuration)
+    /// <param name="isDevelopmentMode">The development mode.</param>
+    internal static void ConfigureApplicationDependencies(this IServiceCollection services, IConfiguration configuration, bool isDevelopmentMode)
     {
         services.ConfigureAuthenticationServices(configuration);
 
         services.AddAPIAdapterDependencies().AddMessagingDependencies();
-        services.AddAIAgentDependencies(configuration).AddMongoDbAdapterDependencies(configuration);
+        services.AddAIAgentDependencies(configuration).AddMongoDbAdapterDependencies(configuration).AddSqlServerDependencies(configuration, isDevelopmentMode);
 
         services.AddDomainDependencies().AddProcessorDependencies(configuration);
         services.AddMemoryCache().AddCacheDependencies();

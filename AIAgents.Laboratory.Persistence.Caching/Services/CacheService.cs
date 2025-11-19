@@ -1,5 +1,6 @@
 ﻿using AIAgents.Laboratory.Domain.DrivenPorts;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static AIAgents.Laboratory.Persistence.Caching.Helpers.Constants;
 
@@ -10,8 +11,9 @@ namespace AIAgents.Laboratory.Persistence.Caching.Services;
 /// </summary>
 /// <param name="memoryCache">The memory cache service.</param>
 /// <param name="logger">The logger.</param>
+/// <param name="configuration">The configuration.</param>
 /// <seealso cref="ICacheService"/>
-public class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger) : ICacheService
+public class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger, IConfiguration configuration) : ICacheService
 {
     /// <summary>
     /// Gets async.
@@ -20,6 +22,10 @@ public class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger
     /// <typeparam name="T"></typeparam>
     public T? GetCachedData<T>(string key)
     {
+        var isCacheServiceEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsCacheServiceEnabled], out var flagValue) && flagValue;
+        if (isCacheServiceEnabled)
+            return default;
+
         if (string.IsNullOrEmpty(key))
         {
             var ex = new ArgumentNullException(key);
@@ -55,6 +61,10 @@ public class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger
     /// <param name="key">The key.</param>
     public bool RemoveCachedData(string key)
     {
+        var isCacheServiceEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsCacheServiceEnabled], out var flagValue) && flagValue;
+        if (isCacheServiceEnabled)
+            return default;
+
         if (string.IsNullOrEmpty(key))
         {
             var ex = new ArgumentNullException(nameof(key), ExceptionConstants.KeyNameIsNullMessageConstant);
@@ -95,6 +105,10 @@ public class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger
     /// <typeparam name="T"></typeparam>
     public bool SetCacheData<T>(string key, T value, TimeSpan expirationTime)
     {
+        var isCacheServiceEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsCacheServiceEnabled], out var flagValue) && flagValue;
+        if (isCacheServiceEnabled)
+            return false;
+
         if (string.IsNullOrEmpty(key))
         {
             var ex = new ArgumentNullException(nameof(key), ExceptionConstants.KeyNameIsNullMessageConstant);
