@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Button, Input, Tooltip } from "@heroui/react";
+import { useEffect, useRef, useState } from "react";
+import { Button, Tooltip } from "@heroui/react";
 import {
 	BotMessageSquare,
 	Info,
@@ -21,13 +21,16 @@ import {
 	GetDirectChatResponseAsync,
 } from "@store/chat/actions";
 import { FullScreenLoading } from "@components/common/spinner";
+import { GetAgentDataByIdAsync } from "@store/agents/actions";
 
 export default function AgentChatComponent({
 	toggleChatbotInformation,
 	onClose,
+	isAgentInfoDrawerOpen,
 }: {
 	toggleChatbotInformation: any;
 	onClose: any;
+	isAgentInfoDrawerOpen: boolean;
 }) {
 	const { getAccessToken } = useAuth();
 	const dispatch = useAppDispatch();
@@ -35,12 +38,19 @@ export default function AgentChatComponent({
 	const [messages, setMessages] = useState<Array<ChatMessage>>([]);
 	const [userInput, setUserInput] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	const ConversationHistoryStoreData = useAppSelector(
 		(state) => state.ChatReducer.conversationHistory
 	);
 	const IsDirectChatLoadingStoreData = useAppSelector(
 		(state) => state.CommonReducer.isDirectChatLoading
+	);
+	const ConversationAgentIdStoreData = useAppSelector(
+		(state) => state.CommonReducer.configurationValue
+	);
+	const IsEditAgentDataLoading = useAppSelector(
+		(state) => state.AgentsReducer.isEditAgentDataLoading
 	);
 
 	const mapChatHistoryToMessages = (
@@ -55,6 +65,15 @@ export default function AgentChatComponent({
 
 	useEffect(() => {
 		if (
+			ConversationAgentIdStoreData.AIChatbotAgentId !== null &&
+			ConversationAgentIdStoreData.AIChatbotAgentId !== undefined &&
+			ConversationAgentIdStoreData.AIChatbotAgentId !== ""
+		)
+			getAgentInformation();
+	}, [ConversationAgentIdStoreData.AIChatbotAgentId]);
+
+	useEffect(() => {
+		if (
 			ConversationHistoryStoreData?.chatHistory &&
 			Array.isArray(ConversationHistoryStoreData.chatHistory) &&
 			ConversationHistoryStoreData.chatHistory.length > 0
@@ -65,6 +84,17 @@ export default function AgentChatComponent({
 			setMessages(mappedMessages);
 		}
 	}, [ConversationHistoryStoreData]);
+
+	async function getAgentInformation() {
+		const token = await getAccessToken();
+		token &&
+			dispatch(
+				GetAgentDataByIdAsync(
+					ConversationAgentIdStoreData.AIChatbotAgentId,
+					token
+				)
+			);
+	}
 
 	async function clearConversation() {
 		setMessages([]);
@@ -141,9 +171,9 @@ export default function AgentChatComponent({
 				<div className="flex items-center space-x-2">
 					<Tooltip content="Chatbot information">
 						<Button
-							disabled={true}
+							disabled={isAgentInfoDrawerOpen}
 							onPress={toggleChatbotInformation}
-							className="p-2 rounded-lg bg-white/5 hover:bg-green-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-green-400"
+							className="p-2 rounded-lg bg-white/5 hover:bg-green-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-green-400 disabled:opacity-50"
 						>
 							<Info className="w-4 h-4" />
 						</Button>
@@ -151,16 +181,18 @@ export default function AgentChatComponent({
 
 					<Tooltip content="Clear conversation history">
 						<Button
+							disabled={isAgentInfoDrawerOpen}
 							onPress={clearConversation}
-							className="p-2 rounded-lg bg-white/5 hover:bg-yellow-500/20 border border-white/10 hover:border-yellow-500/30 transition-all duration-200 text-white/70 hover:text-yellow-400"
+							className="p-2 rounded-lg bg-white/5 hover:bg-yellow-500/20 border border-white/10 hover:border-yellow-500/30 transition-all duration-200 text-white/70 hover:text-yellow-400 disabled:opacity-50"
 						>
 							<RefreshCcw className="w-4 h-4" />
 						</Button>
 					</Tooltip>
 					<Tooltip content="Close chat">
 						<Button
+							disabled={isAgentInfoDrawerOpen}
 							onPress={onClose}
-							className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-red-400"
+							className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-red-400 disabled:opacity-50"
 						>
 							<X className="w-4 h-4" />
 						</Button>
@@ -235,37 +267,60 @@ export default function AgentChatComponent({
 		);
 	};
 
+	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		setUserInput(e.target.value);
+
+		// Auto-resize textarea
+		if (textareaRef.current) {
+			textareaRef.current.style.height = "auto";
+			textareaRef.current.style.height = `${Math.min(
+				textareaRef.current.scrollHeight,
+				200
+			)}px`;
+		}
+	};
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.key === "Enter" && !e.shiftKey) {
+			e.preventDefault();
+			sendChatbotRequest();
+
+			// Reset textarea height after sending
+			if (textareaRef.current) {
+				textareaRef.current.style.height = "auto";
+			}
+		}
+	};
+
 	const renderInputArea = () => {
 		return (
 			<div className="border-t border-white/10 p-4 flex-shrink-0">
-				<div className="flex space-x-2">
+				<div className="flex space-x-2 items-end">
 					<div className="flex-1">
-						<Input
+						<textarea
+							ref={textareaRef}
 							value={userInput}
-							onChange={(e) => setUserInput(e.target.value)}
+							onChange={handleInputChange}
+							onKeyDown={handleKeyDown}
 							placeholder={
 								ManageAgentConstants.TestAgentConstants
 									.PlaceHolders.TypeMessage
 							}
-							onKeyDown={(event: any) => {
-								if (event.key === "Enter" && !event.shiftKey) {
-									sendChatbotRequest();
-								}
-							}}
-							radius="full"
-							disabled={isLoading}
-							classNames={{
-								input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-2 py-2",
-								inputWrapper:
-									"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-cyan-500/50",
-							}}
+							disabled={isLoading || isAgentInfoDrawerOpen}
+							rows={1}
+							className="w-full resize-none bg-white/5 border border-white/10 hover:border-white/20 focus:border-cyan-500/50 focus:outline-none text-white placeholder:text-white/40 px-4 py-3 transition-all duration-200 overflow-y-hidden disabled:opacity-50"
+							style={{ maxHeight: "200px" }}
 						/>
 					</div>
 					<Button
 						onPress={sendChatbotRequest}
-						disabled={!userInput.trim() || isLoading}
+						disabled={
+							!userInput.trim() ||
+							isLoading ||
+							isAgentInfoDrawerOpen
+						}
 						radius="full"
-						className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 px-4 py-3"
+						className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 px-4 py-3 disabled:opacity-50"
 						title="Send message"
 					>
 						<Send className="w-4 h-4" />
@@ -275,7 +330,7 @@ export default function AgentChatComponent({
 		);
 	};
 
-	return IsDirectChatLoadingStoreData ? (
+	return IsDirectChatLoadingStoreData || IsEditAgentDataLoading ? (
 		<FullScreenLoading isLoading={true} message="Chatbot is loading" />
 	) : (
 		<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">

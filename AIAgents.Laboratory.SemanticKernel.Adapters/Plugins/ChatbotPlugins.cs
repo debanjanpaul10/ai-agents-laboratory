@@ -159,31 +159,4 @@ public class ChatbotPlugins(ILogger<ChatbotPlugins> logger)
             return ExceptionConstants.DefaultAIExceptionMessage;
         }
     }
-
-    /// <summary>
-    /// Handles the conversation with user function.
-    /// </summary>
-    /// <param name="kernel">The kernel.</param>
-    /// <param name="input">The user message.</param>
-    /// <returns>The ai response.</returns>
-    [KernelFunction(ConversationAgentFunction.FunctionName)]
-    [Description(ConversationAgentFunction.FunctionDescription)]
-    public async Task<string> ConversationAgentFunctionAsync(Kernel kernel, [Description(ConversationAgentFunction.InputDescription)] string input)
-    {
-        try
-        {
-            var arguments = new KernelArguments()
-            {
-                { ArgumentsConstants.UserMessageInputConstant, input}
-            };
-
-            var result = await kernel.InvokePromptAsync(ConversationAgentFunction.FunctionInstructions, arguments).ConfigureAwait(false);
-            return result.GetValue<string>() ?? string.Empty;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ConversationAgentFunctionAsync), DateTime.UtcNow, ex.Message));
-            return ExceptionConstants.DefaultAIExceptionMessage;
-        }
-    }
 }

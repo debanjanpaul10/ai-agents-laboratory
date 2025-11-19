@@ -118,6 +118,11 @@ internal static class Constants
         /// The is cache service enabled.
         /// </summary>
         internal const string IsCacheServiceEnabled = "IsCacheServiceEnabled";
+
+        /// <summary>
+        /// The AI chatbot agent identifier.
+        /// </summary>
+        internal const string AIChatbotAgentId = "AIChatbotAgentId";
     }
 
     /// <summary>

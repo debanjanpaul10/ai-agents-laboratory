@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Text.Json;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -51,15 +50,16 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel) : IAiServices
     /// </summary>
     /// <param name="userMessage">The user message data.</param>
     /// <param name="conversationDataDomain">The conversation history data domain.</param>
+    /// <param name="agentPrompt">The agent prompt.</param>
     /// <returns>The AI chatbot response.</returns>
-    public async Task<string> GetChatbotResponseAsync(ConversationHistoryDomain conversationDataDomain, string userMessage)
+    public async Task<string> GetChatbotResponseAsync(ConversationHistoryDomain conversationDataDomain, string userMessage, string agentPrompt)
     {
         try
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetChatbotResponseAsync), DateTime.UtcNow));
 
             var chatHistory = new ChatHistory();
-            chatHistory.AddSystemMessage(ChatbotPluginHelpers.ConversationAgentFunction.FunctionInstructions);
+            chatHistory.AddSystemMessage(agentPrompt);
             if (conversationDataDomain.ChatHistory is not null)
             {
                 foreach (var message in conversationDataDomain.ChatHistory)
