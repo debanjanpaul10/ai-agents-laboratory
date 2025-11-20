@@ -320,7 +320,7 @@ export default function AgentChatComponent({
 							isAgentInfoDrawerOpen
 						}
 						radius="full"
-						className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 px-4 py-3 disabled:opacity-50"
+						className="mb-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 px-3 py-3 disabled:opacity-50"
 						title="Send message"
 					>
 						<Send className="w-4 h-4" />

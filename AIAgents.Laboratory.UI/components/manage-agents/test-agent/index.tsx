@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Button, Input } from "@heroui/react";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { Send, MessageSquare, Bot, Zap, ArrowRight } from "lucide-react";
@@ -21,8 +21,9 @@ export default function TestAgentComponent({
 	const [messages, setMessages] = useState<Array<ChatMessage>>([]);
 	const [userInput, setUserInput] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-	const sendChatbotResponse = async () => {
+	const sendChatbotRequest = async () => {
 		if (!userInput.trim()) return;
 
 		const userMessage: ChatMessage = {
@@ -76,6 +77,80 @@ export default function TestAgentComponent({
 		setUserInput("");
 	};
 
+	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		setUserInput(e.target.value);
+
+		// Auto-resize textarea
+		if (textareaRef.current) {
+			textareaRef.current.style.height = "auto";
+			textareaRef.current.style.height = `${Math.min(
+				textareaRef.current.scrollHeight,
+				200
+			)}px`;
+		}
+	};
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.key === "Enter" && !e.shiftKey) {
+			e.preventDefault();
+			sendChatbotRequest();
+
+			// Reset textarea height after sending
+			if (textareaRef.current) {
+				textareaRef.current.style.height = "auto";
+			}
+		}
+	};
+
+	const renderInputArea = () => {
+		return (
+			<div className="border-t border-white/10 p-4 flex-shrink-0">
+				<div className="flex space-x-2 items-end">
+					<div className="flex-1">
+						<textarea
+							ref={textareaRef}
+							value={userInput}
+							onChange={handleInputChange}
+							onKeyDown={handleKeyDown}
+							placeholder={
+								ManageAgentConstants.TestAgentConstants
+									.PlaceHolders.TypeMessage
+							}
+							disabled={isLoading}
+							rows={1}
+							className="w-full resize-none bg-white/5 border border-white/10 hover:border-white/20 focus:border-cyan-500/50 focus:outline-none text-white placeholder:text-white/40 px-4 py-3 transition-all duration-200 overflow-y-hidden disabled:opacity-50"
+							style={{ maxHeight: "200px" }}
+						/>
+					</div>
+					<Button
+						onPress={sendChatbotRequest}
+						disabled={!userInput.trim() || isLoading}
+						radius="full"
+						title="Send message"
+						className="mb-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 px-3 py-3 disabled:opacity-50"
+					>
+						<Send className="w-4 h-4" />
+					</Button>
+				</div>
+
+				{messages.length > 0 && (
+					<div className="mt-3 flex justify-center">
+						<Button
+							variant="solid"
+							onPress={clearConversation}
+							className="text-red/70 hover:text-red text-sm"
+						>
+							{
+								ManageAgentConstants.TestAgentConstants
+									.PlaceHolders.ClearConversation
+							}
+						</Button>
+					</div>
+				)}
+			</div>
+		);
+	};
+
 	return (
 		<div className="h-full flex flex-col">
 			{/* Header */}
@@ -102,7 +177,6 @@ export default function TestAgentComponent({
 					<ArrowRight className="w-4 h-4" />
 				</button>
 			</div>
-
 			{/* Agent Info */}
 			<div className="p-4 border-b border-white/10 bg-white/5">
 				<div className="flex items-center space-x-3">
@@ -118,7 +192,6 @@ export default function TestAgentComponent({
 					</div>
 				</div>
 			</div>
-
 			{/* Conversation Area */}
 			<div className="flex-1 p-4 overflow-y-auto min-h-0">
 				{messages.length === 0 ? (
@@ -180,57 +253,8 @@ export default function TestAgentComponent({
 					</div>
 				)}
 			</div>
-
 			{/* Input Area */}
-			<div className="border-t border-white/10 p-4 flex-shrink-0">
-				<div className="flex space-x-2">
-					<div className="flex-1">
-						<Input
-							value={userInput}
-							onChange={(e) => setUserInput(e.target.value)}
-							placeholder={
-								ManageAgentConstants.TestAgentConstants
-									.PlaceHolders.TypeMessage
-							}
-							onKeyDown={(event: any) => {
-								if (event.key === "Enter" && !event.shiftKey) {
-									sendChatbotResponse();
-								}
-							}}
-							radius="full"
-							disabled={isLoading}
-							classNames={{
-								input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
-								inputWrapper:
-									"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-cyan-500/50",
-							}}
-						/>
-					</div>
-					<Button
-						onPress={sendChatbotResponse}
-						disabled={!userInput.trim() || isLoading}
-						radius="full"
-						className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 px-4 py-3"
-					>
-						<Send className="w-4 h-4" />
-					</Button>
-				</div>
-
-				{messages.length > 0 && (
-					<div className="mt-3 flex justify-center">
-						<Button
-							variant="solid"
-							onPress={clearConversation}
-							className="text-red/70 hover:text-red text-sm"
-						>
-							{
-								ManageAgentConstants.TestAgentConstants
-									.PlaceHolders.ClearConversation
-							}
-						</Button>
-					</div>
-				)}
-			</div>
+			{renderInputArea()}
 		</div>
 	);
 }
