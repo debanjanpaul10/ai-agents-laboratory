@@ -16,14 +16,19 @@ namespace AIAgents.Laboratory.Persistence.Caching.Services;
 public class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger, IConfiguration configuration) : ICacheService
 {
     /// <summary>
-    /// Gets async.
+    /// The is cache service enabled.
     /// </summary>
-    /// <param name="key">The key.</param>
-    /// <typeparam name="T"></typeparam>
+    private readonly bool IsCacheServiceEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsCacheServiceEnabled], out var flagValue) && flagValue;
+
+    /// <summary>
+    /// Gets the cached data.
+    /// </summary>
+    /// <typeparam name="T">The key value type parameter.</typeparam>
+    /// <param name="key">The cache key.</param>
+    /// <returns>The cache key value.</returns>
     public T? GetCachedData<T>(string key)
     {
-        var isCacheServiceEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsCacheServiceEnabled], out var flagValue) && flagValue;
-        if (isCacheServiceEnabled)
+        if (IsCacheServiceEnabled)
             return default;
 
         if (string.IsNullOrEmpty(key))
@@ -56,13 +61,13 @@ public class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger
     }
 
     /// <summary>
-    /// Removes data.
+    /// Removes the cached data.
     /// </summary>
-    /// <param name="key">The key.</param>
+    /// <param name="key">The key name.</param>
+    /// <returns>The boolean for success/failure.</returns>
     public bool RemoveCachedData(string key)
     {
-        var isCacheServiceEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsCacheServiceEnabled], out var flagValue) && flagValue;
-        if (isCacheServiceEnabled)
+        if (IsCacheServiceEnabled)
             return default;
 
         if (string.IsNullOrEmpty(key))
@@ -97,16 +102,16 @@ public class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger
     }
 
     /// <summary>
-    /// Sets async.
+    /// Sets the cache data.
     /// </summary>
-    /// <param name="key">The key.</param>
+    /// <typeparam name="T">The key value type parameter.</typeparam>
+    /// <param name="key">The key name.</param>
     /// <param name="value">The value.</param>
-    /// <param name="expirationTime">The expiration time.</param>
-    /// <typeparam name="T"></typeparam>
+    /// <param name="expirationTime">The cache expiration time.</param>
+    /// <returns>The boolean for success/failure.</returns>
     public bool SetCacheData<T>(string key, T value, TimeSpan expirationTime)
     {
-        var isCacheServiceEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsCacheServiceEnabled], out var flagValue) && flagValue;
-        if (isCacheServiceEnabled)
+        if (IsCacheServiceEnabled)
             return false;
 
         if (string.IsNullOrEmpty(key))

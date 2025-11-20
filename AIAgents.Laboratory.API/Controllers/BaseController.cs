@@ -77,5 +77,8 @@ public abstract class BaseController : ControllerBase
     /// Handles request authentication response.
     /// </summary>
     /// <returns>The boolean for authentication.</returns>
-    protected bool IsRequestAuthorized() => (!string.IsNullOrEmpty(this.UserEmail));
+    protected bool IsRequestAuthorized()
+    {
+        return !string.IsNullOrEmpty(this.UserEmail);
+    }
 }
