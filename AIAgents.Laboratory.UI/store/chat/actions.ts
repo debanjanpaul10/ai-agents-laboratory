@@ -42,7 +42,7 @@ export function InvokeChatAgentAsync(
 			return null;
 		} catch (error: any) {
 			console.error(error);
-			ShowErrorToaster(error);
+			if (error.message) ShowErrorToaster(error.message);
 		} finally {
 			dispatch(ToggleChatResponseSpinner(false));
 		}
@@ -68,7 +68,7 @@ export function ClearConversationHistoryAsync(accessToken: string) {
 			return null;
 		} catch (error: any) {
 			console.error(error);
-			ShowErrorToaster(error);
+			if (error.message) ShowErrorToaster(error.message);
 		} finally {
 			dispatch(ToggleDirectChatLoader(false));
 		}
@@ -95,7 +95,7 @@ export function GetDirectChatResponseAsync(
 			}
 		} catch (error: any) {
 			console.error(error);
-			ShowErrorToaster(error);
+			if (error.message) ShowErrorToaster(error.message);
 		}
 	};
 }
@@ -117,7 +117,7 @@ export function GetConversationHistoryDataForUserAsync(accessToken: string) {
 			}
 		} catch (error: any) {
 			console.error(error);
-			ShowErrorToaster(error);
+			if (error.message) ShowErrorToaster(error.message);
 		} finally {
 			dispatch(ToggleDirectChatLoader(false));
 		}

@@ -38,6 +38,7 @@ export default function AgentChatComponent({
 	const [messages, setMessages] = useState<Array<ChatMessage>>([]);
 	const [userInput, setUserInput] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+	const [showScrollbar, setShowScrollbar] = useState(false);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	const ConversationHistoryStoreData = useAppSelector(
@@ -275,8 +276,11 @@ export default function AgentChatComponent({
 			textareaRef.current.style.height = "auto";
 			textareaRef.current.style.height = `${Math.min(
 				textareaRef.current.scrollHeight,
-				200
+				800
 			)}px`;
+
+			// Show scrollbar only when content exceeds 200px
+			setShowScrollbar(textareaRef.current.scrollHeight > 200);
 		}
 	};
 
@@ -288,6 +292,7 @@ export default function AgentChatComponent({
 			// Reset textarea height after sending
 			if (textareaRef.current) {
 				textareaRef.current.style.height = "auto";
+				setShowScrollbar(false);
 			}
 		}
 	};
@@ -309,7 +314,10 @@ export default function AgentChatComponent({
 							disabled={isLoading || isAgentInfoDrawerOpen}
 							rows={1}
 							className="w-full resize-none bg-white/5 border border-white/10 hover:border-white/20 focus:border-cyan-500/50 focus:outline-none text-white placeholder:text-white/40 px-4 py-3 transition-all duration-200 overflow-y-hidden disabled:opacity-50"
-							style={{ maxHeight: "200px" }}
+							style={{
+								maxHeight: "200px",
+								overflowY: showScrollbar ? "auto" : "hidden",
+							}}
 						/>
 					</div>
 					<Button
