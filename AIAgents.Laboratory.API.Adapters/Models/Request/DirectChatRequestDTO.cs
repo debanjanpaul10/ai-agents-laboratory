@@ -3,7 +3,7 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Request;
 /// <summary>
 /// The Direct Chat Request DTO model.
 /// </summary>
-public class DirectChatRequestDTO
+public sealed record DirectChatRequestDTO
 {
     /// <summary>
     /// Gets or sets the user message.

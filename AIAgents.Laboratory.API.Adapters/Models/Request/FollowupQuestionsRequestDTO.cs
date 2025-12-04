@@ -1,16 +1,9 @@
-// *********************************************************************************
-//	<copyright file="FollowupQuestionsRequestDTO.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The followup question request DTO model.</summary>
-// *********************************************************************************
-
 namespace AIAgents.Laboratory.API.Adapters.Models.Request;
 
 /// <summary>
 /// The followup questions request DTO model.
 /// </summary>
-public class FollowupQuestionsRequestDTO
+public sealed record FollowupQuestionsRequestDTO
 {
     /// <summary>
     /// The user query.

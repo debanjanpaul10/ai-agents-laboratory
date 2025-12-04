@@ -4,7 +4,7 @@ namespace AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 /// The Bug Report Data Entity Class.
 /// </summary>
 /// <seealso cref="BaseEntity" />
-public class BugReportData : BaseEntity
+public sealed record BugReportData : BaseEntity
 {
     /// <summary>
     /// Gets or sets the identifier.

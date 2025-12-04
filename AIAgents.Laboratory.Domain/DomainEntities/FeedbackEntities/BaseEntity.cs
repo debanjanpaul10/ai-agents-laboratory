@@ -3,7 +3,7 @@ namespace AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 /// <summary>
 /// The Base Entity Class.
 /// </summary>
-public class BaseEntity
+public record BaseEntity
 {
     /// <summary>
     /// Gets or sets a value indicating whether this instance is active.

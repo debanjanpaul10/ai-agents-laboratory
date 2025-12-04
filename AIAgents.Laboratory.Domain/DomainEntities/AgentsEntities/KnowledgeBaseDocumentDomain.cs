@@ -4,7 +4,7 @@ namespace AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 /// The Knowledge Base Document Domain model.
 /// </summary>
 
-public class KnowledgeBaseDocumentDomain
+public sealed record KnowledgeBaseDocumentDomain
 {
     /// <summary>
     /// Gets or sets the original filename

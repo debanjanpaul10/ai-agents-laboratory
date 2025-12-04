@@ -4,7 +4,7 @@ namespace AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 /// The Bug Severity Mapping.
 /// </summary>
 /// <seealso cref="BaseEntity"/>
-public class BugSeverityMapping : BaseEntity
+public sealed record BugSeverityMapping : BaseEntity
 {
     /// <summary>
     /// Gets or sets the identifier.

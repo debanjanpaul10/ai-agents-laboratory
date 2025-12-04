@@ -4,7 +4,7 @@
 /// The New Feature Request Data Entity Class.
 /// </summary>
 /// <seealso cref="BaseEntity"/>
-public class NewFeatureRequestData : BaseEntity
+public sealed record NewFeatureRequestData : BaseEntity
 {
     /// <summary>
     /// Gets or sets the identifier.

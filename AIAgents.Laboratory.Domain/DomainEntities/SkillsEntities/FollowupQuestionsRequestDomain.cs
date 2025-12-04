@@ -1,16 +1,9 @@
-// *********************************************************************************
-//	<copyright file="FollowupQuestionsRequestDomain.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The followup question request domain model.</summary>
-// *********************************************************************************
-
 namespace AIAgents.Laboratory.Domain.DomainEntities.SkillsEntities;
 
 /// <summary>
 /// The followup question request domain model.
 /// </summary>
-public class FollowupQuestionsRequestDomain
+public sealed record FollowupQuestionsRequestDomain
 {
     /// <summary>
     /// The user query.
