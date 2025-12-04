@@ -1,4 +1,3 @@
-
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -8,7 +7,7 @@ namespace AIAgents.Laboratory.Domain.DomainEntities;
 /// The conversation history domain.
 /// </summary>
 [BsonIgnoreExtraElements]
-public class ConversationHistoryDomain
+public sealed record ConversationHistoryDomain
 {
     /// <summary>
     /// Gets or sets the identifier.

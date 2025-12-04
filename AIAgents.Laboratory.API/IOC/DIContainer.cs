@@ -40,8 +40,10 @@ public static class DIContainer
         builder.Configuration.AddAzureAppConfiguration(options =>
         {
             options.Connect(new Uri(appConfigurationEndpoint), credentials)
-            .Select(KeyFilter.Any).Select(KeyFilter.Any, AzureAppConfigurationConstants.BaseConfigurationAppConfigKeyConstant)
-            .Select(KeyFilter.Any, AzureAppConfigurationConstants.FeatureFlagAppConfigKeyConstant)
+                .Select(KeyFilter.Any)
+                .Select(KeyFilter.Any, AzureAppConfigurationConstants.BaseConfigurationAppConfigKeyConstant)
+                .Select(KeyFilter.Any, AzureAppConfigurationConstants.FeatureFlagAppConfigKeyConstant)
+                .Select(KeyFilter.Any, AzureAppConfigurationConstants.AiConfigurationAppConfigKeyConstant)
             .ConfigureKeyVault(configure => configure.SetCredential(credentials));
         });
     }

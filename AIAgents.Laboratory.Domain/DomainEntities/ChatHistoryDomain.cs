@@ -3,7 +3,7 @@ namespace AIAgents.Laboratory.Domain.DomainEntities;
 /// <summary>
 /// The Chat message domain model class.
 /// </summary>
-public class ChatHistoryDomain
+public sealed record ChatHistoryDomain
 {
     /// <summary>
     /// The role of the message sender.

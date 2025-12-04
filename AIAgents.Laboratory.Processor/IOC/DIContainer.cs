@@ -1,5 +1,4 @@
-﻿using System.ClientModel;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Processor.Contracts;
 using AIAgents.Laboratory.Processor.Services;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +23,7 @@ public static class DIContainer
     /// <returns>The services collection.</returns>
     public static IServiceCollection AddProcessorDependencies(this IServiceCollection services, IConfiguration configuration)
     {
-        RegisterTextEmbeddingGenerationService(services, configuration);
+        services.RegisterTextEmbeddingGenerationService(configuration);
         return services.AddScoped<IKnowledgeBaseProcessor, KnowledgeBaseProcessor>();
     }
 
@@ -33,42 +32,14 @@ public static class DIContainer
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="configuration">The configuration.</param>
-    private static void RegisterTextEmbeddingGenerationService(IServiceCollection services, IConfiguration configuration)
+    private static void RegisterTextEmbeddingGenerationService(this IServiceCollection services, IConfiguration configuration)
     {
-        var currentAiServiceProvider = configuration[AzureAppConfigurationConstants.CurrentAiServiceProvider];
-        if (string.IsNullOrEmpty(currentAiServiceProvider))
-            throw new InvalidOperationException($"Configuration key '{AzureAppConfigurationConstants.CurrentAiServiceProvider}' is missing or empty. Please check your Azure App Configuration.");
+        var openaiModelId = configuration[OpenAiGptConstants.ModelId];
+        var openAiApiKey = configuration[OpenAiGptConstants.ApiKey];
+        var openAiApiEndpoint = configuration[OpenAiGptConstants.ApiEndpoint];
+        if (string.IsNullOrEmpty(openaiModelId) || string.IsNullOrEmpty(openAiApiKey) || string.IsNullOrEmpty(openAiApiEndpoint))
+            throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
 
-        switch (currentAiServiceProvider)
-        {
-            case GoogleGeminiAiConstants.ServiceProviderName:
-                var isProModelEnabled = bool.TryParse(configuration[GoogleGeminiAiConstants.IsProModelEnabledFlag], out bool parsedValue) && parsedValue;
-                var geminiAiModel = isProModelEnabled ? GoogleGeminiAiConstants.GeminiProModel : GoogleGeminiAiConstants.GeminiFlashModel;
-                var modelId = configuration[geminiAiModel];
-                var apiKey = configuration[GoogleGeminiAiConstants.GeminiAPIKeyConstant];
-                if (string.IsNullOrEmpty(modelId) || string.IsNullOrEmpty(apiKey))
-                    throw new InvalidOperationException($"{ExceptionConstants.AiAPIKeyMissingMessage} Provider: {currentAiServiceProvider}, ModelId: {modelId ?? "null"}, ApiKey: {(string.IsNullOrEmpty(apiKey) ? "null" : "***")}");
-
-                services.AddGoogleAIEmbeddingGenerator(modelId, apiKey);
-                break;
-
-            case PerplexityAiConstants.ServiceProviderName:
-                var perplexityModelId = configuration[PerplexityAiConstants.ModelId];
-                var perplexityApiKey = configuration[PerplexityAiConstants.ApiKey];
-                var perplexityEndpoint = configuration[PerplexityAiConstants.ApiEndpoint];
-                if (string.IsNullOrEmpty(perplexityModelId) || string.IsNullOrEmpty(perplexityApiKey) || string.IsNullOrEmpty(perplexityEndpoint))
-                    throw new InvalidOperationException($"{ExceptionConstants.AiAPIKeyMissingMessage} Provider: {currentAiServiceProvider}, ModelId: {perplexityModelId ?? "null"}, ApiKey: {(string.IsNullOrEmpty(perplexityApiKey) ? "null" : "***")}");
-
-                var openAIClient = new OpenAI.OpenAIClient(new ApiKeyCredential(perplexityApiKey), new OpenAI.OpenAIClientOptions
-                {
-                    Endpoint = new Uri(perplexityEndpoint)
-                });
-                services.AddSingleton(openAIClient);
-                services.AddOpenAIEmbeddingGenerator(modelId: perplexityModelId);
-                break;
-
-            default:
-                throw new InvalidOperationException(string.Format(ExceptionConstants.InvalidServiceProvider, currentAiServiceProvider));
-        }
+        services.AddAzureOpenAIEmbeddingGenerator(openaiModelId, openAiApiEndpoint, openAiApiKey);
     }
 }

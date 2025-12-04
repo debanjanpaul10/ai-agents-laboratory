@@ -3,7 +3,7 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Request;
 /// <summary>
 /// The Add New Bug Report Data DTO.
 /// </summary>
-public class AddBugReportDTO
+public sealed record AddBugReportDTO
 {
     /// <summary>
     /// Gets or sets the bug title.

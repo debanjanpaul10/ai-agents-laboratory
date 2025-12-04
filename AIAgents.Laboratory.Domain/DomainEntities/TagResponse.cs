@@ -1,16 +1,9 @@
-﻿// *********************************************************************************
-//	<copyright file="TagResponseDTO.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The user story tag response DTO.</summary>
-// *********************************************************************************
-
-namespace AIAgents.Laboratory.Domain.DomainEntities;
+﻿namespace AIAgents.Laboratory.Domain.DomainEntities;
 
 /// <summary>
 /// The user story tag response DTO.
 /// </summary>
-public class TagResponse : BaseResponse
+public sealed record TagResponse : BaseResponse
 {
     /// <summary>
     /// The user story genre.

@@ -3,7 +3,7 @@
 /// <summary>
 /// The New Feature Request Data DTO.
 /// </summary>
-public class NewFeatureRequestDTO
+public sealed record NewFeatureRequestDTO
 {
     /// <summary>
     /// Gets or sets the title.
