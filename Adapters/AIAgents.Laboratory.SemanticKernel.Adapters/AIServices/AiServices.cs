@@ -32,7 +32,7 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel) : IAiServices
         try
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow));
-            return await InvokePluginFunctionAsync(input, pluginName, functionName).ConfigureAwait(false);
+            return await this.InvokePluginFunctionAsync(input, pluginName, functionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

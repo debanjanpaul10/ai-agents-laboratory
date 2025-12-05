@@ -12,17 +12,19 @@ using static AIAgents.Laboratory.Domain.Helpers.Constants;
 namespace AIAgents.Laboratory.Domain.UseCases;
 
 /// <summary>
-/// The Chat Service class.
+/// Provides chat-related services, including generating AI-powered responses, managing conversation history, and interacting with agent and knowledge base data.
 /// </summary>
-/// <param name="agentsService">The agents service.</param>
-/// <param name="logger">The logger service.</param>
-/// <param name="aiServices">The Ai services.</param>
-/// <param name="conversationHistoryService">The conversation history service.</param>
-/// <param name="knowledgeBaseProcessor">The knowledge base processor service.</param>
-/// <param name="configuration">The configuration.</param>
-/// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.IChatService" />
-public class ChatService(ILogger<ChatService> logger, IAgentsService agentsService, IAiServices aiServices,
-    IConversationHistoryService conversationHistoryService, IKnowledgeBaseProcessor knowledgeBaseProcessor, IConfiguration configuration) : IChatService
+/// <remarks>ChatService coordinates multiple dependencies to deliver conversational AI functionality, including
+/// agent selection, context management, and knowledge base integration. All operations are asynchronous and designed
+/// for scalable, real-time chat scenarios.</remarks>
+/// <param name="logger">The logger used for recording diagnostic and operational information within the chat service.</param>
+/// <param name="configuration">The application configuration provider used to access settings required by the chat service.</param>
+/// <param name="agentsService">The service used to retrieve agent data and metadata for chat interactions.</param>
+/// <param name="aiServices">The AI services provider used to generate responses and perform AI-related operations.</param>
+/// <param name="conversationHistoryService">The service responsible for retrieving, saving, and clearing user conversation history.</param>
+/// <param name="knowledgeBaseProcessor">The processor used to access and retrieve relevant knowledge base information for chat responses.</param>
+public class ChatService(ILogger<ChatService> logger, IConfiguration configuration, IAgentsService agentsService, IAiServices aiServices,
+    IConversationHistoryService conversationHistoryService, IKnowledgeBaseProcessor knowledgeBaseProcessor) : IChatService
 {
     /// <summary>
     /// Gets the agent chat response asynchronous.
