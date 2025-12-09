@@ -85,6 +85,15 @@ public sealed record AgentDataDomain
     public KnowledgeBaseDocumentDomain? StoredKnowledgeBase { get; set; }
 
     /// <summary>
+    /// Gets or sets the uploaded OpenAPI specification file associated with the request.
+    /// </summary>
+    /// <value>
+    /// The uploaded OpenAPI specification file.
+    /// </value>
+    [BsonIgnore]
+    public IFormFile? OpenApiSpec { get; set; }
+
+    /// <summary>
     /// Gets or sets the is private boolean flag.
     /// </summary>
     /// <value>

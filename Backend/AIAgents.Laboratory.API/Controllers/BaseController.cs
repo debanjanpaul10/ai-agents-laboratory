@@ -21,7 +21,7 @@ public abstract class BaseController : ControllerBase
     /// Initializes a new instance of <see cref="BaseController"/>
     /// </summary>
     /// <param name="httpContextAccessor">The http context accessor.</param>
-    public BaseController(IHttpContextAccessor httpContextAccessor)
+    protected BaseController(IHttpContextAccessor httpContextAccessor)
     {
         if (httpContextAccessor.HttpContext is not null && httpContextAccessor.HttpContext?.User is not null)
         {
