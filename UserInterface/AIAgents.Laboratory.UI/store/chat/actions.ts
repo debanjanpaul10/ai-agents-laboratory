@@ -42,7 +42,8 @@ export function InvokeChatAgentAsync(
 			return null;
 		} catch (error: any) {
 			console.error(error);
-			if (error.message) ShowErrorToaster(error.message);
+			if (error.message || typeof error === "string")
+				ShowErrorToaster(error.message ?? error);
 		} finally {
 			dispatch(ToggleChatResponseSpinner(false));
 		}

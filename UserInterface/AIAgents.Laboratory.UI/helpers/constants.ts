@@ -64,6 +64,7 @@ export const CreateAgentConstants = {
 		ApplicationNamePlaceholder: "Enter application name ...",
 		AgentMetaPromptPlaceholder:
 			"Define your agent's behavior, personality, and capabilities ...",
+		McpServerURL: "Add the URL for your MCP Server.",
 	},
 };
 
@@ -78,6 +79,7 @@ export const ManageAgentConstants = {
 			ApplicationName: "Enter application name ...",
 			AgentMetaprompt:
 				"Define your agent's behavior, personality, and capabilities ...",
+			McpServerURL: "Add the URL for your MCP Server.",
 		},
 		Info: "Describe how your agent should behave, what it should know, and how it should respond to users.",
 		KBInfo: "You can upload knowledge base data to the agent. Available file formats: .pdf, .docx, .xlsx, .txt",

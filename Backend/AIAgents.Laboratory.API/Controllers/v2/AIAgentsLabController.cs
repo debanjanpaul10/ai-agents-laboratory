@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.Constants;
+using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ConfigurationController;
 
 namespace AIAgents.Laboratory.API.Controllers.v2;
@@ -18,7 +19,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="feedbackHandler">The feedback api handler.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
-[ApiVersion("2")]
+[ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
 public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICommonAiHandler commonAiHandler, IFeedbackHandler feedbackHandler) : BaseController(httpContextAccessor)
 {

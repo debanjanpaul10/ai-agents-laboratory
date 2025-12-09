@@ -1,6 +1,14 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { Button, Input } from "@heroui/react";
-import { X, Bot, Sparkles, ScrollText, Expand, Files } from "lucide-react";
+import {
+	X,
+	Bot,
+	Sparkles,
+	ScrollText,
+	Expand,
+	Files,
+	Link,
+} from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleNewAgentDrawer } from "@store/common/actions";
@@ -28,6 +36,7 @@ export default function CreateAgentComponent() {
 		applicationName: "",
 		knowledgeBaseDocument: null,
 		isPrivate: false,
+		mcpServerUrl: "",
 	});
 
 	const IsDrawerOpenStoreData = useAppSelector(
@@ -75,9 +84,19 @@ export default function CreateAgentComponent() {
 				formData.knowledgeBaseDocument
 			);
 		}
+		if (formData.mcpServerUrl)
+			form.append("mcpServerUrl", formData.mcpServerUrl);
 
 		const token = await authContext.getAccessToken();
 		token && dispatch(CreateNewAgentAsync(form, token));
+		setFormData((prev) => ({
+			agentName: "",
+			agentMetaPrompt: "",
+			applicationName: "",
+			knowledgeBaseDocument: null,
+			isPrivate: false,
+			mcpServerUrl: "",
+		}));
 	};
 
 	const handleInputChange = (field: string, value: string | File | null) => {
@@ -283,6 +302,36 @@ export default function CreateAgentComponent() {
 							{/* Knowledge Base */}
 							{ConfigurationsStoreData.IsKnowledgeBaseServiceEnabled ===
 								"true" && renderAgentKnowledgeBaseData()}
+
+							{/* MCP Server URL */}
+							<div className="space-y-2">
+								<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+									<Link className="w-4 h-4 text-green-400" />
+									<span>MCP Server URL</span>
+								</label>
+								<div className="relative">
+									<Input
+										value={formData.mcpServerUrl}
+										onChange={(e) =>
+											handleInputChange(
+												"mcpServerUrl",
+												e.target.value
+											)
+										}
+										placeholder={
+											CreateAgentConstants.InputFields
+												.McpServerURL
+										}
+										className="relative"
+										radius="full"
+										classNames={{
+											input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
+											inputWrapper:
+												"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-purple-500/50 min-h-[48px]",
+										}}
+									/>
+								</div>
+							</div>
 						</div>
 
 						{/* Footer with buttons */}

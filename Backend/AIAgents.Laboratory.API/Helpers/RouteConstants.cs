@@ -11,6 +11,22 @@ public static class RouteConstants
     internal const string AgentStatusHub_Route = "/hubs/agent-status";
 
     /// <summary>
+    /// Provides constant values for supported API version identifiers.
+    /// </summary>
+    internal static class ApiVersionsConstants
+    {
+        /// <summary>
+        /// Represents the string value for version 1 of the API.
+        /// </summary>
+        internal const string ApiVersionV1 = "1";
+
+        /// <summary>
+        /// Represents the API version string for version 2.
+        /// </summary>
+        internal const string ApiVersionV2 = "2";
+    }
+
+    /// <summary>
     /// The route constants for plugins.
     /// </summary>
     internal static class PluginsRoutes

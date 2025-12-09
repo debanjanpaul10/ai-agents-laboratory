@@ -64,6 +64,16 @@ internal static class Constants
         /// The assistant role constant.
         /// </summary>
         internal const string AssistantRoleConstant = "assistant";
+
+        /// <summary>
+        /// The available MCP tools argument
+        /// </summary>
+        internal const string AvailableMcpToolsArgument = "availableMcpTools";
+
+        /// <summary>
+        /// The tool result argument
+        /// </summary>
+        internal const string ToolResultArgument = "toolResult";
     }
 
     /// <summary>
@@ -189,6 +199,11 @@ internal static class Constants
         /// The number of embeddings mismatch
         /// </summary>
         internal const string NumberOfEmbeddingsMismatch = "The number of embeddings generated does not match the number of text chunks.";
+
+        /// <summary>
+        /// The tools not found exception constant
+        /// </summary>
+        internal const string ToolsNotFoundExceptionConstant = "Oops! No such tools exist in the given MCP server";
     }
 
     /// <summary>
@@ -223,21 +238,6 @@ internal static class Constants
     internal static class ConfigurationConstants
     {
         /// <summary>
-        /// The tenant identifier constant
-        /// </summary>
-        internal const string FGToolTenantIdConstant = "FitGymTool:TenantId";
-
-        /// <summary>
-        /// The fg tool client identifier constant
-        /// </summary>
-        internal const string FGToolClientIdConstant = "FitGymTool:ClientId";
-
-        /// <summary>
-        /// The fg tool client secret constant
-        /// </summary>
-        internal const string FGToolClientSecretConstant = "FitGymTool:ClientSecret";
-
-        /// <summary>
         /// The bearer constant
         /// </summary>
         internal const string BearerConstant = "Bearer";
@@ -268,14 +268,29 @@ internal static class Constants
         internal const string ManagedIdentityClientIdConstant = "ManagedIdentityClientId";
 
         /// <summary>
-        /// The FG Tool api base URL
+        /// The ai agents ad client identifier
         /// </summary>
-        internal const string FitGymToolApiBaseUrl = "FitGymToolApiBaseUrl";
+        internal const string AiAgentsAdClientId = "AiAgentsClientId";
 
         /// <summary>
-        /// The local fg tool base URL
+        /// The ai agents ad client secret
         /// </summary>
-        internal const string LocalFGToolBaseUrl = "LocalFGToolBaseUrl";
+        internal const string AiAgentsAdClientSecret = "ClientSecret";
+
+        /// <summary>
+        /// The ai agents lab tenant identifier
+        /// </summary>
+        internal const string AiAgentsLabTenantId = "TenantId";
+
+        /// <summary>
+        /// The authorization constant
+        /// </summary>
+        internal const string AuthorizationConstant = "Authorization";
+
+        /// <summary>
+        /// The bearer token constant
+        /// </summary>
+        internal const string BearerTokenConstant = "Bearer {0}";
     }
 
 }

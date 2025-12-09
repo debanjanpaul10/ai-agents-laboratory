@@ -25,6 +25,7 @@ export default function ManageAgentsComponent() {
 		dateCreated: new Date(),
 		knowledgeBaseDocument: null,
 		isPrivate: false,
+		mcpServerUrl: "",
 	});
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 	const [isTestDrawerOpen, setIsTestDrawerOpen] = useState(false);
@@ -81,6 +82,7 @@ export default function ManageAgentsComponent() {
 			dateCreated: agent.dateCreated,
 			knowledgeBaseDocument: agent.knowledgeBaseDocument || null,
 			isPrivate: agent.isPrivate,
+			mcpServerUrl: agent.mcpServerUrl || "",
 		});
 		setIsEditDrawerOpen(true);
 	};

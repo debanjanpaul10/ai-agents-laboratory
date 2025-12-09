@@ -85,13 +85,12 @@ public sealed record AgentDataDomain
     public KnowledgeBaseDocumentDomain? StoredKnowledgeBase { get; set; }
 
     /// <summary>
-    /// Gets or sets the uploaded OpenAPI specification file associated with the request.
+    /// Gets or sets the URL of the MCP server used for network communication.
     /// </summary>
     /// <value>
-    /// The uploaded OpenAPI specification file.
+    /// The MCP server URL.
     /// </value>
-    [BsonIgnore]
-    public IFormFile? OpenApiSpec { get; set; }
+    public string? McpServerUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the is private boolean flag.

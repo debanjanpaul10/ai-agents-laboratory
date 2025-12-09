@@ -5,6 +5,7 @@ using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.Constants;
+using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.PluginsController;
 
 namespace AIAgents.Laboratory.API.Controllers.v1;
@@ -16,7 +17,7 @@ namespace AIAgents.Laboratory.API.Controllers.v1;
 /// <param name="pluginsHandler">The plugins api adapter class.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
-[ApiVersion("1")]
+[ApiVersion(ApiVersionsConstants.ApiVersionV1)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
 public class PluginsController(IHttpContextAccessor httpContextAccessor, IPluginsHandler pluginsHandler) : BaseController(httpContextAccessor)
 {

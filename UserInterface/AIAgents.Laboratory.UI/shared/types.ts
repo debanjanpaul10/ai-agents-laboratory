@@ -87,3 +87,7 @@ export enum FEEDBACK_TYPES {
 	BUGREPORT,
 	NEWFEATURE,
 }
+
+export interface MarkdownRendererProps {
+	content: string;
+}

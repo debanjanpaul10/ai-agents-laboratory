@@ -46,4 +46,12 @@ public record CreateAgentDTO
     /// The boolean flag for private agent.
     /// </value>
     public bool IsPrivate { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the URL of the MCP server used for network communication.
+    /// </summary>
+    /// <value>
+    /// The MCP server URL.
+    /// </value>
+    public string? McpServerUrl { get; set; }
 }

@@ -25,4 +25,15 @@ public interface IAiServices
     /// <param name="agentPrompt">The agent prompt message.</param>
     /// <returns>The AI chatbot response.</returns>
     Task<string> GetChatbotResponseAsync(ConversationHistoryDomain conversationDataDomain, string userMessage, string agentPrompt);
+
+    /// <summary>
+    /// Gets the ai function response with MCP integration asynchronous.
+    /// </summary>
+    /// <typeparam name="TInput">The type of the input.</typeparam>
+    /// <param name="input">The input.</param>
+    /// <param name="mcpServerUrl">The MCP server URL.</param>
+    /// <param name="pluginName">Name of the plugin.</param>
+    /// <param name="functionName">Name of the function.</param>
+    /// <returns>The AI response.</returns>
+    Task<string> GetAiFunctionResponseWithMcpIntegrationAsync<TInput>(TInput input, string mcpServerUrl, string pluginName, string functionName);
 }

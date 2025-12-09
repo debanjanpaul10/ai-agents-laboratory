@@ -156,7 +156,8 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
             var updates = new List<UpdateDefinition<AgentDataDomain>>
             {
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentMetaPrompt, updateDataDomain.AgentMetaPrompt),
-                Builders<AgentDataDomain>.Update.Set(x => x.AgentName, updateDataDomain.AgentName)
+                Builders<AgentDataDomain>.Update.Set(x => x.AgentName, updateDataDomain.AgentName),
+                Builders<AgentDataDomain>.Update.Set(x => x.McpServerUrl, updateDataDomain.McpServerUrl)
             };
 
             if (IsKnowledgeBaseServiceAllowed)

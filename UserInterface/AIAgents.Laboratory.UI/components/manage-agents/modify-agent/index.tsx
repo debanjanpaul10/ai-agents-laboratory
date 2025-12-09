@@ -13,6 +13,7 @@ import {
 	Files,
 	Upload,
 	Download,
+	Link,
 } from "lucide-react";
 import { useMsal } from "@azure/msal-react";
 
@@ -110,12 +111,14 @@ export default function ModifyAgentComponent({
 		form.append("agentMetaPrompt", editFormData.agentMetaPrompt);
 		form.append("agentName", editFormData.agentName);
 		form.append("applicationName", editFormData.applicationName);
-		if (editFormData.knowledgeBaseDocument) {
+		if (editFormData.knowledgeBaseDocument)
 			form.append(
 				"knowledgeBaseDocument",
 				editFormData.knowledgeBaseDocument
 			);
-		}
+
+		if (editFormData.mcpServerUrl)
+			form.append("mcpServerUrl", editFormData.mcpServerUrl);
 
 		const accessToken = await authContext.getAccessToken();
 		accessToken &&
@@ -525,6 +528,37 @@ export default function ModifyAgentComponent({
 						{/* Agent Knowledge Base */}
 						{ConfigurationStoreData.IsKnowledgeBaseServiceEnabled ===
 							"true" && renderAgentKnowledgeBaseData()}
+
+						{/* MCP Server URL */}
+						<div className="space-y-2">
+							<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+								<Link className="w-4 h-4 text-green-400" />
+								<span>MCP Server URL</span>
+							</label>
+							<div className="relative">
+								<Input
+									value={editFormData.mcpServerUrl}
+									onChange={(e) =>
+										handleInputChange(
+											"mcpServerUrl",
+											e.target.value
+										)
+									}
+									placeholder={
+										ManageAgentConstants
+											.ModifyAgentConstants.Placeholders
+											.McpServerURL
+									}
+									className="relative"
+									radius="full"
+									classNames={{
+										input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
+										inputWrapper:
+											"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-purple-500/50 min-h-[48px]",
+									}}
+								/>
+							</div>
+						</div>
 
 						{/* Agent Info Display */}
 						{renderAgentInformationTile(selectedAgent)}

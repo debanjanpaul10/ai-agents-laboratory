@@ -61,7 +61,11 @@ public class ChatService(ILogger<ChatService> logger, IConfiguration configurati
                 chatMessage.KnowledgeBase = relevantKnowledge;
             }
 
-            return await aiServices.GetAiFunctionResponseAsync(chatMessage, ApplicationPluginsHelpers.PluginName, ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+            // Enable MCP server integration if configured
+            if (!string.IsNullOrEmpty(agentData.McpServerUrl))
+                return await aiServices.GetAiFunctionResponseWithMcpIntegrationAsync(chatMessage, agentData.McpServerUrl, ApplicationPluginsHelpers.PluginName, ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+            else
+                return await aiServices.GetAiFunctionResponseAsync(chatMessage, ApplicationPluginsHelpers.PluginName, ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

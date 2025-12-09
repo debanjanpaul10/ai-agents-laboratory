@@ -10,6 +10,7 @@ import { useAppDispatch } from "@store/index";
 import { ChatMessage, TestAgentComponentProps } from "@shared/types";
 import { ManageAgentConstants } from "@helpers/constants";
 import { generateMessageId } from "@shared/utils";
+import { MarkdownRenderer } from "@components/common/markdown-renderer";
 
 export default function TestAgentComponent({
 	editFormData,
@@ -238,9 +239,17 @@ export default function TestAgentComponent({
 											: "bg-white/5 text-white border border-white/10"
 									}`}
 								>
-									<p className="text-sm whitespace-pre-wrap break-words">
-										{message.content}
-									</p>
+									{message.type === "user" ? (
+										<p className="text-sm whitespace-pre-wrap break-words">
+											{message.content}
+										</p>
+									) : (
+										<div className="text-sm">
+											<MarkdownRenderer
+												content={message.content}
+											/>
+										</div>
+									)}
 								</div>
 							</div>
 						))}

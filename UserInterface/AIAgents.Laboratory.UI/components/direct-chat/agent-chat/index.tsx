@@ -22,6 +22,7 @@ import {
 } from "@store/chat/actions";
 import { FullScreenLoading } from "@components/common/spinner";
 import { GetAgentDataByIdAsync } from "@store/agents/actions";
+import { MarkdownRenderer } from "@components/common/markdown-renderer";
 
 export default function AgentChatComponent({
 	toggleChatbotInformation,
@@ -242,7 +243,17 @@ export default function AgentChatComponent({
 											: "bg-white/5 text-white border border-white/10"
 									}`}
 								>
-									<p className="text-sm">{message.content}</p>
+									{message.type === "user" ? (
+										<p className="text-sm whitespace-pre-wrap break-words">
+											{message.content}
+										</p>
+									) : (
+										<div className="text-sm">
+											<MarkdownRenderer
+												content={message.content}
+											/>
+										</div>
+									)}
 								</div>
 							</div>
 						))}

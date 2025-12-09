@@ -24,8 +24,10 @@
 		"postcss": "^8.5.6",
 		"react": "19.1.0",
 		"react-dom": "19.1.0",
+		"react-markdown": "^10.1.0",
 		"react-redux": "^9.2.0",
 		"redux": "^5.0.1",
+		"remark-gfm": "^4.0.1",
 		"tailwindcss": "^4.1.13"
 	},
 	"devDependencies": {

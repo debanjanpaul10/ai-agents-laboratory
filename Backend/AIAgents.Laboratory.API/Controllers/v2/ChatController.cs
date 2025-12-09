@@ -5,6 +5,7 @@ using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.Constants;
+using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ChatController;
 
 namespace AIAgents.Laboratory.API.Controllers.v2;
@@ -16,7 +17,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="chatHandler">The Chat API adapter handler.</param>
 /// <seealso cref="AIAgents.Laboratory.API.Controllers.BaseController" />
 [ApiController]
-[ApiVersion("2")]
+[ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
 public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandler chatHandler) : BaseController(httpContextAccessor)
 {
