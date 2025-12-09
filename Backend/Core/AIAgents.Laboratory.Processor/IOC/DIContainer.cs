@@ -1,0 +1,45 @@
+﻿using System.Diagnostics.CodeAnalysis;
+using AIAgents.Laboratory.Processor.Contracts;
+using AIAgents.Laboratory.Processor.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using static AIAgents.Laboratory.Processor.Helpers.ProcessorConstants;
+
+namespace AIAgents.Laboratory.Processor.IOC;
+
+/// <summary>
+/// The DI Container Class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public static class DIContainer
+{
+#pragma warning disable SKEXP0010
+
+    /// <summary>
+    /// Adds the processor dependencies.
+    /// </summary>
+    /// <param name="services">The services.</param>
+    /// <param name="configuration">The configuration.</param>
+    /// <returns>The services collection.</returns>
+    public static IServiceCollection AddProcessorDependencies(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.RegisterTextEmbeddingGenerationService(configuration);
+        return services.AddScoped<IKnowledgeBaseProcessor, KnowledgeBaseProcessor>();
+    }
+
+    /// <summary>
+    /// Registers the text embedding generation service.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="configuration">The configuration.</param>
+    private static void RegisterTextEmbeddingGenerationService(this IServiceCollection services, IConfiguration configuration)
+    {
+        var openaiModelId = configuration[OpenAiGptConstants.ModelId];
+        var openAiApiKey = configuration[OpenAiGptConstants.ApiKey];
+        var openAiApiEndpoint = configuration[OpenAiGptConstants.ApiEndpoint];
+        if (string.IsNullOrEmpty(openaiModelId) || string.IsNullOrEmpty(openAiApiKey) || string.IsNullOrEmpty(openAiApiEndpoint))
+            throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
+
+        services.AddAzureOpenAIEmbeddingGenerator(openaiModelId, openAiApiEndpoint, openAiApiKey);
+    }
+}
