@@ -3,7 +3,7 @@ name: Build and Deploy AI Agents Laboratory
 env:
     API_PROJECT_PATH: Backend/AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj
     UI_PROJECT_PATH: UserInterface/AIAgents.Laboratory.UI
-    DATABASE_PROJECT_PATH: Backend/AIAgents.Laboratory.Database/AIAgents.Laboratory.Database.sqlproj
+    DATABASE_PROJECT_PATH: Backend/AIAgents.Laboratory.Database
 
 on:
     push:
@@ -132,12 +132,14 @@ jobs:
 
             - name: Install dependencies and build DB solution
               run: |
-                  dotnet restore ${{ env.DATABASE_PROJECT_PATH }}
-                  dotnet build ${{ env.DATABASE_PROJECT_PATH }} --configuration Release --no-restore
+                  cd ${{ env.DATABASE_PROJECT_PATH }}
+                  dotnet restore 
+                  dotnet build --configuration Release --no-restore
 
             - name: Publish the dacpac file
               run: |
-                  dotnet publish ${{ env.DATABASE_PROJECT_PATH }} --configuration Release --output ./publish-db
+                  cd ${{ env.DATABASE_PROJECT_PATH }}
+                  dotnet publish --configuration Release --output ./publish-db
 
             - name: Set datbase objects artifact path
               id: set-artifact-path
