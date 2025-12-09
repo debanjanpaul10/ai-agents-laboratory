@@ -149,7 +149,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: db-artifact
-                  path: ./publish-db
+                  path: ./${{env.DATABASE_PROJECT_PATH}}/publish-db
 
     deploy-database:
         name: Deploy Database project
