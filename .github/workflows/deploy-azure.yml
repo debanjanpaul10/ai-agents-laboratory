@@ -1,9 +1,9 @@
 name: Build and Deploy AI Agents Laboratory
 
 env:
-    API_PROJECT_PATH: AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj
-    UI_PROJECT_PATH: AIAgents.Laboratory.UI
-    DATABASE_PROJECT_PATH: AIAgents.Laboratory.Database/AIAgents.Laboratory.Database.sqlproj
+    API_PROJECT_PATH: Backend/AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj
+    UI_PROJECT_PATH: UserInterface/AIAgents.Laboratory.UI
+    DATABASE_PROJECT_PATH: Backend/AIAgents.Laboratory.Database/AIAgents.Laboratory.Database.sqlproj
 
 on:
     push:
