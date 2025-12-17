@@ -2,123 +2,115 @@ import { ReactNode } from "react";
 import { AgentDataDTO } from "@models/agent-data-dto";
 
 export interface Environment {
-    production: boolean;
-    apiBaseUrl: string;
-    msalConfig: {
-        auth: {
-            clientId: string;
-            authority: string;
-        };
-        scopes: string[];
-    };
-    apiConfig: {
-        scopes: string[];
-        uri: string;
-        apiScope: string[];
-    };
+	production: boolean;
+	apiBaseUrl: string;
+	msalConfig: {
+		auth: {
+			clientId: string;
+			authority: string;
+		};
+		scopes: string[];
+	};
+	apiConfig: {
+		scopes: string[];
+		uri: string;
+		apiScope: string[];
+	};
 }
 
 export interface AgentData {
-    agentName: string;
-    agentMetaPrompt: string;
-    applicationName: string;
-    agentId: string;
+	agentName: string;
+	agentMetaPrompt: string;
+	applicationName: string;
+	agentId: string;
 }
 
 export interface ResponseDTO {
-    isSuccess: boolean;
-    responseData: any;
+	isSuccess: boolean;
+	responseData: any;
 }
 
 export interface User {
-    id: string;
-    name: string;
-    email: string;
+	id: string;
+	name: string;
+	email: string;
 }
 
 export interface AuthProviderProps {
-    children: ReactNode;
+	children: ReactNode;
 }
 
 export interface AuthContextType {
-    user: User | null;
-    isAuthenticated: boolean;
-    isLoading: boolean;
-    login: () => Promise<void>;
-    logout: () => Promise<void>;
-    getAccessToken: () => Promise<string | null>;
+	user: User | null;
+	isAuthenticated: boolean;
+	isLoading: boolean;
+	login: () => Promise<void>;
+	logout: () => Promise<void>;
+	getAccessToken: () => Promise<string | null>;
 }
 
 export interface ModifyAgentComponentProps {
-    editFormData: AgentDataDTO;
-    selectedAgent: AgentDataDTO | null;
-    setEditFormData: React.Dispatch<React.SetStateAction<AgentDataDTO>>;
-    setSelectedAgent: React.Dispatch<React.SetStateAction<AgentDataDTO | null>>;
-    isEditDrawerOpen: boolean;
-    onTestAgent: () => void;
-    onEditClose: () => void;
-    isDisabled: boolean;
-    onOpenKnowledgeBase: () => void;
-    selectedKnowledgeFiles: File[];
-    removedExistingDocuments: string[];
+	editFormData: AgentDataDTO;
+	selectedAgent: AgentDataDTO | null;
+	setEditFormData: React.Dispatch<React.SetStateAction<AgentDataDTO>>;
+	setSelectedAgent: React.Dispatch<React.SetStateAction<AgentDataDTO | null>>;
+	isEditDrawerOpen: boolean;
+	onTestAgent: () => void;
+	onEditClose: () => void;
+	isDisabled: boolean;
+	onOpenKnowledgeBase: () => void;
+	selectedKnowledgeFiles: File[];
+	removedExistingDocuments: string[];
 }
 
 export interface AuthenticatedAppProps {
-    children: React.ReactNode;
+	children: React.ReactNode;
 }
 
 export interface AgentsListComponentProps {
-    agentsDataList: AgentDataDTO[];
-    handleAgentClick: (agent: AgentDataDTO) => void;
-    onClose: () => void;
-    isDisabled: boolean;
+	agentsDataList: AgentDataDTO[];
+	handleAgentClick: (agent: AgentDataDTO) => void;
+	onClose: () => void;
+	isDisabled: boolean;
 }
 
 export interface ChatMessage {
-    id: string;
-    type: "user" | "bot";
-    content: string;
+	id: string;
+	type: "user" | "bot";
+	content: string;
 }
 
 export interface TestAgentComponentProps {
-    selectedAgent: AgentDataDTO | null;
-    editFormData: AgentDataDTO;
-    onClose: () => void;
+	selectedAgent: AgentDataDTO | null;
+	editFormData: AgentDataDTO;
+	onClose: () => void;
 }
 
 export enum FEEDBACK_TYPES {
-    BUGREPORT,
-    NEWFEATURE,
+	BUGREPORT,
+	NEWFEATURE,
 }
 
 export interface MarkdownRendererProps {
-    content: string;
+	content: string;
 }
 
 export interface CreateAgentFlyoutProps {
-    isOpen: boolean;
-    onClose: () => void;
-    selectedKnowledgeFiles: File[];
-    onOpenKnowledgeBase: () => void;
-    onClearKnowledgeFiles: () => void;
-}
-
-// Represents an existing knowledge base document from the server
-export interface ExistingKnowledgeDocument {
-    fileName: string;
-    contentType: string;
-    length: number;
-    isExisting: true; // Flag to distinguish from new files
+	isOpen: boolean;
+	onClose: () => void;
+	selectedKnowledgeFiles: File[];
+	onOpenKnowledgeBase: () => void;
+	onClearKnowledgeFiles: () => void;
 }
 
 // Union type for both new files and existing documents
-export type KnowledgeBaseItem = File | ExistingKnowledgeDocument;
+export type KnowledgeBaseItem = File | null;
 
 export interface KnowledgeBaseFlyoutProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onFilesChange: (files: File[]) => void;
-    selectedFiles: File[];
-    existingDocuments?: ExistingKnowledgeDocument[]; // Optional existing documents
-    onExistingDocumentsChange?: (removedFileNames: string[]) => void; // Callback for removed existing documents
+	isOpen: boolean;
+	onClose: () => void;
+	onFilesChange: (files: File[]) => void;
+	selectedFiles: File[];
+	existingDocuments?: File[]; // Optional existing documents
+	onExistingDocumentsChange?: (removedFileNames: string[]) => void; // Callback for removed existing documents
 }

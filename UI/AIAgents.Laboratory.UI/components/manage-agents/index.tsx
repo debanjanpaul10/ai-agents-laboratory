@@ -24,7 +24,7 @@ export default function ManageAgentsComponent() {
 		createdBy: "",
 		agentId: "",
 		dateCreated: new Date(),
-		knowledgeBaseDocument: null,
+		knowledgeBaseDocument: [],
 		isPrivate: false,
 		mcpServerUrl: "",
 	});
@@ -129,21 +129,7 @@ export default function ManageAgentsComponent() {
 		)
 			return [];
 
-		const kbDoc = selectedAgent.knowledgeBaseDocument as any; // Type assertion since this comes from server
-		const fileName =
-			kbDoc.fileName || kbDoc.name || "knowledge_base_document";
-
-		// Don't include documents that have been marked for removal
-		if (removedExistingDocuments.includes(fileName)) return [];
-
-		return [
-			{
-				fileName,
-				contentType: kbDoc.contentType || "application/octet-stream",
-				length: kbDoc.length || 0,
-				isExisting: true as const,
-			},
-		];
+		return selectedAgent.knowledgeBaseDocument;
 	};
 
 	return (
