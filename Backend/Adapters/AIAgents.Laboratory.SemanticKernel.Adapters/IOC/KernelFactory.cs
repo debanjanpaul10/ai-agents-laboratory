@@ -1,7 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.SemanticKernel.Adapters.InvocationFilter;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
@@ -22,6 +25,8 @@ internal static class KernelFactory
     {
         var currentAiServiceProvider = configuration[AzureAppConfigurationConstants.CurrentAiServiceProvider] ?? throw new Exception();
         var kernelBuilder = Kernel.CreateBuilder();
+        kernelBuilder.Services.AddLogging();
+        kernelBuilder.Services.AddSingleton<IFunctionInvocationFilter, FunctionInvocationFilter>();
 
         switch (currentAiServiceProvider)
         {

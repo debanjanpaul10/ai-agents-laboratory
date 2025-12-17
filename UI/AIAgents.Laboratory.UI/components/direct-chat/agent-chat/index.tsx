@@ -117,6 +117,13 @@ export default function AgentChatComponent({
 
 		setMessages((prev) => [...prev, userMessage]);
 		setUserInput("");
+
+		// Reset textarea height and scrollbar after clearing input
+		if (textareaRef.current) {
+			textareaRef.current.style.height = "auto";
+			setShowScrollbar(false);
+		}
+
 		setIsLoading(true);
 
 		try {

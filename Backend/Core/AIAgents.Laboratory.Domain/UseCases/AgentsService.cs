@@ -41,14 +41,17 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow, agentData.AgentName));
 
             agentData.AgentId = Guid.NewGuid().ToString();
-            if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Length > 0 && IsKnowledgeBaseServiceAllowed)
+            if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Any() && IsKnowledgeBaseServiceAllowed)
             {
                 agentData.ValidateUploadedFile();
                 await agentData.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
-                if (agentData.StoredKnowledgeBase?.FileContent is not null)
+                if (agentData.StoredKnowledgeBase is not null && agentData.StoredKnowledgeBase.Any())
                 {
-                    var content = System.Text.Encoding.UTF8.GetString(agentData.StoredKnowledgeBase.FileContent);
-                    await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, agentData.AgentId).ConfigureAwait(false);
+                    foreach (var file in agentData.StoredKnowledgeBase)
+                    {
+                        var content = System.Text.Encoding.UTF8.GetString(file.FileContent);
+                        await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, agentData.AgentId).ConfigureAwait(false);
+                    }
                 }
             }
 
@@ -75,15 +78,30 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
     /// <returns>
     /// The agent data dto.
     /// </returns>
-    public async Task<AgentDataDomain> GetAgentDataByIdAsync(string agentId)
+    public async Task<AgentDataDomain> GetAgentDataByIdAsync(string agentId, string userEmail)
     {
         try
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, agentId));
 
+            var filter = Builders<AgentDataDomain>.Filter.And(
+                Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
+                Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, agentId));
+
+            if (!string.IsNullOrEmpty(userEmail))
+                filter = Builders<AgentDataDomain>.Filter.And(
+                    filter,
+                    Builders<AgentDataDomain>.Filter.Or(
+                        Builders<AgentDataDomain>.Filter.Eq(x => x.IsPrivate, false),
+                        Builders<AgentDataDomain>.Filter.And(
+                            Builders<AgentDataDomain>.Filter.Eq(x => x.IsPrivate, true),
+                            Builders<AgentDataDomain>.Filter.Eq(x => x.CreatedBy, userEmail)
+                        )
+                    )
+                );
+
             var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
-                MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName,
-                Builders<AgentDataDomain>.Filter.Where(x => x.AgentId == agentId && x.IsActive)).ConfigureAwait(false);
+                MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
 
             var agentData = allData.First() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
             agentData.ConvertKnowledgebaseBinaryDataToFile();
@@ -103,20 +121,28 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
     /// <summary>
     /// Gets all agents data asynchronous.
     /// </summary>
-    /// <returns>
-    /// The list of <see cref="AgentDataDomain" />
-    /// </returns>
-    public async Task<IEnumerable<AgentDataDomain>> GetAllAgentsDataAsync()
+    /// <param name="userEmail">The current logged in user email.</param>
+    /// <returns>The list of <see cref="AgentDataDomain"/></returns>
+    public async Task<IEnumerable<AgentDataDomain>> GetAllAgentsDataAsync(string userEmail)
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, string.Empty));
+            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, userEmail));
 
-            // Get all active agents from the database
+            var filter = Builders<AgentDataDomain>.Filter.And(
+                Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
+                Builders<AgentDataDomain>.Filter.Eq(x => x.IsDefaultChatbot, false),
+                Builders<AgentDataDomain>.Filter.Or(
+                    Builders<AgentDataDomain>.Filter.Eq(x => x.IsPrivate, false),
+                    Builders<AgentDataDomain>.Filter.And(
+                        Builders<AgentDataDomain>.Filter.Eq(x => x.IsPrivate, true),
+                        Builders<AgentDataDomain>.Filter.Eq(x => x.CreatedBy, userEmail)
+                    )
+                )
+            );
+
             var agents = await mongoDatabaseService.GetDataFromCollectionAsync(
-                MongoDbCollectionConstants.AiAgentsPrimaryDatabase,
-                MongoDbCollectionConstants.AgentsCollectionName,
-                Builders<AgentDataDomain>.Filter.Where(x => x.IsActive && !x.IsDefaultChatbot)).ConfigureAwait(false);
+                MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
 
             // Process stored knowledge base data if available
             foreach (var agent in agents)
@@ -131,7 +157,7 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, string.Empty));
+            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, userEmail));
         }
     }
 
@@ -157,7 +183,8 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
             {
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentMetaPrompt, updateDataDomain.AgentMetaPrompt),
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentName, updateDataDomain.AgentName),
-                Builders<AgentDataDomain>.Update.Set(x => x.McpServerUrl, updateDataDomain.McpServerUrl)
+                Builders<AgentDataDomain>.Update.Set(x => x.McpServerUrl, updateDataDomain.McpServerUrl),
+                Builders<AgentDataDomain>.Update.Set(x => x.IsPrivate, updateDataDomain.IsPrivate),
             };
 
             if (IsKnowledgeBaseServiceAllowed)
@@ -215,21 +242,38 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
     /// <returns>A task to wait on.</returns>
     private async Task HandleKnowledgeBaseDataUpdateAsync(AgentDataDomain updateDataDomain, List<UpdateDefinition<AgentDataDomain>> updates, AgentDataDomain existingAgent)
     {
-        if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Length > 0)
+        try
         {
-            updateDataDomain.ValidateUploadedFile();
-            await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
-            if (updateDataDomain.StoredKnowledgeBase?.FileContent is not null)
-            {
-                var content = System.Text.Encoding.UTF8.GetString(updateDataDomain.StoredKnowledgeBase.FileContent);
-                await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, updateDataDomain.AgentId).ConfigureAwait(false);
-            }
+            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId));
 
-            updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, updateDataDomain.StoredKnowledgeBase));
+            if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Any())
+            {
+                updateDataDomain.ValidateUploadedFile();
+                await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
+                if (updateDataDomain.StoredKnowledgeBase is not null && updateDataDomain.StoredKnowledgeBase.Any())
+                {
+                    foreach (var file in updateDataDomain.StoredKnowledgeBase)
+                    {
+                        var content = System.Text.Encoding.UTF8.GetString(file.FileContent);
+                        await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, updateDataDomain.AgentId).ConfigureAwait(false);
+                    }
+                }
+
+                updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, updateDataDomain.StoredKnowledgeBase));
+            }
+            else if (existingAgent.StoredKnowledgeBase is not null)
+            {
+                updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, null));
+            }
         }
-        else if (existingAgent.StoredKnowledgeBase is not null)
+        catch (Exception ex)
         {
-            updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, null));
+            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, ex.Message));
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId));
         }
     }
 }

@@ -74,7 +74,7 @@ public sealed record AgentDataDomain
     /// The knowledge base document.
     /// </value>
     [BsonIgnore]
-    public IFormFile? KnowledgeBaseDocument { get; set; }
+    public IList<IFormFile>? KnowledgeBaseDocument { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the stored knowledge base document.
@@ -82,7 +82,7 @@ public sealed record AgentDataDomain
     /// <value>
     /// The knowledge base document domain.
     /// </value>
-    public KnowledgeBaseDocumentDomain? StoredKnowledgeBase { get; set; }
+    public IList<KnowledgeBaseDocumentDomain> StoredKnowledgeBase { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the URL of the MCP server used for network communication.

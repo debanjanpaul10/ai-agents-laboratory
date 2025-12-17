@@ -1,4 +1,5 @@
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+using Microsoft.AspNetCore.Http;
 
 namespace AIAgents.Laboratory.Domain.Helpers;
 
@@ -13,13 +14,15 @@ internal static class KnowledgebaseHandlerService
     /// <param name="agentData">The agent data containing the knowledge base document to validate. If the document is null, no validation is performed.</param>
     internal static void ValidateUploadedFile(this AgentDataDomain agentData)
     {
-        if (agentData.KnowledgeBaseDocument is null)
-            return;
+        if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any()) return;
 
         var allowedExtensions = new[] { ".docx", ".doc", ".pdf", ".xlsx", ".xls", ".txt", ".json" };
-        var fileExtensions = Path.GetExtension(agentData.KnowledgeBaseDocument.FileName).ToLowerInvariant();
-        if (!allowedExtensions.Contains(fileExtensions))
-            throw new Exception("Invalid file type. Allowed types are: .docx, .doc, .pdf, .xlsx, .xls, .txt, .json");
+        foreach (var file in agentData.KnowledgeBaseDocument)
+        {
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(fileExtension))
+                throw new Exception("Invalid file type. Allowed types are: .docx, .doc, .pdf, .xlsx, .xls, .txt, .json");
+        }
     }
 
     /// <summary>
@@ -29,19 +32,24 @@ internal static class KnowledgebaseHandlerService
     /// <returns>A task to wait on.</returns>
     internal static async Task ProcessKnowledgebaseDocumentDataAsync(this AgentDataDomain agentData)
     {
-        if (agentData.KnowledgeBaseDocument is null)
-            return;
+        if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any()) return;
 
         using var memoryStream = new MemoryStream();
-        await agentData.KnowledgeBaseDocument.CopyToAsync(memoryStream).ConfigureAwait(false);
-        agentData.StoredKnowledgeBase = new KnowledgeBaseDocumentDomain
+        var knowledgeBaseFiles = new List<KnowledgeBaseDocumentDomain>();
+        foreach (var file in agentData.KnowledgeBaseDocument)
         {
-            FileName = agentData.KnowledgeBaseDocument.FileName,
-            ContentType = agentData.KnowledgeBaseDocument.ContentType,
-            FileContent = memoryStream.ToArray(),
-            FileSize = agentData.KnowledgeBaseDocument.Length,
-            UploadDate = DateTime.UtcNow
-        };
+            await file.CopyToAsync(memoryStream).ConfigureAwait(false);
+            knowledgeBaseFiles.Add(new KnowledgeBaseDocumentDomain
+            {
+                FileName = file.FileName,
+                ContentType = file.ContentType,
+                FileContent = memoryStream.ToArray(),
+                FileSize = file.Length,
+                UploadDate = DateTime.UtcNow
+            });
+        }
+
+        agentData.StoredKnowledgeBase = knowledgeBaseFiles;
     }
 
     /// <summary>
@@ -49,10 +57,15 @@ internal static class KnowledgebaseHandlerService
     /// </summary>
     internal static void ConvertKnowledgebaseBinaryDataToFile(this AgentDataDomain agentData)
     {
-        if (agentData.StoredKnowledgeBase?.FileContent is null)
-            return;
+        if (agentData.StoredKnowledgeBase is null || !agentData.StoredKnowledgeBase.Any()) return;
 
-        var stream = new MemoryStream(agentData.StoredKnowledgeBase.FileContent);
-        agentData.KnowledgeBaseDocument = new FormFileImplementation(stream, agentData.StoredKnowledgeBase.FileContent.Length, agentData.StoredKnowledgeBase.FileName, agentData.StoredKnowledgeBase.FileName);
+        var knowledgeBaseFiles = new List<IFormFile>();
+        foreach (var file in agentData.StoredKnowledgeBase)
+        {
+            var stream = new MemoryStream(file.FileContent);
+            knowledgeBaseFiles.Add(new FormFileImplementation(stream, file.FileContent.Length, file.FileName, file.FileName));
+        }
+
+        agentData.KnowledgeBaseDocument = knowledgeBaseFiles;
     }
 }

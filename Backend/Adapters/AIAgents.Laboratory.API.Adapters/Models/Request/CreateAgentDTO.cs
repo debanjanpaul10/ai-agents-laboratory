@@ -37,7 +37,7 @@ public record CreateAgentDTO
     /// <value>
     /// The knowledge base document.
     /// </value>
-    public IFormFile? KnowledgeBaseDocument { get; set; }
+    public IEnumerable<IFormFile>? KnowledgeBaseDocument { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the is private boolean flag.

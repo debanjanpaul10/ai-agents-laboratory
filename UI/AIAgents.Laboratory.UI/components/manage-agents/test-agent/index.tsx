@@ -39,6 +39,13 @@ export default function TestAgentComponent({
 	async function SendChatbotMessageAsync(userMessage: ChatMessage) {
 		setMessages((prev) => [...prev, userMessage]);
 		setUserInput("");
+
+		// Reset textarea height and scrollbar after clearing input
+		if (textareaRef.current) {
+			textareaRef.current.style.height = "auto";
+			setShowScrollbar(false);
+		}
+
 		setIsLoading(true);
 
 		try {
@@ -99,12 +106,6 @@ export default function TestAgentComponent({
 		if (e.key === "Enter" && !e.shiftKey) {
 			e.preventDefault();
 			sendChatbotRequest();
-
-			// Reset textarea height and scrollbar after sending
-			if (textareaRef.current) {
-				textareaRef.current.style.height = "auto";
-				setShowScrollbar(false);
-			}
 		}
 	};
 
