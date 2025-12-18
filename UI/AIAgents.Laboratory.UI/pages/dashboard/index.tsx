@@ -50,24 +50,24 @@ export default function DashboardComponent() {
 		window.open(ConfigurationsStoreData.HowToFileLink, "_blank");
 	};
 
-	const GetAllAgentsData = async () => {
+	async function GetAllAgentsData() {
 		const token = await fetchToken();
 		token && dispatch(GetAllAgentsDataAsync(token));
-	};
+	}
 
-	const GetAllConfigurationsData = async () => {
+	async function GetAllConfigurationsData() {
 		const token = await fetchToken();
 		token && dispatch(GetAllConfigurations(token));
-	};
+	}
 
-	const fetchToken = async () => {
+	async function fetchToken() {
 		try {
 			if (authContext.isAuthenticated && !authContext.isLoading)
 				return await authContext.getAccessToken();
 		} catch (error) {
 			console.error(error);
 		}
-	};
+	}
 
 	const handleUnAuthorizedUser = () => {
 		return (

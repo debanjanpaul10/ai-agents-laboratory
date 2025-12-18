@@ -113,4 +113,5 @@ export interface KnowledgeBaseFlyoutProps {
 	selectedFiles: File[];
 	existingDocuments?: File[]; // Optional existing documents
 	onExistingDocumentsChange?: (removedFileNames: string[]) => void; // Callback for removed existing documents
+	removedExistingDocs?: string[]; // Current list of removed existing document names
 }

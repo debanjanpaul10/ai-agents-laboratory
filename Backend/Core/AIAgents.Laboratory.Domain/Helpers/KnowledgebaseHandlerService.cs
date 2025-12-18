@@ -1,4 +1,5 @@
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+using AIAgents.Laboratory.Processor.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace AIAgents.Laboratory.Domain.Helpers;
@@ -34,10 +35,10 @@ internal static class KnowledgebaseHandlerService
     {
         if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any()) return;
 
-        using var memoryStream = new MemoryStream();
         var knowledgeBaseFiles = new List<KnowledgeBaseDocumentDomain>();
         foreach (var file in agentData.KnowledgeBaseDocument)
         {
+            using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream).ConfigureAwait(false);
             knowledgeBaseFiles.Add(new KnowledgeBaseDocumentDomain
             {

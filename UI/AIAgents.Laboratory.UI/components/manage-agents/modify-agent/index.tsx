@@ -71,10 +71,17 @@ export default function ModifyAgentComponent({
 		form.append("applicationName", editFormData.applicationName);
 		form.append("isPrivate", editFormData.isPrivate.toString());
 
-		// Handle multiple knowledge base files
+		// Handle multiple knowledge base files (new uploads)
 		if (selectedKnowledgeFiles.length > 0) {
 			selectedKnowledgeFiles.forEach((file) => {
 				form.append(`knowledgeBaseDocument`, file);
+			});
+		}
+
+		// Send list of removed existing knowledge base documents (by file name)
+		if (removedExistingDocuments.length > 0) {
+			removedExistingDocuments.forEach((fileName) => {
+				form.append("removedKnowledgeBaseDocuments", fileName);
 			});
 		}
 
@@ -201,6 +208,16 @@ export default function ModifyAgentComponent({
 	};
 
 	const renderAgentKnowledgeBaseData = () => {
+		// Derive counts from existing and newly selected files
+		const existingDocs =
+			(selectedAgent?.knowledgeBaseDocument as File[] | null) ?? [];
+		const visibleExistingDocs = existingDocs.filter(
+			(doc) => !removedExistingDocuments.includes(doc.name)
+		);
+		const existingCount = visibleExistingDocs.length;
+		const totalCount = selectedKnowledgeFiles.length + existingCount;
+		const hasAnyFiles = totalCount > 0;
+
 		return (
 			<div className="space-y-2">
 				<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
@@ -217,54 +234,17 @@ export default function ModifyAgentComponent({
 							<Files className="w-5 h-5 text-green-400" />
 							<div>
 								<span className="text-white font-medium">
-									{(() => {
-										// Check if existing document exists and hasn't been removed
-										const hasExistingDoc =
-											selectedAgent?.knowledgeBaseDocument &&
-											selectedAgent?.knowledgeBaseDocument
-												.length > 0 &&
-											!removedExistingDocuments.includes(
-												(
-													selectedAgent.knowledgeBaseDocument as any
-												).fileName ||
-													(
-														selectedAgent.knowledgeBaseDocument as any
-													).name
-											);
-										const existingCount = hasExistingDoc
-											? 1
-											: 0;
-										const totalCount =
-											selectedKnowledgeFiles.length +
-											existingCount;
-										return totalCount > 0
-											? `${totalCount} file${
-													totalCount !== 1 ? "s" : ""
-											  } selected`
-											: "Choose files";
-									})()}
+									{totalCount > 0
+										? `${totalCount} file${
+												totalCount !== 1 ? "s" : ""
+										  } selected`
+										: "Choose files"}
 								</span>
-								{(() => {
-									const hasExistingDoc =
-										selectedAgent?.knowledgeBaseDocument &&
-										!removedExistingDocuments.includes(
-											(
-												selectedAgent.knowledgeBaseDocument as any
-											).fileName ||
-												(
-													selectedAgent.knowledgeBaseDocument as any
-												).name ||
-												"knowledge_base_document"
-										);
-									return (
-										(selectedKnowledgeFiles.length > 0 ||
-											hasExistingDoc) && (
-											<p className="text-white/60 text-sm">
-												Click to manage files
-											</p>
-										)
-									);
-								})()}
+								{hasAnyFiles && (
+									<p className="text-white/60 text-sm">
+										Click to manage files
+									</p>
+								)}
 							</div>
 						</div>
 						<div className="text-white/40">

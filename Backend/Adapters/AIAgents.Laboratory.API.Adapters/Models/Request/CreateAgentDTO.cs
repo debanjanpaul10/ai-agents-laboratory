@@ -40,6 +40,11 @@ public record CreateAgentDTO
     public IEnumerable<IFormFile>? KnowledgeBaseDocument { get; set; } = [];
 
     /// <summary>
+    /// Gets or sets the list of knowledge base documents to remove by file name (used for updates).
+    /// </summary>
+    public IList<string> RemovedKnowledgeBaseDocuments { get; set; } = [];
+
+    /// <summary>
     /// Gets or sets the is private boolean flag.
     /// </summary>
     /// <value>

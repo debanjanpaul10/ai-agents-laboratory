@@ -4,6 +4,7 @@ using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Processor.Contracts;
+using AIAgents.Laboratory.Processor.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -49,7 +50,7 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
                 {
                     foreach (var file in agentData.StoredKnowledgeBase)
                     {
-                        var content = System.Text.Encoding.UTF8.GetString(file.FileContent);
+                        var content = knowledgeBaseProcessor.DetectAndReadFileContent(file);
                         await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, agentData.AgentId).ConfigureAwait(false);
                     }
                 }
@@ -246,25 +247,43 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId));
 
+            // Start from existing stored knowledge base
+            var updatedStoredKnowledgeBase = existingAgent.StoredKnowledgeBase?.ToList() ?? [];
+            var hasChanges = false;
+
+            // 1. Remove any existing documents whose names are in RemovedKnowledgeBaseDocuments
+            if (updateDataDomain.RemovedKnowledgeBaseDocuments is not null && updateDataDomain.RemovedKnowledgeBaseDocuments.Any())
+            {
+                var removedSet = new HashSet<string>(updateDataDomain.RemovedKnowledgeBaseDocuments, StringComparer.OrdinalIgnoreCase);
+                updatedStoredKnowledgeBase = [.. updatedStoredKnowledgeBase.Where(doc => !removedSet.Contains(doc.FileName))];
+                hasChanges = true;
+            }
+
+            // 2. Process any newly uploaded knowledge base documents
             if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Any())
             {
                 updateDataDomain.ValidateUploadedFile();
                 await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
+
                 if (updateDataDomain.StoredKnowledgeBase is not null && updateDataDomain.StoredKnowledgeBase.Any())
                 {
                     foreach (var file in updateDataDomain.StoredKnowledgeBase)
                     {
-                        var content = System.Text.Encoding.UTF8.GetString(file.FileContent);
+                        var content = knowledgeBaseProcessor.DetectAndReadFileContent(file);
                         await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, updateDataDomain.AgentId).ConfigureAwait(false);
                     }
-                }
 
-                updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, updateDataDomain.StoredKnowledgeBase));
+                    updatedStoredKnowledgeBase.AddRange(updateDataDomain.StoredKnowledgeBase);
+                    hasChanges = true;
+                }
             }
-            else if (existingAgent.StoredKnowledgeBase is not null)
-            {
-                updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, null));
-            }
+
+            // 3. Only persist changes if something actually changed
+            if (hasChanges)
+                // If all documents were removed, set StoredKnowledgeBase to null, otherwise save the updated list
+                updates.Add(Builders<AgentDataDomain>.Update.Set(
+                    x => x.StoredKnowledgeBase,
+                    updatedStoredKnowledgeBase.Count != 0 ? updatedStoredKnowledgeBase : null));
         }
         catch (Exception ex)
         {

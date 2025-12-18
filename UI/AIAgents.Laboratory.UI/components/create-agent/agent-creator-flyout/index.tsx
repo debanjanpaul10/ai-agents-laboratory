@@ -78,7 +78,7 @@ export default function CreateAgentFlyoutComponent({
 		onClearKnowledgeFiles();
 	};
 
-	const handleSubmit = async () => {
+	async function handleSubmit() {
 		const form = new FormData();
 		form.append("agentMetaPrompt", formData.agentMetaPrompt);
 		form.append("agentName", formData.agentName);
@@ -88,14 +88,8 @@ export default function CreateAgentFlyoutComponent({
 		// Handle multiple knowledge base files
 		if (selectedKnowledgeFiles.length > 0) {
 			selectedKnowledgeFiles.forEach((file) => {
-				form.append(`knowledgeBaseDocuments`, file);
+				form.append("knowledgeBaseDocument", file);
 			});
-		} else if (formData.knowledgeBaseDocument) {
-			// Fallback for single file (backward compatibility)
-			form.append(
-				"knowledgeBaseDocument",
-				formData.knowledgeBaseDocument
-			);
 		}
 
 		if (formData.mcpServerUrl)
@@ -104,7 +98,7 @@ export default function CreateAgentFlyoutComponent({
 		const token = await authContext.getAccessToken();
 		token && dispatch(CreateNewAgentAsync(form, token));
 		handleClearData();
-	};
+	}
 
 	const handleInputChange = (
 		field: string,

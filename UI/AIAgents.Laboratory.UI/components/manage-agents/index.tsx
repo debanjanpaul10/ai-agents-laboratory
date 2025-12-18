@@ -171,6 +171,7 @@ export default function ManageAgentsComponent() {
 								onExistingDocumentsChange={
 									handleExistingDocumentsChange
 								}
+								removedExistingDocs={removedExistingDocuments}
 							/>
 						</div>
 					</div>

@@ -31,7 +31,7 @@ export default function FeatureRequestComponent({
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
 
-	const handleSubmit = async () => {
+	async function handleSubmit() {
 		if (!formData.title.trim() || !formData.description.trim()) {
 			ShowErrorToaster("Please fill in all required fields");
 			return;
@@ -53,7 +53,7 @@ export default function FeatureRequestComponent({
 			);
 
 		setIsSubmitting(false);
-	};
+	}
 
 	return (
 		<div className="h-full flex flex-col">

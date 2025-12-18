@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AIAgents.Laboratory.Processor.Models;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -75,6 +76,12 @@ public sealed record AgentDataDomain
     /// </value>
     [BsonIgnore]
     public IList<IFormFile>? KnowledgeBaseDocument { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the list of knowledge base documents to remove by file name (used for updates only).
+    /// </summary>
+    [BsonIgnore]
+    public IList<string> RemovedKnowledgeBaseDocuments { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the stored knowledge base document.

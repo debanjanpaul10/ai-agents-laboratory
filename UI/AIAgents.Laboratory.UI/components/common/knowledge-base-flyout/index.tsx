@@ -11,7 +11,7 @@ import {
 
 import { KnowledgeBaseFlyoutProps } from "@shared/types";
 import { KnowledgeBaseFlyoutPropsConstants } from "@helpers/constants";
-import { ShowErrorToaster } from "@shared/toaster";
+import { DownloadExistingDocument } from "@shared/utils";
 
 export default function KnowledgeBaseFlyoutComponent({
 	isOpen,
@@ -20,11 +20,9 @@ export default function KnowledgeBaseFlyoutComponent({
 	selectedFiles,
 	existingDocuments = [],
 	onExistingDocumentsChange,
+	removedExistingDocs = [],
 }: KnowledgeBaseFlyoutProps) {
 	const [dragActive, setDragActive] = useState(false);
-	const [removedExistingDocs, setRemovedExistingDocs] = useState<string[]>(
-		[]
-	);
 
 	const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
 		const fileInput = e.target as HTMLInputElement;
@@ -111,36 +109,12 @@ export default function KnowledgeBaseFlyoutComponent({
 
 	const removeExistingDocument = (fileName: string) => {
 		const updatedRemovedDocs = [...removedExistingDocs, fileName];
-		setRemovedExistingDocs(updatedRemovedDocs);
 		onExistingDocumentsChange?.(updatedRemovedDocs);
-	};
-
-	const downloadExistingDocument = (doc: any) => {
-		try {
-			// Create a blob from the file data
-			const blob = new Blob([doc], { type: doc.contentType });
-
-			// Create a temporary download link
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement("a");
-			a.href = url;
-			a.download = doc.name; // sets the filename
-			document.body.appendChild(a);
-			a.click();
-
-			// Cleanup
-			document.body.removeChild(a);
-			URL.revokeObjectURL(url);
-		} catch (error: any) {
-			console.error("Error downloading document:", error);
-			if (error.message) ShowErrorToaster(error.message);
-		}
 	};
 
 	const clearAllFiles = () => {
 		onFilesChange([]);
 		const allRemovedDocs = existingDocuments.map((doc) => doc.name);
-		setRemovedExistingDocs(allRemovedDocs);
 		onExistingDocumentsChange?.(allRemovedDocs);
 	};
 
@@ -280,7 +254,7 @@ export default function KnowledgeBaseFlyoutComponent({
 											<div className="flex items-center space-x-2 flex-shrink-0">
 												<Button
 													onPress={() =>
-														downloadExistingDocument(
+														DownloadExistingDocument(
 															doc
 														)
 													}
@@ -348,7 +322,7 @@ export default function KnowledgeBaseFlyoutComponent({
 					{/* Info */}
 					<div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
 						<p className="text-blue-300 text-sm">
-							<strong>Note:</strong>
+							<strong>Note: </strong>
 							{KnowledgeBaseFlyoutPropsConstants.Hints.Info}
 						</p>
 					</div>
