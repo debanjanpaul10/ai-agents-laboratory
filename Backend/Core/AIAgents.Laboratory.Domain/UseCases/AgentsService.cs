@@ -4,7 +4,6 @@ using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Processor.Contracts;
-using AIAgents.Laboratory.Processor.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -146,8 +145,7 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
                 MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
 
             // Process stored knowledge base data if available
-            foreach (var agent in agents)
-                agent.ConvertKnowledgebaseBinaryDataToFile();
+            foreach (var agent in agents) agent.ConvertKnowledgebaseBinaryDataToFile();
 
             return agents;
         }
@@ -235,12 +233,14 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
     }
 
     /// <summary>
-    /// Handles the knowledge base data update asynchronous.
+    /// Processes updates to an agent's knowledge base documents, including adding new documents and removing specified ones, and prepares the corresponding update definitions for persistence.
     /// </summary>
-    /// <param name="updateDataDomain">The agent data domain model.</param>
-    /// <param name="updates">The list of <see cref="AgentDataDomain"/></param>
-    /// <param name="existingAgent">The agent data domain.</param>
-    /// <returns>A task to wait on.</returns>
+    /// <remarks>This method only adds update definitions to the provided list if changes to the knowledge base are detected. It validates and processes any newly uploaded documents and ensures that removed documents
+    /// are excluded from the persisted knowledge base. The caller is responsible for applying the accumulated updates to the data store.</remarks>
+    /// <param name="updateDataDomain">The domain object containing the knowledge base update information, including any new or removed documents. Cannot be null.</param>
+    /// <param name="updates">A list to which update definitions for the agent's knowledge base will be added if changes are detected. Cannot be null.</param>
+    /// <param name="existingAgent">The current state of the agent's data, used as the baseline for applying knowledge base updates. Cannot be null.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task HandleKnowledgeBaseDataUpdateAsync(AgentDataDomain updateDataDomain, List<UpdateDefinition<AgentDataDomain>> updates, AgentDataDomain existingAgent)
     {
         try
