@@ -39,8 +39,7 @@ public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICo
         if (base.IsRequestAuthorized())
         {
             var result = commonAiHandler.GetConfigurationsData(base.UserEmail);
-            if (result is not null && result.Count > 0)
-                return HandleSuccessRequestResponse(result);
+            if (result is not null && result.Count > 0) return HandleSuccessRequestResponse(result);
 
             return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
@@ -65,8 +64,7 @@ public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICo
         if (base.IsRequestAuthorized())
         {
             var result = commonAiHandler.GetConfigurationByKeyName(configKey);
-            if (result is not null && result.Count > 0)
-                return HandleSuccessRequestResponse(result);
+            if (result is not null && result.Count > 0) return HandleSuccessRequestResponse(result);
 
             return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
@@ -92,8 +90,7 @@ public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICo
         {
             addBugReport.CreatedBy = base.UserEmail;
             var result = await feedbackHandler.AddNewBugReportDataAsync(addBugReport).ConfigureAwait(false);
-            if (result)
-                return HandleSuccessRequestResponse(result);
+            if (result) return HandleSuccessRequestResponse(result);
 
             return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
@@ -119,8 +116,7 @@ public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICo
         {
             newFeatureRequest.CreatedBy = base.UserEmail;
             var result = await feedbackHandler.AddNewFeatureRequestDataAsync(newFeatureRequest).ConfigureAwait(false);
-            if (result)
-                return HandleSuccessRequestResponse(result);
+            if (result) return HandleSuccessRequestResponse(result);
 
             return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }

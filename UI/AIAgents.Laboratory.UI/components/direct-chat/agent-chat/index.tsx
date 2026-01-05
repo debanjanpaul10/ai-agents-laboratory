@@ -12,7 +12,7 @@ import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 
 import { DashboardConstants, ManageAgentConstants } from "@helpers/constants";
 import { ChatMessage } from "@shared/types";
-import { generateMessageId } from "@shared/utils";
+import { GenerateMessageId } from "@shared/utils";
 import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
 import { useAuth } from "@auth/AuthProvider";
 import { useAppDispatch, useAppSelector } from "@store/index";
@@ -59,7 +59,7 @@ export default function AgentChatComponent({
 		chatHistory: Array<{ role: string; content: string }>
 	) => {
 		return chatHistory.map((msg) => ({
-			id: generateMessageId(),
+			id: GenerateMessageId(),
 			type: msg.role === "user" ? ("user" as const) : ("bot" as const),
 			content: msg.content,
 		}));
@@ -110,13 +110,20 @@ export default function AgentChatComponent({
 		if (!userInput.trim()) return;
 
 		const userMessage: ChatMessage = {
-			id: generateMessageId(),
+			id: GenerateMessageId(),
 			type: "user" as const,
 			content: userInput,
 		};
 
 		setMessages((prev) => [...prev, userMessage]);
 		setUserInput("");
+
+		// Reset textarea height and scrollbar after clearing input
+		if (textareaRef.current) {
+			textareaRef.current.style.height = "auto";
+			setShowScrollbar(false);
+		}
+
 		setIsLoading(true);
 
 		try {
@@ -133,7 +140,7 @@ export default function AgentChatComponent({
 
 				if (aiResponse) {
 					const botMessage = {
-						id: generateMessageId(),
+						id: GenerateMessageId(),
 						type: "bot" as const,
 						content: aiResponse,
 					};

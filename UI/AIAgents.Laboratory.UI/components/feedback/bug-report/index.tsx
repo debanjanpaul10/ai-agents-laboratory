@@ -33,7 +33,7 @@ export default function BugReportComponent({
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
 
-	const handleSubmit = async () => {
+	async function handleSubmit() {
 		if (
 			!formData.bugTitle.trim() ||
 			!formData.bugDescription.trim() ||
@@ -57,7 +57,7 @@ export default function BugReportComponent({
 		accessToken && dispatch(AddBugReportDataAsync(bugReport, accessToken));
 
 		setIsSubmitting(false);
-	};
+	}
 
 	return (
 		<div className="h-full flex flex-col">

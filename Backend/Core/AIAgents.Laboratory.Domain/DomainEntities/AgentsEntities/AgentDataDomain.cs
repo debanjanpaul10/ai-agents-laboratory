@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AIAgents.Laboratory.Processor.Models;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -74,7 +75,13 @@ public sealed record AgentDataDomain
     /// The knowledge base document.
     /// </value>
     [BsonIgnore]
-    public IFormFile? KnowledgeBaseDocument { get; set; }
+    public IList<IFormFile>? KnowledgeBaseDocument { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the list of knowledge base documents to remove by file name (used for updates only).
+    /// </summary>
+    [BsonIgnore]
+    public IList<string> RemovedKnowledgeBaseDocuments { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the stored knowledge base document.
@@ -82,7 +89,7 @@ public sealed record AgentDataDomain
     /// <value>
     /// The knowledge base document domain.
     /// </value>
-    public KnowledgeBaseDocumentDomain? StoredKnowledgeBase { get; set; }
+    public IList<KnowledgeBaseDocumentDomain> StoredKnowledgeBase { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the URL of the MCP server used for network communication.

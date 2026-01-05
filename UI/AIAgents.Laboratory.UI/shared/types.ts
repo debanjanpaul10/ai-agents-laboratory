@@ -58,6 +58,9 @@ export interface ModifyAgentComponentProps {
 	onTestAgent: () => void;
 	onEditClose: () => void;
 	isDisabled: boolean;
+	onOpenKnowledgeBase: () => void;
+	selectedKnowledgeFiles: File[];
+	removedExistingDocuments: string[];
 }
 
 export interface AuthenticatedAppProps {
@@ -90,4 +93,25 @@ export enum FEEDBACK_TYPES {
 
 export interface MarkdownRendererProps {
 	content: string;
+}
+
+export interface CreateAgentFlyoutProps {
+	isOpen: boolean;
+	onClose: () => void;
+	selectedKnowledgeFiles: File[];
+	onOpenKnowledgeBase: () => void;
+	onClearKnowledgeFiles: () => void;
+}
+
+// Union type for both new files and existing documents
+export type KnowledgeBaseItem = File | null;
+
+export interface KnowledgeBaseFlyoutProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onFilesChange: (files: File[]) => void;
+	selectedFiles: File[];
+	existingDocuments?: File[]; // Optional existing documents
+	onExistingDocumentsChange?: (removedFileNames: string[]) => void; // Callback for removed existing documents
+	removedExistingDocs?: string[]; // Current list of removed existing document names
 }

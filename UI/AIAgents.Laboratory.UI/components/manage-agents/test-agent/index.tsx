@@ -9,7 +9,7 @@ import { InvokeChatAgentAsync } from "@store/chat/actions";
 import { useAppDispatch } from "@store/index";
 import { ChatMessage, TestAgentComponentProps } from "@shared/types";
 import { ManageAgentConstants } from "@helpers/constants";
-import { generateMessageId } from "@shared/utils";
+import { GenerateMessageId } from "@shared/utils";
 import { MarkdownRenderer } from "@components/common/markdown-renderer";
 
 export default function TestAgentComponent({
@@ -29,7 +29,7 @@ export default function TestAgentComponent({
 		if (!userInput.trim()) return;
 
 		const userMessage: ChatMessage = {
-			id: generateMessageId(),
+			id: GenerateMessageId(),
 			type: "user" as const,
 			content: userInput,
 		};
@@ -39,12 +39,19 @@ export default function TestAgentComponent({
 	async function SendChatbotMessageAsync(userMessage: ChatMessage) {
 		setMessages((prev) => [...prev, userMessage]);
 		setUserInput("");
+
+		// Reset textarea height and scrollbar after clearing input
+		if (textareaRef.current) {
+			textareaRef.current.style.height = "auto";
+			setShowScrollbar(false);
+		}
+
 		setIsLoading(true);
 
 		try {
 			const chatRequest: ChatRequestDTO = {
 				userMessage: userMessage.content.trim(),
-				conversationId: generateMessageId(),
+				conversationId: GenerateMessageId(),
 				agentId: editFormData.agentId,
 				agentName: editFormData.agentName,
 			};
@@ -58,7 +65,7 @@ export default function TestAgentComponent({
 
 				if (aiResponse) {
 					const botMessage = {
-						id: generateMessageId(),
+						id: GenerateMessageId(),
 						type: "bot" as const,
 						content: aiResponse,
 						timestamp: new Date(),
@@ -99,12 +106,6 @@ export default function TestAgentComponent({
 		if (e.key === "Enter" && !e.shiftKey) {
 			e.preventDefault();
 			sendChatbotRequest();
-
-			// Reset textarea height and scrollbar after sending
-			if (textareaRef.current) {
-				textareaRef.current.style.height = "auto";
-				setShowScrollbar(false);
-			}
 		}
 	};
 

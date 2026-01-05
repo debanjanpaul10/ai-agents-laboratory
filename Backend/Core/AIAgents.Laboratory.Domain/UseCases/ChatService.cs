@@ -40,7 +40,7 @@ public class ChatService(ILogger<ChatService> logger, IConfiguration configurati
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, chatRequest.AgentId));
 
-            var agentData = await agentsService.GetAgentDataByIdAsync(chatRequest.AgentId).ConfigureAwait(false);
+            var agentData = await agentsService.GetAgentDataByIdAsync(chatRequest.AgentId, string.Empty).ConfigureAwait(false);
             if (agentData is null || string.IsNullOrEmpty(agentData.AgentMetaPrompt))
             {
                 var ex = new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
@@ -94,7 +94,7 @@ public class ChatService(ILogger<ChatService> logger, IConfiguration configurati
             ArgumentException.ThrowIfNullOrEmpty(userQuery);
 
             var chatbotAgentGuid = configuration[AzureAppConfigurationConstants.AIChatbotAgentId] ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
-            var agentDataTask = agentsService.GetAgentDataByIdAsync(chatbotAgentGuid);
+            var agentDataTask = agentsService.GetAgentDataByIdAsync(chatbotAgentGuid, userEmail);
             var conversationHistoryTask = conversationHistoryService.GetConversationHistoryAsync(userEmail);
             await Task.WhenAll(agentDataTask, conversationHistoryTask).ConfigureAwait(false);
 

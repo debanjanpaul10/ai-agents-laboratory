@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Bot, ChevronsRight } from "lucide-react";
+
 import { AgentData } from "@shared/types";
 import { useAppSelector } from "@store/index";
 import { DashboardConstants } from "@helpers/constants";

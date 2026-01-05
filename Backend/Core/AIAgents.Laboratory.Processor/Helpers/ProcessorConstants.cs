@@ -107,7 +107,7 @@ internal static class ProcessorConstants
         /// <summary>
         /// The log helper method start.
         /// </summary>
-        internal const string LogHelperMethodStart = "{0} started at {1}";
+        internal const string LogHelperMethodStart = "{0} started at {1} for {2}";
 
         /// <summary>
         /// The log helper method failed.
@@ -117,7 +117,7 @@ internal static class ProcessorConstants
         /// <summary>
         /// The log helper method end.
         /// </summary>
-        internal const string LogHelperMethodEnd = "{0} ended at {1}";
+        internal const string LogHelperMethodEnd = "{0} ended at {1} for {2}";
     }
 
     /// <summary>
@@ -154,6 +154,11 @@ internal static class ProcessorConstants
         /// The number of embeddings mismatch
         /// </summary>
         internal const string NumberOfEmbeddingsMismatch = "The number of embeddings generated does not match the number of text chunks.";
+
+        /// <summary>
+        /// The unsupported file type message.
+        /// </summary>
+        internal const string UnsupportedFileTypeMessage = "The uploaded file type is not supported for knowledge base processing.";
     }
 
     /// <summary>
@@ -165,5 +170,36 @@ internal static class ProcessorConstants
         /// The chunk description template
         /// </summary>
         internal const string ChunkDescriptionTemplate = "Knowledge base chunk {0} of {1}";
+
+        /// <summary>
+        /// The comma separator.
+        /// </summary>
+        internal const char CommaSeparator = ',';
+
+        /// <summary>
+        /// The file content types.
+        /// </summary>
+        internal static class FileContentTypes
+        {
+            /// <summary>
+            /// The content type plain text.
+            /// </summary>
+            internal const string PlainTextFiles = ".txt";
+
+            /// <summary>
+            /// The pdf files.
+            /// </summary>
+            internal const string PdfFiles = ".pdf";
+
+            /// <summary>
+            /// The word files.
+            /// </summary>
+            internal const string WordFiles = ".docx, .doc, .docm";
+
+            /// <summary>
+            /// The excel files.
+            /// </summary>
+            internal const string ExcelFiles = ".xls, .xlsx, .xlsm";
+        }
     }
 }

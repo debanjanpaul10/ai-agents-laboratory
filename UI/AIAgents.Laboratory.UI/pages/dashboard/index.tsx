@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useMsal } from "@azure/msal-react";
-import { LogOut } from "lucide-react";
+import { LogOut, Info } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@heroui/react";
 
@@ -27,6 +27,9 @@ export default function DashboardComponent() {
 	const IsLoadingStoreData = useAppSelector(
 		(state) => state.CommonReducer.isLoading
 	);
+	const ConfigurationsStoreData = useAppSelector(
+		(state) => state.CommonReducer.configurations
+	);
 
 	useEffect(() => {
 		if (authContext.isAuthenticated && !authContext.isLoading) {
@@ -42,24 +45,29 @@ export default function DashboardComponent() {
 		localStorage.clear();
 	};
 
-	const GetAllAgentsData = async () => {
+	const handleHowTo = () => {
+		// Open how-to guide in a new tab
+		window.open(ConfigurationsStoreData.HowToFileLink, "_blank");
+	};
+
+	async function GetAllAgentsData() {
 		const token = await fetchToken();
 		token && dispatch(GetAllAgentsDataAsync(token));
-	};
+	}
 
-	const GetAllConfigurationsData = async () => {
+	async function GetAllConfigurationsData() {
 		const token = await fetchToken();
 		token && dispatch(GetAllConfigurations(token));
-	};
+	}
 
-	const fetchToken = async () => {
+	async function fetchToken() {
 		try {
 			if (authContext.isAuthenticated && !authContext.isLoading)
 				return await authContext.getAccessToken();
 		} catch (error) {
 			console.error(error);
 		}
-	};
+	}
 
 	const handleUnAuthorizedUser = () => {
 		return (
@@ -108,22 +116,43 @@ export default function DashboardComponent() {
 									</div>
 								</div>
 
-								{/* Logout button with glassmorphic effect - responsive sizing */}
-								<div className="relative group/button">
-									<div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl blur opacity-75 group-hover/button:opacity-100 transition duration-300"></div>
-									<Button
-										onPress={handleLogout}
-										radius="full"
-										title="Logout from application"
-										className="relative bg-red-500/20 backdrop-blur-sm hover:bg-red-500/30 text-white font-semibold rounded-xl border border-red-500/30 hover:border-red-400/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25"
-									>
-										<span className="flex items-center space-x-1 md:space-x-2">
-											<LogOut className="w-4 h-4 md:w-5 md:h-5" />
-											<span className="text-xs md:text-base">
-												Logout
+								{/* Action buttons with glassmorphic effect - responsive sizing */}
+								<div className="flex items-center space-x-3">
+									{/* How To button */}
+									<div className="relative group/howto">
+										<div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl blur opacity-75 group-hover/howto:opacity-100 transition duration-300"></div>
+										<Button
+											onPress={handleHowTo}
+											radius="full"
+											title="How to use the application"
+											className="relative bg-blue-500/20 backdrop-blur-sm hover:bg-blue-500/30 text-white font-semibold rounded-xl border border-blue-500/30 hover:border-blue-400/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/25"
+										>
+											<span className="flex items-center space-x-1 md:space-x-2">
+												<Info className="w-4 h-4 md:w-5 md:h-5" />
+												<span className="text-xs md:text-base">
+													How To
+												</span>
 											</span>
-										</span>
-									</Button>
+										</Button>
+									</div>
+
+									{/* Logout button */}
+									<div className="relative group/button">
+										<div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl blur opacity-75 group-hover/button:opacity-100 transition duration-300"></div>
+										<Button
+											onPress={handleLogout}
+											radius="full"
+											title="Logout from application"
+											className="relative bg-red-500/20 backdrop-blur-sm hover:bg-red-500/30 text-white font-semibold rounded-xl border border-red-500/30 hover:border-red-400/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25"
+										>
+											<span className="flex items-center space-x-1 md:space-x-2">
+												<LogOut className="w-4 h-4 md:w-5 md:h-5" />
+												<span className="text-xs md:text-base">
+													Logout
+												</span>
+											</span>
+										</Button>
+									</div>
 								</div>
 							</div>
 

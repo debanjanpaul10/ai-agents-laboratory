@@ -3,7 +3,7 @@ using AIAgents.Laboratory.API.IOC;
 using AIAgents.Laboratory.API.Middleware;
 using AIAgents.Laboratory.Messaging.Adapters.Services;
 using Azure.Identity;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using SwaggerConstants = AIAgents.Laboratory.API.Helpers.Constants.SwaggerConstants;
 
@@ -12,11 +12,11 @@ builder.Configuration.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(E
 
 var miCredentials = builder.Configuration[EnvironmentConfigurationConstants.ManagedIdentityClientIdConstant];
 var credentials = builder.Environment.IsDevelopment()
-	? new DefaultAzureCredential()
-	: new DefaultAzureCredential(new DefaultAzureCredentialOptions
-	{
-		ManagedIdentityClientId = miCredentials,
-	});
+    ? new DefaultAzureCredential()
+    : new DefaultAzureCredential(new DefaultAzureCredentialOptions
+    {
+        ManagedIdentityClientId = miCredentials,
+    });
 
 builder.ConfigureAzureAppConfiguration(credentials);
 builder.Services.ConfigureApplicationDependencies(builder.Configuration, builder.Environment.IsDevelopment());
@@ -28,19 +28,19 @@ builder.Services.AddApiVersions();
 
 builder.Services.AddSwaggerGen(options =>
 {
-	options.SwaggerDoc(SwaggerConstants.ApiVersion, new OpenApiInfo
-	{
-		Title = SwaggerConstants.ApplicationAPIName,
-		Version = SwaggerConstants.ApiVersion,
-		Description = SwaggerConstants.SwaggerDescription,
-		Contact = new OpenApiContact
-		{
-			Name = SwaggerConstants.AuthorDetails.Name,
-			Email = SwaggerConstants.AuthorDetails.Email
-		}
+    options.SwaggerDoc(SwaggerConstants.ApiVersion, new OpenApiInfo
+    {
+        Title = SwaggerConstants.ApplicationAPIName,
+        Version = SwaggerConstants.ApiVersion,
+        Description = SwaggerConstants.SwaggerDescription,
+        Contact = new OpenApiContact
+        {
+            Name = SwaggerConstants.AuthorDetails.Name,
+            Email = SwaggerConstants.AuthorDetails.Email
+        }
 
-	});
-	options.EnableAnnotations();
+    });
+    options.EnableAnnotations();
 });
 builder.Services.AddProblemDetails();
 builder.Services.AddHttpContextAccessor();
@@ -48,14 +48,14 @@ builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
-	app.MapOpenApi();
-	app.UseDeveloperExceptionPage();
-	app.UseSwagger();
-	app.UseSwaggerUI(c =>
-	{
-		c.SwaggerEndpoint(SwaggerConstants.SwaggerEndpointUrl, $"{SwaggerConstants.ApplicationAPIName}.{SwaggerConstants.ApiVersion}");
-		c.RoutePrefix = SwaggerConstants.SwaggerUiPrefix;
-	});
+    app.MapOpenApi();
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint(SwaggerConstants.SwaggerEndpointUrl, $"{SwaggerConstants.ApplicationAPIName}.{SwaggerConstants.ApiVersion}");
+        c.RoutePrefix = SwaggerConstants.SwaggerUiPrefix;
+    });
 }
 
 app.UseExceptionMiddleware();
