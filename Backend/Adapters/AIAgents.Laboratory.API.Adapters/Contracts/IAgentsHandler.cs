@@ -19,15 +19,17 @@ public interface IAgentsHandler
     /// <summary>
     /// Gets all agents data asynchronous.
     /// </summary>
+    /// <param name="userEmail">The current logged in user email.</param>
     /// <returns>The list of <see cref="AgentDataDTO"/></returns>
-    Task<IEnumerable<AgentDataDTO>> GetAllAgentsDataAsync();
+    Task<IEnumerable<AgentDataDTO>> GetAllAgentsDataAsync(string userEmail);
 
     /// <summary>
     /// Gets the agent data by identifier asynchronous.
     /// </summary>
     /// <param name="agentId">The agent identifier.</param>
+    /// <param name="userEmail">The user email address.</param>
     /// <returns>The agent data dto.</returns>
-    Task<AgentDataDTO> GetAgentDataByIdAsync(string agentId);
+    Task<AgentDataDTO> GetAgentDataByIdAsync(string agentId, string userEmail);
 
     /// <summary>
     /// Updates the existing agent data.

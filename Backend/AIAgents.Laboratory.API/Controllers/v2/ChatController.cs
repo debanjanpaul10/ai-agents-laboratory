@@ -38,8 +38,7 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
         ArgumentNullException.ThrowIfNull(chatRequestDTO);
 
         var result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
-        if (!string.IsNullOrEmpty(result))
-            return HandleSuccessRequestResponse(result);
+        if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
 
         return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
@@ -61,8 +60,7 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
         ArgumentException.ThrowIfNullOrEmpty(userChatMessage.UserMessage);
 
         var result = await chatHandler.GetDirectChatResponseAsync(userChatMessage.UserMessage, UserEmail).ConfigureAwait(false);
-        if (!string.IsNullOrEmpty(result))
-            return HandleSuccessRequestResponse(result);
+        if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
 
         return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
@@ -80,8 +78,7 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
     public async Task<ResponseDTO> ClearConversationHistoryForUserAsync()
     {
         var result = await chatHandler.ClearConversationHistoryForUserAsync(base.UserEmail).ConfigureAwait(false);
-        if (result)
-            return HandleSuccessRequestResponse(result);
+        if (result) return HandleSuccessRequestResponse(result);
 
         return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeClearedMessageConstant);
     }
@@ -99,8 +96,7 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
     public async Task<ResponseDTO> GetConversationHistoryDataForUserAsync()
     {
         var result = await chatHandler.GetConversationHistoryDataAsync(base.UserEmail).ConfigureAwait(false);
-        if (result is not null)
-            return HandleSuccessRequestResponse(result);
+        if (result is not null) return HandleSuccessRequestResponse(result);
 
         return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeFetchedMessageConstant);
     }

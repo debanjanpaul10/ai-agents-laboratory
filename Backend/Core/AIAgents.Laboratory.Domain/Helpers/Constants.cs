@@ -123,6 +123,11 @@ internal static class Constants
         /// The AI chatbot agent identifier.
         /// </summary>
         internal const string AIChatbotAgentId = "AIChatbotAgentId";
+
+        /// <summary>
+        /// The how to file link constant.
+        /// </summary>
+        internal const string HowToFileLinkConstant = "HowToFileLink";
     }
 
     /// <summary>

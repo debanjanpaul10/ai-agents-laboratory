@@ -63,7 +63,7 @@ public class CommonAiService(IConfiguration configuration, ILogger<CommonAiServi
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationsData), DateTime.UtcNow, userName));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationsData), DateTime.UtcNow, userName);
 
             var cachedValues = cacheService.GetCachedData<Dictionary<string, string>>(CacheKeys.AllAppSettingsKeyName);
             if (cachedValues is not null && cachedValues.Count > 0)
@@ -79,6 +79,7 @@ public class CommonAiService(IConfiguration configuration, ILogger<CommonAiServi
                     { AzureAppConfigurationConstants.IsFeedbackFeatureEnabled, configuration[AzureAppConfigurationConstants.IsFeedbackFeatureEnabled]! },
                     { AzureAppConfigurationConstants.IsEmailNotificationEnabled, configuration[AzureAppConfigurationConstants.IsEmailNotificationEnabled]! },
                     { AzureAppConfigurationConstants.IsCacheServiceEnabled, configuration[AzureAppConfigurationConstants.IsCacheServiceEnabled]! },
+                    { AzureAppConfigurationConstants.HowToFileLinkConstant, configuration[AzureAppConfigurationConstants.HowToFileLinkConstant]! }
                 };
 
                 cacheService.SetCacheData(CacheKeys.AllAppSettingsKeyName, existingCacheData, CacheKeys.CacheExpirationTimeout);
@@ -87,12 +88,12 @@ public class CommonAiService(IConfiguration configuration, ILogger<CommonAiServi
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationsData), DateTime.UtcNow, ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationsData), DateTime.UtcNow, ex.Message);
             throw;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationsData), DateTime.UtcNow, userName));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationsData), DateTime.UtcNow, userName);
         }
     }
 

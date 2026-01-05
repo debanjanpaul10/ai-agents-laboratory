@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppSelector } from "@store/index";
 
 export default function StatsSectionTilesComponent() {
-	const [agentsCount, setAgentsCount] = useState(0);
+	const [agentsCount, setAgentsCount] = useState<number>(0);
 
 	const AgentsListStoreData = useAppSelector(
 		(state) => state.AgentsReducer.agentsListData

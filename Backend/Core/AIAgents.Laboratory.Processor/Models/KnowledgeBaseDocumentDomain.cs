@@ -1,4 +1,4 @@
-namespace AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+namespace AIAgents.Laboratory.Processor.Models;
 
 /// <summary>
 /// The Knowledge Base Document Domain model.

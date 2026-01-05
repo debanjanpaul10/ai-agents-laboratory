@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { Button, Input, Tooltip } from "@heroui/react";
+import React, { useState } from "react";
+import { Button, Input } from "@heroui/react";
 import {
 	Save,
 	Play,
@@ -11,9 +11,8 @@ import {
 	Trash,
 	ScrollText,
 	Files,
-	Upload,
-	Download,
 	Link,
+	GlobeLock,
 } from "lucide-react";
 import { useMsal } from "@azure/msal-react";
 
@@ -39,6 +38,9 @@ export default function ModifyAgentComponent({
 	onTestAgent,
 	onEditClose,
 	isDisabled,
+	onOpenKnowledgeBase,
+	selectedKnowledgeFiles,
+	removedExistingDocuments,
 }: ModifyAgentComponentProps) {
 	const dispatch = useAppDispatch();
 	const authContext = useAuth();
@@ -54,55 +56,11 @@ export default function ModifyAgentComponent({
 		(state) => state.CommonReducer.configurations
 	);
 
-	const handleInputChange = (field: string, value: string | File | null) => {
+	const handleInputChange = (
+		field: string,
+		value: string | File | boolean | null
+	) => {
 		setEditFormData((prev: any) => ({ ...prev, [field]: value }));
-	};
-
-	const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-	const handleUploadClick = () => {
-		fileInputRef.current?.click();
-	};
-
-	const handleDownloadFile = () => {
-		const fileData = editFormData.knowledgeBaseDocument;
-		if (!fileData) return;
-
-		const fileName = fileData.name;
-
-		try {
-			// If it's already a File object
-			if (fileData instanceof File) {
-				const url = URL.createObjectURL(fileData);
-				const link = document.createElement("a");
-				link.href = url;
-				link.download = fileName || "knowledgeBaseDocument";
-				document.body.appendChild(link);
-				link.click();
-				document.body.removeChild(link);
-				URL.revokeObjectURL(url);
-				return;
-			}
-
-			// Create a new blob from the data
-			const blob = new Blob([fileData], {
-				type: "application/octet-stream",
-			});
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.download = fileName || "knowledgeBaseDocument";
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
-		} catch (error) {
-			console.error("Error downloading file:", error);
-		}
-	};
-
-	const handleDeleteFile = () => {
-		handleInputChange("knowledgeBaseDocument", null);
 	};
 
 	async function handleEditSave() {
@@ -111,11 +69,21 @@ export default function ModifyAgentComponent({
 		form.append("agentMetaPrompt", editFormData.agentMetaPrompt);
 		form.append("agentName", editFormData.agentName);
 		form.append("applicationName", editFormData.applicationName);
-		if (editFormData.knowledgeBaseDocument)
-			form.append(
-				"knowledgeBaseDocument",
-				editFormData.knowledgeBaseDocument
-			);
+		form.append("isPrivate", editFormData.isPrivate.toString());
+
+		// Handle multiple knowledge base files (new uploads)
+		if (selectedKnowledgeFiles.length > 0) {
+			selectedKnowledgeFiles.forEach((file) => {
+				form.append(`knowledgeBaseDocument`, file);
+			});
+		}
+
+		// Send list of removed existing knowledge base documents (by file name)
+		if (removedExistingDocuments.length > 0) {
+			removedExistingDocuments.forEach((fileName) => {
+				form.append("removedKnowledgeBaseDocuments", fileName);
+			});
+		}
 
 		if (editFormData.mcpServerUrl)
 			form.append("mcpServerUrl", editFormData.mcpServerUrl);
@@ -240,119 +208,66 @@ export default function ModifyAgentComponent({
 	};
 
 	const renderAgentKnowledgeBaseData = () => {
+		// Derive counts from existing and newly selected files
+		const existingDocs =
+			(selectedAgent?.knowledgeBaseDocument as File[] | null) ?? [];
+		const visibleExistingDocs = existingDocs.filter(
+			(doc) => !removedExistingDocuments.includes(doc.name)
+		);
+		const existingCount = visibleExistingDocs.length;
+		const totalCount = selectedKnowledgeFiles.length + existingCount;
+		const hasAnyFiles = totalCount > 0;
+
 		return (
-			<>
-				<div className="space-y-2">
-					<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
-						<Files className="w-4 h-4 text-pink-400" />
-						<span>Agent Knowledge Base</span>
-					</label>
-					<div className="flex items-center space-x-2">
-						<Tooltip
-							content={
-								editFormData.knowledgeBaseDocument?.name || ""
-							}
-							placement="left"
-						>
-							<Input
-								value={
-									editFormData.knowledgeBaseDocument?.name ||
-									""
-								}
-								radius="full"
-								disabled={true}
-								classNames={{
-									input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
-									inputWrapper:
-										"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-purple-500/50 min-h-[48px]",
-								}}
-							/>
-						</Tooltip>
-
-						<div className="flex items-center space-x-2">
-							{editFormData.knowledgeBaseDocument ? (
-								<>
-									{/* DOWNLOAD */}
-									<div className="relative">
-										<Tooltip content="Download">
-											<Button
-												onPress={handleDownloadFile}
-												radius="full"
-												className="group relative bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 text-white font-semibold hover:from-emerald-500 hover:via-green-600 hover:to-teal-600 shadow-lg hover:shadow-green-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
-											>
-												<div className="flex items-center">
-													<Download className="w-4 h-4 flex-shrink-0" />
-												</div>
-											</Button>
-										</Tooltip>
-									</div>
-
-									{/* UPLOAD */}
-									<div className="relative">
-										<Tooltip content="Upload">
-											<Button
-												onPress={handleUploadClick}
-												disabled={
-													isDisabled ||
-													accounts[0].username !==
-														editFormData.createdBy
-												}
-												radius="full"
-												className="group relative bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 text-white font-semibold hover:from-blue-500 hover:via-indigo-600 hover:to-purple-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
-											>
-												<div className="flex items-center">
-													<Upload className="w-4 h-4 flex-shrink-0" />
-												</div>
-											</Button>
-										</Tooltip>
-									</div>
-
-									{/* DELETE */}
-									<div className="relative">
-										<Tooltip content="Delete">
-											<Button
-												onPress={handleDeleteFile}
-												disabled={
-													accounts[0].username !==
-													editFormData.createdBy
-												}
-												radius="full"
-												className="group relative bg-gradient-to-r from-red-400 via-rose-500 to-pink-500 text-white font-semibold hover:from-red-500 hover:via-rose-600 hover:to-pink-600 shadow-lg hover:shadow-rose-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
-											>
-												<div className="flex items-center">
-													<Trash className="w-4 h-4 flex-shrink-0" />
-												</div>
-											</Button>
-										</Tooltip>
-									</div>
-								</>
-							) : (
-								<div className="relative">
-									<Tooltip content="Upload">
-										<Button
-											onPress={handleUploadClick}
-											disabled={
-												isDisabled ||
-												accounts[0].username !==
-													editFormData.createdBy
-											}
-											radius="full"
-											className="group relative bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 text-white font-semibold hover:from-blue-500 hover:via-indigo-600 hover:to-purple-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
-										>
-											<div className="flex items-center">
-												<Upload className="w-4 h-4 flex-shrink-0" />
-											</div>
-										</Button>
-									</Tooltip>
-								</div>
-							)}
+			<div className="space-y-2">
+				<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+					<Files className="w-4 h-4 text-pink-400" />
+					<span>Agent Knowledge Base</span>
+				</label>
+				<div className="relative group">
+					<div className="absolute -inset-0.5 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur opacity-50 group-hover:opacity-75 transition duration-300"></div>
+					<button
+						onClick={onOpenKnowledgeBase}
+						className="relative w-full bg-white/5 border border-white/10 hover:border-white/20 hover:border-green-500/50 rounded-xl p-4 text-left transition-all duration-200 min-h-[48px] flex items-center justify-between"
+					>
+						<div className="flex items-center space-x-3">
+							<Files className="w-5 h-5 text-green-400" />
+							<div>
+								<span className="text-white font-medium">
+									{totalCount > 0
+										? `${totalCount} file${
+												totalCount !== 1 ? "s" : ""
+										  } selected`
+										: "Choose files"}
+								</span>
+								{hasAnyFiles && (
+									<p className="text-white/60 text-sm">
+										Click to manage files
+									</p>
+								)}
+							</div>
 						</div>
-					</div>
+						<div className="text-white/40">
+							<svg
+								className="w-5 h-5"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M9 5l7 7-7 7"
+								/>
+							</svg>
+						</div>
+					</button>
 				</div>
 				<p className="text-white/40 text-xs">
 					{ManageAgentConstants.ModifyAgentConstants.KBInfo}
 				</p>
-			</>
+			</div>
 		);
 	};
 
@@ -482,6 +397,43 @@ export default function ModifyAgentComponent({
 							/>
 						</div>
 
+						{/* Is Private Field */}
+						<div className="py-2">
+							<div className="flex items-center justify-between py-2">
+								<div className="flex items-center space-x-2">
+									<GlobeLock className="w-4 h-4 text-pink-400" />
+									<span className="text-white/80 text-sm font-medium">
+										Private Agent
+									</span>
+								</div>
+								<label className="relative inline-flex items-center cursor-pointer">
+									<input
+										type="checkbox"
+										checked={editFormData.isPrivate}
+										onChange={(e) =>
+											handleInputChange(
+												"isPrivate",
+												e.target.checked
+											)
+										}
+										disabled={
+											isDisabled ||
+											accounts[0].username !==
+												editFormData.createdBy
+										}
+										className="sr-only peer"
+									/>
+									<div className="relative w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+								</label>
+							</div>
+							<p className="text-white/40 text-xs">
+								{
+									ManageAgentConstants.ModifyAgentConstants
+										.PrivateField
+								}
+							</p>
+						</div>
+
 						{/* Meta Prompt Field */}
 						<div className="space-y-2">
 							<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
@@ -558,6 +510,12 @@ export default function ModifyAgentComponent({
 									}}
 								/>
 							</div>
+							<p className="text-white/40 text-xs">
+								{
+									ManageAgentConstants.ModifyAgentConstants
+										.MCPUrl
+								}
+							</p>
 						</div>
 
 						{/* Agent Info Display */}

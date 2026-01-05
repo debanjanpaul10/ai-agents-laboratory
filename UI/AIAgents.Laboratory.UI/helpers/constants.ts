@@ -83,6 +83,9 @@ export const ManageAgentConstants = {
 		},
 		Info: "Describe how your agent should behave, what it should know, and how it should respond to users.",
 		KBInfo: "You can upload knowledge base data to the agent. Available file formats: .pdf, .docx, .xlsx, .txt",
+		PrivateField:
+			"Private agents are only accessible by you and won't appear in public listings.",
+		MCPUrl: "Provide the URL for any MCP (Model Context Protocol) Servers that you have. The AI Agent will use them for tool calling.",
 	},
 
 	TestAgentConstants: {
@@ -144,4 +147,21 @@ export const NewFeatureRequestConstants = {
 
 export const ApplicationConstants = {
 	ChatbotAgentConfigKeyName: "AIChatbotAgentId",
+};
+
+export const KnowledgeBaseFlyoutPropsConstants = {
+	Headers: {
+		Heading: "Agent Knowledge Base",
+		SubHeading: "Upload multiple files for your agent",
+	},
+	Hints: {
+		DropFiles: "Drop files here or click to browse",
+		SupportedTypes:
+			"Supports .pdf, .doc, .docx, .txt files up to 10MB each",
+		Info: "You can upload multiple knowledge base files to enhance your agent's capabilities. Supported formats include PDF, Word documents, and text files. Each file must be under 10MB.",
+	},
+	Buttons: {
+		Clear: "Clear all files",
+		Done: "Done",
+	},
 };
