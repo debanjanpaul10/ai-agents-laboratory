@@ -7,6 +7,7 @@ import AgentsListComponent from "@components/manage-agents/agents-list";
 import ModifyAgentComponent from "@components/manage-agents/modify-agent";
 import TestAgentComponent from "@components/manage-agents/test-agent";
 import KnowledgeBaseFlyoutComponent from "@components/common/knowledge-base-flyout";
+import VisionImagesFlyoutComponent from "@components/common/vision-images-flyout";
 
 export default function ManageAgentsComponent() {
 	const dispatch = useAppDispatch();
@@ -27,6 +28,7 @@ export default function ManageAgentsComponent() {
 		knowledgeBaseDocument: [],
 		isPrivate: false,
 		mcpServerUrl: "",
+		visionImages: null,
 	});
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 	const [isTestDrawerOpen, setIsTestDrawerOpen] = useState(false);
@@ -36,6 +38,14 @@ export default function ManageAgentsComponent() {
 		File[]
 	>([]);
 	const [removedExistingDocuments, setRemovedExistingDocuments] = useState<
+		string[]
+	>([]);
+	const [isVisionFlyoutOpen, setIsVisionFlyoutOpen] =
+		useState<boolean>(false);
+	const [selectedVisionImages, setSelectedVisionImages] = useState<File[]>(
+		[]
+	);
+	const [removedExistingImages, setRemovedExistingImages] = useState<
 		string[]
 	>([]);
 
@@ -78,9 +88,16 @@ export default function ManageAgentsComponent() {
 		dispatch(ToggleAgentsListDrawer(false));
 		setIsEditDrawerOpen(false);
 		setSelectedAgent(null);
-		setSelectedKnowledgeFiles([]); // Clear knowledge files when closing
-		setRemovedExistingDocuments([]); // Clear removed existing documents when closing
-		setIsKnowledgeBaseFlyoutOpen(false); // Close knowledge base flyout
+
+		// KNOWLEDGE BASE
+		setSelectedKnowledgeFiles([]);
+		setRemovedExistingDocuments([]);
+		setIsKnowledgeBaseFlyoutOpen(false);
+
+		// AI VISION IMAGES
+		setSelectedVisionImages([]);
+		setRemovedExistingImages([]);
+		setIsVisionFlyoutOpen(false);
 	};
 
 	const handleAgentClick = (agent: AgentDataDTO) => {
@@ -95,19 +112,36 @@ export default function ManageAgentsComponent() {
 			knowledgeBaseDocument: agent.knowledgeBaseDocument || null,
 			isPrivate: agent.isPrivate,
 			mcpServerUrl: agent.mcpServerUrl || "",
+			visionImages: agent.visionImages || null,
 		});
-		setSelectedKnowledgeFiles([]); // Clear knowledge files when switching agents
-		setRemovedExistingDocuments([]); // Clear removed existing documents when switching agents
-		setIsKnowledgeBaseFlyoutOpen(false); // Close knowledge base flyout
+
+		// KB FILES
+		setSelectedKnowledgeFiles([]);
+		setRemovedExistingDocuments([]);
+		setIsKnowledgeBaseFlyoutOpen(false);
+
+		// AI VISION IMAGES
+		setSelectedVisionImages([]);
+		setRemovedExistingImages([]);
+		setIsVisionFlyoutOpen(false);
+
 		setIsEditDrawerOpen(true);
 	};
 
 	const handleEditClose = () => {
 		setIsEditDrawerOpen(false);
 		setSelectedAgent(null);
-		setSelectedKnowledgeFiles([]); // Clear knowledge files when closing
-		setRemovedExistingDocuments([]); // Clear removed existing documents when closing
-		setIsKnowledgeBaseFlyoutOpen(false); // Close knowledge base flyout
+
+		// KB FILES
+		setSelectedKnowledgeFiles([]);
+		setRemovedExistingDocuments([]);
+		setIsKnowledgeBaseFlyoutOpen(false);
+
+		// AI VISION IMAGES
+		setSelectedVisionImages([]);
+		setRemovedExistingImages([]);
+		setIsVisionFlyoutOpen(false);
+
 		if (isTestDrawerOpen) {
 			setIsTestDrawerOpen(false);
 		}
@@ -121,7 +155,14 @@ export default function ManageAgentsComponent() {
 		setRemovedExistingDocuments(removedFileNames);
 	};
 
-	// Convert existing knowledge base document to the new format
+	const toggleAiVisionFlyout = (isOpen: boolean) => {
+		setIsVisionFlyoutOpen(isOpen);
+	};
+
+	const handleExistingImagesChange = (removedImageNames: string[]) => {
+		setRemovedExistingImages(removedImageNames);
+	};
+
 	const getExistingDocuments = () => {
 		if (
 			!selectedAgent?.knowledgeBaseDocument ||
@@ -130,6 +171,15 @@ export default function ManageAgentsComponent() {
 			return [];
 
 		return selectedAgent.knowledgeBaseDocument;
+	};
+
+	const getExistingImages = () => {
+		if (
+			!selectedAgent?.visionImages ||
+			selectedAgent?.visionImages.length === 0
+		)
+			return [];
+		return selectedAgent.visionImages;
 	};
 
 	return (
@@ -177,6 +227,30 @@ export default function ManageAgentsComponent() {
 					</div>
 				)}
 
+				{/* Ai Vision Images Flyout */}
+				{isVisionFlyoutOpen && (
+					<div
+						className={`fixed top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out ${
+							isTestDrawerOpen ? "left-0" : "left-0"
+						}`}
+					>
+						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-r border-white/10 shadow-2xl">
+							<VisionImagesFlyoutComponent
+								isOpen={isVisionFlyoutOpen}
+								onClose={() => toggleAiVisionFlyout(false)}
+								onImagesChange={setSelectedVisionImages}
+								selectedImages={selectedVisionImages}
+								existingImages={getExistingImages()}
+								onExistingImagesChange={
+									handleExistingImagesChange
+								}
+								removedImages={removedExistingImages}
+							/>
+						</div>
+					</div>
+				)}
+
 				{/* Modify Agent Drawer - Middle (when edit is open) */}
 				{isEditDrawerOpen && (
 					<div
@@ -200,7 +274,8 @@ export default function ManageAgentsComponent() {
 								onEditClose={handleEditClose}
 								isDisabled={
 									isTestDrawerOpen ||
-									isKnowledgeBaseFlyoutOpen
+									isKnowledgeBaseFlyoutOpen ||
+									isVisionFlyoutOpen
 								}
 								onOpenKnowledgeBase={() =>
 									toggleKnowledgebaseFlyout(true)
@@ -209,6 +284,11 @@ export default function ManageAgentsComponent() {
 								removedExistingDocuments={
 									removedExistingDocuments
 								}
+								onOpenVisionImagesFlyout={() => {
+									toggleAiVisionFlyout(true);
+								}}
+								selectedVisionImages={selectedVisionImages}
+								removedExistingImages={removedExistingImages}
 							/>
 						</div>
 					</div>

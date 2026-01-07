@@ -1,70 +1,69 @@
 import { ChangeEvent, useState } from "react";
 import { Button } from "@heroui/react";
 import {
-	Upload,
-	Files,
-	Trash2,
-	FileText,
 	ArrowRight,
 	Download,
+	Eye,
+	FileText,
+	Image,
+	ScanEye,
+	Trash2,
+	Upload,
 } from "lucide-react";
 
-import { KnowledgeBaseFlyoutProps } from "@shared/types";
-import { KnowledgeBaseFlyoutPropsConstants } from "@helpers/constants";
+import { VisionImagesFlyoutProps } from "@shared/types";
+import { AiVisionImagesFlyoutPropsConstants } from "@helpers/constants";
 import { DownloadExistingDocument } from "@shared/utils";
 
-export default function KnowledgeBaseFlyoutComponent({
+export default function VisionImagesFlyoutComponent({
 	isOpen,
 	onClose,
-	onFilesChange,
-	selectedFiles,
-	existingDocuments = [],
-	onExistingDocumentsChange,
-	removedExistingDocs = [],
-}: KnowledgeBaseFlyoutProps) {
+	onImagesChange,
+	selectedImages,
+	existingImages = [],
+	onExistingImagesChange,
+	removedImages = [],
+}: VisionImagesFlyoutProps) {
 	const [dragActive, setDragActive] = useState(false);
 
-	const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-		const fileInput = e.target as HTMLInputElement;
-		const newFiles = Array.from(fileInput.files || []);
+	const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+		const imageInput = e.target as HTMLInputElement;
+		const newImages = Array.from(imageInput.files || []);
 
-		// Validate file sizes
-		const validFiles = newFiles.filter((file) => {
-			if (file.size > 10 * 1024 * 1024) {
+		// Validate the image sizes
+		const validImages = newImages.filter((img) => {
+			if (img.size > 10 * 1024 * 1024) {
 				alert(
-					`File "${file.name}" exceeds 10MB limit and will be skipped.`
+					`Image "${img.name}" exceeds 10MB limit and will be skipped.`
 				);
 				return false;
 			}
 			return true;
 		});
 
-		// Add to existing files, avoiding duplicates
-		const updatedFiles = [...selectedFiles];
-		validFiles.forEach((file) => {
+		// Add to existing images, avoiding duplicates
+		const updatedImages = [...selectedImages];
+		validImages.forEach((img) => {
 			if (
-				!updatedFiles.some(
+				!updatedImages.some(
 					(existing) =>
-						existing.name === file.name &&
-						existing.size === file.size
+						existing.name === img.name && existing.size === img.size
 				)
 			) {
-				updatedFiles.push(file);
+				updatedImages.push(img);
 			}
 		});
 
-		onFilesChange(updatedFiles);
-		fileInput.value = "";
+		onImagesChange(updatedImages);
+		imageInput.value = "";
 	};
 
 	const handleDrag = (e: React.DragEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
-		if (e.type === "dragenter" || e.type === "dragover") {
+		if (e.type === "dragenter" || e.type === "dragover")
 			setDragActive(true);
-		} else if (e.type === "dragleave") {
-			setDragActive(false);
-		}
+		else if (e.type === "dragleave") setDragActive(false);
 	};
 
 	const handleDrop = (e: React.DragEvent) => {
@@ -72,50 +71,48 @@ export default function KnowledgeBaseFlyoutComponent({
 		e.stopPropagation();
 		setDragActive(false);
 
-		const droppedFiles = Array.from(e.dataTransfer.files);
+		const droppedImages = Array.from(e.dataTransfer.files);
 
 		// Validate file sizes
-		const validFiles = droppedFiles.filter((file) => {
-			if (file.size > 10 * 1024 * 1024) {
+		const validImages = droppedImages.filter((image) => {
+			if (image.size > 10 * 1024 * 1024) {
 				alert(
-					`File "${file.name}" exceeds 10MB limit and will be skipped.`
+					`File "${image.name}" exceeds 10MB limit and will be skipped.`
 				);
 				return false;
 			}
 			return true;
 		});
 
-		// Add to existing files, avoiding duplicates
-		const updatedFiles = [...selectedFiles];
-		validFiles.forEach((file) => {
+		const updatedImages = [...selectedImages];
+		validImages.forEach((image) => {
 			if (
-				!updatedFiles.some(
+				!updatedImages.some(
 					(existing) =>
-						existing.name === file.name &&
-						existing.size === file.size
+						existing.name === image.name &&
+						existing.size === image.size
 				)
-			) {
-				updatedFiles.push(file);
-			}
+			)
+				updatedImages.push(image);
 		});
 
-		onFilesChange(updatedFiles);
+		onImagesChange(updatedImages);
 	};
 
-	const removeFile = (index: number) => {
-		const updatedFiles = selectedFiles.filter((_, i) => i !== index);
-		onFilesChange(updatedFiles);
+	const removeImage = (index: number) => {
+		const updatedImages = selectedImages.filter((_, i) => i !== index);
+		onImagesChange(updatedImages);
 	};
 
-	const removeExistingDocument = (fileName: string) => {
-		const updatedRemovedDocs = [...removedExistingDocs, fileName];
-		onExistingDocumentsChange?.(updatedRemovedDocs);
+	const removeExistingImage = (imageName: string) => {
+		const updatedRemovedImages = [...removedImages, imageName];
+		onExistingImagesChange?.(updatedRemovedImages);
 	};
 
-	const clearAllFiles = () => {
-		onFilesChange([]);
-		const allRemovedDocs = existingDocuments.map((doc) => doc.name);
-		onExistingDocumentsChange?.(allRemovedDocs);
+	const clearAllImages = () => {
+		onImagesChange([]);
+		const allRemovedImages = existingImages.map((img) => img.name);
+		onExistingImagesChange?.(allRemovedImages);
 	};
 
 	const formatFileSize = (bytes: number) => {
@@ -130,24 +127,23 @@ export default function KnowledgeBaseFlyoutComponent({
 
 	return (
 		<>
-			{/* Main flyout content */}
 			<div className="relative h-full bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-slate-800/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl flex flex-col">
-				{/* Header */}
+				{/* HEADER */}
 				<div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
 					<div className="flex items-center space-x-3">
 						<div className="bg-gradient-to-r from-purple-500 to-blue-600 p-2 rounded-xl">
-							<Files className="w-5 h-5 text-white" />
+							<ScanEye className="w-5 h-5 text-white" />
 						</div>
 						<div>
 							<h2 className="text-xl font-bold bg-gradient-to-r from-white via-purple-100 to-blue-100 bg-clip-text text-transparent">
 								{
-									KnowledgeBaseFlyoutPropsConstants.Headers
+									AiVisionImagesFlyoutPropsConstants.Headers
 										.Heading
 								}
 							</h2>
 							<p className="text-white/60 text-sm">
 								{
-									KnowledgeBaseFlyoutPropsConstants.Headers
+									AiVisionImagesFlyoutPropsConstants.Headers
 										.SubHeading
 								}
 							</p>
@@ -162,15 +158,15 @@ export default function KnowledgeBaseFlyoutComponent({
 					</Button>
 				</div>
 
-				{/* Content */}
+				{/* CONTENT */}
 				<div className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0">
-					{/* File Upload Area */}
+					{/* IMAGE UPLOAD */}
 					<div className="space-y-4">
 						<div
 							className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer ${
 								dragActive
-									? "border-yellow-500/50 bg-yellow-500/10"
-									: "border-white/20 hover:border-yellow-500/30 hover:bg-yellow-500/5"
+									? "border-red-500/50 bg-red-500/10"
+									: "border-white/20 hover:border-red-500/30 hover:bg-red-500/5"
 							}`}
 							onDragEnter={handleDrag}
 							onDragLeave={handleDrag}
@@ -178,27 +174,27 @@ export default function KnowledgeBaseFlyoutComponent({
 							onDrop={handleDrop}
 						>
 							<div className="flex flex-col items-center space-y-4">
-								<div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 p-4 rounded-full">
-									<Upload className="w-8 h-8 text-yellow-400" />
+								<div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 p-4 rounded-full">
+									<Upload className="w-8 h-8 text-red-400" />
 								</div>
 								<div>
 									<h3 className="text-white font-medium mb-2">
 										{
-											KnowledgeBaseFlyoutPropsConstants
-												.Hints.DropFiles
+											AiVisionImagesFlyoutPropsConstants
+												.Hints.DropImages
 										}
 									</h3>
 									<p className="text-white/60 text-sm">
 										{
-											KnowledgeBaseFlyoutPropsConstants
+											AiVisionImagesFlyoutPropsConstants
 												.Hints.SupportedTypes
 										}
 									</p>
 								</div>
 								<input
-									onChange={handleFileUpload}
+									onChange={handleImageUpload}
 									type="file"
-									accept=".txt,.pdf,.doc,.docx"
+									accept=".jpg,.png,.jpeg,.svg"
 									multiple
 									className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
 								/>
@@ -206,17 +202,17 @@ export default function KnowledgeBaseFlyoutComponent({
 						</div>
 					</div>
 
-					{/* Existing Documents */}
-					{existingDocuments.length > 0 && (
+					{/* EXISTING IMAGES */}
+					{existingImages.length > 0 && (
 						<div className="space-y-4">
 							<h3 className="text-white/80 font-medium flex items-center space-x-2">
 								<FileText className="w-4 h-4 text-blue-400" />
 								<span>
-									Existing Documents (
+									Existing Images (
 									{
-										existingDocuments.filter(
+										existingImages.filter(
 											(doc) =>
-												!removedExistingDocs.includes(
+												!removedImages.includes(
 													doc.name
 												)
 										).length
@@ -225,12 +221,10 @@ export default function KnowledgeBaseFlyoutComponent({
 								</span>
 							</h3>
 							<div className="space-y-2 max-h-32 overflow-y-auto">
-								{existingDocuments
+								{existingImages
 									.filter(
 										(doc) =>
-											!removedExistingDocs.includes(
-												doc.name
-											)
+											!removedImages.includes(doc.name)
 									)
 									.map((doc, index) => (
 										<div
@@ -265,7 +259,7 @@ export default function KnowledgeBaseFlyoutComponent({
 												</Button>
 												<Button
 													onPress={() =>
-														removeExistingDocument(
+														removeExistingImage(
 															doc.name
 														)
 													}
@@ -282,14 +276,16 @@ export default function KnowledgeBaseFlyoutComponent({
 					)}
 
 					{/* Selected Files List */}
-					{selectedFiles.length > 0 && (
+					{selectedImages.length > 0 && (
 						<div className="space-y-4">
 							<h3 className="text-white/80 font-medium flex items-center space-x-2">
 								<FileText className="w-4 h-4 text-green-400" />
-								<span>New Files ({selectedFiles.length})</span>
+								<span>
+									New Images ({selectedImages.length})
+								</span>
 							</h3>
 							<div className="space-y-2 max-h-32 overflow-y-auto">
-								{selectedFiles.map((file, index) => (
+								{selectedImages.map((file, index) => (
 									<div
 										key={`${file.name}-${index}`}
 										className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10 hover:border-white/20 transition-colors"
@@ -307,7 +303,7 @@ export default function KnowledgeBaseFlyoutComponent({
 											</div>
 										</div>
 										<Button
-											onPress={() => removeFile(index)}
+											onPress={() => removeImage(index)}
 											title="Remove file"
 											className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/30 transition-all duration-200 text-red-400 hover:text-red-300 flex-shrink-0"
 										>
@@ -323,25 +319,23 @@ export default function KnowledgeBaseFlyoutComponent({
 					<div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
 						<p className="text-blue-300 text-sm">
 							<strong>Note: </strong>
-							{KnowledgeBaseFlyoutPropsConstants.Hints.Info}
+							{AiVisionImagesFlyoutPropsConstants.Hints.Info}
 						</p>
 					</div>
 				</div>
 
-				{/* Footer */}
+				{/* FOOTER */}
 				<div className="border-t border-white/10 p-6 flex-shrink-0">
 					<div className="flex items-center justify-between">
 						<p className="text-white/60 text-sm">
-							{selectedFiles.length +
-								existingDocuments.filter(
-									(doc) =>
-										!removedExistingDocs.includes(doc.name)
+							{selectedImages.length +
+								existingImages.filter(
+									(doc) => !removedImages.includes(doc.name)
 								).length}{" "}
 							file
-							{selectedFiles.length +
-								existingDocuments.filter(
-									(doc) =>
-										!removedExistingDocs.includes(doc.name)
+							{selectedImages.length +
+								existingImages.filter(
+									(doc) => !removedImages.includes(doc.name)
 								).length !==
 							1
 								? "s"
@@ -350,38 +344,39 @@ export default function KnowledgeBaseFlyoutComponent({
 						</p>
 						<div className="flex space-x-3">
 							<Button
-								onPress={clearAllFiles}
+								onPress={clearAllImages}
 								title={
-									KnowledgeBaseFlyoutPropsConstants.Buttons
+									AiVisionImagesFlyoutPropsConstants.Buttons
 										.Clear
 								}
 								className="px-4 py-2 bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 text-white/70 hover:text-red-400 transition-all duration-200"
 								radius="full"
 								disabled={
-									selectedFiles.length === 0 &&
-									existingDocuments.filter(
+									selectedImages.length === 0 &&
+									existingImages.filter(
 										(doc) =>
-											!removedExistingDocs.includes(
-												doc.name
-											)
+											!removedImages.includes(doc.name)
 									).length === 0
 								}
 							>
 								{
-									KnowledgeBaseFlyoutPropsConstants.Buttons
+									AiVisionImagesFlyoutPropsConstants.Buttons
 										.Clear
 								}
 							</Button>
 							<Button
 								onPress={onClose}
 								title={
-									KnowledgeBaseFlyoutPropsConstants.Buttons
+									AiVisionImagesFlyoutPropsConstants.Buttons
 										.Done
 								}
 								className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-300"
 								radius="full"
 							>
-								{KnowledgeBaseFlyoutPropsConstants.Buttons.Done}
+								{
+									AiVisionImagesFlyoutPropsConstants.Buttons
+										.Done
+								}
 							</Button>
 						</div>
 					</div>
