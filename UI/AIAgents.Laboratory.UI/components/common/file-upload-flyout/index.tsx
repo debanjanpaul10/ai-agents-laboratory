@@ -25,7 +25,7 @@ export default function FileUploadFlyoutComponent({
 		const validFiles = newFiles.filter((file) => {
 			if (file.size > 10 * 1024 * 1024) {
 				alert(
-					`file "${file.name}" exceeds 10MB limit and will be skipped.`
+					`File "${file.name}" exceeds 10MB limit and will be skipped.`
 				);
 				return false;
 			}
