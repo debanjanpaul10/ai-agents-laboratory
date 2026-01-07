@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace AIAgents.Laboratory.Domain.DrivenPorts;
 
 /// <summary>
-/// Defines the methods for cloudinary storage manager.
+/// The interface declaration for blob storage manager.
 /// </summary>
-public interface ICloudinaryStorageManager
+/// <remarks>All blob storage related activities like uploading, downloading, deleting, etc will be handled for static files.</remarks>
+public interface IBlobStorageManager
 {
     /// <summary>
-    /// Uploads image to cloudinary storage asynchronously.
+    /// Uploads image to blob storage asynchronously.
     /// </summary>
     /// <param name="imageFile">The image form file.</param>
     /// <param name="agentGuid">The agent guid id.</param>

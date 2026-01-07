@@ -17,11 +17,10 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// content extraction, and update preparation. It is intended to be used as part of the agent data management workflow, and relies on injected dependencies for logging, document processing, image storage, and vision analysis.</remarks>
 /// <param name="logger">The logger used to record informational and error messages for operations performed by the service. Cannot be null.</param>
 /// <param name="knowledgeBaseProcessor">The processor responsible for reading and analyzing knowledge base documents. Cannot be null.</param>
-/// <param name="cloudinaryStorageManager">The storage manager used to upload and manage images in cloud storage. Cannot be null.</param>
+/// <param name="blobStorageManager">The storage manager used to upload and manage images in cloud storage. Cannot be null.</param>
 /// <param name="visionProcessor">The processor used to analyze images and extract keywords using AI vision capabilities. Cannot be null.</param>
 /// <seealso cref="IDocumentIntelligenceService"/>
-public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> logger, IKnowledgeBaseProcessor knowledgeBaseProcessor,
-    ICloudinaryStorageManager cloudinaryStorageManager, IVisionProcessor visionProcessor) : IDocumentIntelligenceService
+public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> logger, IKnowledgeBaseProcessor knowledgeBaseProcessor, IBlobStorageManager blobStorageManager, IVisionProcessor visionProcessor) : IDocumentIntelligenceService
 {
     /// <summary>
     /// Processes updates to an agent's knowledge base documents, including adding new documents and removing specified ones, and prepares the corresponding update definitions for persistence.
@@ -123,7 +122,7 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
                     if (image is null) continue;
 
                     // Upload to Cloudinary
-                    var imageUrl = await cloudinaryStorageManager.UploadImageToStorageAsync(image, updateDataDomain.AgentId).ConfigureAwait(false);
+                    var imageUrl = await blobStorageManager.UploadImageToStorageAsync(image, updateDataDomain.AgentId).ConfigureAwait(false);
 
                     // Process the image to generate keywords data
                     var processedImageKeywords = await visionProcessor.ReadDataFromImageWithComputerVisionAsync(imageUrl).ConfigureAwait(false);
@@ -211,7 +210,7 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
                 if (image is null) continue;
 
                 // Upload to Cloudinary
-                var imageUrl = await cloudinaryStorageManager.UploadImageToStorageAsync(image, agentData.AgentId).ConfigureAwait(false);
+                var imageUrl = await blobStorageManager.UploadImageToStorageAsync(image, agentData.AgentId).ConfigureAwait(false);
 
                 // Process the image to generate keywords data
                 var processedImageKeywords = await visionProcessor.ReadDataFromImageWithComputerVisionAsync(imageUrl).ConfigureAwait(false);
