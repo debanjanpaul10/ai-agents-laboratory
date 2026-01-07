@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
+import { Files, FileText, Images, ScanEye } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleNewAgentDrawer } from "@store/common/actions";
 import CreateAgentFlyoutComponent from "@components/create-agent/agent-creator-flyout";
-import KnowledgeBaseFlyoutComponent from "@components/common/knowledge-base-flyout";
+import {
+	AiVisionImagesFlyoutPropsConstants,
+	KnowledgeBaseFlyoutPropsConstants,
+} from "@helpers/constants";
+import FileUploadFlyoutComponent from "@components/common/file-upload-flyout";
 
 export default function CreateAgentComponent() {
 	const dispatch = useAppDispatch();
@@ -12,6 +17,12 @@ export default function CreateAgentComponent() {
 	const [knowledgeBaseFlyoutOpen, setKnowledgeBaseFlyoutOpen] =
 		useState<boolean>(false);
 	const [selectedKnowledgeFiles, setSelectedKnowledgeFiles] = useState<
+		File[]
+	>([]);
+
+	const [aiVisionImagesFlyoutOpen, setAiVisionImagesFlyoutOpen] =
+		useState<boolean>(false);
+	const [selectedAiVisionImages, setSelectedAiVisionImages] = useState<
 		File[]
 	>([]);
 
@@ -25,6 +36,7 @@ export default function CreateAgentComponent() {
 			// Close knowledge base flyout when main drawer closes
 			if (!IsDrawerOpenStoreData) {
 				setKnowledgeBaseFlyoutOpen(false);
+				setAiVisionImagesFlyoutOpen(false);
 			}
 		}
 	}, [IsDrawerOpenStoreData]);
@@ -32,6 +44,7 @@ export default function CreateAgentComponent() {
 	const onClose = () => {
 		dispatch(ToggleNewAgentDrawer(false));
 		setKnowledgeBaseFlyoutOpen(false); // Close knowledge base flyout when main flyout closes
+		setAiVisionImagesFlyoutOpen(false);
 	};
 
 	const toggleKnowledgebaseFlyout = (isOpen: boolean) => {
@@ -40,6 +53,14 @@ export default function CreateAgentComponent() {
 
 	const handleClearKnowledgeFiles = () => {
 		setSelectedKnowledgeFiles([]);
+	};
+
+	const toggleAiVisionFlyout = (isOpen: boolean) => {
+		setAiVisionImagesFlyoutOpen(isOpen);
+	};
+
+	const handleClearAiVisionImages = () => {
+		setSelectedAiVisionImages([]);
 	};
 
 	return (
@@ -56,14 +77,46 @@ export default function CreateAgentComponent() {
 					>
 						<div className="absolute inset-0 bg-gradient-to-r from-green-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-x border-white/10 shadow-2xl">
-							<KnowledgeBaseFlyoutComponent
+							<FileUploadFlyoutComponent
 								isOpen={knowledgeBaseFlyoutOpen}
 								onClose={() => toggleKnowledgebaseFlyout(false)}
 								onFilesChange={setSelectedKnowledgeFiles}
 								selectedFiles={selectedKnowledgeFiles}
-								existingDocuments={[]}
-								onExistingDocumentsChange={() => {}} // No-op for create agent
-								removedExistingDocs={[]} // No existing docs in create flow
+								existingFiles={[]}
+								onExistingFilesChange={() => {}}
+								removedExistingFiles={[]}
+								config={{
+									headerConstants:
+										KnowledgeBaseFlyoutPropsConstants,
+									icons: { title: Files, body: FileText },
+									supportedTypes:
+										".doc,.docx,.pdf,.txt,.xls,.xlsx,.json",
+								}}
+							/>
+						</div>
+					</div>
+				)}
+
+				{aiVisionImagesFlyoutOpen && (
+					<div
+						className={`fixed top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out ${"right-1/3"}`}
+					>
+						<div className="absolute inset-0 bg-gradient-to-r from-green-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-x border-white/10 shadow-2xl">
+							<FileUploadFlyoutComponent
+								isOpen={aiVisionImagesFlyoutOpen}
+								onClose={() => toggleAiVisionFlyout(false)}
+								onFilesChange={setSelectedAiVisionImages}
+								selectedFiles={selectedAiVisionImages}
+								existingFiles={[]}
+								onExistingFilesChange={() => {}}
+								removedExistingFiles={[]}
+								config={{
+									headerConstants:
+										AiVisionImagesFlyoutPropsConstants,
+									icons: { title: ScanEye, body: Images },
+									supportedTypes: ".jpg,.jpeg,.png,.svg",
+								}}
 							/>
 						</div>
 					</div>
@@ -80,6 +133,11 @@ export default function CreateAgentComponent() {
 								toggleKnowledgebaseFlyout(true)
 							}
 							onClearKnowledgeFiles={handleClearKnowledgeFiles}
+							selectedAiVisionImages={selectedAiVisionImages}
+							onOpenAiVisionFlyout={() =>
+								toggleAiVisionFlyout(true)
+							}
+							onClearAiVisionImages={handleClearAiVisionImages}
 						/>
 					</div>
 				</div>

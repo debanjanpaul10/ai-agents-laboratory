@@ -2,7 +2,6 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -29,7 +28,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
     /// <param name="agentData">The agent data.</param>
     /// <returns>The boolean for success/failure.</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    [HttpPost(RouteConstants.AgentsRoutes.CreateNewAgent_Route)]
+    [HttpPost(AgentsRoutes.CreateNewAgent_Route)]
     [Consumes(MediaTypeNames.Multipart.FormData)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -55,7 +54,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
     /// </summary>
     /// <returns>The list of <see cref="CreateAgentDTO"/></returns>
     [AllowAnonymous]
-    [HttpGet(RouteConstants.AgentsRoutes.GetAllAgents_Route)]
+    [HttpGet(AgentsRoutes.GetAllAgents_Route)]
     [ProducesResponseType(typeof(IEnumerable<AgentDataDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,7 +73,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
     /// </summary>
     /// <param name="agentId">The agent identifier.</param>
     /// <returns>The agent data dto model.</returns>
-    [HttpGet(RouteConstants.AgentsRoutes.GetAgentById_Route)]
+    [HttpGet(AgentsRoutes.GetAgentById_Route)]
     [ProducesResponseType(typeof(AgentDataDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -96,7 +95,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
     /// <param name="updateAgentData">The update agent data.</param>
     /// <returns>The agent data dto.</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    [HttpPost(RouteConstants.AgentsRoutes.UpdateExistingAgent_Route)]
+    [HttpPost(AgentsRoutes.UpdateExistingAgent_Route)]
     [ProducesResponseType(typeof(AgentDataDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -121,7 +120,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
     /// </summary>
     /// <param name="agentId">The agent identifier.</param>
     /// <returns>The boolean for success/failure.</returns>
-    [HttpPost(RouteConstants.AgentsRoutes.DeleteExistingAgent_Route)]
+    [HttpPost(AgentsRoutes.DeleteExistingAgent_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

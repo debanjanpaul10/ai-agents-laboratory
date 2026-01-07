@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Automapper" Version="16.0.0" />
+		<PackageReference Include="Azure.Identity" Version="1.18.0-beta.2" />
+		<PackageReference Include="ModelContextProtocol" Version="0.5.0-preview.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference
+			Include="..\..\..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
+	</ItemGroup>
+
+</Project>

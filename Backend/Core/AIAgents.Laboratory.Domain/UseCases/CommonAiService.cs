@@ -79,7 +79,8 @@ public class CommonAiService(IConfiguration configuration, ILogger<CommonAiServi
                     { AzureAppConfigurationConstants.IsFeedbackFeatureEnabled, configuration[AzureAppConfigurationConstants.IsFeedbackFeatureEnabled]! },
                     { AzureAppConfigurationConstants.IsEmailNotificationEnabled, configuration[AzureAppConfigurationConstants.IsEmailNotificationEnabled]! },
                     { AzureAppConfigurationConstants.IsCacheServiceEnabled, configuration[AzureAppConfigurationConstants.IsCacheServiceEnabled]! },
-                    { AzureAppConfigurationConstants.HowToFileLinkConstant, configuration[AzureAppConfigurationConstants.HowToFileLinkConstant]! }
+                    { AzureAppConfigurationConstants.HowToFileLinkConstant, configuration[AzureAppConfigurationConstants.HowToFileLinkConstant]! },
+                    { AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant, configuration[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant]! }
                 };
 
                 cacheService.SetCacheData(CacheKeys.AllAppSettingsKeyName, existingCacheData, CacheKeys.CacheExpirationTimeout);

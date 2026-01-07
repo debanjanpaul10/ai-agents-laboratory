@@ -3,7 +3,6 @@ using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
-using AIAgents.Laboratory.Processor.Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -14,17 +13,22 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <summary>
 /// The Agents Service class.
 /// </summary>
-/// <param name="knowledgeBaseProcessor">The knowledge base processor service.</param>
 /// <param name="logger">The logger service.</param>
 /// <param name="mongoDatabaseService">The mongo db database service.</param>
 /// <param name="configuration">The configuration service.</param>
-/// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.IAgentsService" />
-public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService mongoDatabaseService, IKnowledgeBaseProcessor knowledgeBaseProcessor, IConfiguration configuration) : IAgentsService
+/// <param name="documentIntelligenceService">The document intelligence service.</param>
+/// <seealso cref="IAgentsService" />
+public class AgentsService(ILogger<AgentsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, IDocumentIntelligenceService documentIntelligenceService) : IAgentsService
 {
     /// <summary>
     /// The is knowledge base service allowed
     /// </summary>
     private readonly bool IsKnowledgeBaseServiceAllowed = bool.TryParse(configuration[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant], out var value) && value;
+
+    /// <summary>
+    /// The feature flag for AI vision service.
+    /// </summary>
+    private readonly bool IsAiVisionServiceAllowed = bool.TryParse(configuration[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant], out var aivisionAllowed) && aivisionAllowed;
 
     /// <summary>
     /// Creates the new agent asynchronous.
@@ -42,18 +46,10 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
 
             agentData.AgentId = Guid.NewGuid().ToString();
             if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Any() && IsKnowledgeBaseServiceAllowed)
-            {
-                agentData.ValidateUploadedFile();
-                await agentData.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
-                if (agentData.StoredKnowledgeBase is not null && agentData.StoredKnowledgeBase.Any())
-                {
-                    foreach (var file in agentData.StoredKnowledgeBase)
-                    {
-                        var content = knowledgeBaseProcessor.DetectAndReadFileContent(file);
-                        await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, agentData.AgentId).ConfigureAwait(false);
-                    }
-                }
-            }
+                await documentIntelligenceService.CreateAndProcessKnowledgeBaseDocumentAsync(agentData).ConfigureAwait(false);
+
+            if (agentData.VisionImages is not null && agentData.VisionImages.Any() && IsAiVisionServiceAllowed)
+                await documentIntelligenceService.CreateAndProcessAiVisionImagesKeywordsAsync(agentData).ConfigureAwait(false);
 
             agentData.IsActive = true;
             agentData.DateCreated = DateTime.UtcNow;
@@ -187,7 +183,10 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
             };
 
             if (IsKnowledgeBaseServiceAllowed)
-                await this.HandleKnowledgeBaseDataUpdateAsync(updateDataDomain, updates, existingAgent).ConfigureAwait(false);
+                await documentIntelligenceService.HandleKnowledgeBaseDataUpdateAsync(updateDataDomain, updates, existingAgent).ConfigureAwait(false);
+
+            if (IsAiVisionServiceAllowed)
+                await documentIntelligenceService.HandleAiVisionImagesDataUpdateAsync(updateDataDomain, updates, existingAgent).ConfigureAwait(false);
 
             var update = Builders<AgentDataDomain>.Update.Combine(updates);
             return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
@@ -229,70 +228,6 @@ public class AgentsService(ILogger<AgentsService> logger, IMongoDatabaseService 
         finally
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, agentId));
-        }
-    }
-
-    /// <summary>
-    /// Processes updates to an agent's knowledge base documents, including adding new documents and removing specified ones, and prepares the corresponding update definitions for persistence.
-    /// </summary>
-    /// <remarks>This method only adds update definitions to the provided list if changes to the knowledge base are detected. It validates and processes any newly uploaded documents and ensures that removed documents
-    /// are excluded from the persisted knowledge base. The caller is responsible for applying the accumulated updates to the data store.</remarks>
-    /// <param name="updateDataDomain">The domain object containing the knowledge base update information, including any new or removed documents. Cannot be null.</param>
-    /// <param name="updates">A list to which update definitions for the agent's knowledge base will be added if changes are detected. Cannot be null.</param>
-    /// <param name="existingAgent">The current state of the agent's data, used as the baseline for applying knowledge base updates. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    private async Task HandleKnowledgeBaseDataUpdateAsync(AgentDataDomain updateDataDomain, List<UpdateDefinition<AgentDataDomain>> updates, AgentDataDomain existingAgent)
-    {
-        try
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId));
-
-            // Start from existing stored knowledge base
-            var updatedStoredKnowledgeBase = existingAgent.StoredKnowledgeBase?.ToList() ?? [];
-            var hasChanges = false;
-
-            // 1. Remove any existing documents whose names are in RemovedKnowledgeBaseDocuments
-            if (updateDataDomain.RemovedKnowledgeBaseDocuments is not null && updateDataDomain.RemovedKnowledgeBaseDocuments.Any())
-            {
-                var removedSet = new HashSet<string>(updateDataDomain.RemovedKnowledgeBaseDocuments, StringComparer.OrdinalIgnoreCase);
-                updatedStoredKnowledgeBase = [.. updatedStoredKnowledgeBase.Where(doc => !removedSet.Contains(doc.FileName))];
-                hasChanges = true;
-            }
-
-            // 2. Process any newly uploaded knowledge base documents
-            if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Any())
-            {
-                updateDataDomain.ValidateUploadedFile();
-                await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
-
-                if (updateDataDomain.StoredKnowledgeBase is not null && updateDataDomain.StoredKnowledgeBase.Any())
-                {
-                    foreach (var file in updateDataDomain.StoredKnowledgeBase)
-                    {
-                        var content = knowledgeBaseProcessor.DetectAndReadFileContent(file);
-                        await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, updateDataDomain.AgentId).ConfigureAwait(false);
-                    }
-
-                    updatedStoredKnowledgeBase.AddRange(updateDataDomain.StoredKnowledgeBase);
-                    hasChanges = true;
-                }
-            }
-
-            // 3. Only persist changes if something actually changed
-            if (hasChanges)
-                // If all documents were removed, set StoredKnowledgeBase to null, otherwise save the updated list
-                updates.Add(Builders<AgentDataDomain>.Update.Set(
-                    x => x.StoredKnowledgeBase,
-                    updatedStoredKnowledgeBase.Count != 0 ? updatedStoredKnowledgeBase : null));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId));
         }
     }
 }

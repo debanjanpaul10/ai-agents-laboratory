@@ -9,6 +9,8 @@ import {
 	Files,
 	Link,
 	GlobeLock,
+	Images,
+	ScanEye,
 } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
@@ -30,6 +32,9 @@ export default function CreateAgentFlyoutComponent({
 	selectedKnowledgeFiles,
 	onOpenKnowledgeBase,
 	onClearKnowledgeFiles,
+	selectedAiVisionImages,
+	onOpenAiVisionFlyout,
+	onClearAiVisionImages,
 }: CreateAgentFlyoutProps) {
 	const dispatch = useAppDispatch();
 	const authContext = useAuth();
@@ -43,6 +48,7 @@ export default function CreateAgentFlyoutComponent({
 		knowledgeBaseDocument: null,
 		isPrivate: false,
 		mcpServerUrl: "",
+		visionImages: null,
 	});
 
 	const IsCreateAgentLoading = useAppSelector(
@@ -74,8 +80,10 @@ export default function CreateAgentFlyoutComponent({
 			knowledgeBaseDocument: null,
 			isPrivate: false,
 			mcpServerUrl: "",
+			visionImages: null,
 		});
 		onClearKnowledgeFiles();
+		onClearAiVisionImages();
 	};
 
 	async function handleSubmit() {
@@ -91,6 +99,11 @@ export default function CreateAgentFlyoutComponent({
 				form.append("knowledgeBaseDocument", file);
 			});
 		}
+
+		if (selectedAiVisionImages.length > 0)
+			selectedAiVisionImages.forEach((file) => {
+				form.append("visionImages", file);
+			});
 
 		if (formData.mcpServerUrl)
 			form.append("mcpServerUrl", formData.mcpServerUrl);
@@ -119,17 +132,17 @@ export default function CreateAgentFlyoutComponent({
 		return (
 			<div className="space-y-2">
 				<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
-					<Files className="w-4 h-4 text-pink-400" />
+					<Files className="w-4 h-4 text-yellow-400" />
 					<span>Agent Knowledge Base</span>
 				</label>
 				<div className="relative group">
-					<div className="absolute -inset-0.5 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur opacity-50 group-hover:opacity-75 transition duration-300"></div>
+					<div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl blur opacity-50 group-hover:opacity-75 transition duration-300"></div>
 					<button
 						onClick={onOpenKnowledgeBase}
-						className="relative w-full bg-white/5 border border-white/10 hover:border-white/20 hover:border-green-500/50 rounded-xl p-4 text-left transition-all duration-200 min-h-[48px] flex items-center justify-between"
+						className="relative w-full bg-white/5 border border-white/10 hover:border-white/20 hover:border-yellow-500/50 rounded-xl p-4 text-left transition-all duration-200 min-h-[48px] flex items-center justify-between"
 					>
 						<div className="flex items-center space-x-3">
-							<Files className="w-5 h-5 text-green-400" />
+							<Files className="w-5 h-5 text-yellow-400" />
 							<div>
 								<span className="text-white font-medium">
 									{selectedKnowledgeFiles.length > 0
@@ -169,6 +182,65 @@ export default function CreateAgentFlyoutComponent({
 				</div>
 				<p className="text-white/40 text-xs">
 					{ManageAgentConstants.ModifyAgentConstants.KBInfo}
+				</p>
+			</div>
+		);
+	};
+
+	const renderAiVisionUploadData = () => {
+		return (
+			<div className="space-y-2">
+				<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+					<ScanEye className="w-4 h-4 text-red-400" />
+					<span>AI Vision Images</span>
+				</label>
+				<div className="relative group">
+					<div className="absolute -inset-0.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-xl blur opacity-50 group-hover:opacity-75 transition duration-300"></div>
+					<button
+						onClick={onOpenAiVisionFlyout}
+						className="relative w-full bg-white/5 border border-white/10 hover:border-white/20 hover:border-red-500/50 rounded-xl p-4 text-left transition-all duration-200 min-h-[48px] flex items-center justify-between"
+					>
+						<div className="flex items-center space-x-3">
+							<Images className="w-5 h-5 text-red-400" />
+							<div>
+								<span className="text-white font-medium">
+									{selectedAiVisionImages.length > 0
+										? `${
+												selectedAiVisionImages.length
+										  } file${
+												selectedAiVisionImages.length !==
+												1
+													? "s"
+													: ""
+										  } selected`
+										: "Choose images"}
+								</span>
+								{selectedAiVisionImages.length > 0 && (
+									<p className="text-white/60 text-sm">
+										Click to manage images
+									</p>
+								)}
+							</div>
+						</div>
+						<div className="text-white/40">
+							<svg
+								className="w-5 h-5"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M9 5l7 7-7 7"
+								/>
+							</svg>
+						</div>
+					</button>
+				</div>
+				<p className="text-white/40 text-xs">
+					{ManageAgentConstants.ModifyAgentConstants.VisionInfo}
 				</p>
 			</div>
 		);
@@ -341,6 +413,10 @@ export default function CreateAgentFlyoutComponent({
 					{/* Knowledge Base */}
 					{ConfigurationsStoreData.IsKnowledgeBaseServiceEnabled ===
 						"true" && renderAgentKnowledgeBaseData()}
+
+					{/* AI Vision Images */}
+					{ConfigurationsStoreData.IsAiVisionServiceEnabled ===
+						"true" && renderAiVisionUploadData()}
 
 					{/* MCP Server URL */}
 					<div className="space-y-2">

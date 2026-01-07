@@ -1,7 +1,6 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -28,7 +27,7 @@ public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICo
     /// </summary>
     /// <returns>The dictionary containing the key-value pair.</returns>
     [AllowAnonymous]
-    [HttpGet(RouteConstants.CommonRoutes.GetConfigurations_Route)]
+    [HttpGet(CommonRoutes.GetConfigurations_Route)]
     [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -52,7 +51,7 @@ public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICo
     /// </summary>
     /// <param name="configKey">The configuration key name.</param>
     /// <returns>The dicitionary containing the key and value.</returns>
-    [HttpGet(RouteConstants.CommonRoutes.GetConfigurationByKey_Route)]
+    [HttpGet(CommonRoutes.GetConfigurationByKey_Route)]
     [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -77,7 +76,7 @@ public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICo
     /// </summary>
     /// <param name="addBugReport">The input dto for add new bug data.</param>
     /// <returns>The boolean for success/failure.</returns>
-    [HttpPost(RouteConstants.CommonRoutes.AddBugReport_Route)]
+    [HttpPost(CommonRoutes.AddBugReport_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -103,7 +102,7 @@ public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICo
     /// </summary>
     /// <param name="newFeatureRequest">The new feature request data dto.</param>
     /// <returns>The boolean for success/failure.</returns>
-    [HttpPost(RouteConstants.CommonRoutes.SubmitFeatureRequest_Route)]
+    [HttpPost(CommonRoutes.SubmitFeatureRequest_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

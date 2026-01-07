@@ -61,6 +61,9 @@ export interface ModifyAgentComponentProps {
 	onOpenKnowledgeBase: () => void;
 	selectedKnowledgeFiles: File[];
 	removedExistingDocuments: string[];
+	onOpenVisionImagesFlyout: () => void;
+	selectedVisionImages: File[];
+	removedExistingImages: string[];
 }
 
 export interface AuthenticatedAppProps {
@@ -101,17 +104,25 @@ export interface CreateAgentFlyoutProps {
 	selectedKnowledgeFiles: File[];
 	onOpenKnowledgeBase: () => void;
 	onClearKnowledgeFiles: () => void;
+	selectedAiVisionImages: File[];
+	onOpenAiVisionFlyout: () => void;
+	onClearAiVisionImages: () => void;
 }
 
 // Union type for both new files and existing documents
 export type KnowledgeBaseItem = File | null;
 
-export interface KnowledgeBaseFlyoutProps {
+export interface FileUploadFlyoutProps {
 	isOpen: boolean;
 	onClose: () => void;
 	onFilesChange: (files: File[]) => void;
 	selectedFiles: File[];
-	existingDocuments?: File[]; // Optional existing documents
-	onExistingDocumentsChange?: (removedFileNames: string[]) => void; // Callback for removed existing documents
-	removedExistingDocs?: string[]; // Current list of removed existing document names
+	existingFiles?: File[];
+	onExistingFilesChange?: (removedFileNames: string[]) => void;
+	removedExistingFiles?: string[];
+	config: {
+		headerConstants: any;
+		icons: any;
+		supportedTypes: string;
+	};
 }

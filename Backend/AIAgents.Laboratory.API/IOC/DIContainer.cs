@@ -10,6 +10,7 @@ using AIAgents.Laboratory.Persistence.MongoDatabase.IOC;
 using AIAgents.Laboratory.Persistence.SQLDatabase.IOC;
 using AIAgents.Laboratory.Processor.IOC;
 using AIAgents.Laboratory.SemanticKernel.Adapters.IOC;
+using AIAgents.Laboratory.Storage.Cloudinary.IOC;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -59,7 +60,7 @@ public static class DIContainer
         services.ConfigureAuthenticationServices(configuration);
 
         services.AddAPIAdapterDependencies().AddMessagingDependencies();
-        services.AddAIAgentDependencies(configuration).AddMongoDbAdapterDependencies(configuration).AddSqlServerDependencies(configuration, isDevelopmentMode);
+        services.AddAIAgentDependencies(configuration).AddMongoDbAdapterDependencies(configuration).AddSqlServerDependencies(configuration, isDevelopmentMode).AddCloudinaryDependencies(configuration);
 
         services.AddDomainDependencies().AddProcessorDependencies(configuration);
         services.AddMemoryCache().AddCacheDependencies();
