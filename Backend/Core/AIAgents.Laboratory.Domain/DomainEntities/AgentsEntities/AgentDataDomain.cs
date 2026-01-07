@@ -114,4 +114,30 @@ public sealed record AgentDataDomain
     /// The boolean flag for is default chat bot.
     /// </value>
     public bool IsDefaultChatbot { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the AI Vision images files.
+    /// </summary>
+    /// <value>
+    ///     The AI Vision images files value.
+    /// </value>
+    [BsonIgnore]
+    public IList<IFormFile?> VisionImages { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the removed AI vision images (To be used for updates only).
+    /// </summary>
+    /// <value>
+    ///     The removed AI vision images value.
+    /// </value>
+    [BsonIgnore]
+    public IList<string> RemovedAiVisionImages { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the AI Vision images data.
+    /// </summary>
+    /// <value>
+    ///     The AI Vision images data value.
+    /// </value>
+    public IList<AiVisionImagesDomain?> AiVisionImagesData { get; set; } = [];
 }

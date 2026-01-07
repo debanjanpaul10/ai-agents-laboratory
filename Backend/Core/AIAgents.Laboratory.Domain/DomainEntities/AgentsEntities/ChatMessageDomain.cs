@@ -36,4 +36,6 @@ public sealed record ChatMessageDomain
     /// The knowledge base domain data.
     /// </value>
     public string? KnowledgeBase { get; set; } = string.Empty;
+
+    public IEnumerable<AiVisionImagesDomain?> ImageKeyWords { get; set; } = [];
 }

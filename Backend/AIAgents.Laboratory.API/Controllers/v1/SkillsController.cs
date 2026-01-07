@@ -1,7 +1,6 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.Constants;
@@ -15,7 +14,7 @@ namespace AIAgents.Laboratory.API.Controllers.v1;
 /// </summary>
 /// <param name="httpContextAccessor">The http context accessor.</param>
 /// <param name="skillsHandler">The skills handler adapter.</param>
-/// <seealso cref="AIAgents.Laboratory.API.Controllers.BaseController" />
+/// <seealso cref="BaseController" />
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV1)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
@@ -26,7 +25,7 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     /// </summary>
     /// <param name="userQueryRequest">The user query request.</param>
     /// <returns>The ai response string.</returns>
-    [HttpPost(RouteConstants.AISkillsRoutes.DetectUserIntent_Route)]
+    [HttpPost(AISkillsRoutes.DetectUserIntent_Route)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -45,7 +44,7 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     /// Gets the user greeting response asynchronous.
     /// </summary>
     /// <returns>The ai response string.</returns>
-    [HttpPost(RouteConstants.AISkillsRoutes.GetUserGreetingResponse_Route)]
+    [HttpPost(AISkillsRoutes.GetUserGreetingResponse_Route)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -65,7 +64,7 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     /// </summary>
     /// <param name="ragTextInput">The rag text input.</param>
     /// <returns>The ai response string.</returns>
-    [HttpPost(RouteConstants.AISkillsRoutes.GetRAGTextResponse_Route)]
+    [HttpPost(AISkillsRoutes.GetRAGTextResponse_Route)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -85,7 +84,7 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     /// </summary>
     /// <param name="nltosqlInput">The nltosql input.</param>
     /// <returns>The ai response string.</returns>
-    [HttpPost(RouteConstants.AISkillsRoutes.GetNlToSqlResponse_Route)]
+    [HttpPost(AISkillsRoutes.GetNlToSqlResponse_Route)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -105,7 +104,7 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     /// </summary>
     /// <param name="sqlQueryResult">The SQL query.</param>
     /// <returns>The AI formatted response.</returns>
-    [HttpPost(RouteConstants.AISkillsRoutes.GetSQLQueryMarkdownResponse_Route)]
+    [HttpPost(AISkillsRoutes.GetSQLQueryMarkdownResponse_Route)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -125,7 +124,7 @@ public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsH
     /// </summary>
     /// <param name="followupQuestionsRequest">The followup questions request.</param>
     /// <returns>The list of ai responses.</returns>
-    [HttpPost(RouteConstants.AISkillsRoutes.GetFollowupQuestionsResponse_Route)]
+    [HttpPost(AISkillsRoutes.GetFollowupQuestionsResponse_Route)]
     [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

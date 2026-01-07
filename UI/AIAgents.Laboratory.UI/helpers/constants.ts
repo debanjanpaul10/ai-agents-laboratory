@@ -83,6 +83,8 @@ export const ManageAgentConstants = {
 		},
 		Info: "Describe how your agent should behave, what it should know, and how it should respond to users.",
 		KBInfo: "You can upload knowledge base data to the agent. Available file formats: .pdf, .docx, .xlsx, .txt",
+		VisionInfo:
+			"You can upload images to the agent. Available image formats: .jpg, .jpeg, .png, .svg",
 		PrivateField:
 			"Private agents are only accessible by you and won't appear in public listings.",
 		MCPUrl: "Provide the URL for any MCP (Model Context Protocol) Servers that you have. The AI Agent will use them for tool calling.",
@@ -155,13 +157,31 @@ export const KnowledgeBaseFlyoutPropsConstants = {
 		SubHeading: "Upload multiple files for your agent",
 	},
 	Hints: {
-		DropFiles: "Drop files here or click to browse",
+		DropItems: "Drop files here or click to browse",
 		SupportedTypes:
 			"Supports .pdf, .doc, .docx, .txt files up to 10MB each",
 		Info: "You can upload multiple knowledge base files to enhance your agent's capabilities. Supported formats include PDF, Word documents, and text files. Each file must be under 10MB.",
 	},
 	Buttons: {
 		Clear: "Clear all files",
+		Done: "Done",
+	},
+};
+
+export const AiVisionImagesFlyoutPropsConstants = {
+	Headers: {
+		Heading: "AI Vision Images",
+		SubHeading:
+			"Upload multiple image files for your agent to read and process",
+	},
+	Hints: {
+		DropItems: "Drop images here or click to browse",
+		SupportedTypes:
+			"Supports .png, .jpg, .jpeg, .svg files up to 10MB each",
+		Info: "You can upload multiple images that will be processed by your agent to enhance its capabilites. Supported formats include most common image formats. Each file must be under 10MB.",
+	},
+	Buttons: {
+		Clear: "Clear all images",
 		Done: "Done",
 	},
 };

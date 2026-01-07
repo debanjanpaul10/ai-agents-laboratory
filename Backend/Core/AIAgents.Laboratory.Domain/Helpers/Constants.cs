@@ -100,6 +100,11 @@ internal static class Constants
         internal const string IsKnowledgeBaseServiceEnabledConstant = "IsKnowledgeBaseServiceEnabled";
 
         /// <summary>
+        /// The boolean flag for AI vision service constant.
+        /// </summary>
+        internal const string IsAiVisionServiceEnabledConstant = "IsAiVisionServiceEnabled";
+
+        /// <summary>
         /// The current ai service provider
         /// </summary>
         internal const string CurrentAiServiceProvider = "CurrentAiServiceProvider";

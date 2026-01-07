@@ -24,7 +24,8 @@ public static class DIContainer
     public static IServiceCollection AddProcessorDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.RegisterTextEmbeddingGenerationService(configuration);
-        return services.AddScoped<IKnowledgeBaseProcessor, KnowledgeBaseProcessor>();
+        return services.AddScoped<IKnowledgeBaseProcessor, KnowledgeBaseProcessor>()
+            .AddScoped<IVisionProcessor, VisionProcessor>();
     }
 
     /// <summary>

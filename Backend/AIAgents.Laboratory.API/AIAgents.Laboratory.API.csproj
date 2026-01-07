@@ -11,24 +11,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Asp.Versioning.Abstractions" Version="8.1.0" />
-    <PackageReference Include="AutoMapper" Version="16.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.5.0-preview" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.API.Adapters\AIAgents.Laboratory.API.Adapters.csproj" />
-    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.Messaging.Adapters\AIAgents.Laboratory.Messaging.Adapters.csproj" />
-    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.Persistence.Caching\AIAgents.Laboratory.Persistence.Caching.csproj" />
-    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.Persistence.MongoDatabase\AIAgents.Laboratory.Persistence.MongoDatabase.csproj" />
-    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.Persistence.SQLDatabase\AIAgents.Laboratory.Persistence.SQLDatabase.csproj" />
-    <ProjectReference Include="..\Adapters\AIAgents.Laboratory.SemanticKernel.Adapters\AIAgents.Laboratory.SemanticKernel.Adapters.csproj" />
+    <ProjectReference Include="..\Adapters\Services\AIAgents.Laboratory.API.Adapters\AIAgents.Laboratory.API.Adapters.csproj" />
+    <ProjectReference Include="..\Adapters\Services\AIAgents.Laboratory.Messaging.Adapters\AIAgents.Laboratory.Messaging.Adapters.csproj" />
+    <ProjectReference Include="..\Adapters\Services\AIAgents.Laboratory.SemanticKernel.Adapters\AIAgents.Laboratory.SemanticKernel.Adapters.csproj" />
+    <ProjectReference Include="..\Adapters\Storage\AIAgents.Laboratory.Persistence.Caching\AIAgents.Laboratory.Persistence.Caching.csproj" />
+    <ProjectReference Include="..\Adapters\Storage\AIAgents.Laboratory.Persistence.MongoDatabase\AIAgents.Laboratory.Persistence.MongoDatabase.csproj" />
+    <ProjectReference Include="..\Adapters\Storage\AIAgents.Laboratory.Persistence.SQLDatabase\AIAgents.Laboratory.Persistence.SQLDatabase.csproj" />
+    <ProjectReference Include="..\Adapters\Storage\AIAgents.Laboratory.Storage.Cloudinary\AIAgents.Laboratory.Storage.Cloudinary.csproj" />
     <ProjectReference Include="..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
     <ProjectReference Include="..\Core\AIAgents.Laboratory.Processor\AIAgents.Laboratory.Processor.csproj" />
   </ItemGroup>
