@@ -9,22 +9,23 @@ namespace AIAgents.Laboratory.Domain.Helpers;
 /// </summary>
 internal static class DocumentHandlerService
 {
-    #region KNOWLEDGE BASE
-
     /// <summary>
-    /// Validates that the uploaded knowledge base document in the specified agent data has an allowed file extension.
+    /// Validates that the uploaded files in the specified agent data has an allowed file extension.
     /// </summary>
-    /// <param name="agentData">The agent data containing the knowledge base document to validate. If the document is null, no validation is performed.</param>
-    internal static void ValidateUploadedFiles(this AgentDataDomain agentData)
+    /// <param name="uploadedFiles">The uploaded files</param>
+    /// <param name="allowedFileFormats">The allowed file formats.</param>
+    internal static void ValidateUploadedFiles(IList<IFormFile> uploadedFiles, string allowedFileFormats)
     {
-        if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any()) return;
+        if (uploadedFiles is null || uploadedFiles.Any() || string.IsNullOrEmpty(allowedFileFormats)) return;
 
-        var allowedExtensions = new[] { ".docx", ".doc", ".pdf", ".xlsx", ".xls", ".txt", ".json" };
-        foreach (var file in agentData.KnowledgeBaseDocument)
+        var allowedExtensions = allowedFileFormats.Split(",");
+        foreach (var file in uploadedFiles)
         {
+            if (file is null) continue;
+
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (!allowedExtensions.Contains(fileExtension))
-                throw new FileFormatException("Invalid file type. Allowed types are: .docx, .doc, .pdf, .xlsx, .xls, .txt, .json");
+                throw new FileFormatException($"Invalid file type. Allowed types are: {allowedFileFormats}");
         }
     }
 
@@ -71,29 +72,4 @@ internal static class DocumentHandlerService
 
         agentData.KnowledgeBaseDocument = knowledgeBaseFiles;
     }
-
-    #endregion
-
-    #region VISION IMAGES
-
-    /// <summary>
-    /// Validates that the uploaded ai vision images in the specified agent data has an allowed file extension.
-    /// </summary>
-    /// <param name="agentData">The agent data containing the ai vision images to validate. If the images are null, no validation is performed.</param>
-    internal static void ValidateUploadedImages(this AgentDataDomain agentData)
-    {
-        if (agentData.VisionImages is null || !agentData.VisionImages.Any()) return;
-
-        var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".svg" };
-        foreach (var image in agentData.VisionImages)
-        {
-            if (image is null) continue;
-
-            var fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant();
-            if (!allowedExtensions.Contains(fileExtension))
-                throw new FileFormatException("Invalid file type. Allowed types are: .png, .jpeg, .jpg, .svg");
-        }
-    }
-
-    #endregion
 }

@@ -30,14 +30,14 @@ public class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logger, ICon
 
             if (imageFile.Length == 0) return string.Empty;
 
-            var bucketName = configuration[GCPAppConfigurationConstants.GCPBucketNameConstant];
+            var bucketName = configuration[AzureAppConfigurationConstants.GCPBucketNameConstant];
             if (string.IsNullOrWhiteSpace(bucketName))
             {
                 logger.LogError("GCP bucket name is not configured");
                 return string.Empty;
             }
 
-            var folderName = configuration[GCPAppConfigurationConstants.GCPFolderNameConstant];
+            var folderName = configuration[AzureAppConfigurationConstants.GCPFolderNameConstant];
             var objectName = string.Format(GCPCloudStorageConstants.AgentImagesFolderStructureFormat, folderName, agentGuid) + "/" + imageFile.FileName;
 
             using var stream = imageFile.OpenReadStream();
@@ -48,9 +48,7 @@ public class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logger, ICon
                 source: stream).ConfigureAwait(false);
 
             // Construct the public URL for the uploaded object
-            var publicUrl = $"https://storage.googleapis.com/{bucketName}/{objectName}";
-
-            return publicUrl;
+            return string.Format(GCPCloudStorageConstants.PublicUrlConstant, bucketName, objectName);
         }
         catch (Exception ex)
         {

@@ -133,6 +133,16 @@ internal static class Constants
         /// The how to file link constant.
         /// </summary>
         internal const string HowToFileLinkConstant = "HowToFileLink";
+
+        /// <summary>
+        /// The allowed kb file formats constant.
+        /// </summary>
+        internal const string AllowedKbFileFormatsConstant = "AllowedKbFileFormats";
+
+        /// <summary>
+        /// The allowed vision images file formats constant.
+        /// </summary>
+        internal const string AllowedVisionImageFileFormatsConstant = "AllowedVisionImageFileFormats";
     }
 
     /// <summary>

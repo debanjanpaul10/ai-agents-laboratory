@@ -50,6 +50,21 @@ internal static class Constants
         /// The cloudinary folder name constant.
         /// </summary>
         internal const string CloudinaryFolderNameConstant = "Cloudinary:FolderName";
+
+        /// <summary>
+        /// The GCP bucket name constant.
+        /// </summary>
+        internal const string GCPBucketNameConstant = "GCP:BucketName";
+
+        /// <summary>
+        /// The GCP folder name constant.
+        /// </summary>
+        internal const string GCPFolderNameConstant = "GCP:FolderName";
+
+        /// <summary>
+        /// The GCP service account JSON content constant.
+        /// </summary>
+        internal const string GCPServiceAccountJsonConstant = "GCP:ServiceAccountJson";
     }
 
     /// <summary>
@@ -72,31 +87,10 @@ internal static class Constants
         /// The agent images folder structure format constant.
         /// </summary>
         internal const string AgentImagesFolderStructureFormat = "{0}/{1}";
-    }
-
-    /// <summary>
-    /// The GCP app configuration constants class.
-    /// </summary>
-    internal static class GCPAppConfigurationConstants
-    {
-        /// <summary>
-        /// The GCP bucket name constant.
-        /// </summary>
-        internal const string GCPBucketNameConstant = "GCP:BucketName";
 
         /// <summary>
-        /// The GCP folder name constant.
+        /// The GCP document public url constant.
         /// </summary>
-        internal const string GCPFolderNameConstant = "GCP:FolderName";
-
-        /// <summary>
-        /// The GCP project ID constant.
-        /// </summary>
-        internal const string GCPProjectIdConstant = "GCP:ProjectId";
-
-        /// <summary>
-        /// The GCP service account JSON content constant.
-        /// </summary>
-        internal const string GCPServiceAccountJsonConstant = "GCP:ServiceAccountJson";
+        internal const string PublicUrlConstant = "https://storage.googleapis.com/{0}/{1}";
     }
 }

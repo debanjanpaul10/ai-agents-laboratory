@@ -50,7 +50,7 @@ public static class DIContainer
     private static IServiceCollection AddGoogleCloudStorageDependencies(this IServiceCollection services, IConfiguration configuration) =>
         services.AddSingleton(provider =>
         {
-            var serviceAccountJson = configuration[GCPAppConfigurationConstants.GCPServiceAccountJsonConstant];
+            var serviceAccountJson = configuration[AzureAppConfigurationConstants.GCPServiceAccountJsonConstant];
             ArgumentNullException.ThrowIfNull(serviceAccountJson);
 
             // Use service account JSON content from configuration

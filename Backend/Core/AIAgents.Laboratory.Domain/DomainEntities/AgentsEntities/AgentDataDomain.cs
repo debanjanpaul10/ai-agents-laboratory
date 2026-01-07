@@ -122,7 +122,7 @@ public sealed record AgentDataDomain
     ///     The AI Vision images files value.
     /// </value>
     [BsonIgnore]
-    public IList<IFormFile?> VisionImages { get; set; } = [];
+    public IList<IFormFile>? VisionImages { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the removed AI vision images (To be used for updates only).
