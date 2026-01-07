@@ -157,7 +157,7 @@ export const KnowledgeBaseFlyoutPropsConstants = {
 		SubHeading: "Upload multiple files for your agent",
 	},
 	Hints: {
-		DropFiles: "Drop files here or click to browse",
+		DropItems: "Drop files here or click to browse",
 		SupportedTypes:
 			"Supports .pdf, .doc, .docx, .txt files up to 10MB each",
 		Info: "You can upload multiple knowledge base files to enhance your agent's capabilities. Supported formats include PDF, Word documents, and text files. Each file must be under 10MB.",
@@ -175,7 +175,7 @@ export const AiVisionImagesFlyoutPropsConstants = {
 			"Upload multiple image files for your agent to read and process",
 	},
 	Hints: {
-		DropImages: "Drop images here or click to browse",
+		DropItems: "Drop images here or click to browse",
 		SupportedTypes:
 			"Supports .png, .jpg, .jpeg, .svg files up to 10MB each",
 		Info: "You can upload multiple images that will be processed by your agent to enhance its capabilites. Supported formats include most common image formats. Each file must be under 10MB.",

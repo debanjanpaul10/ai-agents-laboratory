@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Files, FileText, Images, ScanEye } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleAgentsListDrawer } from "@store/common/actions";
@@ -6,8 +7,11 @@ import { AgentDataDTO } from "@models/agent-data-dto";
 import AgentsListComponent from "@components/manage-agents/agents-list";
 import ModifyAgentComponent from "@components/manage-agents/modify-agent";
 import TestAgentComponent from "@components/manage-agents/test-agent";
-import KnowledgeBaseFlyoutComponent from "@components/common/knowledge-base-flyout";
-import VisionImagesFlyoutComponent from "@components/common/vision-images-flyout";
+import FileUploadFlyoutComponent from "@components/common/file-upload-flyout";
+import {
+	AiVisionImagesFlyoutPropsConstants,
+	KnowledgeBaseFlyoutPropsConstants,
+} from "@helpers/constants";
 
 export default function ManageAgentsComponent() {
 	const dispatch = useAppDispatch();
@@ -212,16 +216,23 @@ export default function ManageAgentsComponent() {
 					>
 						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-r border-white/10 shadow-2xl">
-							<KnowledgeBaseFlyoutComponent
+							<FileUploadFlyoutComponent
 								isOpen={isKnowledgeBaseFlyoutOpen}
 								onClose={() => toggleKnowledgebaseFlyout(false)}
 								onFilesChange={setSelectedKnowledgeFiles}
 								selectedFiles={selectedKnowledgeFiles}
-								existingDocuments={getExistingDocuments()}
-								onExistingDocumentsChange={
+								existingFiles={getExistingDocuments()}
+								onExistingFilesChange={
 									handleExistingDocumentsChange
 								}
-								removedExistingDocs={removedExistingDocuments}
+								removedExistingFiles={removedExistingDocuments}
+								config={{
+									headerConstants:
+										KnowledgeBaseFlyoutPropsConstants,
+									icons: { title: Files, body: FileText },
+									supportedTypes:
+										".doc,.docx,.pdf,.txt,.xls,.xlsx,.json",
+								}}
 							/>
 						</div>
 					</div>
@@ -236,16 +247,22 @@ export default function ManageAgentsComponent() {
 					>
 						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-r border-white/10 shadow-2xl">
-							<VisionImagesFlyoutComponent
+							<FileUploadFlyoutComponent
 								isOpen={isVisionFlyoutOpen}
 								onClose={() => toggleAiVisionFlyout(false)}
-								onImagesChange={setSelectedVisionImages}
-								selectedImages={selectedVisionImages}
-								existingImages={getExistingImages()}
-								onExistingImagesChange={
+								onFilesChange={setSelectedVisionImages}
+								selectedFiles={selectedVisionImages}
+								existingFiles={getExistingImages()}
+								onExistingFilesChange={
 									handleExistingImagesChange
 								}
-								removedImages={removedExistingImages}
+								removedExistingFiles={removedExistingImages}
+								config={{
+									headerConstants:
+										AiVisionImagesFlyoutPropsConstants,
+									icons: { title: ScanEye, body: Images },
+									supportedTypes: ".jpg,.jpeg,.png,.svg",
+								}}
 							/>
 						</div>
 					</div>

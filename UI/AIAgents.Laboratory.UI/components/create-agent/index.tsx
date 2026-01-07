@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
+import { Files, FileText, Images, ScanEye } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleNewAgentDrawer } from "@store/common/actions";
 import CreateAgentFlyoutComponent from "@components/create-agent/agent-creator-flyout";
-import KnowledgeBaseFlyoutComponent from "@components/common/knowledge-base-flyout";
-import VisionImagesFlyoutComponent from "@components/common/vision-images-flyout";
+import {
+	AiVisionImagesFlyoutPropsConstants,
+	KnowledgeBaseFlyoutPropsConstants,
+} from "@helpers/constants";
+import FileUploadFlyoutComponent from "@components/common/file-upload-flyout";
 
 export default function CreateAgentComponent() {
 	const dispatch = useAppDispatch();
@@ -73,14 +77,21 @@ export default function CreateAgentComponent() {
 					>
 						<div className="absolute inset-0 bg-gradient-to-r from-green-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-x border-white/10 shadow-2xl">
-							<KnowledgeBaseFlyoutComponent
+							<FileUploadFlyoutComponent
 								isOpen={knowledgeBaseFlyoutOpen}
 								onClose={() => toggleKnowledgebaseFlyout(false)}
 								onFilesChange={setSelectedKnowledgeFiles}
 								selectedFiles={selectedKnowledgeFiles}
-								existingDocuments={[]}
-								onExistingDocumentsChange={() => {}} // No-op for create agent
-								removedExistingDocs={[]} // No existing docs in create flow
+								existingFiles={[]}
+								onExistingFilesChange={() => {}}
+								removedExistingFiles={[]}
+								config={{
+									headerConstants:
+										KnowledgeBaseFlyoutPropsConstants,
+									icons: { title: Files, body: FileText },
+									supportedTypes:
+										".doc,.docx,.pdf,.txt,.xls,.xlsx,.json",
+								}}
 							/>
 						</div>
 					</div>
@@ -92,14 +103,20 @@ export default function CreateAgentComponent() {
 					>
 						<div className="absolute inset-0 bg-gradient-to-r from-green-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-x border-white/10 shadow-2xl">
-							<VisionImagesFlyoutComponent
+							<FileUploadFlyoutComponent
 								isOpen={aiVisionImagesFlyoutOpen}
 								onClose={() => toggleAiVisionFlyout(false)}
-								onImagesChange={setSelectedAiVisionImages}
-								selectedImages={selectedAiVisionImages}
-								existingImages={[]}
-								onExistingImagesChange={() => {}} // No-op for create agent
-								removedImages={[]} // No existing docs in create flow
+								onFilesChange={setSelectedAiVisionImages}
+								selectedFiles={selectedAiVisionImages}
+								existingFiles={[]}
+								onExistingFilesChange={() => {}}
+								removedExistingFiles={[]}
+								config={{
+									headerConstants:
+										AiVisionImagesFlyoutPropsConstants,
+									icons: { title: ScanEye, body: Images },
+									supportedTypes: ".jpg,.jpeg,.png,.svg",
+								}}
 							/>
 						</div>
 					</div>

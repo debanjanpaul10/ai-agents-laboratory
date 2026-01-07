@@ -112,22 +112,17 @@ export interface CreateAgentFlyoutProps {
 // Union type for both new files and existing documents
 export type KnowledgeBaseItem = File | null;
 
-export interface KnowledgeBaseFlyoutProps {
+export interface FileUploadFlyoutProps {
 	isOpen: boolean;
 	onClose: () => void;
 	onFilesChange: (files: File[]) => void;
 	selectedFiles: File[];
-	existingDocuments?: File[]; // Optional existing documents
-	onExistingDocumentsChange?: (removedFileNames: string[]) => void; // Callback for removed existing documents
-	removedExistingDocs?: string[]; // Current list of removed existing document names
-}
-
-export interface VisionImagesFlyoutProps {
-	isOpen: boolean;
-	onClose: () => void;
-	onImagesChange: (files: File[]) => void;
-	selectedImages: File[];
-	existingImages?: File[];
-	onExistingImagesChange?: (removedImageNames: string[]) => void;
-	removedImages?: string[];
+	existingFiles?: File[];
+	onExistingFilesChange?: (removedFileNames: string[]) => void;
+	removedExistingFiles?: string[];
+	config: {
+		headerConstants: any;
+		icons: any;
+		supportedTypes: string;
+	};
 }
