@@ -3,9 +3,7 @@ import { Button } from "@heroui/react";
 import {
 	ArrowRight,
 	Download,
-	Eye,
 	FileText,
-	Image,
 	ScanEye,
 	Trash2,
 	Upload,
