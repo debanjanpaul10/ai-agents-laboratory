@@ -76,17 +76,29 @@ export default function ModifyAgentComponent({
 		form.append("applicationName", editFormData.applicationName);
 		form.append("isPrivate", editFormData.isPrivate.toString());
 
-		// Handle multiple knowledge base files (new uploads)
+		// KB FILES
 		if (selectedKnowledgeFiles.length > 0) {
 			selectedKnowledgeFiles.forEach((file) => {
-				form.append(`knowledgeBaseDocument`, file);
+				form.append("knowledgeBaseDocument", file);
 			});
 		}
 
-		// Send list of removed existing knowledge base documents (by file name)
 		if (removedExistingDocuments.length > 0) {
 			removedExistingDocuments.forEach((fileName) => {
 				form.append("removedKnowledgeBaseDocuments", fileName);
+			});
+		}
+
+		// AI VISION IMAGES
+		if (selectedVisionImages.length > 0) {
+			selectedVisionImages.forEach((image) => {
+				form.append("visionImages", image);
+			});
+		}
+
+		if (removedExistingImages.length > 0) {
+			removedExistingImages.forEach((imageName) => {
+				form.append("removedAiVisionImages", imageName);
 			});
 		}
 
@@ -213,7 +225,6 @@ export default function ModifyAgentComponent({
 	};
 
 	const renderAgentKnowledgeBaseData = () => {
-		// Derive counts from existing and newly selected files
 		const existingDocs =
 			(selectedAgent?.knowledgeBaseDocument as File[] | null) ?? [];
 		const visibleExistingDocs = existingDocs.filter(
