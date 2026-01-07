@@ -17,8 +17,7 @@ public static class DIContainer
     /// <param name="services">The services.</param>
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddDomainDependencies(this IServiceCollection services) =>
-        services.AddScoped<IPluginsAiService, PluginsAiService>()
-            .AddScoped<ICommonAiService, CommonAiService>()
+        services.AddScoped<ICommonAiService, CommonAiService>()
             .AddScoped<ISkillsService, SkillsService>()
             .AddScoped<IAgentsService, AgentsService>()
             .AddScoped<IAgentChatService, AgentChatService>()

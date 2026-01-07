@@ -20,10 +20,8 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="agentsService">The service used to retrieve agent data and metadata required for chat interactions.</param>
 /// <param name="knowledgeBaseProcessor">The processor used to extract relevant knowledge base information to enhance agent responses.</param>
 /// <param name="aiServices">The AI services used to generate responses based on chat context and agent configuration.</param>
-/// <param name="visionProcessor">The AI Vision Processor service used to read and argument from images.</param>
 /// <seealso cref="IAgentChatService"/>
-public class AgentChatService(IConfiguration configuration, ILogger<AgentChatService> logger, IAgentsService agentsService,
-    IKnowledgeBaseProcessor knowledgeBaseProcessor, IAiServices aiServices, IVisionProcessor visionProcessor) : IAgentChatService
+public class AgentChatService(IConfiguration configuration, ILogger<AgentChatService> logger, IAgentsService agentsService, IKnowledgeBaseProcessor knowledgeBaseProcessor, IAiServices aiServices) : IAgentChatService
 {
     /// <summary>
     /// The feature flag for knowledge base service.
@@ -72,17 +70,21 @@ public class AgentChatService(IConfiguration configuration, ILogger<AgentChatSer
             }
 
             // Use AI Vision services if configured
-            if (IsAiVisionServiceAllowed)
-            {
-                var imageUrl = "https://raw.githubusercontent.com/Azure-Samples/cognitive-services-sample-data-files/master/ComputerVision/Images/printed_text.jpg";
-                var result = await visionProcessor.ReadDataFromImageWithComputerVisionAsync(imageUrl).ConfigureAwait(false);
-            }
+            if (IsAiVisionServiceAllowed && agentData.AiVisionImagesData is not null && agentData.AiVisionImagesData.Any())
+                chatMessage.ImageKeyWords = agentData.AiVisionImagesData;
 
             // Enable MCP server integration if configured
             if (!string.IsNullOrEmpty(agentData.McpServerUrl))
-                return await aiServices.GetAiFunctionResponseWithMcpIntegrationAsync(chatMessage, agentData.McpServerUrl, ApplicationPluginsHelpers.PluginName, ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+                return await aiServices.GetAiFunctionResponseWithMcpIntegrationAsync(
+                    input: chatMessage,
+                    mcpServerUrl: agentData.McpServerUrl,
+                    pluginName: ApplicationPluginsHelpers.PluginName,
+                    functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
             else
-                return await aiServices.GetAiFunctionResponseAsync(chatMessage, ApplicationPluginsHelpers.PluginName, ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+                return await aiServices.GetAiFunctionResponseAsync(
+                    input: chatMessage,
+                    pluginName: ApplicationPluginsHelpers.PluginName,
+                    functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

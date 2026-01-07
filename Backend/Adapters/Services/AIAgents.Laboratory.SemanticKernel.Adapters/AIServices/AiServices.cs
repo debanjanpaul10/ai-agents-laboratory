@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text.Json;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
@@ -42,17 +41,23 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel, IMcpClientSer
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow));
-            return await this.InvokePluginFunctionAsync(input, pluginName, functionName).ConfigureAwait(false);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow);
+            var kernelArguments = new KernelArguments()
+            {
+                [ArgumentsConstants.KernelArgumentsInputConstant] = JsonSerializer.Serialize(input)
+            };
+
+            var responseFromAI = await kernel.InvokeAsync(pluginName, functionName, kernelArguments).ConfigureAwait(false);
+            return responseFromAI.GetValue<string>() ?? string.Empty;
         }
         catch (Exception ex)
         {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, ex.Message);
             throw;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow);
         }
     }
 
@@ -69,7 +74,7 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel, IMcpClientSer
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseWithMcpIntegrationAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseWithMcpIntegrationAsync), DateTime.UtcNow);
 
             // Step 1: Get available MCP tools
             var availableMcpTools = await mcpClientServices.GetAllMcpToolsAsync(mcpServerUrl).ConfigureAwait(false);
@@ -98,16 +103,16 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel, IMcpClientSer
             };
 
             var finalResponseFromAI = await kernel.InvokeAsync(PluginName, GenerateFinalResponseWithToolResultFunction.FunctionName, finalKernelArguments).ConfigureAwait(false);
-            return finalResponseFromAI.GetValue<string>()!;
+            return finalResponseFromAI.GetValue<string>() ?? string.Empty;
         }
         catch (Exception ex)
         {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseWithMcpIntegrationAsync), DateTime.UtcNow, ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseWithMcpIntegrationAsync), DateTime.UtcNow, ex.Message);
             throw;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseWithMcpIntegrationAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseWithMcpIntegrationAsync), DateTime.UtcNow);
         }
     }
 
@@ -122,7 +127,7 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel, IMcpClientSer
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetChatbotResponseAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetChatbotResponseAsync), DateTime.UtcNow);
 
             var chatHistory = new ChatHistory();
             chatHistory.AddSystemMessage(agentPrompt);
@@ -143,48 +148,12 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel, IMcpClientSer
         }
         catch (Exception ex)
         {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetChatbotResponseAsync), DateTime.UtcNow, ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetChatbotResponseAsync), DateTime.UtcNow, ex.Message);
             throw;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow);
         }
     }
-
-    #region PRIVATE METHODS
-
-    /// <summary>
-    /// Invokes the plugin function asynchronous.
-    /// </summary>
-    /// <typeparam name="TInput">The type of the input.</typeparam>
-    /// <param name="input">The input.</param>
-    /// <param name="pluginName">Name of the plugin.</param>
-    /// <param name="functionName">Name of the function.</param>
-    /// <returns>The AI string response.</returns>
-    private async Task<string> InvokePluginFunctionAsync<TInput>(TInput input, string pluginName, string functionName)
-    {
-        try
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
-            var kernelArguments = new KernelArguments()
-            {
-                [ArgumentsConstants.KernelArgumentsInputConstant] = JsonSerializer.Serialize(input)
-            };
-
-            var responseFromAI = await kernel.InvokeAsync(pluginName, functionName, kernelArguments).ConfigureAwait(false);
-            return responseFromAI.GetValue<string>()!;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(InvokePluginFunctionAsync), DateTime.UtcNow, ex.Message));
-            throw;
-        }
-        finally
-        {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(InvokePluginFunctionAsync), DateTime.UtcNow));
-        }
-    }
-
-    #endregion
 }

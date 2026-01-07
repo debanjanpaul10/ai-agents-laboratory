@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Globalization;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
@@ -15,85 +14,6 @@ namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
 /// <param name="logger">The logger service.</param>
 public class ApplicationPlugins(ILogger<ApplicationPlugins> logger)
 {
-    #region IBBS
-
-    /// <summary>
-    /// Executes the generate tag for story plugin asynchronous.
-    /// </summary>
-    /// <param name="kernel">The kernel.</param>
-    /// <param name="input">The input.</param>
-    /// <returns>The AI response.</returns>
-    [KernelFunction(name: GenerateGenreTagForStoryFunction.FunctionName)]
-    [Description(description: GenerateGenreTagForStoryFunction.FunctionDescription)]
-    public static async Task<string> ExecuteGenerateTagForStoryPluginAsync(Kernel kernel, [Description(GenerateGenreTagForStoryFunction.InputDescription)] string input)
-    {
-        var arguments = new KernelArguments
-        {
-            { ArgumentsConstants.KernelArgumentsInputConstant, input }
-        };
-
-        var result = await kernel.InvokePromptAsync(GenerateGenreTagForStoryFunction.FunctionInstructions, arguments).ConfigureAwait(false);
-        return result.GetValue<string>() ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Executes the content moderation plugin.
-    /// </summary>
-    /// <param name="kernel">The kernel.</param>
-    /// <param name="input">The input.</param>
-    /// <returns>The AI response.</returns>
-    [KernelFunction(name: ContentModerationFunction.FunctionName)]
-    [Description(description: ContentModerationFunction.FunctionDescription)]
-    public static async Task<string> ExecuteContentModerationPlugin(Kernel kernel, [Description(ContentModerationFunction.InputDescription)] string input)
-    {
-        var arguments = new KernelArguments
-        {
-            { ArgumentsConstants.KernelArgumentsInputConstant, input }
-        };
-
-        var result = await kernel.InvokePromptAsync(ContentModerationFunction.FunctionInstructions, arguments).ConfigureAwait(false);
-        return result.GetValue<string>() ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Executes rewrite user story async.
-    /// </summary>
-    /// <param name="kernel">The kernel.</param>
-    /// <param name="input">The input.</param>
-    [KernelFunction(RewriteUserStoryFunction.FunctionName)]
-    [Description(RewriteUserStoryFunction.FunctionDescription)]
-    public static async Task<string> ExecuteRewriteUserStoryAsync(Kernel kernel, [Description(RewriteUserStoryFunction.InputDescription)] string input)
-    {
-        var arguments = new KernelArguments
-        {
-            { ArgumentsConstants.KernelArgumentsInputConstant, input }
-        };
-
-        var result = await kernel.InvokePromptAsync(RewriteUserStoryFunction.FunctionInstructions, arguments).ConfigureAwait(false);
-        return result.GetValue<string>() ?? string.Empty;
-    }
-
-    #endregion
-
-    /// <summary>
-    /// Determines the bug severity asynchronous.
-    /// </summary>
-    /// <param name="kernel">The kernel.</param>
-    /// <param name="input">The input.</param>
-    /// <returns>The ai prompt response.</returns>
-    [KernelFunction(DetermineBugSeverityFunction.FunctionName)]
-    [Description(DetermineBugSeverityFunction.FunctionDescription)]
-    public static async Task<string> DetermineBugSeverityAsync(Kernel kernel, [Description(DetermineBugSeverityFunction.InputDescription)] string input)
-    {
-        var arguments = new KernelArguments()
-        {
-            { ArgumentsConstants.KernelArgumentsInputConstant, input }
-        };
-
-        var result = await kernel.InvokePromptAsync(DetermineBugSeverityFunction.FunctionInstructions, arguments).ConfigureAwait(false);
-        return result.GetValue<string>() ?? string.Empty;
-    }
-
     /// <summary>
     /// Gets the chat message response asynchronous.
     /// </summary>
@@ -116,7 +36,7 @@ public class ApplicationPlugins(ILogger<ApplicationPlugins> logger)
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetChatMessageResponseAsync), DateTime.UtcNow, ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetChatMessageResponseAsync), DateTime.UtcNow, ex.Message);
             return ExceptionConstants.DefaultAIExceptionMessage;
         }
     }
@@ -150,7 +70,7 @@ public class ApplicationPlugins(ILogger<ApplicationPlugins> logger)
         }
         catch (JsonException ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(DetermineToolToCallAsync), DateTime.UtcNow, ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DetermineToolToCallAsync), DateTime.UtcNow, ex.Message);
             return ExceptionConstants.DefaultAIExceptionMessage;
         }
     }

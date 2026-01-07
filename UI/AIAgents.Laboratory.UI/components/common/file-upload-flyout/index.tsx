@@ -17,7 +17,7 @@ export default function FileUploadFlyoutComponent({
 }: FileUploadFlyoutProps) {
 	const [dragActive, setDragActive] = useState(false);
 
-	const handlefileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+	const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
 		const fileInput = e.target as HTMLInputElement;
 		const newFiles = Array.from(fileInput.files || []);
 
@@ -175,9 +175,9 @@ export default function FileUploadFlyoutComponent({
 									</p>
 								</div>
 								<input
-									onChange={handlefileUpload}
+									onChange={handleFileUpload}
 									type="file"
-									accept=".jpg,.png,.jpeg,.svg"
+									accept={config.supportedTypes}
 									multiple
 									className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
 								/>
