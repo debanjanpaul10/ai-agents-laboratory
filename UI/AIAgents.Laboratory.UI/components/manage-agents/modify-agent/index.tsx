@@ -288,8 +288,7 @@ export default function ModifyAgentComponent({
 	};
 
 	const renderAiVisionImagesData = () => {
-		const existingImages =
-			(selectedAgent?.visionImages as File[] | null) ?? [];
+		const existingImages = selectedAgent?.visionImages ?? [];
 		const visibleExistingImages = existingImages.filter(
 			(image) => !removedExistingImages.includes(image.name)
 		);
