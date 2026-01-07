@@ -59,4 +59,20 @@ public record CreateAgentDTO
     /// The MCP server URL.
     /// </value>
     public string? McpServerUrl { get; set; }
+
+    /// <summary>
+    /// Gets or sets the AI Vision images files.
+    /// </summary>
+    /// <value>
+    ///     The AI Vision images files value.
+    /// </value>
+    public IEnumerable<IFormFile?> VisionImages { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the removed AI vision images (To be used for updates only).
+    /// </summary>
+    /// <value>
+    ///     The removed AI vision images value.
+    /// </value>
+    public IList<string> RemovedAiVisionImages { get; set; } = [];
 }

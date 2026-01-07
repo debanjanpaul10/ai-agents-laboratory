@@ -16,11 +16,11 @@ namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 /// Provides AI-related services, including invoking AI plugin functions and generating chatbot responses.
 /// </summary>
 /// <remarks>This class serves as a central point for interacting with AI capabilities, such as executing plugin
-/// functions and handling chatbot conversations. It is intended to be used as a service within applications that
-/// require AI integration. All public methods are asynchronous and thread-safe.</remarks>
+/// functions and handling chatbot conversations. It is intended to be used as a service within applications that require AI integration. All public methods are asynchronous and thread-safe.</remarks>
 /// <param name="logger">The logger used to record diagnostic and operational information for the service.</param>
 /// <param name="kernel">The kernel instance used to access AI plugins and services.</param>
 /// <param name="mcpClientServices">The mcp client services.</param>
+/// <seealso cref="IAiServices"/>
 public class AiServices(ILogger<AiServices> logger, Kernel kernel, IMcpClientServices mcpClientServices) : IAiServices
 {
     /// <summary>

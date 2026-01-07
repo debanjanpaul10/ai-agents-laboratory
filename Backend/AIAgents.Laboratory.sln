@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.Domain"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.Processor", "Core\AIAgents.Laboratory.Processor\AIAgents.Laboratory.Processor.csproj", "{E2FE36E9-4078-1825-1CFD-7503B8EBA461}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIAgents.Laboratory.Storage.Cloudinary", "Adapters\AIAgents.Laboratory.Storage.Cloudinary\AIAgents.Laboratory.Storage.Cloudinary.csproj", "{95B6D40A-3A76-44A6-8A68-EBBDC26273A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{E2FE36E9-4078-1825-1CFD-7503B8EBA461}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2FE36E9-4078-1825-1CFD-7503B8EBA461}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2FE36E9-4078-1825-1CFD-7503B8EBA461}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95B6D40A-3A76-44A6-8A68-EBBDC26273A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95B6D40A-3A76-44A6-8A68-EBBDC26273A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95B6D40A-3A76-44A6-8A68-EBBDC26273A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95B6D40A-3A76-44A6-8A68-EBBDC26273A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +92,7 @@ Global
 		{1191E906-4475-81B9-DD20-4F27689CED9C} = {D52AF77B-723B-43C6-911E-05DB4387462A}
 		{D233D728-3D2A-60BC-55B5-73BC1F83A617} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{E2FE36E9-4078-1825-1CFD-7503B8EBA461} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{95B6D40A-3A76-44A6-8A68-EBBDC26273A8} = {D52AF77B-723B-43C6-911E-05DB4387462A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D6B93BAE-85C1-4545-A2FE-51E7BD4362FC}

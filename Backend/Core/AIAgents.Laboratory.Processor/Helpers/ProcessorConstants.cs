@@ -14,6 +14,16 @@ internal static class ProcessorConstants
         /// The current ai service provider
         /// </summary>
         internal const string CurrentAiServiceProvider = "CurrentAiServiceProvider";
+
+        /// <summary>
+        /// Represents the configuration key used to retrieve the Azure AI Vision service API key from application settings.
+        /// </summary>
+        internal const string AzureAiVisionKey = "AzureAiVision:Key";
+
+        /// <summary>
+        /// Represents the configuration key for the Azure AI Vision service endpoint.
+        /// </summary>
+        internal const string AzureAiVisionEndpoint = "AzureAiVision:Endpoint";
     }
 
     /// <summary>
@@ -201,5 +211,16 @@ internal static class ProcessorConstants
             /// </summary>
             internal const string ExcelFiles = ".xls, .xlsx, .xlsm";
         }
+    }
+
+    /// <summary>
+    /// Provides constant values used by the AI Vision components.
+    /// </summary>
+    internal static class AiVisionConstants
+    {
+        /// <summary>
+        /// Represents the number of characters in a standard operation identifier.
+        /// </summary>
+        internal const int NUMBER_OF_CHARACTERS_IN_OPERATION_ID = 36;
     }
 }
