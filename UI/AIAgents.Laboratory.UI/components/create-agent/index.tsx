@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Files, FileText, Images, ScanEye } from "lucide-react";
+import { Download, Files, FileText, Images, ScanEye, View } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleNewAgentDrawer } from "@store/common/actions";
@@ -88,7 +88,11 @@ export default function CreateAgentComponent() {
 								config={{
 									headerConstants:
 										KnowledgeBaseFlyoutPropsConstants,
-									icons: { title: Files, body: FileText },
+									icons: {
+										title: Files,
+										body: FileText,
+										download: Download,
+									},
 									supportedTypes:
 										".doc,.docx,.pdf,.txt,.xls,.xlsx,.json",
 								}}
@@ -114,7 +118,11 @@ export default function CreateAgentComponent() {
 								config={{
 									headerConstants:
 										AiVisionImagesFlyoutPropsConstants,
-									icons: { title: ScanEye, body: Images },
+									icons: {
+										title: ScanEye,
+										body: Images,
+										download: View,
+									},
 									supportedTypes: ".jpg,.jpeg,.png,.svg",
 								}}
 							/>

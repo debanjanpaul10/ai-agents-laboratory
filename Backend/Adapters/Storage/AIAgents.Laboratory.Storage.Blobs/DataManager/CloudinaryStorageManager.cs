@@ -4,9 +4,9 @@ using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using static AIAgents.Laboratory.Storage.Cloudinary.Helpers.Constants;
+using static AIAgents.Laboratory.Storage.Blobs.Helpers.Constants;
 
-namespace AIAgents.Laboratory.Storage.Cloudinary.DataManager;
+namespace AIAgents.Laboratory.Storage.Blobs.DataManager;
 
 /// <summary>
 /// The Cloudinary Storage Manager implementation for handling file operations with Cloudinary.
@@ -15,7 +15,7 @@ namespace AIAgents.Laboratory.Storage.Cloudinary.DataManager;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="cloudinary">The Cloudinary client instance.</param>
 /// <seealso cref="ICloudinaryStorageManager"/>
-public class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> logger, IConfiguration configuration, ICloudinary cloudinary) : ICloudinaryStorageManager
+public class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> logger, IConfiguration configuration, ICloudinary cloudinary) : IBlobStorageManager
 {
     /// <summary>
     /// Uploads image to cloudinary storage asynchronously.

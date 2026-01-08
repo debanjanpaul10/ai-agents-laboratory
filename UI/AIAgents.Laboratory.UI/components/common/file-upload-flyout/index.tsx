@@ -237,10 +237,10 @@ export default function FileUploadFlyoutComponent({
 															doc
 														)
 													}
-													title="Download existing document"
+													title="Check existing document"
 													className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 hover:border-blue-500/30 transition-all duration-200 text-blue-400 hover:text-blue-300 flex-shrink-0"
 												>
-													<Download className="w-4 h-4" />
+													<config.icons.download className="w-4 h-4" />
 												</Button>
 												<Button
 													onPress={() =>

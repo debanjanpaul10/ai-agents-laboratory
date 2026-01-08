@@ -1,4 +1,4 @@
-﻿namespace AIAgents.Laboratory.Storage.Cloudinary.Helpers;
+﻿namespace AIAgents.Laboratory.Storage.Blobs.Helpers;
 
 /// <summary>
 /// The Constants Class.
@@ -50,6 +50,21 @@ internal static class Constants
         /// The cloudinary folder name constant.
         /// </summary>
         internal const string CloudinaryFolderNameConstant = "Cloudinary:FolderName";
+
+        /// <summary>
+        /// The GCP bucket name constant.
+        /// </summary>
+        internal const string GCPBucketNameConstant = "GCP:BucketName";
+
+        /// <summary>
+        /// The GCP folder name constant.
+        /// </summary>
+        internal const string GCPFolderNameConstant = "GCP:FolderName";
+
+        /// <summary>
+        /// The GCP service account JSON content constant.
+        /// </summary>
+        internal const string GCPServiceAccountJsonConstant = "GCP:ServiceAccountJson";
     }
 
     /// <summary>
@@ -61,5 +76,38 @@ internal static class Constants
         /// The agent images folder structure format constant.
         /// </summary>
         internal const string AgentImagesFolderStructureFormat = "{0}/{1}";
+    }
+
+    /// <summary>
+    /// The GCP cloud storage constants class.
+    /// </summary>
+    internal static class GCPCloudStorageConstants
+    {
+        /// <summary>
+        /// The agent images folder structure format constant.
+        /// </summary>
+        internal const string AgentImagesFolderStructureFormat = "{0}/{1}";
+
+        /// <summary>
+        /// The GCP document public url constant.
+        /// </summary>
+        internal const string PublicUrlConstant = "https://storage.googleapis.com/{0}/{1}";
+    }
+
+    /// <summary>
+    /// The Exception Constants class.
+    /// </summary>
+    internal static class ExceptionConstants
+    {
+        /// <summary>
+        /// The GCP Bucket not configured exception message constant.
+        /// </summary>
+        internal const string GCPBucketNotConfiguredExceptionMessage = "The GCP Bucket is not configured.";
+
+        /// <summary>
+        /// The exception message for failure to initialize GCP.
+        /// </summary>
+        internal const string FailedToInitialzeGCPExceptionMessage = "Failed to initialize Google Cloud Storage client. Please verify the service account JSON configuration.";
+
     }
 }
