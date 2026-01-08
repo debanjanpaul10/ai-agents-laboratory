@@ -38,14 +38,16 @@ public class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logger, ICon
             }
 
             var folderName = configuration[AzureAppConfigurationConstants.GCPFolderNameConstant];
-            var objectName = string.Format(GCPCloudStorageConstants.AgentImagesFolderStructureFormat, folderName, agentGuid) + "/" + imageFile.FileName;
+            var safeFileName = Path.GetFileName(imageFile.FileName);
+            var objectName = string.Format(GCPCloudStorageConstants.AgentImagesFolderStructureFormat, folderName, agentGuid) + "/" + safeFileName;
 
             using var stream = imageFile.OpenReadStream();
             var uploadedObject = await storageClient.UploadObjectAsync(
                 bucket: bucketName,
                 objectName: objectName,
                 contentType: imageFile.ContentType,
-                source: stream).ConfigureAwait(false);
+                source: stream,
+                options: new UploadObjectOptions { PredefinedAcl = PredefinedObjectAcl.PublicRead }).ConfigureAwait(false);
 
             // Construct the public URL for the uploaded object
             return string.Format(GCPCloudStorageConstants.PublicUrlConstant, bucketName, objectName);

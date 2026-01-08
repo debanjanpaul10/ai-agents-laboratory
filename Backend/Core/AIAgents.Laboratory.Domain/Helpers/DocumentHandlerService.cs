@@ -16,7 +16,7 @@ internal static class DocumentHandlerService
     /// <param name="allowedFileFormats">The allowed file formats.</param>
     internal static void ValidateUploadedFiles(IList<IFormFile> uploadedFiles, string allowedFileFormats)
     {
-        if (uploadedFiles is null || uploadedFiles.Any() || string.IsNullOrEmpty(allowedFileFormats)) return;
+        if (uploadedFiles is null || !uploadedFiles.Any() || string.IsNullOrEmpty(allowedFileFormats)) return;
 
         var allowedExtensions = allowedFileFormats.Split(",");
         foreach (var file in uploadedFiles)

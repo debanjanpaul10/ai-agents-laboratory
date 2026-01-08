@@ -69,7 +69,7 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentData.AgentId);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentData.AgentId);
         }
     }
 
@@ -104,7 +104,6 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
             if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Any() && !string.IsNullOrEmpty(AllowedKnowledgebaseFileFormats))
             {
                 DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.KnowledgeBaseDocument, AllowedKnowledgebaseFileFormats);
-
                 await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
                 if (updateDataDomain.StoredKnowledgeBase is not null && updateDataDomain.StoredKnowledgeBase.Any())
                 {
@@ -128,12 +127,12 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, ex.Message);
             throw;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId);
         }
     }
 
@@ -156,7 +155,6 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
 
             if (agentData.VisionImages is null || !agentData.VisionImages.Any() || string.IsNullOrEmpty(AllowedAiVisionImagesFileFormats)) return;
             DocumentHandlerService.ValidateUploadedFiles(agentData.VisionImages, AllowedAiVisionImagesFileFormats);
-
             foreach (var image in agentData.VisionImages)
             {
                 if (image is null) continue;
@@ -219,7 +217,6 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
             if (updateDataDomain.VisionImages is not null && updateDataDomain.VisionImages.Any() && !string.IsNullOrEmpty(AllowedAiVisionImagesFileFormats))
             {
                 DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.VisionImages, AllowedAiVisionImagesFileFormats);
-
                 foreach (var image in updateDataDomain.VisionImages)
                 {
                     if (image is null) continue;
