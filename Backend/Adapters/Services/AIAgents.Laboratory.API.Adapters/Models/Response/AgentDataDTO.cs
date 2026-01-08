@@ -5,7 +5,7 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 /// <summary>
 /// The Agent Data DTO model.
 /// </summary>
-/// <seealso cref="AIAgents.Laboratory.API.Adapters.Models.Request.CreateAgentDTO" />
+/// <seealso cref="CreateAgentDTO" />
 public sealed record AgentDataDTO : CreateAgentDTO
 {
     /// <summary>
@@ -39,4 +39,12 @@ public sealed record AgentDataDTO : CreateAgentDTO
     /// The boolean flag for is default chat bot.
     /// </value>
     public bool IsDefaultChatbot { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the AI Vision images data.
+    /// </summary>
+    /// <value>
+    ///     The AI Vision images data value.
+    /// </value>
+    public IList<AiVisionImagesDataDTO?> AiVisionImagesData { get; set; } = [];
 }

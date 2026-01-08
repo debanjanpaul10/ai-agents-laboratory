@@ -100,7 +100,9 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
                 MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
 
             var agentData = allData.First() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
-            agentData.ConvertKnowledgebaseBinaryDataToFile();
+            if (agentData.StoredKnowledgeBase is not null && agentData.StoredKnowledgeBase.Any())
+                agentData.ConvertKnowledgebaseBinaryDataToFile();
+
             return agentData;
         }
         catch (Exception ex)
@@ -141,7 +143,9 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
                 MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
 
             // Process stored knowledge base data if available
-            foreach (var agent in agents) agent.ConvertKnowledgebaseBinaryDataToFile();
+            foreach (var agent in agents)
+                if (agent.StoredKnowledgeBase is not null && agent.StoredKnowledgeBase.Any())
+                    agent.ConvertKnowledgebaseBinaryDataToFile();
 
             return agents;
         }

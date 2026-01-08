@@ -288,9 +288,9 @@ export default function ModifyAgentComponent({
 	};
 
 	const renderAiVisionImagesData = () => {
-		const existingImages = selectedAgent?.visionImages ?? [];
+		const existingImages = selectedAgent?.aiVisionImagesData ?? [];
 		const visibleExistingImages = existingImages.filter(
-			(image) => !removedExistingImages.includes(image.name)
+			(image: any) => !removedExistingImages.includes(image.imageName || image.name)
 		);
 		const existingCount = visibleExistingImages.length;
 		const totalCount = selectedVisionImages.length + existingCount;

@@ -1,6 +1,7 @@
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Processor.Models;
 using Microsoft.AspNetCore.Http;
+using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.Helpers;
 
@@ -9,22 +10,26 @@ namespace AIAgents.Laboratory.Domain.Helpers;
 /// </summary>
 internal static class DocumentHandlerService
 {
-    #region KNOWLEDGE BASE
-
     /// <summary>
-    /// Validates that the uploaded knowledge base document in the specified agent data has an allowed file extension.
+    /// Validates that the uploaded files in the specified agent data has an allowed file extension.
     /// </summary>
-    /// <param name="agentData">The agent data containing the knowledge base document to validate. If the document is null, no validation is performed.</param>
-    internal static void ValidateUploadedFiles(this AgentDataDomain agentData)
+    /// <param name="uploadedFiles">The uploaded files</param>
+    /// <param name="allowedFileFormats">The allowed file formats.</param>
+    internal static void ValidateUploadedFiles(IList<IFormFile> uploadedFiles, string allowedFileFormats)
     {
-        if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any()) return;
+        if (uploadedFiles is null || !uploadedFiles.Any() || string.IsNullOrWhiteSpace(allowedFileFormats))
+            throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
 
-        var allowedExtensions = new[] { ".docx", ".doc", ".pdf", ".xlsx", ".xls", ".txt", ".json" };
-        foreach (var file in agentData.KnowledgeBaseDocument)
+        var allowedExtensions = allowedFileFormats.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(extension => extension.StartsWith('.') ? extension.ToLowerInvariant() : $".{extension.ToLowerInvariant()}")
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var file in uploadedFiles)
         {
+            if (file is null) continue;
+
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (!allowedExtensions.Contains(fileExtension))
-                throw new FileFormatException("Invalid file type. Allowed types are: .docx, .doc, .pdf, .xlsx, .xls, .txt, .json");
+                throw new FileFormatException(string.Concat(ExceptionConstants.InvalidFileFormatExceptionMessage, allowedFileFormats));
         }
     }
 
@@ -35,7 +40,8 @@ internal static class DocumentHandlerService
     /// <returns>A task to wait on.</returns>
     internal static async Task ProcessKnowledgebaseDocumentDataAsync(this AgentDataDomain agentData)
     {
-        if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any()) return;
+        if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any())
+            throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
 
         var knowledgeBaseFiles = new List<KnowledgeBaseDocumentDomain>();
         foreach (var file in agentData.KnowledgeBaseDocument)
@@ -60,7 +66,8 @@ internal static class DocumentHandlerService
     /// </summary>
     internal static void ConvertKnowledgebaseBinaryDataToFile(this AgentDataDomain agentData)
     {
-        if (agentData.StoredKnowledgeBase is null || !agentData.StoredKnowledgeBase.Any()) return;
+        if (agentData.StoredKnowledgeBase is null || !agentData.StoredKnowledgeBase.Any())
+            throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
 
         var knowledgeBaseFiles = new List<IFormFile>();
         foreach (var file in agentData.StoredKnowledgeBase)
@@ -71,29 +78,4 @@ internal static class DocumentHandlerService
 
         agentData.KnowledgeBaseDocument = knowledgeBaseFiles;
     }
-
-    #endregion
-
-    #region VISION IMAGES
-
-    /// <summary>
-    /// Validates that the uploaded ai vision images in the specified agent data has an allowed file extension.
-    /// </summary>
-    /// <param name="agentData">The agent data containing the ai vision images to validate. If the images are null, no validation is performed.</param>
-    internal static void ValidateUploadedImages(this AgentDataDomain agentData)
-    {
-        if (agentData.VisionImages is null || !agentData.VisionImages.Any()) return;
-
-        var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".svg" };
-        foreach (var image in agentData.VisionImages)
-        {
-            if (image is null) continue;
-
-            var fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant();
-            if (!allowedExtensions.Contains(fileExtension))
-                throw new FileFormatException("Invalid file type. Allowed types are: .png, .jpeg, .jpg, .svg");
-        }
-    }
-
-    #endregion
 }

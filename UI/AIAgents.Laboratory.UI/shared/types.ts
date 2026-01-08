@@ -117,7 +117,7 @@ export interface FileUploadFlyoutProps {
 	onClose: () => void;
 	onFilesChange: (files: File[]) => void;
 	selectedFiles: File[];
-	existingFiles?: File[];
+	existingFiles?: File[] | any[];
 	onExistingFilesChange?: (removedFileNames: string[]) => void;
 	removedExistingFiles?: string[];
 	config: {

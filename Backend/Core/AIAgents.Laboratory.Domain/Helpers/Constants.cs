@@ -67,6 +67,16 @@ internal static class Constants
         /// The data not found exception message constant.
         /// </summary>
         internal const string DataNotFoundExceptionMessage = "Oops! The requested data could not be found!";
+
+        /// <summary>
+        /// The file not found exception message constant.
+        /// </summary>
+        internal const string FileNotFoundExceptionMessage = "Oops! It seems the uploaded file could not be found!";
+
+        /// <summary>
+        /// Invalid file format exception message constant.
+        /// </summary>
+        internal const string InvalidFileFormatExceptionMessage = "Invalid file type. Allowed types are: ";
     }
 
     /// <summary>
@@ -133,6 +143,16 @@ internal static class Constants
         /// The how to file link constant.
         /// </summary>
         internal const string HowToFileLinkConstant = "HowToFileLink";
+
+        /// <summary>
+        /// The allowed kb file formats constant.
+        /// </summary>
+        internal const string AllowedKbFileFormatsConstant = "AllowedKbFileFormats";
+
+        /// <summary>
+        /// The allowed vision images file formats constant.
+        /// </summary>
+        internal const string AllowedVisionImageFileFormatsConstant = "AllowedVisionImageFileFormats";
     }
 
     /// <summary>
