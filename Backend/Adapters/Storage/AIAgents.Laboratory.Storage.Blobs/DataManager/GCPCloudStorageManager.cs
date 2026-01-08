@@ -32,10 +32,7 @@ public class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logger, ICon
 
             var bucketName = configuration[AzureAppConfigurationConstants.GCPBucketNameConstant];
             if (string.IsNullOrWhiteSpace(bucketName))
-            {
-                logger.LogError("GCP bucket name is not configured");
-                return string.Empty;
-            }
+                throw new InvalidOperationException(ExceptionConstants.GCPBucketNotConfiguredExceptionMessage);
 
             var folderName = configuration[AzureAppConfigurationConstants.GCPFolderNameConstant];
             var safeFileName = Path.GetFileName(imageFile.FileName);

@@ -161,6 +161,7 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
 
                 // Upload to BLOB STORAGE
                 var imageUrl = await blobStorageManager.UploadImageToStorageAsync(image, agentData.AgentId).ConfigureAwait(false);
+                if (string.IsNullOrEmpty(imageUrl)) continue;
 
                 // Process the image to generate keywords data
                 var processedImageKeywords = await visionProcessor.ReadDataFromImageWithComputerVisionAsync(imageUrl).ConfigureAwait(false);
@@ -182,7 +183,7 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow, agentData.AgentId);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow, agentData.AgentId);
         }
     }
 
@@ -247,12 +248,12 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, ex.Message);
             throw;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId);
         }
     }
 

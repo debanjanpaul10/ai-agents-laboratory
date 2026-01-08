@@ -93,4 +93,21 @@ internal static class Constants
         /// </summary>
         internal const string PublicUrlConstant = "https://storage.googleapis.com/{0}/{1}";
     }
+
+    /// <summary>
+    /// The Exception Constants class.
+    /// </summary>
+    internal static class ExceptionConstants
+    {
+        /// <summary>
+        /// The GCP Bucket not configured exception message constant.
+        /// </summary>
+        internal const string GCPBucketNotConfiguredExceptionMessage = "The GCP Bucket is not configured.";
+
+        /// <summary>
+        /// The exception message for failure to initialize GCP.
+        /// </summary>
+        internal const string FailedToInitialzeGCPExceptionMessage = "Failed to initialize Google Cloud Storage client. Please verify the service account JSON configuration.";
+
+    }
 }

@@ -53,9 +53,16 @@ public static class DIContainer
             var serviceAccountJson = configuration[AzureAppConfigurationConstants.GCPServiceAccountJsonConstant];
             ArgumentNullException.ThrowIfNull(serviceAccountJson);
 
-            // Use service account JSON content from configuration
-            var credential = GoogleCredential.FromJson(serviceAccountJson);
-            var storageClient = StorageClient.Create(credential);
-            return storageClient;
+            try
+            {
+                // Use service account JSON content from configuration
+                var credential = GoogleCredential.FromJson(serviceAccountJson);
+                var storageClient = StorageClient.Create(credential);
+                return storageClient;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(ExceptionConstants.FailedToInitialzeGCPExceptionMessage, ex);
+            }
         }).AddScoped<IBlobStorageManager, GCPCloudStorageManager>();
 }

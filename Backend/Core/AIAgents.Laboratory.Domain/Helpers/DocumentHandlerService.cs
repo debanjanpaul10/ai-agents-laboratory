@@ -17,10 +17,12 @@ internal static class DocumentHandlerService
     /// <param name="allowedFileFormats">The allowed file formats.</param>
     internal static void ValidateUploadedFiles(IList<IFormFile> uploadedFiles, string allowedFileFormats)
     {
-        if (uploadedFiles is null || !uploadedFiles.Any() || string.IsNullOrEmpty(allowedFileFormats))
+        if (uploadedFiles is null || !uploadedFiles.Any() || string.IsNullOrWhiteSpace(allowedFileFormats))
             throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
 
-        var allowedExtensions = allowedFileFormats.Split(",");
+        var allowedExtensions = allowedFileFormats.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(extension => extension.StartsWith('.') ? extension.ToLowerInvariant() : $".{extension.ToLowerInvariant()}")
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
         foreach (var file in uploadedFiles)
         {
             if (file is null) continue;
