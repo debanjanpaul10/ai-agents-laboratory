@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Files, FileText, Images, ScanEye } from "lucide-react";
+import { Download, Files, FileText, Images, ScanEye, View } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { ToggleAgentsListDrawer } from "@store/common/actions";
@@ -33,6 +33,7 @@ export default function ManageAgentsComponent() {
 		isPrivate: false,
 		mcpServerUrl: "",
 		visionImages: null,
+		aiVisionImagesData: [],
 	});
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 	const [isTestDrawerOpen, setIsTestDrawerOpen] = useState(false);
@@ -117,6 +118,7 @@ export default function ManageAgentsComponent() {
 			isPrivate: agent.isPrivate,
 			mcpServerUrl: agent.mcpServerUrl || "",
 			visionImages: agent.visionImages || null,
+			aiVisionImagesData: agent.aiVisionImagesData || [],
 		});
 
 		// KB FILES
@@ -174,16 +176,38 @@ export default function ManageAgentsComponent() {
 		)
 			return [];
 
-		return selectedAgent.knowledgeBaseDocument;
+		// Transform knowledge base documents to match FileUploadFlyoutComponent expected format
+		return selectedAgent.knowledgeBaseDocument.map((doc: any) => {
+			// If it's already a File object, return as-is (it has name and size)
+			if (doc instanceof File) {
+				return doc;
+			}
+
+			// Otherwise, transform API response format to expected format
+			return {
+				name: doc.documentName || doc.name || doc.fileName || "Unknown",
+				size: doc.size || doc.fileSize || 0,
+				documentUrl: doc.documentUrl || doc.url || "",
+				contentType: doc.contentType || "",
+				...doc, // Preserve any other properties
+			};
+		});
 	};
 
 	const getExistingImages = () => {
 		if (
-			!selectedAgent?.visionImages ||
-			selectedAgent?.visionImages.length === 0
+			!selectedAgent?.aiVisionImagesData ||
+			selectedAgent?.aiVisionImagesData.length === 0
 		)
 			return [];
-		return selectedAgent.visionImages;
+
+		// Transform vision images to match FileUploadFlyoutComponent expected format
+		return selectedAgent.aiVisionImagesData.map((image: any) => ({
+			name: image.imageName || image.name || "Unknown",
+			size: image.size || 0, // Size not available from API, defaulting to 0
+			imageUrl: image.imageUrl || image.url || "",
+			...image, // Preserve any other properties
+		}));
 	};
 
 	return (
@@ -229,7 +253,11 @@ export default function ManageAgentsComponent() {
 								config={{
 									headerConstants:
 										KnowledgeBaseFlyoutPropsConstants,
-									icons: { title: Files, body: FileText },
+									icons: {
+										title: Files,
+										body: FileText,
+										download: Download,
+									},
 									supportedTypes:
 										".doc,.docx,.pdf,.txt,.xls,.xlsx,.json",
 								}}
@@ -260,7 +288,11 @@ export default function ManageAgentsComponent() {
 								config={{
 									headerConstants:
 										AiVisionImagesFlyoutPropsConstants,
-									icons: { title: ScanEye, body: Images },
+									icons: {
+										title: ScanEye,
+										body: Images,
+										download: View,
+									},
 									supportedTypes: ".jpg,.jpeg,.png,.svg",
 								}}
 							/>
