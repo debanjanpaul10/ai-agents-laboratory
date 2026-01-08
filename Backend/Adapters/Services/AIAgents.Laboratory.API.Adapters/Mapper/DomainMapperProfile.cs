@@ -51,5 +51,7 @@ public class DomainMapperProfile : Profile
             .ForMember(dest => dest.AgentId, opt => opt.MapFrom(src => src.AgentId));
         CreateMap<BaseResponse, BaseResponseDTO>().ReverseMap();
         CreateMap<ChatRequestDTO, ChatRequestDomain>().ReverseMap();
+        CreateMap<AiVisionImagesDomain, AiVisionImagesDataDTO>().ReverseMap()
+            .ForMember(destination => destination.ImageKeywords, options => options.Ignore());
     }
 }

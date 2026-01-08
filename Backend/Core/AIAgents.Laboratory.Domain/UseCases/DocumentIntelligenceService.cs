@@ -161,7 +161,7 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
             {
                 if (image is null) continue;
 
-                // Upload to Cloudinary
+                // Upload to BLOB STORAGE
                 var imageUrl = await blobStorageManager.UploadImageToStorageAsync(image, agentData.AgentId).ConfigureAwait(false);
 
                 // Process the image to generate keywords data
@@ -171,7 +171,7 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
                 agentData.AiVisionImagesData.Add(new()
                 {
                     ImageKeywords = processedImageKeywords,
-                    ImageName = image.Name,
+                    ImageName = image.FileName,
                     ImageUrl = imageUrl,
                 });
             }
@@ -224,17 +224,17 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
                 {
                     if (image is null) continue;
 
-                    // Upload to Cloudinary
+                    // Upload to BLOB STORAGE
                     var imageUrl = await blobStorageManager.UploadImageToStorageAsync(image, updateDataDomain.AgentId).ConfigureAwait(false);
 
                     // Process the image to generate keywords data
                     var processedImageKeywords = await visionProcessor.ReadDataFromImageWithComputerVisionAsync(imageUrl).ConfigureAwait(false);
 
                     // Save the keywords to data object
-                    updateDataDomain.AiVisionImagesData.Add(new()
+                    updatedStoredImagesKeywords.Add(new()
                     {
                         ImageKeywords = processedImageKeywords,
-                        ImageName = image.Name,
+                        ImageName = image.FileName,
                         ImageUrl = imageUrl,
                     });
                     hasChanges = true;
