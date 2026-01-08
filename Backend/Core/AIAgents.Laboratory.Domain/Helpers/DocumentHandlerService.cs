@@ -1,6 +1,7 @@
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Processor.Models;
 using Microsoft.AspNetCore.Http;
+using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.Helpers;
 
@@ -16,7 +17,8 @@ internal static class DocumentHandlerService
     /// <param name="allowedFileFormats">The allowed file formats.</param>
     internal static void ValidateUploadedFiles(IList<IFormFile> uploadedFiles, string allowedFileFormats)
     {
-        if (uploadedFiles is null || !uploadedFiles.Any() || string.IsNullOrEmpty(allowedFileFormats)) return;
+        if (uploadedFiles is null || !uploadedFiles.Any() || string.IsNullOrEmpty(allowedFileFormats))
+            throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
 
         var allowedExtensions = allowedFileFormats.Split(",");
         foreach (var file in uploadedFiles)
@@ -25,7 +27,7 @@ internal static class DocumentHandlerService
 
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (!allowedExtensions.Contains(fileExtension))
-                throw new FileFormatException($"Invalid file type. Allowed types are: {allowedFileFormats}");
+                throw new FileFormatException(string.Concat(ExceptionConstants.InvalidFileFormatExceptionMessage, allowedFileFormats));
         }
     }
 
@@ -36,7 +38,8 @@ internal static class DocumentHandlerService
     /// <returns>A task to wait on.</returns>
     internal static async Task ProcessKnowledgebaseDocumentDataAsync(this AgentDataDomain agentData)
     {
-        if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any()) return;
+        if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any())
+            throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
 
         var knowledgeBaseFiles = new List<KnowledgeBaseDocumentDomain>();
         foreach (var file in agentData.KnowledgeBaseDocument)
@@ -61,7 +64,8 @@ internal static class DocumentHandlerService
     /// </summary>
     internal static void ConvertKnowledgebaseBinaryDataToFile(this AgentDataDomain agentData)
     {
-        if (agentData.StoredKnowledgeBase is null || !agentData.StoredKnowledgeBase.Any()) return;
+        if (agentData.StoredKnowledgeBase is null || !agentData.StoredKnowledgeBase.Any())
+            throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
 
         var knowledgeBaseFiles = new List<IFormFile>();
         foreach (var file in agentData.StoredKnowledgeBase)
