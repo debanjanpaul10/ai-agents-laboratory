@@ -50,4 +50,15 @@ public interface IDocumentIntelligenceService
     /// <param name="agentData">The agent data containing the vision images to process. Must not be null and must contain valid uploaded images.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task CreateAndProcessAiVisionImagesKeywordsAsync(AgentDataDomain agentData);
+
+    /// <summary>
+    /// Deletes the knowledge base documents and AI Vision images data associated with a specific agent from the storage.
+    /// </summary>
+    /// <remarks>
+    /// This method invokes the blob storage manager to remove all folders and data related to the agent's documents.
+    /// It logs the start and end of the operation, as well as any errors that occur during the process.
+    /// </remarks>
+    /// <param name="agentId">The unique identifier of the agent whose data is to be deleted. Cannot be null or empty.</param>
+    /// <returns>A task that represents the asynchronous delete operation.</returns>
+    Task DeleteKnowledgebaseAndImagesDataAsync(string agentId);
 }

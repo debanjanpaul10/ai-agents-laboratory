@@ -77,6 +77,11 @@ internal static class Constants
         /// Invalid file format exception message constant.
         /// </summary>
         internal const string InvalidFileFormatExceptionMessage = "Invalid file type. Allowed types are: ";
+
+        /// <summary>
+        /// The configuration key does not exists exception message.
+        /// </summary>
+        internal const string ConfigurationKeyNotFoundExceptionMessage = "The configuration key does not exists!";
     }
 
     /// <summary>
@@ -191,5 +196,4 @@ internal static class Constants
         /// </summary>
         internal const string AssistantRoleConstant = "assistant";
     }
-
 }

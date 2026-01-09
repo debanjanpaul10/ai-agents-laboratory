@@ -47,9 +47,14 @@ internal static class Constants
         internal const string CloudinaryApiSecretConstant = "Cloudinary:APISecret";
 
         /// <summary>
-        /// The cloudinary folder name constant.
+        /// The cloudinary image folder name constant.
         /// </summary>
-        internal const string CloudinaryFolderNameConstant = "Cloudinary:FolderName";
+        internal const string CloudinaryImageFolderNameConstant = "Cloudinary:ImageFolderName";
+
+        /// <summary>
+        /// The cloudinary kb folder name constant.
+        /// </summary>
+        internal const string CloudinaryKnowledgebaseFolderNameConstant = "Cloudinary:KnowledgeBaseFolderName";
 
         /// <summary>
         /// The GCP bucket name constant.
@@ -59,12 +64,22 @@ internal static class Constants
         /// <summary>
         /// The GCP folder name constant.
         /// </summary>
-        internal const string GCPFolderNameConstant = "GCP:FolderName";
+        internal const string GCPImageFolderNameConstant = "GCP:ImageFolderName";
+
+        /// <summary>
+        /// The GCP knowledge base folder name constant.
+        /// </summary>
+        internal const string GCPKBFolderNameConstant = "GCP:KnowledgeBaseFolderName";
 
         /// <summary>
         /// The GCP service account JSON content constant.
         /// </summary>
         internal const string GCPServiceAccountJsonConstant = "GCP:ServiceAccountJson";
+
+        /// <summary>
+        /// The cloud storage service constant.
+        /// </summary>
+        internal const string CloudStorageServiceConstant = "CloudStorageService";
     }
 
     /// <summary>
@@ -76,6 +91,11 @@ internal static class Constants
         /// The agent images folder structure format constant.
         /// </summary>
         internal const string AgentImagesFolderStructureFormat = "{0}/{1}";
+
+        /// <summary>
+        /// The cloudinary storage service constant.
+        /// </summary>
+        internal const string CloudinaryStorageService = "Cloudinary";
     }
 
     /// <summary>
@@ -86,12 +106,17 @@ internal static class Constants
         /// <summary>
         /// The agent images folder structure format constant.
         /// </summary>
-        internal const string AgentImagesFolderStructureFormat = "{0}/{1}";
+        internal const string AgentFolderStructureFormat = "{0}/{1}";
 
         /// <summary>
         /// The GCP document public url constant.
         /// </summary>
         internal const string PublicUrlConstant = "https://storage.googleapis.com/{0}/{1}";
+
+        /// <summary>
+        /// The Google Cloud Platform storage service constant.
+        /// </summary>
+        internal const string GCPStorageService = "GCP";
     }
 
     /// <summary>
@@ -108,6 +133,16 @@ internal static class Constants
         /// The exception message for failure to initialize GCP.
         /// </summary>
         internal const string FailedToInitialzeGCPExceptionMessage = "Failed to initialize Google Cloud Storage client. Please verify the service account JSON configuration.";
+
+        /// <summary>
+        /// The folder name not found in configuration exception message.
+        /// </summary>
+        internal const string FolderNotFoundInConfigurationExceptionMessage = "The folder name is not found in the configuration.";
+
+        /// <summary>
+        /// The configuration key does not exists exception message.
+        /// </summary>
+        internal const string ConfigurationKeyNotFoundExceptionMessage = "The configuration key does not exists!";
 
     }
 }
