@@ -222,6 +222,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
             var updateAgent = allAgents.FirstOrDefault() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
 
             var update = Builders<AgentDataDomain>.Update.Set(x => x.IsActive, false);
+            await documentIntelligenceService.DeleteKnowledgebaseAndImagesDataAsync(agentId).ConfigureAwait(false);
             return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)

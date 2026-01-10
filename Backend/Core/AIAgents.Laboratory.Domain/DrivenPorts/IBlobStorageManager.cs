@@ -1,3 +1,4 @@
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.AspNetCore.Http;
 
 namespace AIAgents.Laboratory.Domain.DrivenPorts;
@@ -9,10 +10,18 @@ namespace AIAgents.Laboratory.Domain.DrivenPorts;
 public interface IBlobStorageManager
 {
     /// <summary>
-    /// Uploads image to blob storage asynchronously.
+    /// Uploads documents to BLOB storage.
     /// </summary>
-    /// <param name="imageFile">The image form file.</param>
+    /// <param name="documentFile">The user uploaded document file.</param>
     /// <param name="agentGuid">The agent guid id.</param>
-    /// <returns>The uploaded image url.</returns>
-    Task<string> UploadImageToStorageAsync(IFormFile imageFile, string agentGuid);
+    /// <param name="fileType">The type of uploaded file.</param>
+    /// <returns>The public URL for the document.</returns>
+    Task<string> UploadDocumentsToStorageAsync(IFormFile documentFile, string agentGuid, UploadedFileType fileType);
+
+    /// <summary>
+    /// Deletes the documents data and folder from blob storage.
+    /// </summary>
+    /// <param name="agentId">The agent id.</param>
+    /// <returns>A boolean for success/failure.</returns>
+    Task<bool> DeleteDocumentsFolderAndDataAsync(string agentId);
 }

@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Reflection.Metadata;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
@@ -27,12 +28,40 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
     /// <summary>
     /// The configuration value for allowed knowledge base file formats.
     /// </summary>
-    private readonly string AllowedKnowledgebaseFileFormats = configuration[AzureAppConfigurationConstants.AllowedKbFileFormatsConstant]!;
+    private readonly string AllowedKnowledgebaseFileFormats = configuration[AzureAppConfigurationConstants.AllowedKbFileFormatsConstant] ?? throw new InvalidOperationException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The configuration value for allowed ai vision images file formats.
     /// </summary>
-    private readonly string AllowedAiVisionImagesFileFormats = configuration[AzureAppConfigurationConstants.AllowedVisionImageFileFormatsConstant]!;
+    private readonly string AllowedAiVisionImagesFileFormats = configuration[AzureAppConfigurationConstants.AllowedVisionImageFileFormatsConstant] ?? throw new InvalidOperationException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+
+    /// <summary>
+    /// Deletes the knowledge base documents and AI Vision images data associated with a specific agent from the storage.
+    /// </summary>
+    /// <remarks>
+    /// This method invokes the blob storage manager to remove all folders and data related to the agent's documents.
+    /// It logs the start and end of the operation, as well as any errors that occur during the process.
+    /// </remarks>
+    /// <param name="agentId">The unique identifier of the agent whose data is to be deleted. Cannot be null or empty.</param>
+    /// <returns>A task that represents the asynchronous delete operation.</returns>
+    /// <exception cref="Exception">Thrown when an error occurs during the deletion process.</exception>
+    public async Task DeleteKnowledgebaseAndImagesDataAsync(string agentId)
+    {
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteKnowledgebaseAndImagesDataAsync), DateTime.UtcNow, agentId);
+            await blobStorageManager.DeleteDocumentsFolderAndDataAsync(agentId).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteKnowledgebaseAndImagesDataAsync), DateTime.UtcNow, ex.Message);
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteKnowledgebaseAndImagesDataAsync), DateTime.UtcNow, agentId);
+        }
+    }
 
     #region KNOWLEDGE BASE
 
@@ -51,6 +80,9 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
 
             if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any() || string.IsNullOrEmpty(AllowedKnowledgebaseFileFormats)) return;
             DocumentHandlerService.ValidateUploadedFiles(agentData.KnowledgeBaseDocument, AllowedKnowledgebaseFileFormats);
+
+            foreach (var uploadedDocument in agentData.KnowledgeBaseDocument)
+                await blobStorageManager.UploadDocumentsToStorageAsync(uploadedDocument, agentData.AgentId, UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
 
             await agentData.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
             if (agentData.StoredKnowledgeBase is not null && agentData.StoredKnowledgeBase.Any())
@@ -104,6 +136,9 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
             if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Any() && !string.IsNullOrEmpty(AllowedKnowledgebaseFileFormats))
             {
                 DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.KnowledgeBaseDocument, AllowedKnowledgebaseFileFormats);
+                foreach (var uploadedFile in updateDataDomain.KnowledgeBaseDocument)
+                    await blobStorageManager.UploadDocumentsToStorageAsync(uploadedFile, updateDataDomain.AgentId, UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
+
                 await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
                 if (updateDataDomain.StoredKnowledgeBase is not null && updateDataDomain.StoredKnowledgeBase.Any())
                 {
@@ -160,7 +195,7 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
                 if (image is null) continue;
 
                 // Upload to BLOB STORAGE
-                var imageUrl = await blobStorageManager.UploadImageToStorageAsync(image, agentData.AgentId).ConfigureAwait(false);
+                var imageUrl = await blobStorageManager.UploadDocumentsToStorageAsync(image, agentData.AgentId, UploadedFileType.AiVisionImageDocument).ConfigureAwait(false);
                 if (string.IsNullOrEmpty(imageUrl)) continue;
 
                 // Process the image to generate keywords data
@@ -223,7 +258,7 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
                     if (image is null) continue;
 
                     // Upload to BLOB STORAGE
-                    var imageUrl = await blobStorageManager.UploadImageToStorageAsync(image, updateDataDomain.AgentId).ConfigureAwait(false);
+                    var imageUrl = await blobStorageManager.UploadDocumentsToStorageAsync(image, updateDataDomain.AgentId, UploadedFileType.AiVisionImageDocument).ConfigureAwait(false);
 
                     // Process the image to generate keywords data
                     var processedImageKeywords = await visionProcessor.ReadDataFromImageWithComputerVisionAsync(imageUrl).ConfigureAwait(false);
