@@ -241,11 +241,7 @@ export default function ManageAgentsPage() {
 
 	const renderAuthorizedManageAgents = () => {
 		return (
-			<MainLayout
-				title="Manage Agents"
-				contentClassName="p-0"
-				isFullWidth={true}
-			>
+			<MainLayout contentClassName="p-0" isFullWidth={true}>
 				<div className="w-full h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-black">
 					<AgentsListComponent
 						agentsDataList={agentsDataList}
