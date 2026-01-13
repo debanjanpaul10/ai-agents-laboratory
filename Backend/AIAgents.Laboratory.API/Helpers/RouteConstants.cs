@@ -239,4 +239,15 @@ public static class RouteConstants
         /// </summary>
         internal const string DeleteExistingToolSkillBySkillId_Route = "deletetoolskill/{skillId}";
     }
+
+    /// <summary>
+    /// The route constants for Workspaces Controller.
+    /// </summary>
+    internal static class WorkspacesRoutes
+    {
+        /// <summary>
+        /// The get all workspaces route.
+        /// </summary>
+        internal const string GetAllWorkspaces_Route = "getallworkspaces";
+    }
 }

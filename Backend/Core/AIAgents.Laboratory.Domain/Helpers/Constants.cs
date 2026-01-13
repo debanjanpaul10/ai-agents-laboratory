@@ -168,22 +168,27 @@ internal static class Constants
         /// <summary>
         /// The skills database name
         /// </summary>
-        internal const string AiAgentsPrimaryDatabase = "ai-agents-primary";
+        internal const string AiAgentsPrimaryDatabase = "AiAgentsPrimaryDatabase";
 
         /// <summary>
         /// The agents collection name
         /// </summary>
-        internal const string AgentsCollectionName = "agents";
+        internal const string AgentsCollectionName = "AgentsCollection";
 
         /// <summary>
         /// The conversation history collection name.
         /// </summary>
-        internal const string ConversationHistoryCollectionName = "conversation-history";
+        internal const string ConversationHistoryCollectionName = "ConversationHistoryCollection";
 
         /// <summary>
         /// The tool skills collection name.
         /// </summary>
-        internal const string ToolSkillsCollectionName = "tool-skills";
+        internal const string ToolSkillsCollectionName = "ToolSkillsCollection";
+
+        /// <summary>
+        /// The agents workspace collection name.
+        /// </summary>
+        internal const string WorkspaceCollectionName = "WorkspaceCollection";
     }
 
     /// <summary>

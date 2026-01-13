@@ -372,4 +372,16 @@ internal static class SwaggerConstants
             internal const string OperationId = nameof(DeleteExistingToolSkillBySkillIdAction);
         }
     }
+
+    internal static class WorkspacesController
+    {
+        internal static class GetAllWorkspacesAction
+        {
+            internal const string Summary = "Gets all the workspaces list data.";
+
+            internal const string Description = "Gets the list of all the available workspaces in the system.";
+            internal const string OperationId = nameof(GetAllWorkspacesAction);
+        }
+    }
 }
+

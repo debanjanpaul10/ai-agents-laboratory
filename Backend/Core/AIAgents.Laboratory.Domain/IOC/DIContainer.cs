@@ -25,5 +25,6 @@ public static class DIContainer
             .AddScoped<IConversationHistoryService, ConversationHistoryService>()
             .AddScoped<IFeedbackService, FeedbackService>()
             .AddScoped<IDocumentIntelligenceService, DocumentIntelligenceService>()
-            .AddScoped<IToolSkillsService, ToolSkillsService>();
+            .AddScoped<IToolSkillsService, ToolSkillsService>()
+            .AddScoped<IWorkspacesService, WorkspacesService>();
 }

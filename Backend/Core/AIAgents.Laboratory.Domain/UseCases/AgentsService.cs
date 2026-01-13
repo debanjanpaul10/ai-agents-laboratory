@@ -22,7 +22,17 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 public class AgentsService(ILogger<AgentsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, IDocumentIntelligenceService documentIntelligenceService) : IAgentsService
 {
     /// <summary>
-    /// The is knowledge base service allowed
+    /// The mongo database name configuration value.
+    /// </summary>
+    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+
+    /// <summary>
+    /// The agents data collection name configuration value.
+    /// </summary>
+    private readonly string AgentsDataCollectionName = configuration[MongoDbCollectionConstants.AgentsCollectionName] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+
+    /// <summary>
+    /// The is knowledge base service allowed.
     /// </summary>
     private readonly bool IsKnowledgeBaseServiceAllowed = bool.TryParse(configuration[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant], out var value) && value;
 
@@ -53,7 +63,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
                 await documentIntelligenceService.CreateAndProcessAiVisionImagesKeywordsAsync(agentData).ConfigureAwait(false);
 
             agentData.PrepareAuditEntityData(userEmail);
-            return await mongoDatabaseService.SaveDataAsync(agentData, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.SaveDataAsync(agentData, MongoDatabaseName, AgentsDataCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -95,8 +105,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
                     )
                 );
 
-            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
-                MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
+            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, AgentsDataCollectionName, filter).ConfigureAwait(false);
 
             var agentData = allData.First() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
             if (agentData.StoredKnowledgeBase is not null && agentData.StoredKnowledgeBase.Any())
@@ -138,8 +147,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
                 )
             );
 
-            var agents = await mongoDatabaseService.GetDataFromCollectionAsync(
-                MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
+            var agents = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, AgentsDataCollectionName, filter).ConfigureAwait(false);
 
             // Process stored knowledge base data if available
             foreach (var agent in agents)
@@ -174,7 +182,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { updateDataDomain }));
 
             var filter = Builders<AgentDataDomain>.Filter.And(Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
-            var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
+            var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, AgentsDataCollectionName, filter).ConfigureAwait(false);
             var existingAgent = agentsData.FirstOrDefault() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
 
             var updates = new List<UpdateDefinition<AgentDataDomain>>
@@ -194,7 +202,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
                 await documentIntelligenceService.HandleAiVisionImagesDataUpdateAsync(updateDataDomain, updates, existingAgent).ConfigureAwait(false);
 
             var update = Builders<AgentDataDomain>.Update.Combine(updates);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, MongoDatabaseName, AgentsDataCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -219,7 +227,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, agentId));
 
             var filter = Builders<AgentDataDomain>.Filter.Where(x => x.IsActive && x.AgentId == agentId);
-            var allAgents = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName, filter).ConfigureAwait(false);
+            var allAgents = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, AgentsDataCollectionName, filter).ConfigureAwait(false);
             var updateAgent = allAgents.FirstOrDefault() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
 
             var updates = new List<UpdateDefinition<AgentDataDomain>>
@@ -229,7 +237,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
             };
             var update = Builders<AgentDataDomain>.Update.Combine(updates);
             await documentIntelligenceService.DeleteKnowledgebaseAndImagesDataAsync(agentId).ConfigureAwait(false);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, MongoDbCollectionConstants.AiAgentsPrimaryDatabase, MongoDbCollectionConstants.AgentsCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, MongoDatabaseName, AgentsDataCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
