@@ -33,6 +33,10 @@ export const DashboardConstants = {
 			"Modify and delete existing AI agents",
 		],
 	},
+	QuickActionsTile: {
+		Header: "Quick Actions",
+		SubText: "More actions coming soon!",
+	},
 	FooterConstants: {
 		FooterText: "AI Agents Laboratory - a product of Debanjan's Laboratory",
 	},
@@ -60,6 +64,24 @@ export const MarketplaceConstants = {
 	LoadingConstants: {
 		MainLoader: "Loading AI Agents Marketplace",
 		LoginRedirectLoader: "Redirecting to Login",
+	},
+	ComingSoonConstants: {
+		Header: "Skill Marketplace Coming Soon",
+		SubHeading:
+			"Explore and add new capabilities to your AI agents from our curated marketplace of skills and tools.",
+	},
+};
+
+export const WorkspacesConstants = {
+	LoadingConstants: {
+		MainLoader: "Loading AI Agents Workspaces",
+		LoginRedirectLoader: "Redirecting to Login",
+	},
+
+	ComingSoonConstants: {
+		Header: "AI Agents Workspaces Coming Soon",
+		SubHeading:
+			"Create your own custom workspaces and add multiple agents to test and work on.",
 	},
 };
 

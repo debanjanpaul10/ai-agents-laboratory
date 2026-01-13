@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Input } from "@heroui/react";
-import { Lightbulb, FileText, Send, X, Info } from "lucide-react";
+import { Lightbulb, FileText, Send, X, Info, PackagePlus } from "lucide-react";
 
 import { NewFeatureRequestDTO } from "@models/new-feature-request-dto";
 import { ShowErrorToaster } from "@shared/toaster";
@@ -61,7 +61,7 @@ export default function FeatureRequestComponent({
 			<div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
 				<div className="flex items-center space-x-3">
 					<div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-2 rounded-xl">
-						<Lightbulb className="w-5 h-5 text-white" />
+						<PackagePlus className="w-5 h-5 text-white" />
 					</div>
 					<div>
 						<h2 className="text-xl font-bold bg-gradient-to-r from-white via-emerald-100 to-teal-100 bg-clip-text text-transparent">

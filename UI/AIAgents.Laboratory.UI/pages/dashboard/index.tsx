@@ -4,9 +4,10 @@ import { useAuth } from "@auth/AuthProvider";
 import ActiveAgentsTileComponent from "@components/dashboard/active-agents-tile";
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { FullScreenLoading } from "@components/common/spinner";
-import StatsSectionTilesComponent from "@components/dashboard/stats-section-tiles";
+import SystemHealthTileComponent from "@components/dashboard/system-health-tile";
 import FooterComponent from "@components/common/footer";
 import WelcomeCardComponent from "@components/dashboard/welcome-card";
+import QuickActionsTileComponent from "@components/dashboard/quick-actions-tile";
 import DirectChatComponent from "@components/direct-chat";
 import { DashboardConstants } from "@helpers/constants";
 import {
@@ -80,13 +81,12 @@ export default function DashboardComponent() {
 				<div className="space-y-6">
 					<WelcomeCardComponent />
 
-					{/* Feature cards grid */}
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					{/* Main Grid */}
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
 						<ActiveAgentsTileComponent />
+						<QuickActionsTileComponent />
+						<SystemHealthTileComponent />
 					</div>
-
-					{/* Bottom stats section */}
-					<StatsSectionTilesComponent />
 				</div>
 				<DirectChatComponent />
 				<FeedbackComponent />

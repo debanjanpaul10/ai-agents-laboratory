@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { LayoutDashboard, Users, Store, LogOut, Info } from "lucide-react";
+import {
+	LayoutDashboard,
+	Users,
+	Store,
+	LogOut,
+	Info,
+	Laptop,
+} from "lucide-react";
 import Image from "next/image";
 import { Button } from "@heroui/react";
 import { useMsal } from "@azure/msal-react";
@@ -46,6 +53,11 @@ export default function Sidebar() {
 			name: "Skills Marketplace",
 			href: "/marketplace",
 			icon: Store,
+		},
+		{
+			name: "Agents Workspaces",
+			href: "/workspaces",
+			icon: Laptop,
 		},
 	];
 
