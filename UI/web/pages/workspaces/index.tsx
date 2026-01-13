@@ -67,7 +67,7 @@ export default function WorkspacesComponent() {
 
 	const renderAuthorizedWorkspaces = () => {
 		return (
-			<MainLayout title="Skill Marketplace">
+			<MainLayout>
 				<div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] bg-white/5 rounded-3xl border border-white/10 p-8 text-center backdrop-blur-sm">
 					<div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-full mb-6">
 						<Laptop className="h-40 w-40" />

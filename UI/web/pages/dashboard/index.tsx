@@ -73,11 +73,7 @@ export default function DashboardComponent() {
 
 	const renderAuthorizedDashboard = () => {
 		return (
-			<MainLayout
-				title="Dashboard"
-				isFullWidth={true}
-				contentClassName="p-6"
-			>
+			<MainLayout isFullWidth={true} contentClassName="p-6">
 				<div className="space-y-6">
 					<WelcomeCardComponent />
 
