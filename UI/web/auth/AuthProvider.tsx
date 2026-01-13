@@ -50,7 +50,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		if (!isLoading && !isAuthenticated && router.pathname !== "/") {
 			router.push("/");
 		}
-	}, [isLoading, isAuthenticated, router.pathname, router]);
+	}, [isLoading, isAuthenticated, router.pathname]);
 
 	const login = async (): Promise<void> => {
 		try {

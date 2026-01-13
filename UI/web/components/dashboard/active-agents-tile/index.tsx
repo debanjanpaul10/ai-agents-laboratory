@@ -15,12 +15,7 @@ export default function ActiveAgentsTileComponent() {
 	);
 
 	useEffect(() => {
-		if (
-			TopActiveAgentsStoreData !== null &&
-			Object.values(TopActiveAgentsStoreData).length > 0 &&
-			TopActiveAgentsStoreData.topActiveAgents !== null &&
-			TopActiveAgentsStoreData.topActiveAgents?.length > 0
-		) {
+		if (TopActiveAgentsStoreData?.topActiveAgents?.length > 0) {
 			setAgentsDataList(TopActiveAgentsStoreData.topActiveAgents);
 			setActiveAgentsCount(TopActiveAgentsStoreData.activeAgentsCount);
 		}
