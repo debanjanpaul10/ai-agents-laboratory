@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useMsal } from "@azure/msal-react";
 import { InteractionStatus } from "@azure/msal-browser";
+import { useRouter } from "next/router";
 
-import { AuthContextType, AuthProviderProps, User } from "../shared/types";
+import { FullScreenLoading } from "@components/common/spinner";
+import { AuthContextType, AuthProviderProps, User } from "@shared/types";
+import { DashboardConstants } from "@helpers/constants";
 
 const defaultAuthContext: AuthContextType = {
 	user: null,
@@ -25,6 +28,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	const [user, setUser] = useState<User | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const { instance, inProgress, accounts } = useMsal();
+	const router = useRouter();
 
 	const isAuthenticated = accounts.length > 0;
 
@@ -41,6 +45,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			setIsLoading(false);
 		}
 	}, [accounts, inProgress]);
+
+	useEffect(() => {
+		if (!isLoading && !isAuthenticated && router.pathname !== "/") {
+			router.push("/");
+		}
+	}, [isLoading, isAuthenticated, router.pathname, router]);
 
 	const login = async (): Promise<void> => {
 		try {
@@ -85,6 +95,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		logout,
 		getAccessToken,
 	};
+
+	if (isLoading || (!isAuthenticated && router.pathname !== "/")) {
+		return (
+			<FullScreenLoading
+				isLoading={true}
+				message={
+					DashboardConstants.LoadingConstants.CheckingAuthentication
+				}
+			/>
+		);
+	}
 
 	return React.createElement(AuthContext.Provider, { value }, children);
 }

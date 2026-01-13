@@ -15,6 +15,7 @@ import {
 	GlobeLock,
 	Images,
 	ScanEye,
+	WandSparkles,
 } from "lucide-react";
 import { useMsal } from "@azure/msal-react";
 
@@ -72,6 +73,7 @@ export default function ModifyAgentComponent({
 		const form = new FormData();
 		form.append("agentId", editFormData.agentId);
 		form.append("agentMetaPrompt", editFormData.agentMetaPrompt);
+		form.append("agentDescription", editFormData.agentDescription);
 		form.append("agentName", editFormData.agentName);
 		form.append("applicationName", editFormData.applicationName);
 		form.append("isPrivate", editFormData.isPrivate.toString());
@@ -290,7 +292,8 @@ export default function ModifyAgentComponent({
 	const renderAiVisionImagesData = () => {
 		const existingImages = selectedAgent?.aiVisionImagesData ?? [];
 		const visibleExistingImages = existingImages.filter(
-			(image: any) => !removedExistingImages.includes(image.imageName || image.name)
+			(image: any) =>
+				!removedExistingImages.includes(image.imageName || image.name)
 		);
 		const existingCount = visibleExistingImages.length;
 		const totalCount = selectedVisionImages.length + existingCount;
@@ -416,6 +419,35 @@ export default function ModifyAgentComponent({
 									inputWrapper:
 										"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-green-500/50 min-h-[48px]",
 								}}
+							/>
+						</div>
+
+						{/* Agent Description Field */}
+						<div className="space-y-2">
+							<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+								<WandSparkles className="w-4 h-4 text-blue-400" />
+								<span>Agent Description</span>
+							</label>
+							<textarea
+								value={editFormData.agentDescription}
+								onChange={(e) =>
+									handleInputChange(
+										"agentDescription",
+										e.target.value
+									)
+								}
+								rows={6}
+								placeholder={
+									ManageAgentConstants.ModifyAgentConstants
+										.Placeholders
+										.AgentDescriptionPlaceholder
+								}
+								disabled={
+									isDisabled ||
+									accounts[0].username !==
+										editFormData.createdBy
+								}
+								className="w-full bg-white/5 border border-white/10 text-white placeholder:text-white/40 resize-none px-4 py-3 pr-12 rounded-xl hover:border-white/20 focus:border-orange-500/50 focus:outline-none transition-colors duration-200"
 							/>
 						</div>
 
@@ -585,6 +617,11 @@ export default function ModifyAgentComponent({
 									}
 									className="relative"
 									radius="full"
+									disabled={
+										isDisabled ||
+										accounts[0].username !==
+											editFormData.createdBy
+									}
 									classNames={{
 										input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
 										inputWrapper:

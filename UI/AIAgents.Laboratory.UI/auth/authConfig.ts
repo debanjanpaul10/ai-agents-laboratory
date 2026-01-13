@@ -6,6 +6,7 @@ export const msalConfig: Configuration = {
 	auth: {
 		clientId: environment.msalConfig.auth.clientId,
 		authority: environment.msalConfig.auth.authority,
+		redirectUri: "/",
 	},
 	cache: {
 		cacheLocation: "sessionStorage",

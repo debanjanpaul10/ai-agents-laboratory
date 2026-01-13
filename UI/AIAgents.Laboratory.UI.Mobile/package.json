@@ -1,0 +1,12 @@
+{
+  "name": "ai-agents-lab-ui-mobile",
+  "version": "1.0.0",
+  "description": "The mobile version for the AI Agents Lab application",
+  "license": "ISC",
+  "author": "debanjanpaul10@gmail.com",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

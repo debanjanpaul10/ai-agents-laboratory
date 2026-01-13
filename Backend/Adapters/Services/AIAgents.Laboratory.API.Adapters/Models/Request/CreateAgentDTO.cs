@@ -16,6 +16,14 @@ public record CreateAgentDTO
     public string AgentName { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the agent description.
+    /// </summary>
+    /// <value>
+    /// The value of agent description.
+    /// </value>
+    public string AgentDescription { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the agent meta prompt.
     /// </summary>
     /// <value>

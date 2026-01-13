@@ -1,3 +1,4 @@
+import { ReduxStoreType } from "@shared/types";
 import {
 	GET_AGENT_BY_ID,
 	GET_ALL_AGENTS_DATA,
@@ -20,7 +21,7 @@ const initialState: any = {
 	isEditAgentDataLoading: false,
 };
 
-export function AgentsReducer(state = initialState, action: any) {
+export function AgentsReducer(state = initialState, action: ReduxStoreType) {
 	switch (action.type) {
 		case GET_ALL_AGENTS_DATA: {
 			return {

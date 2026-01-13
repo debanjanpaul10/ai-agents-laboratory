@@ -1,3 +1,4 @@
+import { ReduxStoreType } from "@shared/types";
 import {
 	TOGGLE_AGENT_TEST_DRAWER,
 	TOGGLE_AGENTS_LIST_DRAWER,
@@ -12,6 +13,7 @@ import {
 	TOGGLE_FEEDBACK_DRAWER,
 	TOGGLE_FEEDBACK_LOADER,
 	ADD_NEW_FEATURE_REQUEST,
+	GET_TOP_ACTIVE_AGENTS,
 } from "@store/common/actionTypes";
 
 const initialState: any = {
@@ -28,9 +30,10 @@ const initialState: any = {
 	featureRequest: {},
 	isFeedbackDrawerOpen: false,
 	isFeedbackDrawerLoading: false,
+	topActiveAgents: [],
 };
 
-export function CommonReducer(state = initialState, action: any) {
+export function CommonReducer(state = initialState, action: ReduxStoreType) {
 	switch (action.type) {
 		case TOGGLE_NEW_AGENT_DRAWER: {
 			return {
@@ -108,6 +111,12 @@ export function CommonReducer(state = initialState, action: any) {
 			return {
 				...state,
 				isFeedbackDrawerLoading: action.payload,
+			};
+		}
+		case GET_TOP_ACTIVE_AGENTS: {
+			return {
+				...state,
+				topActiveAgents: action.payload,
 			};
 		}
 

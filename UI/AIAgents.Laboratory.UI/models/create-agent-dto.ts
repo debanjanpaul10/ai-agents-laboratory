@@ -1,5 +1,6 @@
 export class CreateAgentDTO {
 	agentName: string = "";
+	agentDescription: string = "";
 	agentMetaPrompt: string = "";
 	applicationName: string = "";
 	knowledgeBaseDocument: File[] | null = null;

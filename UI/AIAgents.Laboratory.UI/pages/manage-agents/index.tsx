@@ -1,22 +1,40 @@
 import { useEffect, useState } from "react";
-import { Download, Files, FileText, Images, ScanEye, View } from "lucide-react";
+import {
+	Download,
+	Files,
+	FileText,
+	Images,
+	ScanEye,
+	View,
+	Plus,
+} from "lucide-react";
+import { Button } from "@heroui/react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
-import { ToggleAgentsListDrawer } from "@store/common/actions";
+import { GetAllAgentsDataAsync } from "@store/agents/actions";
+import {
+	ToggleNewAgentDrawer,
+	GetAllConfigurations,
+} from "@store/common/actions";
 import { AgentDataDTO } from "@models/agent-data-dto";
 import AgentsListComponent from "@components/manage-agents/agents-list";
 import ModifyAgentComponent from "@components/manage-agents/modify-agent";
 import TestAgentComponent from "@components/manage-agents/test-agent";
+import CreateAgentComponent from "@components/create-agent";
 import FileUploadFlyoutComponent from "@components/common/file-upload-flyout";
 import {
 	AiVisionImagesFlyoutPropsConstants,
 	KnowledgeBaseFlyoutPropsConstants,
+	DashboardConstants,
 } from "@helpers/constants";
+import MainLayout from "@components/common/main-layout";
+import { useAuth } from "@auth/AuthProvider";
+import { FullScreenLoading } from "@components/common/spinner";
 
-export default function ManageAgentsComponent() {
+export default function ManageAgentsPage() {
 	const dispatch = useAppDispatch();
+	const authContext = useAuth();
 
-	const [agentsListDrawerOpen, setAgentsListDrawerOpen] = useState(false);
 	const [agentsDataList, setAgentsDataList] = useState<AgentDataDTO[]>([]);
 
 	const [selectedAgent, setSelectedAgent] = useState<AgentDataDTO | null>(
@@ -24,11 +42,13 @@ export default function ManageAgentsComponent() {
 	);
 	const [editFormData, setEditFormData] = useState<AgentDataDTO>({
 		agentName: "",
+		agentDescription: "",
 		applicationName: "",
 		agentMetaPrompt: "",
 		createdBy: "",
 		agentId: "",
 		dateCreated: new Date(),
+		dateModified: new Date(),
 		knowledgeBaseDocument: [],
 		isPrivate: false,
 		mcpServerUrl: "",
@@ -57,63 +77,66 @@ export default function ManageAgentsComponent() {
 	const AgentsListStoreData = useAppSelector(
 		(state) => state.AgentsReducer.agentsListData
 	);
-	const IsAgentsListDrawerOpenStoreData = useAppSelector(
-		(state) => state.CommonReducer.isAgentsListDrawerOpen
+	const IsLoadingStoreData = useAppSelector(
+		(state) => state.CommonReducer.isLoading
+	);
+
+	const ConfigurationsStoreData = useAppSelector(
+		(state) => state.CommonReducer.configurations
 	);
 
 	useEffect(() => {
-		if (agentsListDrawerOpen !== IsAgentsListDrawerOpenStoreData) {
-			setAgentsListDrawerOpen(IsAgentsListDrawerOpenStoreData);
+		if (authContext.isAuthenticated && !authContext.isLoading) {
+			GetAllAgentsData();
+			if (
+				!ConfigurationsStoreData ||
+				Object.keys(ConfigurationsStoreData).length === 0
+			) {
+				GetAllConfigurationsData();
+			}
 		}
-	}, [IsAgentsListDrawerOpenStoreData]);
+	}, [authContext.isAuthenticated, authContext.isLoading]);
+
+	async function GetAllAgentsData() {
+		const token = await fetchToken();
+		token && dispatch(GetAllAgentsDataAsync(token));
+	}
+
+	async function GetAllConfigurationsData() {
+		const token = await fetchToken();
+		token && dispatch(GetAllConfigurations(token));
+	}
+
+	async function fetchToken() {
+		try {
+			if (authContext.isAuthenticated && !authContext.isLoading)
+				return await authContext.getAccessToken();
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
 	useEffect(() => {
-		if (
-			agentsDataList !== AgentsListStoreData &&
-			AgentsListStoreData.length > 0
-		) {
+		if (agentsDataList !== AgentsListStoreData) {
 			setAgentsDataList(AgentsListStoreData);
 		}
 	}, [AgentsListStoreData]);
 
-	useEffect(() => {
-		if (agentsListDrawerOpen) {
-			document.body.style.overflow = "hidden";
-		} else {
-			document.body.style.overflow = "unset";
-		}
-
-		// Cleanup on unmount
-		return () => {
-			document.body.style.overflow = "unset";
-		};
-	}, [agentsListDrawerOpen]);
-
-	const onClose = () => {
-		dispatch(ToggleAgentsListDrawer(false));
-		setIsEditDrawerOpen(false);
-		setSelectedAgent(null);
-
-		// KNOWLEDGE BASE
-		setSelectedKnowledgeFiles([]);
-		setRemovedExistingDocuments([]);
-		setIsKnowledgeBaseFlyoutOpen(false);
-
-		// AI VISION IMAGES
-		setSelectedVisionImages([]);
-		setRemovedExistingImages([]);
-		setIsVisionFlyoutOpen(false);
+	const handleCreateAgent = () => {
+		dispatch(ToggleNewAgentDrawer(true));
 	};
 
 	const handleAgentClick = (agent: AgentDataDTO) => {
 		setSelectedAgent(agent);
 		setEditFormData({
 			agentName: agent.agentName || "",
+			agentDescription: agent.agentDescription || "",
 			applicationName: agent.applicationName || "",
 			agentMetaPrompt: agent.agentMetaPrompt || "",
 			createdBy: agent.createdBy || "",
 			agentId: agent.agentId || "",
 			dateCreated: agent.dateCreated,
+			dateModified: agent.dateModified,
 			knowledgeBaseDocument: agent.knowledgeBaseDocument || null,
 			isPrivate: agent.isPrivate,
 			mcpServerUrl: agent.mcpServerUrl || "",
@@ -176,20 +199,16 @@ export default function ManageAgentsComponent() {
 		)
 			return [];
 
-		// Transform knowledge base documents to match FileUploadFlyoutComponent expected format
 		return selectedAgent.knowledgeBaseDocument.map((doc: any) => {
-			// If it's already a File object, return as-is (it has name and size)
 			if (doc instanceof File) {
 				return doc;
 			}
-
-			// Otherwise, transform API response format to expected format
 			return {
 				name: doc.documentName || doc.name || doc.fileName || "Unknown",
 				size: doc.size || doc.fileSize || 0,
 				documentUrl: doc.documentUrl || doc.url || "",
 				contentType: doc.contentType || "",
-				...doc, // Preserve any other properties
+				...doc,
 			};
 		});
 	};
@@ -201,118 +220,71 @@ export default function ManageAgentsComponent() {
 		)
 			return [];
 
-		// Transform vision images to match FileUploadFlyoutComponent expected format
 		return selectedAgent.aiVisionImagesData.map((image: any) => ({
 			name: image.imageName || image.name || "Unknown",
-			size: image.size || 0, // Size not available from API, defaulting to 0
+			size: image.size || 0,
 			imageUrl: image.imageUrl || image.url || "",
-			...image, // Preserve any other properties
+			...image,
 		}));
 	};
 
-	return (
-		agentsListDrawerOpen && (
-			<>
-				<div
-					className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 max-w-full"
-					onClick={onClose}
-				/>
-				{/* Test Agent Drawer - Leftmost only when test is open) */}
-				{isTestDrawerOpen && (
-					<div className="fixed left-0 top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out">
-						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
-						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-r border-white/10 shadow-2xl">
-							<TestAgentComponent
-								selectedAgent={selectedAgent}
-								editFormData={editFormData}
-								onClose={() => setIsTestDrawerOpen(false)}
-							/>
-						</div>
-					</div>
-				)}
+	const handleUnAuthorizedUser = () => {
+		return (
+			<FullScreenLoading
+				isLoading={true}
+				message={
+					DashboardConstants.LoadingConstants.LoginRedirectLoader
+				}
+			/>
+		);
+	};
 
-				{/* Knowledge base flyout */}
-				{isKnowledgeBaseFlyoutOpen && (
+	const renderAuthorizedManageAgents = () => {
+		return (
+			<MainLayout
+				title="Manage Agents"
+				contentClassName="p-0"
+				isFullWidth={true}
+			>
+				<div className="w-full h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-black">
+					<AgentsListComponent
+						agentsDataList={agentsDataList}
+						handleAgentClick={handleAgentClick}
+						onClose={() => {}}
+						isDisabled={isAnyDrawerOpen}
+						showCloseButton={false}
+						actionButton={
+							<Button
+								onPress={handleCreateAgent}
+								className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-500/20"
+								size="sm"
+							>
+								<Plus className="w-4 h-4 mr-2" />
+								Add New Agent
+							</Button>
+						}
+					/>
+				</div>
+
+				<CreateAgentComponent />
+
+				{/* Backdrop Overlay */}
+				{isAnyDrawerOpen && (
 					<div
-						className={`fixed top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out ${
-							isTestDrawerOpen ? "left-0" : "left-0"
-						}`}
-					>
-						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
-						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-r border-white/10 shadow-2xl">
-							<FileUploadFlyoutComponent
-								isOpen={isKnowledgeBaseFlyoutOpen}
-								onClose={() => toggleKnowledgebaseFlyout(false)}
-								onFilesChange={setSelectedKnowledgeFiles}
-								selectedFiles={selectedKnowledgeFiles}
-								existingFiles={getExistingDocuments()}
-								onExistingFilesChange={
-									handleExistingDocumentsChange
-								}
-								removedExistingFiles={removedExistingDocuments}
-								config={{
-									headerConstants:
-										KnowledgeBaseFlyoutPropsConstants,
-									icons: {
-										title: Files,
-										body: FileText,
-										download: Download,
-									},
-									supportedTypes:
-										".doc,.docx,.pdf,.txt,.xls,.xlsx,.json",
-								}}
-							/>
-						</div>
-					</div>
+						className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300"
+						onClick={() => {
+							/* Optional: Close all drawers logic if desired, keeping non-clickable for now as requested user might just want visual block */
+						}}
+					/>
 				)}
 
-				{/* Ai Vision Images Flyout */}
-				{isVisionFlyoutOpen && (
-					<div
-						className={`fixed top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out ${
-							isTestDrawerOpen ? "left-0" : "left-0"
-						}`}
-					>
-						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
-						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-r border-white/10 shadow-2xl">
-							<FileUploadFlyoutComponent
-								isOpen={isVisionFlyoutOpen}
-								onClose={() => toggleAiVisionFlyout(false)}
-								onFilesChange={setSelectedVisionImages}
-								selectedFiles={selectedVisionImages}
-								existingFiles={getExistingImages()}
-								onExistingFilesChange={
-									handleExistingImagesChange
-								}
-								removedExistingFiles={removedExistingImages}
-								config={{
-									headerConstants:
-										AiVisionImagesFlyoutPropsConstants,
-									icons: {
-										title: ScanEye,
-										body: Images,
-										download: View,
-									},
-									supportedTypes: ".jpg,.jpeg,.png,.svg",
-								}}
-							/>
-						</div>
-					</div>
-				)}
+				{/* Drawers  */}
 
-				{/* Modify Agent Drawer - Middle (when edit is open) */}
+				{/* Modify Agent Drawer - Base Drawer (z-50) */}
 				{isEditDrawerOpen && (
-					<div
-						className={`fixed top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out ${
-							isTestDrawerOpen
-								? "left-1/3"
-								: isKnowledgeBaseFlyoutOpen
-								? "left-1/3"
-								: "right-1/3"
-						}`}
-					>
+					<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/3 w-full">
 						<div className="absolute inset-0 bg-gradient-to-r from-green-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
-						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-x border-white/10 shadow-2xl">
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 							<ModifyAgentComponent
 								editFormData={editFormData}
 								selectedAgent={selectedAgent}
@@ -343,23 +315,98 @@ export default function ManageAgentsComponent() {
 					</div>
 				)}
 
-				{/* Agents List Drawer - Rightmost (always visible when main drawer is open) */}
-				<div className="fixed right-0 top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out">
-					<div className="absolute inset-0 bg-gradient-to-l from-purple-600/20 via-blue-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
-					<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
-						<AgentsListComponent
-							agentsDataList={agentsDataList}
-							handleAgentClick={handleAgentClick}
-							onClose={onClose}
-							isDisabled={
-								isTestDrawerOpen ||
-								isEditDrawerOpen ||
-								isKnowledgeBaseFlyoutOpen
-							}
-						/>
+				{/* Test Agent Drawer - Secondary (z-60) */}
+				{isTestDrawerOpen && (
+					<div className="fixed top-0 right-0 md:right-1/3 md:w-2/3 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
+							<TestAgentComponent
+								selectedAgent={selectedAgent}
+								editFormData={editFormData}
+								onClose={() => setIsTestDrawerOpen(false)}
+							/>
+						</div>
 					</div>
-				</div>
-			</>
-		)
+				)}
+
+				{/* Knowledge Base Flyout - Secondary (z-60) */}
+				{isKnowledgeBaseFlyoutOpen && (
+					<div className="fixed top-0 right-0 md:right-1/3 md:w-1/3 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
+							<FileUploadFlyoutComponent
+								isOpen={isKnowledgeBaseFlyoutOpen}
+								onClose={() => toggleKnowledgebaseFlyout(false)}
+								onFilesChange={setSelectedKnowledgeFiles}
+								selectedFiles={selectedKnowledgeFiles}
+								existingFiles={getExistingDocuments()}
+								onExistingFilesChange={
+									handleExistingDocumentsChange
+								}
+								removedExistingFiles={removedExistingDocuments}
+								config={{
+									headerConstants:
+										KnowledgeBaseFlyoutPropsConstants,
+									icons: {
+										title: Files,
+										body: FileText,
+										download: Download,
+									},
+									supportedTypes:
+										".doc,.docx,.pdf,.txt,.xls,.xlsx,.json",
+								}}
+							/>
+						</div>
+					</div>
+				)}
+
+				{/* Vision Flyout - Secondary (z-60) */}
+				{isVisionFlyoutOpen && (
+					<div className="fixed top-0 right-0 md:right-1/3 md:w-1/3 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
+							<FileUploadFlyoutComponent
+								isOpen={isVisionFlyoutOpen}
+								onClose={() => toggleAiVisionFlyout(false)}
+								onFilesChange={setSelectedVisionImages}
+								selectedFiles={selectedVisionImages}
+								existingFiles={getExistingImages()}
+								onExistingFilesChange={
+									handleExistingImagesChange
+								}
+								removedExistingFiles={removedExistingImages}
+								config={{
+									headerConstants:
+										AiVisionImagesFlyoutPropsConstants,
+									icons: {
+										title: ScanEye,
+										body: Images,
+										download: View,
+									},
+									supportedTypes: ".jpg,.jpeg,.png,.svg",
+								}}
+							/>
+						</div>
+					</div>
+				)}
+			</MainLayout>
+		);
+	};
+
+	const isAnyDrawerOpen =
+		isEditDrawerOpen ||
+		isTestDrawerOpen ||
+		isKnowledgeBaseFlyoutOpen ||
+		isVisionFlyoutOpen;
+
+	return !authContext.isAuthenticated ? (
+		handleUnAuthorizedUser()
+	) : IsLoadingStoreData ? (
+		<FullScreenLoading
+			isLoading={IsLoadingStoreData}
+			message={DashboardConstants.LoadingConstants.MainLoader}
+		/>
+	) : (
+		renderAuthorizedManageAgents()
 	);
 }

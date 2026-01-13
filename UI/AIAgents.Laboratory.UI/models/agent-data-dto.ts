@@ -5,5 +5,6 @@ export class AgentDataDTO extends CreateAgentDTO {
 	agentId: string = "";
 	createdBy: string = "";
 	dateCreated: Date = new Date();
+	dateModified: Date = new Date();
 	aiVisionImagesData: AiVisionImagesDataDTO[] = [];
 }

@@ -11,6 +11,7 @@ import {
 	GlobeLock,
 	Images,
 	ScanEye,
+	WandSparkles,
 } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
@@ -44,6 +45,7 @@ export default function CreateAgentFlyoutComponent({
 	const [formData, setFormData] = useState<CreateAgentDTO>({
 		agentName: "",
 		agentMetaPrompt: "",
+		agentDescription: "",
 		applicationName: "",
 		knowledgeBaseDocument: null,
 		isPrivate: false,
@@ -76,6 +78,7 @@ export default function CreateAgentFlyoutComponent({
 		setFormData({
 			agentName: "",
 			agentMetaPrompt: "",
+			agentDescription: "",
 			applicationName: "",
 			knowledgeBaseDocument: null,
 			isPrivate: false,
@@ -90,6 +93,7 @@ export default function CreateAgentFlyoutComponent({
 		const form = new FormData();
 		form.append("agentMetaPrompt", formData.agentMetaPrompt);
 		form.append("agentName", formData.agentName);
+		form.append("agentDescription", formData.agentDescription);
 		form.append("applicationName", formData.applicationName);
 		form.append("isPrivate", formData.isPrivate.toString());
 
@@ -311,6 +315,29 @@ export default function CreateAgentFlyoutComponent({
 								}}
 							/>
 						</div>
+					</div>
+
+					{/* Agent Description Field */}
+					<div className="space-y-2">
+						<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+							<WandSparkles className="w-4 h-4 text-blue-400" />
+							<span>Agent Description</span>
+						</label>
+						<textarea
+							value={formData.agentDescription}
+							onChange={(e) =>
+								handleInputChange(
+									"agentDescription",
+									e.target.value
+								)
+							}
+							rows={6}
+							placeholder={
+								CreateAgentConstants.InputFields
+									.AgentDescriptionPlaceholder
+							}
+							className="w-full bg-white/5 border border-white/10 text-white placeholder:text-white/40 resize-none px-4 py-3 pr-12 rounded-xl hover:border-white/20 focus:border-orange-500/50 focus:outline-none transition-colors duration-200"
+						/>
 					</div>
 
 					{/* Application Name Field */}

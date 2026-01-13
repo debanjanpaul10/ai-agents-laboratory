@@ -18,6 +18,11 @@ export interface Environment {
 	};
 }
 
+export interface ReduxStoreType {
+	type: string;
+	payload: any;
+}
+
 export interface AgentData {
 	agentName: string;
 	agentMetaPrompt: string;
@@ -75,6 +80,8 @@ export interface AgentsListComponentProps {
 	handleAgentClick: (agent: AgentDataDTO) => void;
 	onClose: () => void;
 	isDisabled: boolean;
+	showCloseButton?: boolean;
+	actionButton?: React.ReactNode;
 }
 
 export interface ChatMessage {
@@ -125,4 +132,9 @@ export interface FileUploadFlyoutProps {
 		icons: any;
 		supportedTypes: string;
 	};
+}
+
+export interface MainLayoutProps {
+	children: ReactNode;
+	title?: string;
 }

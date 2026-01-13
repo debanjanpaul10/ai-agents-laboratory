@@ -155,6 +155,11 @@ internal static class Constants
         /// The invalid feature request data message.
         /// </summary>
         internal const string InvalidFeatureRequestDataMessage = "The feature request data provided is invalid.";
+
+        /// <summary>
+        /// The requested data not found exception message constant.
+        /// </summary>
+        internal const string DataCannotBeFoundExceptionMessage = "Oops! The requested data not exist!";
     }
 
     /// <summary>

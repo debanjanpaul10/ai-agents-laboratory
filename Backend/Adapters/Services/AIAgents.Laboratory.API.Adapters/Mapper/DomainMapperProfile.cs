@@ -11,7 +11,7 @@ namespace AIAgents.Laboratory.API.Adapters.Mapper;
 /// <summary>
 /// The Domain Mapper Profile Class.
 /// </summary>
-/// <seealso cref="AutoMapper.Profile" />
+/// <seealso cref="Profile" />
 public class DomainMapperProfile : Profile
 {
     /// <summary>
@@ -53,5 +53,7 @@ public class DomainMapperProfile : Profile
         CreateMap<ChatRequestDTO, ChatRequestDomain>().ReverseMap();
         CreateMap<AiVisionImagesDomain, AiVisionImagesDataDTO>().ReverseMap()
             .ForMember(destination => destination.ImageKeywords, options => options.Ignore());
+        CreateMap<ToolSkillDomain, ToolSkillDTO>().ReverseMap()
+            .ForMember(destination => destination.IsActive, options => options.Ignore());
     }
 }

@@ -3,13 +3,15 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import { AgentsReducer } from "@store/agents/reducers";
 import { CommonReducer } from "@store/common/reducers";
-import { ChatReducer } from "./chat/reducers";
+import { ChatReducer } from "@store/chat/reducers";
+import { ToolSkillsReducer } from "@store/tools-skills/reducers";
 
 export const store = configureStore({
 	reducer: {
 		AgentsReducer: AgentsReducer,
 		CommonReducer: CommonReducer,
 		ChatReducer: ChatReducer,
+		ToolSkillsReducer: ToolSkillsReducer,
 	},
 });
 

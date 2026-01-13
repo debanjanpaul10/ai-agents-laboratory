@@ -44,4 +44,19 @@ public class CommonAiHandler(ICommonAiService commonAiService, IMapper mapper) :
     {
         return commonAiService.GetConfigurationsData(userName);
     }
+
+    /// <summary>
+    /// Gets the top active agents data list and the agents count asynchronously.
+    /// </summary>
+    /// <param name="userName">The current logged in user.</param>
+    /// <returns>A tupple containing the list of agents and the top 3 active ai agents.</returns>
+    public async Task<TopActiveAgentsDTO> GetTopActiveAgentsDataAsync(string userName)
+    {
+        var (ActiveAgentsCount, TopActiveAgentsList) = await commonAiService.GetTopActiveAgentsDataAsync(userName).ConfigureAwait(false);
+        return new()
+        {
+            ActiveAgentsCount = ActiveAgentsCount,
+            TopActiveAgents = mapper.Map<IEnumerable<AgentDataDTO>>(TopActiveAgentsList)
+        };
+    }
 }

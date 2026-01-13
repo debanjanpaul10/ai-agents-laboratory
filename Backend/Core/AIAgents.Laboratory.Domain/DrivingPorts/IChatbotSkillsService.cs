@@ -4,9 +4,9 @@ using AIAgents.Laboratory.Domain.DomainEntities.SkillsEntities;
 namespace AIAgents.Laboratory.Domain.DrivingPorts;
 
 /// <summary>
-/// The AI Skills service interface.
+/// The AI Chatbot Skills service interface.
 /// </summary>
-public interface ISkillsService
+public interface IChatbotSkillsService
 {
 	/// <summary>
 	/// Gets the SQL query markdown response asynchronous.

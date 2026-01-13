@@ -4,19 +4,27 @@ import { Bot, ChevronsRight } from "lucide-react";
 import { AgentData } from "@shared/types";
 import { useAppSelector } from "@store/index";
 import { DashboardConstants } from "@helpers/constants";
+import { TopActiveAgentsDTO } from "@models/top-active-agents-dto";
 
 export default function ActiveAgentsTileComponent() {
 	const [agentsDataList, setAgentsDataList] = useState<AgentData[]>([]);
+	const [activeAgentsCount, setActiveAgentsCount] = useState<number>(0);
 
-	const AgentsStoreData = useAppSelector(
-		(state) => state.AgentsReducer.agentsListData
+	const TopActiveAgentsStoreData = useAppSelector<TopActiveAgentsDTO>(
+		(state) => state.CommonReducer.topActiveAgents
 	);
 
 	useEffect(() => {
-		if (AgentsStoreData !== null && AgentsStoreData.length > 0) {
-			setAgentsDataList(AgentsStoreData);
+		if (
+			TopActiveAgentsStoreData !== null &&
+			Object.values(TopActiveAgentsStoreData).length > 0 &&
+			TopActiveAgentsStoreData.topActiveAgents !== null &&
+			TopActiveAgentsStoreData.topActiveAgents?.length > 0
+		) {
+			setAgentsDataList(TopActiveAgentsStoreData.topActiveAgents);
+			setActiveAgentsCount(TopActiveAgentsStoreData.activeAgentsCount);
 		}
-	}, [AgentsStoreData]);
+	}, [TopActiveAgentsStoreData]);
 
 	return (
 		<div className="relative group/card">
@@ -107,8 +115,8 @@ export default function ActiveAgentsTileComponent() {
 
 				<div className="mt-4 flex items-center text-gray-400 text-xs">
 					<span className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></span>
-					{agentsDataList.length > 0
-						? `${agentsDataList.length} agents running`
+					{activeAgentsCount > 0
+						? `${activeAgentsCount} agents running`
 						: DashboardConstants.ActiveAgentsTile.ReadyToDeployText}
 				</div>
 			</div>

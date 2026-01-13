@@ -1,4 +1,4 @@
-namespace AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
+namespace AIAgents.Laboratory.Domain.DomainEntities;
 
 /// <summary>
 /// The Base Entity Class.

@@ -48,10 +48,18 @@ export const DashboardConstants = {
 		},
 	},
 	LoadingConstants: {
-		MainLoader: "Loading AI Agents Data ...",
-		SaveNewAgentLoader: "Saving New Agent ...",
-		LoginRedirectLoader: "Redirecting to Login ...",
-		SaveAgentDataLoader: "Saving agent data ...",
+		MainLoader: "Loading AI Agents Data",
+		SaveNewAgentLoader: "Saving New Agent",
+		LoginRedirectLoader: "Redirecting to Login",
+		SaveAgentDataLoader: "Saving agent data",
+		CheckingAuthentication: "Checking authentication",
+	},
+};
+
+export const MarketplaceConstants = {
+	LoadingConstants: {
+		MainLoader: "Loading AI Agents Marketplace",
+		LoginRedirectLoader: "Redirecting to Login",
 	},
 };
 
@@ -61,6 +69,8 @@ export const CreateAgentConstants = {
 	},
 	InputFields: {
 		AgentNamePlaceholder: "Enter agent name ...",
+		AgentDescriptionPlaceholder:
+			"Add a summarized version of your agent's capabilities ...",
 		ApplicationNamePlaceholder: "Enter application name ...",
 		AgentMetaPromptPlaceholder:
 			"Define your agent's behavior, personality, and capabilities ...",
@@ -77,6 +87,8 @@ export const ManageAgentConstants = {
 		Placeholders: {
 			AgentName: "Enter agent name...",
 			ApplicationName: "Enter application name ...",
+			AgentDescriptionPlaceholder:
+				"Add a summarized version of your agent's capabilities ...",
 			AgentMetaprompt:
 				"Define your agent's behavior, personality, and capabilities ...",
 			McpServerURL: "Add the URL for your MCP Server.",

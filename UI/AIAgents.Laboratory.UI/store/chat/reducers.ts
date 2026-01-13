@@ -1,3 +1,4 @@
+import { ReduxStoreType } from "@shared/types";
 import {
 	CLEAR_CONVERSATION_HISTORY,
 	DIRECT_CHAT_REQUEST,
@@ -12,7 +13,7 @@ const initialState = {
 	conversationHistory: {},
 };
 
-export function ChatReducer(state = initialState, action: any) {
+export function ChatReducer(state = initialState, action: ReduxStoreType) {
 	switch (action.type) {
 		case GET_CHAT_RESPONSE: {
 			return {

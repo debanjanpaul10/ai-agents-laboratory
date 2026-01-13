@@ -4,6 +4,7 @@ import {
 	AddBugReportDataApiAsync,
 	GetConfigurationByKeyNameApiAsync,
 	GetConfigurationsDataApiAsync,
+	GetTopActiveAgentsDataApiAsync,
 	SubmitFeatureRequestDataApiAsync,
 } from "@shared/api-service";
 import {
@@ -11,6 +12,7 @@ import {
 	ADD_NEW_FEATURE_REQUEST,
 	GET_ALL_CONFIGURATIONS,
 	GET_CONFIGURATION_BY_KEY_NAME,
+	GET_TOP_ACTIVE_AGENTS,
 	TOGGLE_AGENT_TEST_DRAWER,
 	TOGGLE_AGENTS_LIST_DRAWER,
 	TOGGLE_DIRECT_CHAT_DRAWER,
@@ -203,6 +205,25 @@ export function SubmitFeatureRequestDataAsync(
 			if (error.message) ShowErrorToaster(error.message);
 		} finally {
 			dispatch(ToggleFeedbackLoader(false, FEEDBACK_TYPES.NEWFEATURE));
+		}
+	};
+}
+
+export function GetTopActiveAgentsDataAsync(accessToken: string) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleMainLoader(true));
+			const response = await GetTopActiveAgentsDataApiAsync(accessToken);
+			if (response?.isSuccess && response?.responseData)
+				dispatch({
+					type: GET_TOP_ACTIVE_AGENTS,
+					payload: response.responseData,
+				});
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleMainLoader(false));
 		}
 	};
 }

@@ -5,6 +5,7 @@ import { ChatRequestDTO } from "@models/chat-request-dto";
 import { CreateAgentDTO } from "@models/create-agent-dto";
 import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
 import { NewFeatureRequestDTO } from "@models/new-feature-request-dto";
+import { ToolSkillDTO } from "@models/tool-skill-dto";
 
 export async function GetAgentsApiAsync(accessToken: string) {
 	return await GetAsync("agents/getallagents", accessToken);
@@ -98,4 +99,52 @@ export async function SubmitFeatureRequestDataApiAsync(
 		newFeatureRequest,
 		accessToken
 	);
+}
+
+export async function GetAllToolSkillsApiAsync(accessToken: string) {
+	return await GetAsync("toolskills/getalltoolskills", accessToken);
+}
+
+export async function GetToolSkillBySkillIdApiAsync(
+	skillId: string,
+	accessToken: string
+) {
+	return await GetAsync(`toolskills/gettoolskill/${skillId}`, accessToken);
+}
+
+export async function AddNewToolSkillApiAsync(
+	toolSkillData: ToolSkillDTO,
+	accessToken: string
+) {
+	return await PostAsync(
+		"toolskills/addtoolskill",
+		toolSkillData,
+		accessToken
+	);
+}
+
+export async function UpdateExistingToolSkillDataApiAsync(
+	updateToolSkillData: ToolSkillDTO,
+	accessToken: string
+) {
+	return await PostAsync(
+		"toolskills/updatetoolskill",
+		updateToolSkillData,
+		accessToken
+	);
+}
+
+export async function DeleteExistingToolSkillBySkillIdApiAsync(
+	skillId: string,
+	accessToken: string
+) {
+	return await PostAsync(
+		`toolskills/deletetoolskill/${skillId}`,
+		null,
+		accessToken
+	);
+}
+
+export async function GetTopActiveAgentsDataApiAsync(accessToken: string) {
+	return await GetAsync("aiagentslab/topactiveagents", accessToken);
 }

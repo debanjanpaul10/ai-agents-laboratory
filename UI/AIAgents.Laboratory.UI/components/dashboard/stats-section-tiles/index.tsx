@@ -1,19 +1,24 @@
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@store/index";
+import { TopActiveAgentsDTO } from "@models/top-active-agents-dto";
 
 export default function StatsSectionTilesComponent() {
-	const [agentsCount, setAgentsCount] = useState<number>(0);
+	const [activeAgentsCount, setActiveAgentsCount] = useState<number>(0);
 
-	const AgentsListStoreData = useAppSelector(
-		(state) => state.AgentsReducer.agentsListData
+	const TopActiveAgentsStoreData = useAppSelector<TopActiveAgentsDTO>(
+		(state) => state.CommonReducer.topActiveAgents
 	);
 	const ConfigurationsStoreData = useAppSelector(
 		(state) => state.CommonReducer.configurations
 	);
 
 	useEffect(() => {
-		setAgentsCount(AgentsListStoreData.length);
-	}, [AgentsListStoreData]);
+		if (
+			TopActiveAgentsStoreData !== null &&
+			TopActiveAgentsStoreData.topActiveAgents?.length > 0
+		)
+			setActiveAgentsCount(TopActiveAgentsStoreData.activeAgentsCount);
+	}, [TopActiveAgentsStoreData]);
 
 	return (
 		<div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -37,7 +42,7 @@ export default function StatsSectionTilesComponent() {
 					<div>
 						<p className="text-white/60 text-xs">Active Agents</p>
 						<p className="text-white font-semibold">
-							{agentsCount}
+							{activeAgentsCount}
 						</p>
 					</div>
 				</div>

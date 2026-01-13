@@ -8,7 +8,7 @@ internal static class SwaggerConstants
     /// <summary>
     /// The Skills Controller.
     /// </summary>
-    internal static class SkillsController
+    internal static class ChatbotSkillsController
     {
         /// <summary>
         /// Swagger documentation for GetSQLQueryMarkdownResponseAsync
@@ -297,9 +297,9 @@ internal static class SwaggerConstants
         }
 
         /// <summary>
-		/// Swagger documentation for AddBugReportDataAsync
-		/// </summary>
-		internal static class AddBugReportDataAction
+        /// Swagger documentation for AddBugReportDataAsync
+        /// </summary>
+        internal static class AddBugReportDataAction
         {
             internal const string Summary = "Adds the bug report data asynchronous.";
             internal const string Description = "Creates a new bug report documentation by user/member to be reviewed by devs and fixed.";
@@ -314,6 +314,62 @@ internal static class SwaggerConstants
             internal const string Summary = "Submits the feature request data asynchronous.";
             internal const string Description = "Creates a new feature request documentation by user/member to be reviewed by devs and implemented.";
             internal const string OperationId = nameof(SubmitFeatureRequestDataAction);
+        }
+    }
+
+    /// <summary>
+    /// Swagger documentation for ToolSkillsController.
+    /// </summary>
+    internal static class ToolSkillsController
+    {
+        /// <summary>
+        /// Swagger documentation for GetAllToolSkillsAsync.
+        /// </summary>
+        internal static class GetAllToolSkillsAction
+        {
+            internal const string Summary = "Gets all the tool skills.";
+            internal const string Description = "Gets the list of all the existing skills for all tools present in the system.";
+            internal const string OperationId = nameof(GetAllToolSkillsAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for GetToolSkillBySkillIdAsync.
+        /// </summary>
+        internal static class GetToolSkillBySkillIdAction
+        {
+            internal const string Summary = "Gets a single tool skill by skill id.";
+            internal const string Description = "Gets the single tool skill by its corresponding skill id.";
+            internal const string OperationId = nameof(GetToolSkillBySkillIdAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for AddNewToolSkillAsync.
+        /// </summary>
+        internal static class AddNewToolSkillAction
+        {
+            internal const string Summary = "Creates a new tool skill.";
+            internal const string Description = "Creates a new tool skill that will be used by the agents via the marketplace.";
+            internal const string OperationId = nameof(AddNewToolSkillAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for UpdateExistingToolSkillDataAsync.
+        /// </summary>
+        internal static class UpdateExistingToolSkillDataAction
+        {
+            internal const string Summary = "Updates an existing tool.";
+            internal const string Description = "Updates an existing tool data present in the marketplace.";
+            internal const string OperationId = nameof(UpdateExistingToolSkillDataAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for DeleteExistingToolSkillBySkillIdAsync.
+        /// </summary>
+        internal static class DeleteExistingToolSkillBySkillIdAction
+        {
+            internal const string Summary = "Deletes an existing tool data.";
+            internal const string Description = "Deletes an existing tool data based on the skill id from the marketplace.";
+            internal const string OperationId = nameof(DeleteExistingToolSkillBySkillIdAction);
         }
     }
 }

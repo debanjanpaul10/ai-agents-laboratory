@@ -1,4 +1,5 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
+﻿using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 
 namespace AIAgents.Laboratory.Domain.Helpers;
 
@@ -29,5 +30,19 @@ internal static class DomainUtilities
         featureRequestDataDomain.DateCreated = DateTime.UtcNow;
         featureRequestDataDomain.DateModified = DateTime.UtcNow;
         featureRequestDataDomain.ModifiedBy = featureRequestDataDomain.CreatedBy;
+    }
+
+    /// <summary>
+    /// Prepares the audit entity data.
+    /// </summary>
+    /// <param name="entityModel">The entity data model.</param>
+    /// <param name="currentUser">The current logged in user.</param>
+    internal static void PrepareAuditEntityData(this BaseEntity entityModel, string currentUser)
+    {
+        entityModel.IsActive = true;
+        entityModel.DateModified = DateTime.UtcNow;
+        entityModel.ModifiedBy = currentUser;
+        entityModel.DateCreated = DateTime.UtcNow;
+        entityModel.CreatedBy = currentUser;
     }
 }

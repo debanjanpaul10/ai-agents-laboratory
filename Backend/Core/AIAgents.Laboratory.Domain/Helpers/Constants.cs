@@ -179,6 +179,11 @@ internal static class Constants
         /// The conversation history collection name.
         /// </summary>
         internal const string ConversationHistoryCollectionName = "conversation-history";
+
+        /// <summary>
+        /// The tool skills collection name.
+        /// </summary>
+        internal const string ToolSkillsCollectionName = "tool-skills";
     }
 
     /// <summary>

@@ -122,4 +122,25 @@ public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICo
 
         return HandleUnAuthorizedRequestResponse();
     }
+
+    /// <summary>
+    /// Gets the list of top active agents.
+    /// </summary>
+    /// <returns>The top active agents data DTO.</returns>
+    [HttpGet(CommonRoutes.GetTopActiveAgents_Route)]
+    [ProducesResponseType(typeof(TopActiveAgentsDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ResponseDTO> GetTopActiveAgentsDataAsync()
+    {
+        if (base.IsRequestAuthorized())
+        {
+            var result = await commonAiHandler.GetTopActiveAgentsDataAsync(base.UserEmail).ConfigureAwait(false);
+            if (result is not null) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status500InternalServerError, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
+    }
 }

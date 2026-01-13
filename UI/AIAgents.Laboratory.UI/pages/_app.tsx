@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Inter } from "next/font/google";
 import { MsalProvider } from "@azure/msal-react";
 import { PublicClientApplication } from "@azure/msal-browser";
@@ -12,15 +13,31 @@ import { ClientThemeProvider } from "@components/common/providers/client-theme-p
 import { AuthProvider } from "@auth/AuthProvider";
 import { metadata } from "@helpers/constants";
 import { store } from "@store/index";
+import { FullScreenLoading } from "@components/common/spinner";
 
 const inter = Inter({ subsets: ["latin"] });
 
 // Create MSAL instance
 const msalInstance = new PublicClientApplication(msalConfig);
 
-// ToasterBridge was removed. Use the addToast API from @heroui/toast in non-React code.
-
 export default function App({ Component, pageProps }: AppProps) {
+	const [isMsalInitialized, setIsMsalInitialized] = useState(false);
+
+	useEffect(() => {
+		msalInstance.initialize().then(() => {
+			setIsMsalInitialized(true);
+		});
+	}, []);
+
+	if (!isMsalInitialized) {
+		return (
+			<FullScreenLoading
+				isLoading={true}
+				message="Initializing application..."
+			/>
+		);
+	}
+
 	return (
 		<>
 			<Head>
@@ -37,7 +54,10 @@ export default function App({ Component, pageProps }: AppProps) {
 					<MsalProvider instance={msalInstance}>
 						<Provider store={store}>
 							<AuthProvider>
-								<ToastProvider />
+								<ToastProvider
+									placement="top-center"
+									toastProps={{ classNames: { base: "z-[100]" } }}
+								/>
 								<Component {...pageProps} />
 							</AuthProvider>
 						</Provider>

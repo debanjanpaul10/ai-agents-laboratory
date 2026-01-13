@@ -1,0 +1,132 @@
+using System.Net.Mime;
+using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Models.Response;
+using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+using static AIAgents.Laboratory.API.Helpers.Constants;
+using static AIAgents.Laboratory.API.Helpers.RouteConstants;
+using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ToolSkillsController;
+
+namespace AIAgents.Laboratory.API.Controllers.v2;
+
+/// <summary>
+/// The tool skills controller.
+/// </summary>
+/// <param name="httpContextAccessor">The http context accessor service.</param>
+/// <param name="toolSkillsHandler">The tool skills handler</param>
+/// <seealso cref="BaseController"/>
+[ApiController]
+[ApiVersion(ApiVersionsConstants.ApiVersionV2)]
+[Route("aiagentsapi/v{version:apiVersion}/[controller]")]
+public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToolSkillsHandler toolSkillsHandler) : BaseController(httpContextAccessor)
+{
+    /// <summary>
+    /// Gets the list of all active tool skills asynchronously.
+    /// </summary>
+    /// <returns>The list of <see cref="ToolSkillDTO"/></returns>
+    [HttpGet(ToolSkillsRoutes.GetAllToolSkills_Route)]
+    [ProducesResponseType(typeof(IEnumerable<ToolSkillDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = GetAllToolSkillsAction.Summary, Description = GetAllToolSkillsAction.Description, OperationId = GetAllToolSkillsAction.OperationId)]
+    public async Task<ResponseDTO> GetAllToolSkillsAsync()
+    {
+        var result = await toolSkillsHandler.GetAllToolSkillsAsync(base.UserEmail).ConfigureAwait(false);
+        if (result is not null) return HandleSuccessRequestResponse(result);
+        else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+    }
+
+    /// <summary>
+    /// Gets a single tool skill by id.
+    /// </summary>
+    /// <param name="toolSkillId">The tool skill id.</param>
+    /// <returns>The tool skill dto model.</returns>
+    [HttpGet(ToolSkillsRoutes.GetToolSkillBySkillId_Route)]
+    [ProducesResponseType(typeof(ToolSkillDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = GetToolSkillBySkillIdAction.Summary, Description = GetToolSkillBySkillIdAction.Description, OperationId = GetToolSkillBySkillIdAction.OperationId)]
+    public async Task<ResponseDTO> GetToolSkillBySkillIdAsync([FromRoute] string toolSkillId)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(toolSkillId);
+
+        var result = await toolSkillsHandler.GetToolSkillBySkillIdAsync(toolSkillId, base.UserEmail).ConfigureAwait(false);
+        if (result is not null && result.ToolSkillGuid is not null) return HandleSuccessRequestResponse(result);
+        else return HandleBadRequestResponse(StatusCodes.Status500InternalServerError, ExceptionConstants.DataCannotBeFoundExceptionMessage);
+    }
+
+    /// <summary>
+    /// Creates a new tool skill data.
+    /// </summary>
+    /// <param name="toolSkillData">The tool skill data dto model.</param>
+    /// <returns>The boolean for <c>success/failure.</c></returns>
+    [HttpPost(ToolSkillsRoutes.AddNewToolSkill_Route)]
+    [Consumes(MediaTypeNames.Multipart.FormData)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = AddNewToolSkillAction.Summary, Description = AddNewToolSkillAction.Description, OperationId = AddNewToolSkillAction.OperationId)]
+    public async Task<ResponseDTO> AddNewToolSkillAsync(ToolSkillDTO toolSkillData)
+    {
+        ArgumentNullException.ThrowIfNull(toolSkillData);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await toolSkillsHandler.AddNewToolSkillAsync(toolSkillData, base.UserEmail).ConfigureAwait(false);
+            if (result) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
+    }
+
+    /// <summary>
+    /// Updates an existing tool skill data.
+    /// </summary>
+    /// <param name="updateToolSkillData">The updated tool skill data dto model.</param>
+    /// <returns>The boolean for <c>success/failure.</c></returns>
+    [HttpPost(ToolSkillsRoutes.UpdateExistingToolSkillData_Route)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = UpdateExistingToolSkillDataAction.Summary, Description = UpdateExistingToolSkillDataAction.Description, OperationId = UpdateExistingToolSkillDataAction.OperationId)]
+    public async Task<ResponseDTO> UpdateExistingToolSkillDataAsync([FromForm] ToolSkillDTO updateToolSkillData)
+    {
+        ArgumentNullException.ThrowIfNull(updateToolSkillData);
+        if (IsRequestAuthorized())
+        {
+            var result = await toolSkillsHandler.UpdateExistingToolSkillDataAsync(updateToolSkillData, base.UserEmail).ConfigureAwait(false);
+            if (result) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
+    }
+
+    /// <summary>
+    /// Deletes an existing tool skill by its skill id.
+    /// </summary>
+    /// <param name="toolSkillId">The tool skill id.</param>
+    /// <returns>The boolean for <c>success/failure.</c></returns>
+    [HttpPost(ToolSkillsRoutes.DeleteExistingToolSkillBySkillId_Route)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = DeleteExistingToolSkillBySkillIdAction.Summary, Description = DeleteExistingToolSkillBySkillIdAction.Description, OperationId = DeleteExistingToolSkillBySkillIdAction.OperationId)]
+    public async Task<ResponseDTO> DeleteExistingToolSkillBySkillIdAsync([FromRoute] string toolSkillId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
+        if (IsRequestAuthorized())
+        {
+            var result = await toolSkillsHandler.DeleteExistingToolSkillBySkillIdAsync(toolSkillId, base.UserEmail).ConfigureAwait(false);
+            if (result) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
+    }
+}

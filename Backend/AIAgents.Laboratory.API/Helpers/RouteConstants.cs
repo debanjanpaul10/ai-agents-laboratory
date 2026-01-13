@@ -202,5 +202,41 @@ public static class RouteConstants
         /// The submit feature request route.
         /// </summary>
         internal const string SubmitFeatureRequest_Route = "submitfeaturerequest";
+
+        /// <summary>
+        /// The route constant for getting top 3 active ai agents.
+        /// </summary>
+        internal const string GetTopActiveAgents_Route = "topactiveagents";
+    }
+
+    /// <summary>
+    /// The route constants class for Tool Skills Controller.
+    /// </summary>
+    internal static class ToolSkillsRoutes
+    {
+        /// <summary>
+        /// The add new tool skill route.
+        /// </summary>
+        internal const string AddNewToolSkill_Route = "addtoolskill";
+
+        /// <summary>
+        /// The update existing tool skill route.
+        /// </summary>
+        internal const string UpdateExistingToolSkillData_Route = "updatetoolskill";
+
+        /// <summary>
+        /// The get all tool skills data route.
+        /// </summary>
+        internal const string GetAllToolSkills_Route = "getalltoolskills";
+
+        /// <summary>
+        /// The get tool skill by skill id route.
+        /// </summary>
+        internal const string GetToolSkillBySkillId_Route = "gettoolskill/{skillId}";
+
+        /// <summary>
+        /// The delete existing tool skill by skill id route.
+        /// </summary>
+        internal const string DeleteExistingToolSkillBySkillId_Route = "deletetoolskill/{skillId}";
     }
 }

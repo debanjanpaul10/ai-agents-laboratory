@@ -11,12 +11,12 @@ using static AIAgents.Laboratory.Domain.Helpers.Constants;
 namespace AIAgents.Laboratory.Domain.UseCases;
 
 /// <summary>
-/// The AI Skills Service class.
+/// The AI Chatbot Skills Service class.
 /// </summary>
 /// <param name="aiAgentServices">The AI agent services.</param>
 /// <param name="logger">The logger service.</param>
-/// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.ISkillsService" />
-public class SkillsService(ILogger<SkillsService> logger, IAiServices aiAgentServices) : ISkillsService
+/// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.IChatbotSkillsService" />
+public class ChatbotSkillsService(ILogger<ChatbotSkillsService> logger, IAiServices aiAgentServices) : IChatbotSkillsService
 {
     /// <summary>
     /// Detects the user intent asynchronous.

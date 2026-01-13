@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
-using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.SkillsController;
+using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ChatbotSkillsController;
 
 namespace AIAgents.Laboratory.API.Controllers.v1;
 
 /// <summary>
-/// The AI Skills controller.
+/// The AI Chatbot skills controller.
 /// </summary>
 /// <param name="httpContextAccessor">The http context accessor.</param>
 /// <param name="skillsHandler">The skills handler adapter.</param>
@@ -18,7 +18,7 @@ namespace AIAgents.Laboratory.API.Controllers.v1;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV1)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public class SkillsController(IHttpContextAccessor httpContextAccessor, ISkillsHandler skillsHandler) : BaseController(httpContextAccessor)
+public class ChatbotSkillsController(IHttpContextAccessor httpContextAccessor, IChatbotSkillsHandler skillsHandler) : BaseController(httpContextAccessor)
 {
     /// <summary>
     /// Detects the user intent asynchronous.

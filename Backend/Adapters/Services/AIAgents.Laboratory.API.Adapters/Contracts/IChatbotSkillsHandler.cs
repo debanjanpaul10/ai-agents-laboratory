@@ -3,9 +3,9 @@ using AIAgents.Laboratory.API.Adapters.Models.Request;
 namespace AIAgents.Laboratory.API.Adapters.Contracts;
 
 /// <summary>
-/// The skills handler interface.
+/// The AI Chatbot skills handler interface.
 /// </summary>
-public interface ISkillsHandler
+public interface IChatbotSkillsHandler
 {
 	/// <summary>
 	/// Gets the SQL query markdown response asynchronous.
