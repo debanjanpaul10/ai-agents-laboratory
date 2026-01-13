@@ -51,10 +51,14 @@ public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToo
     public async Task<ResponseDTO> GetToolSkillBySkillIdAsync([FromRoute] string toolSkillId)
     {
         ArgumentException.ThrowIfNullOrEmpty(toolSkillId);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await toolSkillsHandler.GetToolSkillBySkillIdAsync(toolSkillId, base.UserEmail).ConfigureAwait(false);
+            if (result is not null && result.ToolSkillGuid is not null) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status500InternalServerError, ExceptionConstants.DataCannotBeFoundExceptionMessage);
+        }
 
-        var result = await toolSkillsHandler.GetToolSkillBySkillIdAsync(toolSkillId, base.UserEmail).ConfigureAwait(false);
-        if (result is not null && result.ToolSkillGuid is not null) return HandleSuccessRequestResponse(result);
-        else return HandleBadRequestResponse(StatusCodes.Status500InternalServerError, ExceptionConstants.DataCannotBeFoundExceptionMessage);
+        return HandleUnAuthorizedRequestResponse();
     }
 
     /// <summary>

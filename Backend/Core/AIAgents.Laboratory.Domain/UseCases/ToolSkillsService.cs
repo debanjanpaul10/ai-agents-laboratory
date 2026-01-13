@@ -38,7 +38,7 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewToolSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userEmail, toolSkillData }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewToolSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userEmail, toolSkillData.ToolSkillDisplayName }));
 
             toolSkillData.ToolSkillGuid = Guid.NewGuid().ToString();
             toolSkillData.PrepareAuditEntityData(userEmail);
@@ -51,7 +51,7 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddNewToolSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userEmail, toolSkillData }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddNewToolSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userEmail, toolSkillData.ToolSkillDisplayName }));
         }
     }
 
@@ -69,7 +69,7 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
 
             var filter = Builders<ToolSkillDomain>.Filter.Where(tsd => tsd.IsActive && tsd.ToolSkillGuid == toolSkillId);
             var allToolSkills = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, ToolSkillsCollectionName, filter);
-            var updateToolSkill = allToolSkills.First() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+            var updateToolSkill = allToolSkills.FirstOrDefault() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
 
             var updates = new List<UpdateDefinition<ToolSkillDomain>>
             {
@@ -158,7 +158,7 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentUserEmail, updateToolSkillData }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentUserEmail, updateToolSkillData.ToolSkillGuid }));
 
             var filter = Builders<ToolSkillDomain>.Filter.And(
                 Builders<ToolSkillDomain>.Filter.Eq(x => x.IsActive, true),
@@ -186,7 +186,7 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentUserEmail, updateToolSkillData }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentUserEmail, updateToolSkillData.ToolSkillGuid }));
         }
     }
 }

@@ -53,7 +53,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userEmail, agentData }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userEmail, agentData.AgentName }));
 
             agentData.AgentId = Guid.NewGuid().ToString();
             if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Any() && IsKnowledgeBaseServiceAllowed)
@@ -72,7 +72,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userEmail, agentData }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userEmail, agentData.AgentName }));
         }
     }
 
@@ -179,7 +179,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { updateDataDomain }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { updateDataDomain.AgentId, updateDataDomain.ModifiedBy }));
 
             var filter = Builders<AgentDataDomain>.Filter.And(Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
             var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, AgentsDataCollectionName, filter).ConfigureAwait(false);
@@ -211,7 +211,7 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { updateDataDomain }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { updateDataDomain.AgentId, updateDataDomain.ModifiedBy }));
         }
     }
 

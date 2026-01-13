@@ -77,9 +77,9 @@ export default function SystemHealthTileComponent() {
 					{renderHealthItem(
 						<Bot className="w-4 h-4 text-purple-400" />,
 						"AI Provider",
-						ConfigurationsStoreData.CurrentAiServiceProvider ||
+						ConfigurationsStoreData?.CurrentAiServiceProvider ||
 							"Not Configured",
-						ConfigurationsStoreData.CurrentAiServiceProvider
+						ConfigurationsStoreData?.CurrentAiServiceProvider
 							? "bg-purple-400"
 							: "bg-yellow-400"
 					)}
