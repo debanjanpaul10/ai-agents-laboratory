@@ -13,8 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\..\..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
   </ItemGroup>
 
 </Project>

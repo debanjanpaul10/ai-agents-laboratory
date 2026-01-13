@@ -45,6 +45,7 @@ public static class DIContainer
                 .Select(KeyFilter.Any, AzureAppConfigurationConstants.BaseConfigurationAppConfigKeyConstant)
                 .Select(KeyFilter.Any, AzureAppConfigurationConstants.FeatureFlagAppConfigKeyConstant)
                 .Select(KeyFilter.Any, AzureAppConfigurationConstants.AiConfigurationAppConfigKeyConstant)
+                .Select(KeyFilter.Any, AzureAppConfigurationConstants.MongoDbAppConfigKeyConstant)
             .ConfigureKeyVault(configure => configure.SetCredential(credentials));
         });
     }

@@ -2,7 +2,7 @@ name: Build and Deploy AI Agents Laboratory
 
 env:
     API_PROJECT_PATH: Backend/AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj
-    UI_PROJECT_PATH: UI/AIAgents.Laboratory.UI
+    WEB_UI_PROJECT_PATH: UI/web
     DATABASE_PROJECT_PATH: Backend/AIAgents.Laboratory.Database
 
 on:
@@ -18,8 +18,8 @@ on:
                 default: true
                 type: boolean
 
-            deploy_ui:
-                description: "AIAgents.Laboratory.UI"
+            deploy_webui:
+                description: "AIAgents.Laboratory.Web.UI"
                 required: false
                 default: true
                 type: boolean
@@ -87,7 +87,7 @@ jobs:
 
     build-and-deploy-web:
         name: Build and Deploy UI solution
-        if: ${{ github.event_name == 'push' || inputs.deploy_ui }}
+        if: ${{ github.event_name == 'push' || inputs.deploy_webui }}
         runs-on: ubuntu-latest
         environment: Production
 
@@ -102,7 +102,7 @@ jobs:
 
             - name: Install dependencies and build UI
               run: |
-                  cd ${{ env.UI_PROJECT_PATH }}
+                  cd ${{ env.WEB_UI_PROJECT_PATH }}
                   npm install
                   npm run build
 
@@ -111,7 +111,7 @@ jobs:
               with:
                   azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_TOKEN }}
                   action: "upload"
-                  app_location: ${{ env.UI_PROJECT_PATH }}
+                  app_location: ${{ env.WEB_UI_PROJECT_PATH }}
                   output_location: "out"
 
     build-database:
