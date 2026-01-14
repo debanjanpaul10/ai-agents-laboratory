@@ -17,40 +17,62 @@ namespace AIAgents.Laboratory.Persistence.SQLDatabase.IOC;
 public static class DIContainer
 {
     /// <summary>
-    /// Adds the SQL server dependencies.
+    /// Adds the Relational SQL dependencies.
     /// </summary>
     /// <param name="services">The services collection.</param>
     /// <param name="configuration">The configuration.</param>
     /// <param name="isDevelopmentMode">The is development mode flag.</param>
     /// <returns>The service collection.</returns>
-    public static IServiceCollection AddSqlServerDependencies(this IServiceCollection services, IConfiguration configuration, bool isDevelopmentMode) =>
-        services.ConfigureSqlDatabase(configuration, isDevelopmentMode).AddDataManagerDependencies();
+    public static IServiceCollection AddRelationalSqlDependencies(this IServiceCollection services, IConfiguration configuration, bool isDevelopmentMode)
+    {
+        var currentSqlServiceProvider = configuration[ConfigurationConstants.CurrentSQLProviderConstant] ?? throw new Exception(ErrorMessages.DatabaseConnectionNotFound);
+        switch (currentSqlServiceProvider)
+        {
+            case DatabaseConstants.AzureSQLConstant:
+                services.ConfigureAzureSqlDatabase(configuration, isDevelopmentMode);
+                break;
+            case DatabaseConstants.PostgreSQLConstant:
+                services.ConfigurePostgreSqlDatabase(configuration);
+                break;
+        }
+
+        return services.AddDataManagerDependencies();
+    }
 
     /// <summary>
-    /// Configures the SQL database.
+    /// Configures the Postgre SQL database.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="configuration"></param>
+    /// <returns></returns>
+    private static IServiceCollection ConfigurePostgreSqlDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        var sqlConnectionString = configuration[ConfigurationConstants.PostgreSQLConnectionStringConstant];
+        ArgumentException.ThrowIfNullOrWhiteSpace(sqlConnectionString);
+
+        return services.AddDbContext<SqlDbContext>(options =>
+            options.UseNpgsql(
+                connectionString: sqlConnectionString,
+                npgsqlOptionsAction: options => options.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(30), errorCodesToAdd: null)));
+    }
+
+    /// <summary>
+    /// Configures the Azure SQL database.
     /// </summary>
     /// <param name="services">The services collection.</param>
     /// <param name="configuration">The configuration.</param>
     /// <param name="isDevelopmentMode">The is development mode flag.</param>
     /// <returns>The service collection.</returns>
-    private static IServiceCollection ConfigureSqlDatabase(this IServiceCollection services, IConfiguration configuration, bool isDevelopmentMode)
+    private static IServiceCollection ConfigureAzureSqlDatabase(this IServiceCollection services, IConfiguration configuration, bool isDevelopmentMode)
     {
-        var sqlConnectionString = isDevelopmentMode
-            ? configuration[ConfigurationConstants.LocalSqlConnectionStringConstant]
-            : configuration[ConfigurationConstants.AzureSqlConnectionStringConstant];
-
-        if (string.IsNullOrWhiteSpace(sqlConnectionString))
-            throw new ArgumentNullException(nameof(sqlConnectionString), ErrorMessages.DatabaseConnectionNotFound);
+        var sqlConnectionString = isDevelopmentMode ? configuration[ConfigurationConstants.LocalSqlConnectionStringConstant] : configuration[ConfigurationConstants.AzureSqlConnectionStringConstant];
+        ArgumentException.ThrowIfNullOrWhiteSpace(sqlConnectionString);
 
         return services.AddDbContext<SqlDbContext>(options =>
-        {
             options.UseSqlServer(
                 connectionString: sqlConnectionString,
-                options => options.EnableRetryOnFailure(
-                    maxRetryCount: 3,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null));
-        });
+                sqlServerOptionsAction: options => options.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null))
+        );
     }
 
     /// <summary>

@@ -105,7 +105,7 @@ export async function SubmitFeatureRequestDataApiAsync(
 	accessToken: string
 ) {
 	return await PostAsync(
-		"aiagents/submitfeaturerequest",
+		"aiagentslab/submitfeaturerequest",
 		newFeatureRequest,
 		accessToken
 	);
