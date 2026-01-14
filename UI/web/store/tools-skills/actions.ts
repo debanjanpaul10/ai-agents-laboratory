@@ -2,20 +2,54 @@ import { Action, Dispatch } from "redux";
 
 import { ReduxStoreType } from "@shared/types";
 import {
+	ADD_NEW_TOOL_SKILL,
 	GET_ALL_TOOLS_SKILLS,
 	GET_TOOL_SKILL_BY_ID,
+	TOGGLE_ADD_SKILL_DRAWER,
+	TOGGLE_CREATE_SKILLS_LOADER,
+	TOGGLE_EDIT_SKILLS_LOADER,
 	TOGGLE_TOOLS_SKILLS_LOADER,
 } from "@store/tools-skills/actionTypes";
 import {
+	AddNewToolSkillApiAsync,
 	GetAllToolSkillsApiAsync,
 	GetToolSkillBySkillIdApiAsync,
 } from "@shared/api-service";
-import { ShowErrorToaster } from "@shared/toaster";
+import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
+import { ToolSkillDTO } from "@models/tool-skill-dto";
 
 export function ToggleToolSkillsLoader(isLoading: boolean): ReduxStoreType {
 	return {
 		type: TOGGLE_TOOLS_SKILLS_LOADER,
 		payload: isLoading,
+	};
+}
+
+export function ToggleEditSkillLoader(isLoading: boolean) {
+	return {
+		type: TOGGLE_EDIT_SKILLS_LOADER,
+		payload: isLoading,
+	};
+}
+
+export function ToggleCreateSkillLoader(isLoading: boolean) {
+	return {
+		type: TOGGLE_CREATE_SKILLS_LOADER,
+		payload: isLoading,
+	};
+}
+
+export function ToggleEditSkillDrawer(isOpen: boolean) {
+	return {
+		type: TOGGLE_EDIT_SKILLS_LOADER,
+		payload: isOpen,
+	};
+}
+
+export function ToggleAddSkillDrawer(isOpen: boolean) {
+	return {
+		type: TOGGLE_ADD_SKILL_DRAWER,
+		payload: isOpen,
 	};
 }
 
@@ -60,6 +94,36 @@ export function GetToolSkillBySkillIdAsync(
 			if (error.message) ShowErrorToaster(error.message);
 		} finally {
 			dispatch(ToggleToolSkillsLoader(false));
+		}
+	};
+}
+
+export function AddNewToolSkillAsync(
+	newToolSkill: ToolSkillDTO | FormData,
+	accessToken: string
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleCreateSkillLoader(true));
+			const response = await AddNewToolSkillApiAsync(
+				newToolSkill,
+				accessToken
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: ADD_NEW_TOOL_SKILL,
+					payload: response.responseData,
+				});
+
+				dispatch(ToggleAddSkillDrawer(false));
+				dispatch(GetAllToolSkillsAsync(accessToken) as any);
+				ShowSuccessToaster("Skill created successfully");
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleCreateSkillLoader(false));
 		}
 	};
 }

@@ -7,6 +7,7 @@ import {
 	TOGGLE_AGENT_CREATE_SPINNER,
 	TOGGLE_CHAT_RESPONSE_SPINNER,
 	TOGGLE_EDIT_AGENT_SPINNER,
+	TOGGLE_NEW_AGENT_DRAWER,
 	UPDATE_AGENT_DATA,
 } from "@store/agents/actionTypes";
 import {
@@ -18,8 +19,15 @@ import {
 } from "@shared/api-service";
 import { CreateAgentDTO } from "@models/create-agent-dto";
 import { AgentDataDTO } from "@models/agent-data-dto";
-import { ToggleMainLoader, ToggleNewAgentDrawer } from "@store/common/actions";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
+import { ToggleMainLoader } from "@store/common/actions";
+
+export function ToggleNewAgentDrawer(isOpen: boolean) {
+	return {
+		type: TOGGLE_NEW_AGENT_DRAWER,
+		payload: isOpen,
+	};
+}
 
 export function ToggleCreateAgentSpinner(isLoading: boolean) {
 	return {

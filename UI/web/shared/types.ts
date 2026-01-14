@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { AgentDataDTO } from "@models/agent-data-dto";
+import { ToolSkillDTO } from "@models/tool-skill-dto";
 
 export interface Environment {
 	production: boolean;
@@ -78,6 +79,15 @@ export interface AuthenticatedAppProps {
 export interface AgentsListComponentProps {
 	agentsDataList: AgentDataDTO[];
 	handleAgentClick: (agent: AgentDataDTO) => void;
+	onClose: () => void;
+	isDisabled: boolean;
+	showCloseButton?: boolean;
+	actionButton?: React.ReactNode;
+}
+
+export interface SkillsListComponentProps {
+	toolSkillsList: ToolSkillDTO[];
+	handleSkillClick: (skill: ToolSkillDTO) => void;
 	onClose: () => void;
 	isDisabled: boolean;
 	showCloseButton?: boolean;

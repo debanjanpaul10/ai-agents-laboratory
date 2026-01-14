@@ -57,6 +57,7 @@ export const DashboardConstants = {
 		LoginRedirectLoader: "Redirecting to Login",
 		SaveAgentDataLoader: "Saving agent data",
 		CheckingAuthentication: "Checking authentication",
+		CreateNewSkill: "Saving Skill details",
 	},
 };
 
@@ -69,6 +70,21 @@ export const MarketplaceConstants = {
 		Header: "Skills Marketplace Coming Soon",
 		SubHeading:
 			"Explore and add new capabilities to your AI agents from our curated marketplace of skills and tools.",
+	},
+	Headers: {
+		Header: "Skills Marketplace",
+		SubText:
+			"Discover and integrate advanced capabilities into your AI agents.",
+	},
+	AddSkillConstants: {
+		Header: "Add New Skill",
+		SubHeader: "Create and register a new tool skill for your AI agents.",
+		Placeholders: {
+			DisplayName: "Enter skill display name...",
+			TechnicalName: "Enter technical name (e.g. get_weather)...",
+			McpUrl: "Enter MCP Server URL (if applicable)...",
+		},
+		Info: "The technical name should be unique. It is used by the AI agent to identify and call the tool during a conversation.",
 	},
 };
 
@@ -102,7 +118,8 @@ export const CreateAgentConstants = {
 
 export const ManageAgentConstants = {
 	Headers: {
-		SubText: "Manage Existing AI Agents",
+		Header: "Agents Management",
+		SubHeader: "Create and manage AI agents to cater to your needs.",
 	},
 	ModifyAgentConstants: {
 		MainHeader: "Modify AI Agent Configuration",

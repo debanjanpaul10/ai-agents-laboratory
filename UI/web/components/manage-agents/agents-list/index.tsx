@@ -132,17 +132,17 @@ export default function AgentsListComponent({
 	return (
 		<div className="h-full flex flex-col bg-gradient-to-b from-gray-900 via-slate-900 to-black">
 			{/* Header - Fixed */}
-			<div className="flex items-center justify-between md:p-6 p-4 flex-shrink-0">
-				<div className="flex items-center space-x-3">
-					<div className="bg-gradient-to-r from-purple-500 to-blue-600 p-2 rounded-xl">
-						<Bot className="w-5 h-5 text-white" />
+			<div className="flex items-center justify-between md:p-6 p-4 flex-shrink-0 border-b border-white/5 bg-white/[0.02] backdrop-blur-sm">
+				<div className="flex items-center space-x-4">
+					<div className="bg-white/5 border border-white/10 p-2.5 rounded-xl shadow-inner">
+						<Bot className="w-5 h-5 text-blue-400" />
 					</div>
 					<div>
-						<h2 className="text-xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
-							{ManageAgentConstants.Headers.SubText}
+						<h2 className="text-xl font-semibold text-white tracking-tight">
+							{ManageAgentConstants.Headers.Header}
 						</h2>
-						<p className="text-white/60 text-sm">
-							Select an agent to modify
+						<p className="text-white/40 text-sm font-medium">
+							{ManageAgentConstants.Headers.SubHeader}
 						</p>
 					</div>
 				</div>

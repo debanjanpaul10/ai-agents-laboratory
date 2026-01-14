@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { Download, Files, FileText, Images, ScanEye, View } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
-import { ToggleNewAgentDrawer } from "@store/common/actions";
-import CreateAgentFlyoutComponent from "@components/create-agent/agent-creator-flyout";
 import {
 	AiVisionImagesFlyoutPropsConstants,
 	KnowledgeBaseFlyoutPropsConstants,
 } from "@helpers/constants";
 import FileUploadFlyoutComponent from "@components/common/file-upload-flyout";
+import { ToggleNewAgentDrawer } from "@store/agents/actions";
+import CreateAgentFlyoutComponent from "@components/manage-agents/create-agent/agent-creator-flyout";
 
 export default function CreateAgentComponent() {
 	const dispatch = useAppDispatch();
@@ -27,7 +27,7 @@ export default function CreateAgentComponent() {
 	>([]);
 
 	const IsDrawerOpenStoreData = useAppSelector(
-		(state) => state.CommonReducer.isNewAgentDrawerOpen
+		(state) => state.AgentsReducer.isNewAgentDrawerOpen
 	);
 
 	useEffect(() => {

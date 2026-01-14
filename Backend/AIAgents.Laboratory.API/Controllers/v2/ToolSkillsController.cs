@@ -73,7 +73,7 @@ public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToo
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = AddNewToolSkillAction.Summary, Description = AddNewToolSkillAction.Description, OperationId = AddNewToolSkillAction.OperationId)]
-    public async Task<ResponseDTO> AddNewToolSkillAsync(ToolSkillDTO toolSkillData)
+    public async Task<ResponseDTO> AddNewToolSkillAsync([FromForm] ToolSkillDTO toolSkillData)
     {
         ArgumentNullException.ThrowIfNull(toolSkillData);
         if (base.IsRequestAuthorized())
@@ -92,6 +92,7 @@ public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToo
     /// <param name="updateToolSkillData">The updated tool skill data dto model.</param>
     /// <returns>The boolean for <c>success/failure.</c></returns>
     [HttpPost(ToolSkillsRoutes.UpdateExistingToolSkillData_Route)]
+    [Consumes(MediaTypeNames.Multipart.FormData)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

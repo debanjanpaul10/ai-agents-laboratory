@@ -30,7 +30,6 @@ import { FullScreenLoading } from "@components/common/spinner";
 import { DashboardConstants, ManageAgentConstants } from "@helpers/constants";
 import { AgentDataDTO } from "@models/agent-data-dto";
 import ExpandMetapromptEditorComponent from "@components/common/expand-metaprompt-editor";
-import { ToggleAgentsListDrawer } from "@store/common/actions";
 
 export default function ModifyAgentComponent({
 	editFormData,
@@ -121,7 +120,6 @@ export default function ModifyAgentComponent({
 		const token = await authContext.getAccessToken();
 		token &&
 			dispatch(DeleteExistingAgentDataAsync(editFormData.agentId, token));
-		dispatch(ToggleAgentsListDrawer(false));
 		handleEditClose();
 	}
 

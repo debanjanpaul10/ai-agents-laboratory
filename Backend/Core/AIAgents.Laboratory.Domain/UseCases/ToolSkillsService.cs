@@ -129,8 +129,7 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentUserEmail, toolSkillId }));
 
             var filter = Builders<ToolSkillDomain>.Filter.And(
-                Builders<ToolSkillDomain>.Filter.Eq(x => x.IsActive, true),
-                Builders<ToolSkillDomain>.Filter.Eq(x => x.ToolSkillGuid, toolSkillId));
+                Builders<ToolSkillDomain>.Filter.Eq(x => x.IsActive, true), Builders<ToolSkillDomain>.Filter.Eq(x => x.ToolSkillGuid, toolSkillId));
             var allData = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, ToolSkillsCollectionName, filter).ConfigureAwait(false);
             return allData?.First() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
         }

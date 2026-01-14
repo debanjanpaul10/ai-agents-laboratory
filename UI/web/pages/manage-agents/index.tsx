@@ -11,16 +11,16 @@ import {
 import { Button } from "@heroui/react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
-import { GetAllAgentsDataAsync } from "@store/agents/actions";
 import {
+	GetAllAgentsDataAsync,
 	ToggleNewAgentDrawer,
-	GetAllConfigurations,
-} from "@store/common/actions";
+} from "@store/agents/actions";
+import { GetAllConfigurations } from "@store/common/actions";
 import { AgentDataDTO } from "@models/agent-data-dto";
 import AgentsListComponent from "@components/manage-agents/agents-list";
 import ModifyAgentComponent from "@components/manage-agents/modify-agent";
 import TestAgentComponent from "@components/manage-agents/test-agent";
-import CreateAgentComponent from "@components/create-agent";
+import CreateAgentComponent from "@components/manage-agents/create-agent";
 import FileUploadFlyoutComponent from "@components/common/file-upload-flyout";
 import {
 	AiVisionImagesFlyoutPropsConstants,
@@ -36,7 +36,6 @@ export default function ManageAgentsPage() {
 	const authContext = useAuth();
 
 	const [agentsDataList, setAgentsDataList] = useState<AgentDataDTO[]>([]);
-
 	const [selectedAgent, setSelectedAgent] = useState<AgentDataDTO | null>(
 		null
 	);
@@ -252,10 +251,9 @@ export default function ManageAgentsPage() {
 						actionButton={
 							<Button
 								onPress={handleCreateAgent}
-								className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-500/20"
-								size="sm"
+								className="bg-white/5 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-white font-medium px-6 rounded-xl transition-all duration-300 group shadow-lg"
 							>
-								<Plus className="w-4 h-4 mr-2" />
+								<Plus className="w-4 h-4 mr-2 text-blue-400 group-hover:text-blue-300 group-hover:scale-110 transition-all" />
 								Add New Agent
 							</Button>
 						}

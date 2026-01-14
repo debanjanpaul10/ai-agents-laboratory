@@ -127,7 +127,7 @@ export async function GetToolSkillBySkillIdApiAsync(
 }
 
 export async function AddNewToolSkillApiAsync(
-	toolSkillData: ToolSkillDTO,
+	toolSkillData: ToolSkillDTO | FormData,
 	accessToken: string
 ) {
 	return await PostAsync(
@@ -138,7 +138,7 @@ export async function AddNewToolSkillApiAsync(
 }
 
 export async function UpdateExistingToolSkillDataApiAsync(
-	updateToolSkillData: ToolSkillDTO,
+	updateToolSkillData: ToolSkillDTO | FormData,
 	accessToken: string
 ) {
 	return await PostAsync(
