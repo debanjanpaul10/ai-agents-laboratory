@@ -82,13 +82,10 @@ export default function EditSkillFlyoutComponent({
 
 	async function handleSkillDelete() {
 		const token = await authContext.getAccessToken();
-		if (token) {
-			await dispatch(
-				DeleteExistingToolSkillAsync(editFormData.toolSkillGuid, token)
-			);
-			setIsDeletePopupOpen(false);
-			handleEditClose();
-		}
+		var skillId = editFormData.toolSkillGuid;
+		token && dispatch(DeleteExistingToolSkillAsync(skillId, token));
+		setIsDeletePopupOpen(false);
+		handleEditClose();
 	}
 
 	async function GetAllMcpToolsAvailable(mcpServerUrl: string) {

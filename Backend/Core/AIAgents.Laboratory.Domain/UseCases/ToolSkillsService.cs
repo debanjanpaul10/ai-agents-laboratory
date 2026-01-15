@@ -193,7 +193,7 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
 
             var updates = new List<UpdateDefinition<ToolSkillDomain>>
             {
-                Builders<ToolSkillDomain>.Update.Set(x => x.AssociatedAgentGuids, updateToolSkillData.AssociatedAgentGuids),
+                Builders<ToolSkillDomain>.Update.Set(x => x.AssociatedAgents, updateToolSkillData.AssociatedAgents),
                 Builders<ToolSkillDomain>.Update.Set(x => x.ToolSkillDisplayName, updateToolSkillData.ToolSkillDisplayName),
                 Builders<ToolSkillDomain>.Update.Set(x => x.ToolSkillMcpServerUrl, updateToolSkillData.ToolSkillMcpServerUrl),
                 Builders<ToolSkillDomain>.Update.Set(x => x.ToolSkillTechnicalName, updateToolSkillData.ToolSkillTechnicalName),

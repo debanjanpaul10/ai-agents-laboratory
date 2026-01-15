@@ -24,14 +24,11 @@ export default function MarketplaceComponent() {
 	const dispatch = useAppDispatch();
 	const authContext = useAuth();
 
-	const [toolSkillsDataList, setTooSkillsDataList] = useState<ToolSkillDTO[]>(
-		[]
-	);
 	const [selectedSkill, setSelectedSkill] = useState<ToolSkillDTO | null>(
 		null
 	);
 	const [editFormData, setEditFormData] = useState<ToolSkillDTO>({
-		associatedAgentGuids: [],
+		associatedAgents: {},
 		createdBy: "",
 		dateCreated: new Date(),
 		dateModified: new Date(),
@@ -77,18 +74,10 @@ export default function MarketplaceComponent() {
 		}
 	}, [authContext.isAuthenticated, authContext.isLoading]);
 
-	useEffect(() => {
-		if (
-			ToolSkillsListStoreData.length > 0 &&
-			ToolSkillsListStoreData !== toolSkillsDataList
-		)
-			setTooSkillsDataList(ToolSkillsListStoreData);
-	}, [ToolSkillsListStoreData]);
-
 	const handleSkillClick = (toolSkill: ToolSkillDTO) => {
 		setSelectedSkill(toolSkill);
 		setEditFormData({
-			associatedAgentGuids: toolSkill.associatedAgentGuids || [],
+			associatedAgents: toolSkill.associatedAgents || {},
 			createdBy: toolSkill.createdBy || "",
 			dateCreated: toolSkill.dateCreated || new Date(),
 			dateModified: toolSkill.dateModified || new Date(),
@@ -142,7 +131,7 @@ export default function MarketplaceComponent() {
 			<MainLayout contentClassName="p-0" isFullWidth={true}>
 				<div className="w-full h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-black">
 					<SkillsListComponent
-						toolSkillsList={toolSkillsDataList}
+						toolSkillsList={ToolSkillsListStoreData}
 						handleSkillClick={handleSkillClick}
 						onClose={() => {}}
 						isDisabled={isAnyDrawerOpen}

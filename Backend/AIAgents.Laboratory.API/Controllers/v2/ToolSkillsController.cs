@@ -46,7 +46,7 @@ public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToo
     /// <summary>
     /// Gets a single tool skill by id.
     /// </summary>
-    /// <param name="toolSkillId">The tool skill id.</param>
+    /// <param name="skillId">The tool skill id.</param>
     /// <returns>The tool skill dto model.</returns>
     [HttpGet(ToolSkillsRoutes.GetToolSkillBySkillId_Route)]
     [ProducesResponseType(typeof(ToolSkillDTO), StatusCodes.Status200OK)]
@@ -54,12 +54,12 @@ public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToo
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetToolSkillBySkillIdAction.Summary, Description = GetToolSkillBySkillIdAction.Description, OperationId = GetToolSkillBySkillIdAction.OperationId)]
-    public async Task<ResponseDTO> GetToolSkillBySkillIdAsync([FromRoute] string toolSkillId)
+    public async Task<ResponseDTO> GetToolSkillBySkillIdAsync([FromRoute] string skillId)
     {
-        ArgumentException.ThrowIfNullOrEmpty(toolSkillId);
+        ArgumentException.ThrowIfNullOrEmpty(skillId);
         if (base.IsRequestAuthorized())
         {
-            var result = await toolSkillsHandler.GetToolSkillBySkillIdAsync(toolSkillId, base.UserEmail).ConfigureAwait(false);
+            var result = await toolSkillsHandler.GetToolSkillBySkillIdAsync(skillId, base.UserEmail).ConfigureAwait(false);
             if (result is not null && result.ToolSkillGuid is not null) return HandleSuccessRequestResponse(result);
             else return HandleBadRequestResponse(StatusCodes.Status500InternalServerError, ExceptionConstants.DataCannotBeFoundExceptionMessage);
         }
@@ -120,7 +120,7 @@ public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToo
     /// <summary>
     /// Deletes an existing tool skill by its skill id.
     /// </summary>
-    /// <param name="toolSkillId">The tool skill id.</param>
+    /// <param name="skillId">The tool skill id.</param>
     /// <returns>The boolean for <c>success/failure.</c></returns>
     [HttpPost(ToolSkillsRoutes.DeleteExistingToolSkillBySkillId_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
@@ -128,12 +128,12 @@ public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToo
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = DeleteExistingToolSkillBySkillIdAction.Summary, Description = DeleteExistingToolSkillBySkillIdAction.Description, OperationId = DeleteExistingToolSkillBySkillIdAction.OperationId)]
-    public async Task<ResponseDTO> DeleteExistingToolSkillBySkillIdAsync([FromRoute] string toolSkillId)
+    public async Task<ResponseDTO> DeleteExistingToolSkillBySkillIdAsync([FromRoute] string skillId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
         if (IsRequestAuthorized())
         {
-            var result = await toolSkillsHandler.DeleteExistingToolSkillBySkillIdAsync(toolSkillId, base.UserEmail).ConfigureAwait(false);
+            var result = await toolSkillsHandler.DeleteExistingToolSkillBySkillIdAsync(skillId, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
             else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }

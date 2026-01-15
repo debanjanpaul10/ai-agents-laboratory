@@ -22,7 +22,7 @@ export default function CreateSkillComponent() {
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 	const [formData, setFormData] = useState<ToolSkillDTO>({
-		associatedAgentGuids: [],
+		associatedAgents: {},
 		createdBy: "",
 		dateCreated: new Date(),
 		dateModified: new Date(),
@@ -55,7 +55,7 @@ export default function CreateSkillComponent() {
 			if (IsDrawerOpenStoreData) {
 				// Reset form when opening
 				setFormData({
-					associatedAgentGuids: [],
+					associatedAgents: {},
 					createdBy: authContext.user?.email || "",
 					dateCreated: new Date(),
 					dateModified: new Date(),
@@ -90,7 +90,7 @@ export default function CreateSkillComponent() {
 
 	const handleClearData = () => {
 		setFormData({
-			associatedAgentGuids: [],
+			associatedAgents: {},
 			createdBy: "",
 			dateCreated: new Date(),
 			dateModified: new Date(),

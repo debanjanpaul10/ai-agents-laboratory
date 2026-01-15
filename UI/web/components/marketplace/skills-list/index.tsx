@@ -34,8 +34,8 @@ export default function SkillsListComponent({
 	const uniqueAgents = useMemo(() => {
 		const agents = [
 			...new Set(
-				toolSkillsList.flatMap(
-					(skill) => skill.associatedAgentGuids || []
+				toolSkillsList.flatMap((skill) =>
+					Object.keys(skill.associatedAgents || {})
 				)
 			),
 		];
@@ -69,7 +69,9 @@ export default function SkillsListComponent({
 			// Agent filter
 			const matchesAgent =
 				selectedAgent === "all" ||
-				(skill.associatedAgentGuids || []).includes(selectedAgent);
+				Object.keys(skill.associatedAgents || {}).includes(
+					selectedAgent
+				);
 
 			// Creator filter
 			const matchesCreator =

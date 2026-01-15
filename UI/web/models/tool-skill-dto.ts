@@ -3,7 +3,7 @@ export class ToolSkillDTO {
 	toolSkillDisplayName: string = "";
 	toolSkillTechnicalName: string = "";
 	toolSkillMcpServerUrl: string = "";
-	associatedAgentGuids: string[] = [];
+	associatedAgents: Record<string, string> = {};
 	dateCreated: Date = new Date();
 	createdBy: string = "";
 	dateModified: Date = new Date();
