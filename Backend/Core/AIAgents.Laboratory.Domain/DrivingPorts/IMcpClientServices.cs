@@ -1,6 +1,6 @@
-﻿using ModelContextProtocol.Client;
+﻿using AIAgents.Laboratory.Domain.DomainEntities;
 
-namespace AIAgents.Laboratory.SemanticKernel.Adapters.Contracts;
+namespace AIAgents.Laboratory.Domain.DrivingPorts;
 
 /// <summary>
 /// Defines a service for retrieving MCP client tools and functions from a specified MCP server.
@@ -12,8 +12,8 @@ public interface IMcpClientServices
     /// </summary>
     /// <param name="mcpServerUrl">The URL of the MCP server endpoint from which to retrieve the list of client tools. Must be a valid, absolute URI.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see
-    /// cref="McpClientTool"/> objects representing the available client tools. The collection will be empty if no tools are found.</returns>
-    Task<IEnumerable<McpClientTool>> GetAllMcpToolsAsync(string mcpServerUrl);
+    /// cref="McpServerToolsDomain"/> objects representing the available client tools. The collection will be empty if no tools are found.</returns>
+    Task<IEnumerable<McpServerToolsDomain>> GetAllMcpToolsAsync(string mcpServerUrl);
 
     /// <summary>
     /// Gets the MCP tool response asynchronous.

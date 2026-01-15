@@ -41,6 +41,7 @@ public class DomainMapperProfile : Profile
         CreateMap<AIAgentResponseDomain, AIAgentResponseDTO>();
         CreateMap<ChatHistoryDomain, ChatHistoryDTO>();
         CreateMap<ConversationHistoryDomain, ConversationHistoryDTO>();
+        CreateMap<McpServerToolsDomain, McpServerToolsDTO>();
 
         CreateMap<AgentDataDomain, AgentDataDTO>().ReverseMap()
             .ForMember(dest => dest.AgentId, opt => opt.MapFrom(src => src.AgentId));

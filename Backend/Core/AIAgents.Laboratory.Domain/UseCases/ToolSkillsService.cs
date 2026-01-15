@@ -15,8 +15,10 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// </summary>
 /// <param name="logger">The logger service.</param>
 /// <param name="mongoDatabaseService">The mongo database service.</param>
+/// <param name="configuration">The configuration service.</param>
+/// <param name="mcpClientServices">The MCP client services.</param>
 /// <seealso cref="IToolSkillsService"/>
-public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService) : IToolSkillsService
+public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, IMcpClientServices mcpClientServices) : IToolSkillsService
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -88,6 +90,30 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
         finally
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentUserEmail, toolSkillId }));
+        }
+    }
+
+    /// <summary>
+    /// Gets all MCP tools available asynchronously.
+    /// </summary>
+    /// <param name="serverUrl">The MCP server url.</param>
+    /// <param name="currentUserEmail">The current user email.</param>
+    /// <returns>The list of <see cref="McpServerToolsDomain"/></returns>
+    public async Task<IEnumerable<McpServerToolsDomain>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail)
+    {
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { serverUrl, currentUserEmail }));
+            return await mcpClientServices.GetAllMcpToolsAsync(serverUrl).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow, ex.Message);
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { serverUrl, currentUserEmail }));
         }
     }
 

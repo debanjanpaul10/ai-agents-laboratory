@@ -2,7 +2,7 @@ using System.Text.Json;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.SemanticKernel.Adapters.Contracts;
+using AIAgents.Laboratory.Domain.DrivingPorts;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;

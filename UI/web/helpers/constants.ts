@@ -58,6 +58,7 @@ export const DashboardConstants = {
 		SaveAgentDataLoader: "Saving agent data",
 		CheckingAuthentication: "Checking authentication",
 		CreateNewSkill: "Saving Skill details",
+		McpToolsListLoading: "Getting the available MCP tools",
 	},
 };
 

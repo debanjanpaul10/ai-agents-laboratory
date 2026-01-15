@@ -371,6 +371,17 @@ internal static class SwaggerConstants
             internal const string Description = "Deletes an existing tool data based on the skill id from the marketplace.";
             internal const string OperationId = nameof(DeleteExistingToolSkillBySkillIdAction);
         }
+
+        /// <summary>
+        /// Swagger documentation for GetAllMcpToolsAvailableAsync.
+        /// </summary>
+        internal static class GetAllMcpToolsAvailableAction
+        {
+            internal const string Summary = "Gets all the MCP tools available from the given MCP server url.";
+            internal const string Description = "Gets the list of all the available MCP tools present in given MCP server.";
+            internal const string OperationId = nameof(GetAllMcpToolsAvailableAction);
+        }
+
     }
 
     internal static class WorkspacesController

@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
 import { Button, Input } from "@heroui/react";
-import { Bot, Sparkles, X, Terminal, Globe, Type } from "lucide-react";
+import { Bot, Sparkles, X, Terminal, Globe, Type, Wrench } from "lucide-react";
+import McpToolsListFlyoutComponent from "@components/marketplace/mcp-tools-list";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import {
 	AddNewToolSkillAsync,
+	GetAllMcpToolsAvailableAsync,
 	ToggleAddSkillDrawer,
+	ToggleMcpToolsDrawer,
 } from "@store/tools-skills/actions";
 import { DashboardConstants, MarketplaceConstants } from "@helpers/constants";
 import { useAuth } from "@auth/AuthProvider";
 import { ToolSkillDTO } from "@models/tool-skill-dto";
 import { FullScreenLoading } from "@components/common/spinner";
+import { McpServerToolRequestDTO } from "@models/mcp-server-tool-request-dto";
 
 export default function CreateSkillComponent() {
 	const dispatch = useAppDispatch();
@@ -35,6 +39,14 @@ export default function CreateSkillComponent() {
 
 	const IsCreateSkillLoading = useAppSelector(
 		(state) => state.ToolSkillsReducer.isCreateSkillLoading
+	);
+
+	const IsMcpToolsFlyoutOpen = useAppSelector(
+		(state) => state.ToolSkillsReducer.isMcpToolsDrawerOpen
+	);
+
+	const IsMcpToolsLoading = useAppSelector(
+		(state) => state.ToolSkillsReducer.isMcpToolsLoading
 	);
 
 	useEffect(() => {
@@ -90,6 +102,15 @@ export default function CreateSkillComponent() {
 		});
 	};
 
+	async function GetAllMcpToolsAvailable(mcpServerUrl: string) {
+		const token = await authContext.getAccessToken();
+		var mcpServerRequest: McpServerToolRequestDTO = {
+			serverUrl: mcpServerUrl,
+		};
+		token &&
+			dispatch(GetAllMcpToolsAvailableAsync(mcpServerRequest, token));
+	}
+
 	const isFormValid =
 		formData.toolSkillDisplayName.trim() !== "" &&
 		formData.toolSkillTechnicalName.trim() !== "";
@@ -99,10 +120,14 @@ export default function CreateSkillComponent() {
 		formData.toolSkillTechnicalName.trim() !== "" ||
 		formData.toolSkillMcpServerUrl.trim() !== "";
 
-	return IsCreateSkillLoading ? (
+	return IsCreateSkillLoading || IsMcpToolsLoading ? (
 		<FullScreenLoading
-			isLoading={IsCreateSkillLoading}
-			message={DashboardConstants.LoadingConstants.CreateNewSkill}
+			isLoading={IsCreateSkillLoading || IsMcpToolsLoading}
+			message={
+				IsCreateSkillLoading
+					? DashboardConstants.LoadingConstants.CreateNewSkill
+					: DashboardConstants.LoadingConstants.McpToolsListLoading
+			}
 		/>
 	) : (
 		isDrawerOpen && (
@@ -226,32 +251,55 @@ export default function CreateSkillComponent() {
 											<label className="text-white/80 font-semibold text-sm ml-1">
 												MCP Server URL
 											</label>
-											<Input
-												placeholder={
-													MarketplaceConstants
-														.AddSkillConstants
-														.Placeholders.McpUrl
-												}
-												variant="bordered"
-												size="lg"
-												value={
-													formData.toolSkillMcpServerUrl
-												}
-												onValueChange={(v) =>
-													handleInputChange(
-														"toolSkillMcpServerUrl",
-														v
-													)
-												}
-												startContent={
-													<Globe className="w-5 h-5 text-cyan-400 mr-3" />
-												}
-												classNames={{
-													input: "text-white placeholder:text-white/20 p-3",
-													inputWrapper:
-														"bg-white/5 border-white/10 hover:border-cyan-500/30 focus-within:!border-cyan-500/50 transition-all min-h-[56px] rounded-2xl",
-												}}
-											/>
+											<div className="flex gap-3 items-center">
+												<Input
+													placeholder={
+														MarketplaceConstants
+															.AddSkillConstants
+															.Placeholders.McpUrl
+													}
+													variant="bordered"
+													size="lg"
+													value={
+														formData.toolSkillMcpServerUrl
+													}
+													onValueChange={(v) =>
+														handleInputChange(
+															"toolSkillMcpServerUrl",
+															v
+														)
+													}
+													startContent={
+														<Globe className="w-5 h-5 text-cyan-400 mr-3" />
+													}
+													classNames={{
+														input: "text-white placeholder:text-white/20 p-3",
+														inputWrapper:
+															"bg-white/5 border-white/10 hover:border-cyan-500/30 focus-within:!border-cyan-500/50 transition-all min-h-[56px] rounded-2xl",
+													}}
+													className="flex-1"
+												/>
+												<Button
+													isIconOnly
+													className="h-[56px] w-[56px] min-w-[56px] bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-400/10 text-cyan-400 transition-all duration-300 rounded-2xl group/btn disabled:opacity-50 disabled:cursor-not-allowed"
+													onPress={() => {
+														GetAllMcpToolsAvailable(
+															formData.toolSkillMcpServerUrl
+														);
+													}}
+													isLoading={
+														IsMcpToolsLoading
+													}
+													disabled={
+														!formData.toolSkillMcpServerUrl
+													}
+													title="View Available Tools"
+												>
+													{!IsMcpToolsLoading && (
+														<Wrench className="w-5 h-5 group-hover/btn:rotate-45 transition-transform duration-300" />
+													)}
+												</Button>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -316,6 +364,10 @@ export default function CreateSkillComponent() {
 						</div>
 					</div>
 				</div>
+				<McpToolsListFlyoutComponent
+					isOpen={IsMcpToolsFlyoutOpen}
+					onClose={() => dispatch(ToggleMcpToolsDrawer(false))}
+				/>
 			</>
 		)
 	);

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
-using AIAgents.Laboratory.SemanticKernel.Adapters.Contracts;
+using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -21,15 +22,20 @@ public class McpClientServices(IConfiguration configuration, ILogger<McpClientSe
     /// </summary>
     /// <param name="mcpServerUrl">The URL of the MCP server endpoint from which to retrieve the list of client tools. Must be a valid, absolute URI.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see
-    /// cref="McpClientTool"/> objects representing the available client tools. The collection will be empty if no tools are found.</returns>
-    public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAsync(string mcpServerUrl)
+    /// cref="McpServerToolsDomain"/> objects representing the available client tools. The collection will be empty if no tools are found.</returns>
+    public async Task<IEnumerable<McpServerToolsDomain>> GetAllMcpToolsAsync(string mcpServerUrl)
     {
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAsync), DateTime.UtcNow);
 
             var mcpClient = await this.CreateMcpClientAsync(mcpServerUrl).ConfigureAwait(false);
-            return await mcpClient.ListToolsAsync().ConfigureAwait(false);
+            var mcpTools = await mcpClient.ListToolsAsync().ConfigureAwait(false);
+            return mcpTools.Select(tool => new McpServerToolsDomain
+            {
+                ToolName = tool.Name,
+                ToolDescription = tool.Description
+            });
         }
         catch (Exception ex)
         {

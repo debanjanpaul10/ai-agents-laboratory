@@ -4,6 +4,7 @@ import { AgentDataDTO } from "@models/agent-data-dto";
 import { ChatRequestDTO } from "@models/chat-request-dto";
 import { CreateAgentDTO } from "@models/create-agent-dto";
 import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
+import { McpServerToolRequestDTO } from "@models/mcp-server-tool-request-dto";
 import { NewFeatureRequestDTO } from "@models/new-feature-request-dto";
 import { ToolSkillDTO } from "@models/tool-skill-dto";
 
@@ -111,6 +112,10 @@ export async function SubmitFeatureRequestDataApiAsync(
 	);
 }
 
+export async function GetTopActiveAgentsDataApiAsync(accessToken: string) {
+	return await GetAsync("aiagentslab/topactiveagents", accessToken);
+}
+
 // #endregion
 
 // #region MARKETPLACE
@@ -159,8 +164,15 @@ export async function DeleteExistingToolSkillBySkillIdApiAsync(
 	);
 }
 
-export async function GetTopActiveAgentsDataApiAsync(accessToken: string) {
-	return await GetAsync("aiagentslab/topactiveagents", accessToken);
+export async function GetAllMcpToolsAvailableApiAsync(
+	mcpServerTool: McpServerToolRequestDTO,
+	accessToken: string
+) {
+	return await PostAsync(
+		"toolskills/getallmcptoolsavailable",
+		mcpServerTool,
+		accessToken
+	);
 }
 
 // #endregion

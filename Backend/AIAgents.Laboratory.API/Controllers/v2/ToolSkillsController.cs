@@ -1,5 +1,6 @@
 using System.Net.Mime;
 using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -129,6 +130,31 @@ public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToo
         {
             var result = await toolSkillsHandler.DeleteExistingToolSkillBySkillIdAsync(toolSkillId, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
+    }
+
+    /// <summary>
+    /// Gets all the MCP tools available from the given MCP server url.
+    /// </summary>
+    /// <param name="mcpServerUrl">The provided MCP server url.</param>
+    /// <returns>The list of <see cref="McpServerToolsDTO"/></returns>
+    [HttpPost(ToolSkillsRoutes.GetAllMcpToolsAvailable_Route)]
+    [ProducesResponseType(typeof(IEnumerable<McpServerToolsDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = GetAllMcpToolsAvailableAction.Summary, Description = GetAllMcpToolsAvailableAction.Description, OperationId = GetAllMcpToolsAvailableAction.OperationId)]
+    public async Task<ResponseDTO> GetAllMcpToolsAvailableAsync(McpServerToolRequestDTO mcpServerToolRequest)
+    {
+        ArgumentNullException.ThrowIfNull(mcpServerToolRequest);
+        ArgumentException.ThrowIfNullOrWhiteSpace(mcpServerToolRequest.ServerUrl);
+        if (IsRequestAuthorized())
+        {
+            var result = await toolSkillsHandler.GetAllMcpToolsAvailableAsync(mcpServerToolRequest.ServerUrl, base.UserEmail).ConfigureAwait(false);
+            if (result is not null) return HandleSuccessRequestResponse(result);
             else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
 
