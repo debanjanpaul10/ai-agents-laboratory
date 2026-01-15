@@ -15,7 +15,10 @@ import { MarketplaceConstants } from "@helpers/constants";
 import MainLayout from "@components/common/main-layout";
 import SkillsListComponent from "@components/marketplace/skills-list";
 import CreateSkillComponent from "@components/marketplace/create-skill";
+import EditSkillFlyoutComponent from "@components/marketplace/edit-skill";
+import McpToolsListFlyoutComponent from "@components/marketplace/mcp-tools-list";
 import { ToolSkillDTO } from "@models/tool-skill-dto";
+import { ToggleMcpToolsDrawer } from "@store/tools-skills/actions";
 
 export default function MarketplaceComponent() {
 	const dispatch = useAppDispatch();
@@ -56,6 +59,10 @@ export default function MarketplaceComponent() {
 
 	const IsAddSkillDrawerOpenStoreData = useAppSelector(
 		(state) => state.ToolSkillsReducer.isAddSkillDrawerOpen
+	);
+
+	const IsMcpToolsFlyoutOpen = useAppSelector(
+		(state) => state.ToolSkillsReducer.isMcpToolsDrawerOpen
 	);
 
 	useEffect(() => {
@@ -151,7 +158,37 @@ export default function MarketplaceComponent() {
 						}
 					/>
 					<CreateSkillComponent />
+					<McpToolsListFlyoutComponent
+						isOpen={IsMcpToolsFlyoutOpen}
+						onClose={() => dispatch(ToggleMcpToolsDrawer(false))}
+					/>
 				</div>
+
+				{/* Backdrop Overlay */}
+				{isAnyDrawerOpen && (
+					<div
+						className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300"
+						onClick={() => {}}
+					/>
+				)}
+
+				{/* Edit Skill Drawer */}
+				{isEditDrawerOpen && (
+					<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/3 w-full">
+						<div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
+							<EditSkillFlyoutComponent
+								editFormData={editFormData}
+								selectedSkill={selectedSkill}
+								setEditFormData={setEditFormData}
+								setSelectedSkill={setSelectedSkill}
+								isEditDrawerOpen={isEditDrawerOpen}
+								onEditClose={() => setIsEditDrawerOpen(false)}
+								isDisabled={false}
+							/>
+						</div>
+					</div>
+				)}
 			</MainLayout>
 		);
 	};

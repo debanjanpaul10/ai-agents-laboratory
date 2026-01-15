@@ -33,9 +33,14 @@ public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToo
     [SwaggerOperation(Summary = GetAllToolSkillsAction.Summary, Description = GetAllToolSkillsAction.Description, OperationId = GetAllToolSkillsAction.OperationId)]
     public async Task<ResponseDTO> GetAllToolSkillsAsync()
     {
-        var result = await toolSkillsHandler.GetAllToolSkillsAsync(base.UserEmail).ConfigureAwait(false);
-        if (result is not null) return HandleSuccessRequestResponse(result);
-        else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await toolSkillsHandler.GetAllToolSkillsAsync(base.UserEmail).ConfigureAwait(false);
+            if (result is not null) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
     }
 
     /// <summary>
@@ -139,7 +144,7 @@ public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToo
     /// <summary>
     /// Gets all the MCP tools available from the given MCP server url.
     /// </summary>
-    /// <param name="mcpServerUrl">The provided MCP server url.</param>
+    /// <param name="mcpServerToolRequest">The provided MCP server tools data request model DTO.</param>
     /// <returns>The list of <see cref="McpServerToolsDTO"/></returns>
     [HttpPost(ToolSkillsRoutes.GetAllMcpToolsAvailable_Route)]
     [ProducesResponseType(typeof(IEnumerable<McpServerToolsDTO>), StatusCodes.Status200OK)]

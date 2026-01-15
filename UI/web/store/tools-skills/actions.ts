@@ -18,6 +18,8 @@ import {
 	GetAllMcpToolsAvailableApiAsync,
 	GetAllToolSkillsApiAsync,
 	GetToolSkillBySkillIdApiAsync,
+	UpdateExistingToolSkillDataApiAsync,
+	DeleteExistingToolSkillBySkillIdApiAsync,
 } from "@shared/api-service";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 import { ToolSkillDTO } from "@models/tool-skill-dto";
@@ -154,6 +156,7 @@ export function GetAllMcpToolsAvailableAsync(
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleMcpToolsLoader(true));
+			dispatch(ToggleMcpToolsDrawer(true));
 			const response = await GetAllMcpToolsAvailableApiAsync(
 				mcpServerTool,
 				accessToken
@@ -163,13 +166,59 @@ export function GetAllMcpToolsAvailableAsync(
 					type: GET_ALL_MCP_SERVER_TOOLS,
 					payload: response.responseData,
 				});
-				dispatch(ToggleMcpToolsDrawer(true));
 			}
 		} catch (error: any) {
 			console.error(error);
 			if (error.message) ShowErrorToaster(error.message);
 		} finally {
 			dispatch(ToggleMcpToolsLoader(false));
+		}
+	};
+}
+export function UpdateExistingToolSkillAsync(
+	updateToolSkill: ToolSkillDTO | FormData,
+	accessToken: string
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleEditSkillLoader(true));
+			const response = await UpdateExistingToolSkillDataApiAsync(
+				updateToolSkill,
+				accessToken
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch(GetAllToolSkillsAsync(accessToken) as any);
+				ShowSuccessToaster("Skill updated successfully");
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleEditSkillLoader(false));
+		}
+	};
+}
+
+export function DeleteExistingToolSkillAsync(
+	skillId: string,
+	accessToken: string
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleToolSkillsLoader(true));
+			const response = await DeleteExistingToolSkillBySkillIdApiAsync(
+				skillId,
+				accessToken
+			);
+			if (response?.isSuccess) {
+				dispatch(GetAllToolSkillsAsync(accessToken) as any);
+				ShowSuccessToaster("Skill deleted successfully");
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleToolSkillsLoader(false));
 		}
 	};
 }

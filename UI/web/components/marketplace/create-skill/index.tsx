@@ -120,14 +120,10 @@ export default function CreateSkillComponent() {
 		formData.toolSkillTechnicalName.trim() !== "" ||
 		formData.toolSkillMcpServerUrl.trim() !== "";
 
-	return IsCreateSkillLoading || IsMcpToolsLoading ? (
+	return IsCreateSkillLoading ? (
 		<FullScreenLoading
-			isLoading={IsCreateSkillLoading || IsMcpToolsLoading}
-			message={
-				IsCreateSkillLoading
-					? DashboardConstants.LoadingConstants.CreateNewSkill
-					: DashboardConstants.LoadingConstants.McpToolsListLoading
-			}
+			isLoading={IsCreateSkillLoading}
+			message={DashboardConstants.LoadingConstants.CreateNewSkill}
 		/>
 	) : (
 		isDrawerOpen && (
@@ -364,10 +360,6 @@ export default function CreateSkillComponent() {
 						</div>
 					</div>
 				</div>
-				<McpToolsListFlyoutComponent
-					isOpen={IsMcpToolsFlyoutOpen}
-					onClose={() => dispatch(ToggleMcpToolsDrawer(false))}
-				/>
 			</>
 		)
 	);

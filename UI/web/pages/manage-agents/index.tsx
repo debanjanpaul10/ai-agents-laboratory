@@ -311,7 +311,7 @@ export default function ManageAgentsPage() {
 
 				{/* Test Agent Drawer - Secondary (z-60) */}
 				{isTestDrawerOpen && (
-					<div className="fixed top-0 right-0 md:right-1/3 md:w-2/3 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+					<div className="fixed top-0 right-0 md:right-[33.333333%] md:w-[66.666667%] w-full h-screen z-[60] transition-all duration-500 ease-in-out">
 						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 							<TestAgentComponent
@@ -325,7 +325,7 @@ export default function ManageAgentsPage() {
 
 				{/* Knowledge Base Flyout - Secondary (z-60) */}
 				{isKnowledgeBaseFlyoutOpen && (
-					<div className="fixed top-0 right-0 md:right-1/3 md:w-1/3 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+					<div className="fixed top-0 right-0 md:right-[33.333333%] md:w-[33.333333%] w-full h-screen z-[60] transition-all duration-500 ease-in-out">
 						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 							<FileUploadFlyoutComponent
@@ -356,7 +356,7 @@ export default function ManageAgentsPage() {
 
 				{/* Vision Flyout - Secondary (z-60) */}
 				{isVisionFlyoutOpen && (
-					<div className="fixed top-0 right-0 md:right-1/3 md:w-1/3 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+					<div className="fixed top-0 right-0 md:right-[33.333333%] md:w-[33.333333%] w-full h-screen z-[60] transition-all duration-500 ease-in-out">
 						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 							<FileUploadFlyoutComponent

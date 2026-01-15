@@ -1,7 +1,7 @@
 import { McpServerToolsDTO } from "@models/mcp-server-tools-dto";
 import { useAppSelector } from "@store/index";
 import { useEffect, useState } from "react";
-import { X, Wrench, Info, Zap } from "lucide-react";
+import { X, Wrench, Info, Zap, ArrowRight } from "lucide-react";
 
 export default function McpToolsListFlyoutComponent({
 	isOpen,
@@ -23,9 +23,7 @@ export default function McpToolsListFlyoutComponent({
 	);
 
 	useEffect(() => {
-		if (
-			Array.isArray(McpServerToolsStoreData)
-		) {
+		if (Array.isArray(McpServerToolsStoreData)) {
 			setMcpServerTools(McpServerToolsStoreData);
 		}
 	}, [McpServerToolsStoreData]);
@@ -34,7 +32,7 @@ export default function McpToolsListFlyoutComponent({
 
 	return (
 		<>
-			<div className="fixed top-0 right-0 md:right-1/3 md:w-2/3 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+			<div className="fixed top-0 right-0 md:right-[33.333333%] md:w-[66.666667%] w-full h-screen z-[60] transition-all duration-500 ease-in-out">
 				<div className="absolute inset-0 bg-gradient-to-l from-indigo-600/20 via-blue-600/20 to-transparent blur-sm opacity-50 -z-10"></div>
 				<div className="relative h-full bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl flex flex-col">
 					{/* Header */}
@@ -56,7 +54,7 @@ export default function McpToolsListFlyoutComponent({
 							onClick={onClose}
 							className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 text-white/50 hover:text-white"
 						>
-							<X className="w-4 h-4" />
+							<ArrowRight className="w-4 h-4" />
 						</button>
 					</div>
 
@@ -65,7 +63,10 @@ export default function McpToolsListFlyoutComponent({
 						{IsLoading ? (
 							<div className="space-y-4">
 								{[1, 2, 3].map((i) => (
-									<div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-4 animate-pulse">
+									<div
+										key={i}
+										className="bg-white/5 border border-white/10 rounded-2xl p-4 animate-pulse"
+									>
 										<div className="flex items-start space-x-3">
 											<div className="bg-white/10 w-9 h-9 rounded-lg" />
 											<div className="flex-1 space-y-2">
@@ -91,7 +92,8 @@ export default function McpToolsListFlyoutComponent({
 												{tool.toolName}
 											</h4>
 											<p className="text-white/50 text-xs mt-1 leading-relaxed line-clamp-3">
-												{tool.toolDescription || "No description provided."}
+												{tool.toolDescription ||
+													"No description provided."}
 											</p>
 										</div>
 									</div>
@@ -102,7 +104,9 @@ export default function McpToolsListFlyoutComponent({
 								<div className="p-4 bg-white/5 rounded-full">
 									<Info className="w-8 h-8 text-white/20" />
 								</div>
-								<p className="text-white/40 text-sm font-medium">No tools found</p>
+								<p className="text-white/40 text-sm font-medium">
+									No tools found
+								</p>
 							</div>
 						)}
 					</div>

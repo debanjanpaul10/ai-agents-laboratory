@@ -66,6 +66,8 @@ export const MarketplaceConstants = {
 	LoadingConstants: {
 		MainLoader: "Loading AI Agents Marketplace",
 		LoginRedirectLoader: "Redirecting to Login",
+		UpdateSkill: "Updating Skill details",
+		McpToolsListLoading: "Getting the available MCP tools",
 	},
 	ComingSoonConstants: {
 		Header: "Skills Marketplace Coming Soon",

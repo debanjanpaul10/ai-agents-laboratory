@@ -144,7 +144,26 @@ export interface FileUploadFlyoutProps {
 	};
 }
 
+export interface EditSkillFlyoutComponentProps {
+	editFormData: ToolSkillDTO;
+	selectedSkill: ToolSkillDTO | null;
+	setEditFormData: React.Dispatch<React.SetStateAction<ToolSkillDTO>>;
+	setSelectedSkill: React.Dispatch<React.SetStateAction<ToolSkillDTO | null>>;
+	isEditDrawerOpen: boolean;
+	onEditClose: () => void;
+	isDisabled: boolean;
+}
+
 export interface MainLayoutProps {
 	children: ReactNode;
 	title?: string;
+}
+
+export interface DeletePopupProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onDelete: () => void;
+	title: string;
+	description: string;
+	isLoading?: boolean;
 }
