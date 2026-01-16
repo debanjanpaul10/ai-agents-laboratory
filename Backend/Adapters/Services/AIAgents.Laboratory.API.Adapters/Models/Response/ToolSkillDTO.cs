@@ -28,7 +28,7 @@ public sealed record ToolSkillDTO
     /// <summary>
     /// The list of associated agents containing the agent guid and the agent name.
     /// </summary>
-    public Dictionary<string, string> AssociatedAgents { get; set; } = [];
+    public IList<AssociatedAgentsSkillDataDTO> AssociatedAgents { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the date created.
@@ -61,4 +61,5 @@ public sealed record ToolSkillDTO
     /// The modified by.
     /// </value>
     public string ModifiedBy { get; set; } = string.Empty;
+
 }

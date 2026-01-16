@@ -11,12 +11,16 @@ import {
 	Type,
 	Wrench,
 	X,
+	Bot,
+	ChevronRight,
+	Users,
 } from "lucide-react";
 
 import { useAuth } from "@auth/AuthProvider";
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { EditSkillFlyoutComponentProps } from "@shared/types";
-import { ToolSkillDTO } from "@models/tool-skill-dto";
+import { ToolSkillDTO } from "@models/response/tool-skill-dto";
+import { AssociatedAgentsSkillDataDTO } from "@models/response/associated-agents-skill-data.dto";
 import {
 	DeleteExistingToolSkillAsync,
 	GetAllMcpToolsAvailableAsync,
@@ -24,7 +28,7 @@ import {
 } from "@store/tools-skills/actions";
 import { FullScreenLoading } from "@components/common/spinner";
 import { MarketplaceConstants } from "@helpers/constants";
-import { McpServerToolRequestDTO } from "@models/mcp-server-tool-request-dto";
+import { McpServerToolRequestDTO } from "@models/request/mcp-server-tool-request-dto";
 import DeletePopupComponent from "@components/common/delete-popup";
 
 export default function EditSkillFlyoutComponent({
@@ -126,6 +130,49 @@ export default function EditSkillFlyoutComponent({
 						</span>
 					</div>
 				</div>
+			</div>
+		);
+	};
+
+	const renderAssociatedAgents = (agents: AssociatedAgentsSkillDataDTO[]) => {
+		return (
+			<div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+				<h3 className="text-white/80 font-bold mb-4 flex items-center space-x-2">
+					<Users className="w-4 h-4 text-purple-400" />
+					<span className="text-xs uppercase tracking-wider">
+						Associated Agents
+					</span>
+				</h3>
+				{!agents || agents.length === 0 ? (
+					<div className="py-4 text-center">
+						<p className="text-white/30 text-xs italic">
+							No agents currently using this skill
+						</p>
+					</div>
+				) : (
+					<div className="space-y-2">
+						{agents.map((agent) => (
+							<div
+								key={agent.agentGuid}
+								className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-indigo-500/30 transition-all duration-300 group"
+							>
+								<div className="flex items-center space-x-3">
+									<div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 group-hover:bg-indigo-500/20 transition-colors">
+										<Bot className="w-4 h-4 text-indigo-400" />
+									</div>
+									<div className="flex flex-col">
+										<span className="text-white/80 text-sm font-medium group-hover:text-white transition-colors">
+											{agent.agentName}
+										</span>
+										<span className="text-white/20 text-[10px] font-mono">
+											{agent.agentGuid}
+										</span>
+									</div>
+								</div>
+							</div>
+						))}
+					</div>
+				)}
 			</div>
 		);
 	};
@@ -333,6 +380,9 @@ export default function EditSkillFlyoutComponent({
 
 						{/* Tool Information */}
 						{renderSkillInformationTile(selectedSkill)}
+
+						{/* Associated Agents */}
+						{renderAssociatedAgents(selectedSkill.associatedAgents)}
 					</div>
 
 					{/* Footer */}

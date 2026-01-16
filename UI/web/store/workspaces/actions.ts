@@ -1,5 +1,8 @@
 import { Action, Dispatch } from "redux";
-import { GET_ALL_WORKSPACES, TOGGLE_WORKSPACES_LOADER } from "./actionTypes";
+import {
+	GET_ALL_WORKSPACES,
+	TOGGLE_WORKSPACES_LOADER,
+} from "@store/workspaces/actionTypes";
 import { ShowErrorToaster } from "@shared/toaster";
 import { GetAllWorkspacesDataApiAsync } from "@shared/api-service";
 

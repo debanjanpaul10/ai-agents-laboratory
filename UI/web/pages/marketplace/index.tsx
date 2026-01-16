@@ -11,13 +11,13 @@ import {
 } from "@store/tools-skills/actions";
 import { GetAllConfigurations } from "@store/common/actions";
 import { FullScreenLoading } from "@components/common/spinner";
-import { MarketplaceConstants } from "@helpers/constants";
+import { DashboardConstants, MarketplaceConstants } from "@helpers/constants";
 import MainLayout from "@components/common/main-layout";
 import SkillsListComponent from "@components/marketplace/skills-list";
 import CreateSkillComponent from "@components/marketplace/create-skill";
 import EditSkillFlyoutComponent from "@components/marketplace/edit-skill";
 import McpToolsListFlyoutComponent from "@components/marketplace/mcp-tools-list";
-import { ToolSkillDTO } from "@models/tool-skill-dto";
+import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 import { ToggleMcpToolsDrawer } from "@store/tools-skills/actions";
 
 export default function MarketplaceComponent() {
@@ -28,7 +28,7 @@ export default function MarketplaceComponent() {
 		null
 	);
 	const [editFormData, setEditFormData] = useState<ToolSkillDTO>({
-		associatedAgents: {},
+		associatedAgents: [],
 		createdBy: "",
 		dateCreated: new Date(),
 		dateModified: new Date(),
@@ -163,7 +163,7 @@ export default function MarketplaceComponent() {
 
 				{/* Edit Skill Drawer */}
 				{isEditDrawerOpen && (
-					<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/3 w-full">
+					<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/2 w-full">
 						<div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 							<EditSkillFlyoutComponent
@@ -192,7 +192,7 @@ export default function MarketplaceComponent() {
 	) : IsSkillsMarketPlaceLoading ? (
 		<FullScreenLoading
 			isLoading={IsSkillsMarketPlaceLoading}
-			message={MarketplaceConstants.LoadingConstants.MainLoader}
+			message={DashboardConstants.LoadingConstants.MainLoader}
 		/>
 	) : (
 		renderAuthorizedMarketplace()

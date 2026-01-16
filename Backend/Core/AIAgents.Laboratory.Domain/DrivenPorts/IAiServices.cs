@@ -35,5 +35,5 @@ public interface IAiServices
     /// <param name="pluginName">Name of the plugin.</param>
     /// <param name="functionName">Name of the function.</param>
     /// <returns>The AI response.</returns>
-    Task<string> GetAiFunctionResponseWithMcpIntegrationAsync<TInput>(TInput input, string mcpServerUrl, string pluginName, string functionName);
+    Task<string> GetAiFunctionResponseAsync<TInput>(TInput input, string mcpServerUrl, string pluginName, string functionName);
 }

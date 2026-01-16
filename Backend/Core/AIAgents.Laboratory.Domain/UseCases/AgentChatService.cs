@@ -20,8 +20,10 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="agentsService">The service used to retrieve agent data and metadata required for chat interactions.</param>
 /// <param name="knowledgeBaseProcessor">The processor used to extract relevant knowledge base information to enhance agent responses.</param>
 /// <param name="aiServices">The AI services used to generate responses based on chat context and agent configuration.</param>
+/// <param name="toolSkillsService">The tool skills service used to manage and invoke external tools or skills associated with agents.</param>
 /// <seealso cref="IAgentChatService"/>
-public class AgentChatService(IConfiguration configuration, ILogger<AgentChatService> logger, IAgentsService agentsService, IKnowledgeBaseProcessor knowledgeBaseProcessor, IAiServices aiServices) : IAgentChatService
+public class AgentChatService(IConfiguration configuration, ILogger<AgentChatService> logger, IAgentsService agentsService,
+    IKnowledgeBaseProcessor knowledgeBaseProcessor, IAiServices aiServices, IToolSkillsService toolSkillsService) : IAgentChatService
 {
     /// <summary>
     /// The feature flag for knowledge base service.
@@ -64,27 +66,23 @@ public class AgentChatService(IConfiguration configuration, ILogger<AgentChatSer
 
             // Get data from Knowledge Base if configured
             if (IsKnowledgeBaseServiceAllowed && (agentData.KnowledgeBaseDocument is not null || agentData.StoredKnowledgeBase is not null))
-            {
-                var relevantKnowledge = await knowledgeBaseProcessor.GetRelevantKnowledgeAsync(chatRequest.UserMessage, agentData.AgentId).ConfigureAwait(false);
-                chatMessage.KnowledgeBase = relevantKnowledge;
-            }
+                chatMessage.KnowledgeBase = await knowledgeBaseProcessor.GetRelevantKnowledgeAsync(chatRequest.UserMessage, agentData.AgentId).ConfigureAwait(false);
 
             // Use AI Vision services if configured
             if (IsAiVisionServiceAllowed && agentData.AiVisionImagesData is not null && agentData.AiVisionImagesData.Any())
                 chatMessage.ImageKeyWords = agentData.AiVisionImagesData;
 
-            // Enable MCP server integration if configured
-            if (!string.IsNullOrEmpty(agentData.McpServerUrl))
-                return await aiServices.GetAiFunctionResponseWithMcpIntegrationAsync(
-                    input: chatMessage,
-                    mcpServerUrl: agentData.McpServerUrl,
-                    pluginName: ApplicationPluginsHelpers.PluginName,
-                    functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+            // Handle integrated skills if configured
+            if (agentData.AssociatedSkillGuids is not null && agentData.AssociatedSkillGuids.Count > 0)
+                return await this.GetResponseWithIntegratedSkillAsync(
+                    chatMessage,
+                    associatedSkillGuids: agentData.AssociatedSkillGuids).ConfigureAwait(false);
             else
                 return await aiServices.GetAiFunctionResponseAsync(
                     input: chatMessage,
                     pluginName: ApplicationPluginsHelpers.PluginName,
                     functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+
         }
         catch (Exception ex)
         {
@@ -94,6 +92,40 @@ public class AgentChatService(IConfiguration configuration, ILogger<AgentChatSer
         finally
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, chatRequest.AgentId));
+        }
+    }
+
+    /// <summary>
+    /// Gets the response with integrated skill asynchronous.
+    /// </summary>
+    /// <param name="chatMessage">The chat message request domain model.</param>
+    /// <param name="associatedSkillGuids">The associated skill guids list</param>
+    /// <returns>The AI agent response string.</returns>
+    private async Task<string> GetResponseWithIntegratedSkillAsync(ChatMessageDomain chatMessage, IList<string> associatedSkillGuids)
+    {
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, chatMessage.AgentName);
+
+            var associatedSkill = await toolSkillsService.GetToolSkillBySkillIdAsync(associatedSkillGuids.First(), string.Empty).ConfigureAwait(false);
+            ArgumentNullException.ThrowIfNull(associatedSkill);
+            ArgumentException.ThrowIfNullOrWhiteSpace(associatedSkill.ToolSkillMcpServerUrl);
+
+            return await aiServices.GetAiFunctionResponseAsync(
+                input: chatMessage,
+                mcpServerUrl: associatedSkill.ToolSkillMcpServerUrl,
+                pluginName: ApplicationPluginsHelpers.PluginName,
+                functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, ex.Message);
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, chatMessage.AgentName);
         }
     }
 }

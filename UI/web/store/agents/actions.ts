@@ -17,8 +17,8 @@ import {
 	GetAgentsApiAsync,
 	UpdateExistingAgentApiAsync,
 } from "@shared/api-service";
-import { CreateAgentDTO } from "@models/create-agent-dto";
-import { AgentDataDTO } from "@models/agent-data-dto";
+import { CreateAgentDTO } from "@models/request/create-agent-dto";
+import { AgentDataDTO } from "@models/response/agent-data-dto";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 import { ToggleMainLoader } from "@store/common/actions";
 

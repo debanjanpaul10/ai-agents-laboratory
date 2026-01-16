@@ -103,7 +103,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
         ArgumentNullException.ThrowIfNull(updateAgentData);
         if (IsRequestAuthorized())
         {
-            var result = await agentsHandler.UpdateExistingAgentDataAsync(updateAgentData).ConfigureAwait(false);
+            var result = await agentsHandler.UpdateExistingAgentDataAsync(updateAgentData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
             else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }

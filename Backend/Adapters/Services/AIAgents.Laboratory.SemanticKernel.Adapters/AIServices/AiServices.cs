@@ -3,6 +3,7 @@ using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -70,11 +71,11 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel, IMcpClientSer
     /// <param name="pluginName">Name of the plugin.</param>
     /// <param name="functionName">Name of the function.</param>
     /// <returns>The AI response.</returns>
-    public async Task<string> GetAiFunctionResponseWithMcpIntegrationAsync<TInput>(TInput input, string mcpServerUrl, string pluginName, string functionName)
+    public async Task<string> GetAiFunctionResponseAsync<TInput>(TInput input, string mcpServerUrl, string pluginName, string functionName)
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseWithMcpIntegrationAsync), DateTime.UtcNow);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow);
 
             // Step 1: Get available MCP tools
             var availableMcpTools = await mcpClientServices.GetAllMcpToolsAsync(mcpServerUrl).ConfigureAwait(false);
@@ -88,7 +89,7 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel, IMcpClientSer
 
             var responseFromAI = await kernel.InvokeAsync(PluginName, DetermineToolToCallFunction.FunctionName, kernelArguments).ConfigureAwait(false);
             var toolSelectionResultResponse = responseFromAI.GetValue<string>() ?? throw new Exception(ExceptionConstants.ToolsNotFoundExceptionConstant);
-            var toolSelectionResult = JsonSerializer.Deserialize<ToolSelectionResultDomain>(toolSelectionResultResponse, JsonOptions) ?? throw new Exception();
+            var toolSelectionResult = JsonSerializer.Deserialize<ToolSelectionResultDomain>(DomainUtilities.ExtractJsonFromMarkdown(toolSelectionResultResponse), JsonOptions) ?? throw new Exception();
 
             // Step 3: If a tool was selected, call it
             var toolResult = string.Empty;
@@ -107,12 +108,12 @@ public class AiServices(ILogger<AiServices> logger, Kernel kernel, IMcpClientSer
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseWithMcpIntegrationAsync), DateTime.UtcNow, ex.Message);
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, ex.Message);
             throw;
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseWithMcpIntegrationAsync), DateTime.UtcNow);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow);
         }
     }
 

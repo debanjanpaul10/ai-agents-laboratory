@@ -22,8 +22,8 @@ import {
 	DeleteExistingToolSkillBySkillIdApiAsync,
 } from "@shared/api-service";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
-import { ToolSkillDTO } from "@models/tool-skill-dto";
-import { McpServerToolRequestDTO } from "@models/mcp-server-tool-request-dto";
+import { ToolSkillDTO } from "@models/response/tool-skill-dto";
+import { McpServerToolRequestDTO } from "@models/request/mcp-server-tool-request-dto";
 
 export function ToggleToolSkillsLoader(isLoading: boolean): ReduxStoreType {
 	return {
@@ -144,6 +144,7 @@ export function AddNewToolSkillAsync(
 			console.error(error);
 			if (error.message) ShowErrorToaster(error.message);
 		} finally {
+			dispatch(ToggleMcpToolsDrawer(false));
 			dispatch(ToggleCreateSkillLoader(false));
 		}
 	};

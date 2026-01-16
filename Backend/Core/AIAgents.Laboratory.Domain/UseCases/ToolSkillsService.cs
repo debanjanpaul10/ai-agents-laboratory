@@ -4,6 +4,7 @@ using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using ModelContextProtocol.Client;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
@@ -58,6 +59,42 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
     }
 
     /// <summary>
+    /// Associates a skill and an agent asynchronously.
+    /// </summary>
+    /// <param name="agentData">The agent data containing agent name and agent guid.</param>
+    /// <param name="toolSkillId">The tool skill guid id.</param>
+    /// <param name="currentUserEmail">The current user email.</param>
+    /// <returns>A boolean for <c>success/failure.</c></returns>
+    public async Task<bool> AssociateSkillAndAgentAsync(IList<AssociatedAgentsSkillDataDomain> agentDetailsList, string toolSkillId, string currentUserEmail)
+    {
+        ArgumentNullException.ThrowIfNull(agentDetailsList);
+        ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
+
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { toolSkillId, currentUserEmail }));
+
+            var toolData = await this.GetToolSkillBySkillIdAsync(toolSkillId, currentUserEmail).ConfigureAwait(false);
+            if (toolData is null) return false;
+
+            toolData.AssociatedAgents = agentDetailsList;
+            await this.UpdateExistingToolSkillDataAsync(toolData, currentUserEmail).ConfigureAwait(false);
+            return true;
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow, ex.Message);
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { toolSkillId, currentUserEmail }));
+        }
+    }
+
+    /// <summary>
     /// Deletes an existing tool by tool skill id asynchronously.
     /// </summary>
     /// <param name="toolSkillId">The tool skill id to delete.</param>
@@ -65,6 +102,9 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
     /// <returns>A boolean for success/failure.</returns>
     public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
+
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentUserEmail, toolSkillId }));
@@ -98,9 +138,12 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
     /// </summary>
     /// <param name="serverUrl">The MCP server url.</param>
     /// <param name="currentUserEmail">The current user email.</param>
-    /// <returns>The list of <see cref="McpServerToolsDomain"/></returns>
-    public async Task<IEnumerable<McpServerToolsDomain>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail)
+    /// <returns>The list of <see cref="McpClientTool"/></returns>
+    public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(serverUrl);
+        ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
+
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { serverUrl, currentUserEmail }));
@@ -150,6 +193,9 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
     /// <returns>The tool skill domain model.</returns>
     public async Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
+
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentUserEmail, toolSkillId }));

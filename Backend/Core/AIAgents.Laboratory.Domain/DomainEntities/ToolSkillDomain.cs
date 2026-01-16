@@ -41,5 +41,5 @@ public sealed record ToolSkillDomain : BaseEntity
     /// <summary>
     /// The list of associated agents containing the agent guid and the agent name.
     /// </summary>
-    public Dictionary<string, string> AssociatedAgents { get; set; } = [];
+    public IList<AssociatedAgentsSkillDataDomain> AssociatedAgents { get; set; } = [];
 }

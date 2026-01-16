@@ -1,7 +1,8 @@
-import { McpServerToolsDTO } from "@models/mcp-server-tools-dto";
-import { useAppSelector } from "@store/index";
 import { useEffect, useState } from "react";
-import { X, Wrench, Info, Zap, ArrowRight } from "lucide-react";
+import { Wrench, Info, Zap, ArrowRight } from "lucide-react";
+
+import { McpServerToolsDTO } from "@models/response/mcp-server-tools-dto";
+import { useAppSelector } from "@store/index";
 
 export default function McpToolsListFlyoutComponent({
 	isOpen,
@@ -32,7 +33,7 @@ export default function McpToolsListFlyoutComponent({
 
 	return (
 		<>
-			<div className="fixed top-0 right-0 md:right-[33.333333%] md:w-[66.666667%] w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+			<div className="fixed top-0 right-0 md:right-1/2 md:w-1/2 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
 				<div className="absolute inset-0 bg-gradient-to-l from-indigo-600/20 via-blue-600/20 to-transparent blur-sm opacity-50 -z-10"></div>
 				<div className="relative h-full bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl flex flex-col">
 					{/* Header */}

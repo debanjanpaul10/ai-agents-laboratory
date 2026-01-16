@@ -239,3 +239,19 @@ export const AiVisionImagesFlyoutPropsConstants = {
 		Done: "Done",
 	},
 };
+
+export const AssociateSkillsFlyoutPropsConstants = {
+	Headers: {
+		Heading: "Associate Tool Skills",
+		SubHeading: "Select multiple skills to empower your agent",
+	},
+	Hints: {
+		Search: "Search for skills...",
+		Info: "Select the tool skills that your agent should be able to use. Each skill provides specific capabilities like searching the web, analyzing data, or interacting with external services.",
+		NoSkills: "No skills found matching your search.",
+	},
+	Buttons: {
+		Clear: "Clear selection",
+		Done: "Done",
+	},
+};

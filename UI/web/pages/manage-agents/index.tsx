@@ -16,11 +16,12 @@ import {
 	ToggleNewAgentDrawer,
 } from "@store/agents/actions";
 import { GetAllConfigurations } from "@store/common/actions";
-import { AgentDataDTO } from "@models/agent-data-dto";
+import { AgentDataDTO } from "@models/response/agent-data-dto";
 import AgentsListComponent from "@components/manage-agents/agents-list";
 import ModifyAgentComponent from "@components/manage-agents/modify-agent";
 import TestAgentComponent from "@components/manage-agents/test-agent";
 import CreateAgentComponent from "@components/manage-agents/create-agent";
+import AssociateSkillsFlyoutComponent from "@components/manage-agents/associate-skills";
 import FileUploadFlyoutComponent from "@components/common/file-upload-flyout";
 import {
 	AiVisionImagesFlyoutPropsConstants,
@@ -50,9 +51,9 @@ export default function ManageAgentsPage() {
 		dateModified: new Date(),
 		knowledgeBaseDocument: [],
 		isPrivate: false,
-		mcpServerUrl: "",
 		visionImages: null,
 		aiVisionImagesData: [],
+		associatedSkillGuids: [],
 	});
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 	const [isTestDrawerOpen, setIsTestDrawerOpen] = useState(false);
@@ -72,6 +73,7 @@ export default function ManageAgentsPage() {
 	const [removedExistingImages, setRemovedExistingImages] = useState<
 		string[]
 	>([]);
+	const [isSkillsFlyoutOpen, setIsSkillsFlyoutOpen] = useState(false);
 
 	const AgentsListStoreData = useAppSelector(
 		(state) => state.AgentsReducer.agentsListData
@@ -138,9 +140,9 @@ export default function ManageAgentsPage() {
 			dateModified: agent.dateModified,
 			knowledgeBaseDocument: agent.knowledgeBaseDocument || null,
 			isPrivate: agent.isPrivate,
-			mcpServerUrl: agent.mcpServerUrl || "",
 			visionImages: agent.visionImages || null,
 			aiVisionImagesData: agent.aiVisionImagesData || [],
+			associatedSkillGuids: agent.associatedSkillGuids || [],
 		});
 
 		// KB FILES
@@ -173,6 +175,7 @@ export default function ManageAgentsPage() {
 		if (isTestDrawerOpen) {
 			setIsTestDrawerOpen(false);
 		}
+		setIsSkillsFlyoutOpen(false);
 	};
 
 	const toggleKnowledgebaseFlyout = (isOpen: boolean) => {
@@ -189,6 +192,17 @@ export default function ManageAgentsPage() {
 
 	const handleExistingImagesChange = (removedImageNames: string[]) => {
 		setRemovedExistingImages(removedImageNames);
+	};
+
+	const toggleSkillsFlyout = (isOpen: boolean) => {
+		setIsSkillsFlyoutOpen(isOpen);
+	};
+
+	const handleSkillsChange = (skillGuids: string[]) => {
+		setEditFormData((prev) => ({
+			...prev,
+			associatedSkillGuids: skillGuids,
+		}));
 	};
 
 	const getExistingDocuments = () => {
@@ -264,19 +278,14 @@ export default function ManageAgentsPage() {
 
 				{/* Backdrop Overlay */}
 				{isAnyDrawerOpen && (
-					<div
-						className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300"
-						onClick={() => {
-							/* Optional: Close all drawers logic if desired, keeping non-clickable for now as requested user might just want visual block */
-						}}
-					/>
+					<div className="fixed inset-0 bg-black/60 backdrop-blur-md z-40 transition-all duration-300" />
 				)}
 
 				{/* Drawers  */}
 
 				{/* Modify Agent Drawer - Base Drawer (z-50) */}
 				{isEditDrawerOpen && (
-					<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/3 w-full">
+					<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/2 w-full">
 						<div className="absolute inset-0 bg-gradient-to-r from-green-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 							<ModifyAgentComponent
@@ -304,6 +313,9 @@ export default function ManageAgentsPage() {
 								}}
 								selectedVisionImages={selectedVisionImages}
 								removedExistingImages={removedExistingImages}
+								onOpenAssociateSkills={() =>
+									toggleSkillsFlyout(true)
+								}
 							/>
 						</div>
 					</div>
@@ -311,7 +323,7 @@ export default function ManageAgentsPage() {
 
 				{/* Test Agent Drawer - Secondary (z-60) */}
 				{isTestDrawerOpen && (
-					<div className="fixed top-0 right-0 md:right-[33.333333%] md:w-[66.666667%] w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+					<div className="fixed top-0 right-0 md:right-1/2 md:w-1/2 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
 						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 							<TestAgentComponent
@@ -325,7 +337,7 @@ export default function ManageAgentsPage() {
 
 				{/* Knowledge Base Flyout - Secondary (z-60) */}
 				{isKnowledgeBaseFlyoutOpen && (
-					<div className="fixed top-0 right-0 md:right-[33.333333%] md:w-[33.333333%] w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+					<div className="fixed top-0 right-0 md:right-1/2 md:w-1/2 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
 						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 							<FileUploadFlyoutComponent
@@ -356,7 +368,7 @@ export default function ManageAgentsPage() {
 
 				{/* Vision Flyout - Secondary (z-60) */}
 				{isVisionFlyoutOpen && (
-					<div className="fixed top-0 right-0 md:right-[33.333333%] md:w-[33.333333%] w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+					<div className="fixed top-0 right-0 md:right-1/2 md:w-1/2 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
 						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 							<FileUploadFlyoutComponent
@@ -383,6 +395,21 @@ export default function ManageAgentsPage() {
 						</div>
 					</div>
 				)}
+				{isSkillsFlyoutOpen && (
+					<div className="fixed top-0 right-0 md:right-1/2 md:w-1/2 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
+							<AssociateSkillsFlyoutComponent
+								isOpen={isSkillsFlyoutOpen}
+								onClose={() => toggleSkillsFlyout(false)}
+								onSkillsChange={handleSkillsChange}
+								selectedSkillGuids={
+									editFormData.associatedSkillGuids || []
+								}
+							/>
+						</div>
+					</div>
+				)}
 			</MainLayout>
 		);
 	};
@@ -391,7 +418,8 @@ export default function ManageAgentsPage() {
 		isEditDrawerOpen ||
 		isTestDrawerOpen ||
 		isKnowledgeBaseFlyoutOpen ||
-		isVisionFlyoutOpen;
+		isVisionFlyoutOpen ||
+		isSkillsFlyoutOpen;
 
 	return !authContext.isAuthenticated ? (
 		handleUnAuthorizedUser()

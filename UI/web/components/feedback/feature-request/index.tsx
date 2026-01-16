@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, Input } from "@heroui/react";
 import { Lightbulb, FileText, Send, X, Info, PackagePlus } from "lucide-react";
 
-import { NewFeatureRequestDTO } from "@models/new-feature-request-dto";
+import { NewFeatureRequestDTO } from "@models/request/new-feature-request-dto";
 import { ShowErrorToaster } from "@shared/toaster";
 import { useAuth } from "@auth/AuthProvider";
 import { useAppDispatch } from "@store/index";

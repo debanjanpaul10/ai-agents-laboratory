@@ -16,6 +16,7 @@ import {
 	ScanEye,
 	WandSparkles,
 	X,
+	Terminal,
 } from "lucide-react";
 import { useMsal } from "@azure/msal-react";
 
@@ -28,7 +29,7 @@ import {
 } from "@store/agents/actions";
 import { FullScreenLoading } from "@components/common/spinner";
 import { DashboardConstants, ManageAgentConstants } from "@helpers/constants";
-import { AgentDataDTO } from "@models/agent-data-dto";
+import { AgentDataDTO } from "@models/response/agent-data-dto";
 import ExpandMetapromptEditorComponent from "@components/common/expand-metaprompt-editor";
 import DeletePopupComponent from "@components/common/delete-popup";
 
@@ -47,6 +48,7 @@ export default function ModifyAgentComponent({
 	onOpenVisionImagesFlyout,
 	removedExistingImages,
 	selectedVisionImages,
+	onOpenAssociateSkills,
 }: ModifyAgentComponentProps) {
 	const dispatch = useAppDispatch();
 	const authContext = useAuth();
@@ -108,8 +110,11 @@ export default function ModifyAgentComponent({
 			});
 		}
 
-		if (editFormData.mcpServerUrl)
-			form.append("mcpServerUrl", editFormData.mcpServerUrl);
+		if (editFormData.associatedSkillGuids.length > 0) {
+			editFormData.associatedSkillGuids.forEach((guid) => {
+				form.append("associatedSkillGuids", guid);
+			});
+		}
 
 		const accessToken = await authContext.getAccessToken();
 		accessToken &&
@@ -359,6 +364,62 @@ export default function ModifyAgentComponent({
 		);
 	};
 
+	const renderAssociateToolSkillsData = () => {
+		const totalCount = editFormData.associatedSkillGuids?.length || 0;
+
+		return (
+			<div className="space-y-2">
+				<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+					<Terminal className="w-4 h-4 text-cyan-400" />
+					<span>Associate Tool Skills</span>
+				</label>
+				<div className="relative group">
+					<div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-xl blur opacity-50 group-hover:opacity-75 transition duration-300"></div>
+					<button
+						onClick={onOpenAssociateSkills}
+						className="relative w-full bg-white/5 border border-white/10 hover:border-white/20 hover:border-cyan-500/50 rounded-xl p-4 text-left transition-all duration-200 min-h-[48px] flex items-center justify-between"
+					>
+						<div className="flex items-center space-x-3">
+							<Terminal className="w-5 h-5 text-cyan-400" />
+							<div>
+								<span className="text-white font-medium">
+									{totalCount > 0
+										? `${totalCount} skill${
+												totalCount !== 1 ? "s" : ""
+										  } associated`
+										: "Associate skills"}
+								</span>
+								{totalCount > 0 && (
+									<p className="text-white/60 text-sm">
+										Click to manage skills
+									</p>
+								)}
+							</div>
+						</div>
+						<div className="text-white/40">
+							<svg
+								className="w-5 h-5"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M9 5l7 7-7 7"
+								/>
+							</svg>
+						</div>
+					</button>
+				</div>
+				<p className="text-white/40 text-[10px] ml-1 pt-1 italic">
+					{ManageAgentConstants.ModifyAgentConstants.MCPUrl}
+				</p>
+			</div>
+		);
+	};
+
 	return IsEditAgentDataLoading ? (
 		<FullScreenLoading
 			isLoading={true}
@@ -594,43 +655,8 @@ export default function ModifyAgentComponent({
 					{ConfigurationStoreData.IsAiVisionServiceEnabled ===
 						"true" && renderAiVisionImagesData()}
 
-					{/* MCP Server URL */}
-					<div className="space-y-2">
-						<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
-							<Link className="w-4 h-4 text-green-400" />
-							<span>MCP Server URL</span>
-						</label>
-						<div className="relative">
-							<Input
-								value={editFormData.mcpServerUrl}
-								onChange={(e) =>
-									handleInputChange(
-										"mcpServerUrl",
-										e.target.value
-									)
-								}
-								placeholder={
-									ManageAgentConstants.ModifyAgentConstants
-										.Placeholders.McpServerURL
-								}
-								className="relative"
-								radius="full"
-								disabled={
-									isDisabled ||
-									accounts[0].username !==
-										editFormData.createdBy
-								}
-								classNames={{
-									input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 px-4 py-3",
-									inputWrapper:
-										"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-purple-500/50 min-h-[48px]",
-								}}
-							/>
-						</div>
-						<p className="text-white/40 text-xs">
-							{ManageAgentConstants.ModifyAgentConstants.MCPUrl}
-						</p>
-					</div>
+					{/* Associate Tool Skills */}
+					{renderAssociateToolSkillsData()}
 
 					{/* Agent Info Display */}
 					{renderAgentInformationTile(selectedAgent)}

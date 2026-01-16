@@ -1,12 +1,12 @@
 import { GetAsync, PostAsync } from "@helpers/http-utility";
-import { AddBugReportDTO } from "@models/add-bug-report-dto";
-import { AgentDataDTO } from "@models/agent-data-dto";
-import { ChatRequestDTO } from "@models/chat-request-dto";
-import { CreateAgentDTO } from "@models/create-agent-dto";
-import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
-import { McpServerToolRequestDTO } from "@models/mcp-server-tool-request-dto";
-import { NewFeatureRequestDTO } from "@models/new-feature-request-dto";
-import { ToolSkillDTO } from "@models/tool-skill-dto";
+import { AddBugReportDTO } from "@models/request/add-bug-report-dto";
+import { AgentDataDTO } from "@models/response/agent-data-dto";
+import { ChatRequestDTO } from "@models/request/chat-request-dto";
+import { CreateAgentDTO } from "@models/request/create-agent-dto";
+import { DirectChatRequestDTO } from "@models/request/direct-chat-request-dto";
+import { McpServerToolRequestDTO } from "@models/request/mcp-server-tool-request-dto";
+import { NewFeatureRequestDTO } from "@models/request/new-feature-request-dto";
+import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 
 // #region AGENTS
 

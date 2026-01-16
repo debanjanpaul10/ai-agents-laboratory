@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
-import { CreateAgentDTO } from "@models/create-agent-dto";
+import { CreateAgentDTO } from "@models/request/create-agent-dto";
 import {
 	CreateAgentConstants,
 	DashboardConstants,
@@ -37,6 +37,9 @@ export default function CreateAgentFlyoutComponent({
 	selectedAiVisionImages,
 	onOpenAiVisionFlyout,
 	onClearAiVisionImages,
+	selectedSkillGuids,
+	onOpenAssociateSkills,
+	onClearSkillGuids,
 }: CreateAgentFlyoutProps) {
 	const dispatch = useAppDispatch();
 	const authContext = useAuth();
@@ -50,8 +53,8 @@ export default function CreateAgentFlyoutComponent({
 		applicationName: "",
 		knowledgeBaseDocument: null,
 		isPrivate: false,
-		mcpServerUrl: "",
 		visionImages: null,
+		associatedSkillGuids: [],
 	});
 
 	const IsCreateAgentLoading = useAppSelector(
@@ -73,7 +76,14 @@ export default function CreateAgentFlyoutComponent({
 		return () => {
 			document.body.style.overflow = "unset";
 		};
-	}, [isOpen]);
+	}, [isOpen, selectedSkillGuids]);
+
+	useEffect(() => {
+		setFormData((prev) => ({
+			...prev,
+			associatedSkillGuids: selectedSkillGuids,
+		}));
+	}, [selectedSkillGuids]);
 
 	const handleClearData = () => {
 		setFormData({
@@ -83,11 +93,12 @@ export default function CreateAgentFlyoutComponent({
 			applicationName: "",
 			knowledgeBaseDocument: null,
 			isPrivate: false,
-			mcpServerUrl: "",
 			visionImages: null,
+			associatedSkillGuids: [],
 		});
 		onClearKnowledgeFiles();
 		onClearAiVisionImages();
+		onClearSkillGuids();
 	};
 
 	async function handleSubmit() {
@@ -110,8 +121,11 @@ export default function CreateAgentFlyoutComponent({
 				form.append("visionImages", file);
 			});
 
-		if (formData.mcpServerUrl)
-			form.append("mcpServerUrl", formData.mcpServerUrl);
+		if (formData.associatedSkillGuids.length > 0) {
+			formData.associatedSkillGuids.forEach((guid) => {
+				form.append("associatedSkillGuids", guid);
+			});
+		}
 
 		const token = await authContext.getAccessToken();
 		token && dispatch(CreateNewAgentAsync(form, token));
@@ -138,8 +152,8 @@ export default function CreateAgentFlyoutComponent({
 		formData.agentMetaPrompt.trim() !== "" ||
 		formData.agentDescription.trim() !== "" ||
 		formData.applicationName.trim() !== "" ||
-		formData.mcpServerUrl.trim() !== "" ||
 		formData.isPrivate !== false ||
+		selectedSkillGuids.length > 0 ||
 		selectedKnowledgeFiles.length > 0 ||
 		selectedAiVisionImages.length > 0;
 
@@ -256,6 +270,62 @@ export default function CreateAgentFlyoutComponent({
 				</div>
 				<p className="text-white/40 text-xs">
 					{ManageAgentConstants.ModifyAgentConstants.VisionInfo}
+				</p>
+			</div>
+		);
+	};
+
+	const renderAssociateToolSkillsData = () => {
+		return (
+			<div className="space-y-2">
+				<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
+					<Terminal className="w-4 h-4 text-cyan-400" />
+					<span>Associate Tool Skills</span>
+				</label>
+				<div className="relative group">
+					<div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-xl blur opacity-50 group-hover:opacity-75 transition duration-300"></div>
+					<button
+						onClick={onOpenAssociateSkills}
+						className="relative w-full bg-white/5 border border-white/10 hover:border-white/20 hover:border-cyan-500/50 rounded-xl p-4 text-left transition-all duration-200 min-h-[48px] flex items-center justify-between"
+					>
+						<div className="flex items-center space-x-3">
+							<Terminal className="w-5 h-5 text-cyan-400" />
+							<div>
+								<span className="text-white font-medium">
+									{selectedSkillGuids.length > 0
+										? `${selectedSkillGuids.length} skill${
+												selectedSkillGuids.length !== 1
+													? "s"
+													: ""
+										  } associated`
+										: "Associate skills"}
+								</span>
+								{selectedSkillGuids.length > 0 && (
+									<p className="text-white/60 text-sm">
+										Click to manage skills
+									</p>
+								)}
+							</div>
+						</div>
+						<div className="text-white/40">
+							<svg
+								className="w-5 h-5"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M9 5l7 7-7 7"
+								/>
+							</svg>
+						</div>
+					</button>
+				</div>
+				<p className="text-white/40 text-[10px] ml-1 pt-1 italic">
+					Empower your agent with specific tool capabilities.
 				</p>
 			</div>
 		);
@@ -488,41 +558,8 @@ export default function CreateAgentFlyoutComponent({
 						{ConfigurationsStoreData.IsAiVisionServiceEnabled ===
 							"true" && renderAiVisionUploadData()}
 
-						{/* MCP Server URL */}
-						<div className="space-y-2">
-							<label className="text-white/80 font-semibold text-sm ml-1">
-								MCP Server URL
-							</label>
-							<Input
-								value={formData.mcpServerUrl}
-								onChange={(e) =>
-									handleInputChange(
-										"mcpServerUrl",
-										e.target.value
-									)
-								}
-								placeholder={
-									CreateAgentConstants.InputFields
-										.McpServerURL
-								}
-								variant="bordered"
-								size="lg"
-								startContent={
-									<Link className="w-5 h-5 text-cyan-400 mr-2" />
-								}
-								classNames={{
-									input: "text-white placeholder:text-white/20",
-									inputWrapper:
-										"bg-white/5 border-white/10 hover:border-cyan-500/30 focus-within:!border-cyan-500/50 transition-all min-h-[56px] rounded-2xl",
-								}}
-							/>
-							<p className="text-white/40 text-[10px] ml-1 pt-1 italic">
-								{
-									ManageAgentConstants.ModifyAgentConstants
-										.MCPUrl
-								}
-							</p>
-						</div>
+						{/* Associate Tool Skills */}
+						{renderAssociateToolSkillsData()}
 					</div>
 				</div>
 
@@ -532,7 +569,7 @@ export default function CreateAgentFlyoutComponent({
 						<Button
 							onPress={handleSubmit}
 							title="Create AI Agent"
-							className="flex-1 h-14 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 rounded-2xl group border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+							className="px-6 h-14 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 rounded-2xl group border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
 							disabled={
 								!formData.agentName.trim() ||
 								!formData.agentMetaPrompt.trim() ||

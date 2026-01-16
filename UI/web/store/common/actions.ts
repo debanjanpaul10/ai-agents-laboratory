@@ -20,9 +20,9 @@ import {
 	TOGGLE_MAIN_SPINNER,
 } from "@store/common/actionTypes";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
-import { AddBugReportDTO } from "@models/add-bug-report-dto";
+import { AddBugReportDTO } from "@models/request/add-bug-report-dto";
 import { FEEDBACK_TYPES } from "@shared/types";
-import { NewFeatureRequestDTO } from "@models/new-feature-request-dto";
+import { NewFeatureRequestDTO } from "@models/request/new-feature-request-dto";
 
 export function ToggleDirectChatDrawer(isOpen: boolean) {
 	return {

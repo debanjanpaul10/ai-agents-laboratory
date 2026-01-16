@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Bug, FileText, AlertTriangle, Send, X, Info, Bot } from "lucide-react";
 
-import { AddBugReportDTO } from "@models/add-bug-report-dto";
+import { AddBugReportDTO } from "@models/request/add-bug-report-dto";
 import { useAuth } from "@auth/AuthProvider";
 import { BugReportConstants, SeverityOptions } from "@helpers/constants";
 import { useAppDispatch } from "@store/index";

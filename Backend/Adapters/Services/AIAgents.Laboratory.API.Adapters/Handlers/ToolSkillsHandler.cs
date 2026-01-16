@@ -46,7 +46,11 @@ public class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSkillsServ
     public async Task<IEnumerable<McpServerToolsDTO>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail)
     {
         var domainResult = await toolSkillsService.GetAllMcpToolsAvailableAsync(serverUrl, currentUserEmail).ConfigureAwait(false);
-        return mapper.Map<IEnumerable<McpServerToolsDTO>>(domainResult);
+        return domainResult.Select(tool => new McpServerToolsDTO
+        {
+            ToolName = tool.Name,
+            ToolDescription = tool.Description
+        });
     }
 
     /// <summary>

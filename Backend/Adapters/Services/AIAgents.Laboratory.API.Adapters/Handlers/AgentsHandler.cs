@@ -58,11 +58,12 @@ public class AgentsHandler(IMapper mapper, IAgentsService agentsService) : IAgen
     /// Updates the existing agent data.
     /// </summary>
     /// <param name="updateAgentData">The update agent data DTO model.</param>
+    /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData)
+    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData, string currentUserEmail)
     {
         var domainRequest = mapper.Map<AgentDataDomain>(updateAgentData);
-        return await agentsService.UpdateExistingAgentDataAsync(domainRequest).ConfigureAwait(false);
+        return await agentsService.UpdateExistingAgentDataAsync(domainRequest, currentUserEmail).ConfigureAwait(false);
     }
 
     /// <summary>

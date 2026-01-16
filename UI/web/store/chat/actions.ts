@@ -1,6 +1,6 @@
 import { Action, Dispatch } from "redux";
 
-import { ChatRequestDTO } from "@models/chat-request-dto";
+import { ChatRequestDTO } from "@models/request/chat-request-dto";
 import {
 	ClearConversationHistoryForUserApiAsync,
 	GetConversationHistoryDataForUserApiAsync,
@@ -15,8 +15,8 @@ import {
 	GET_CONVERSATION_HISTORY,
 } from "./actionTypes";
 import { ToggleDirectChatLoader } from "@store/common/actions";
-import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
-import { ConversationHistoryDTO } from "@models/conversation-history-dto";
+import { DirectChatRequestDTO } from "@models/request/direct-chat-request-dto";
+import { ConversationHistoryDTO } from "@models/response/conversation-history-dto";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 
 export function InvokeChatAgentAsync(

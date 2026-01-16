@@ -1,4 +1,5 @@
 using AIAgents.Laboratory.Domain.DomainEntities;
+using ModelContextProtocol.Client;
 
 namespace AIAgents.Laboratory.Domain.DrivingPorts;
 
@@ -51,6 +52,15 @@ public interface IToolSkillsService
     /// </summary>
     /// <param name="serverUrl">The MCP server url.</param>
     /// <param name="currentUserEmail">The current user email.</param>
-    /// <returns>The list of <see cref="McpServerToolsDomain"/></returns>
-    Task<IEnumerable<McpServerToolsDomain>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail);
+    /// <returns>The list of <see cref="McpClientTool"/></returns>
+    Task<IEnumerable<McpClientTool>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail);
+
+    /// <summary>
+    /// Associates a skill and an agent asynchronously.
+    /// </summary>
+    /// <param name="agentData">The agent data containing agent name and agent guid.</param>
+    /// <param name="toolSkillId">The tool skill guid id.</param>
+    /// <param name="currentUserEmail">The current user email.</param>
+    /// <returns>A boolean for <c>success/failure.</c></returns>
+    Task<bool> AssociateSkillAndAgentAsync(IList<AssociatedAgentsSkillDataDomain> agentData, string toolSkillId, string currentUserEmail);
 }

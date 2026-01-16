@@ -23,19 +23,14 @@ public class McpClientServices(IConfiguration configuration, ILogger<McpClientSe
     /// <param name="mcpServerUrl">The URL of the MCP server endpoint from which to retrieve the list of client tools. Must be a valid, absolute URI.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see
     /// cref="McpServerToolsDomain"/> objects representing the available client tools. The collection will be empty if no tools are found.</returns>
-    public async Task<IEnumerable<McpServerToolsDomain>> GetAllMcpToolsAsync(string mcpServerUrl)
+    public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAsync(string mcpServerUrl)
     {
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAsync), DateTime.UtcNow);
 
             var mcpClient = await this.CreateMcpClientAsync(mcpServerUrl).ConfigureAwait(false);
-            var mcpTools = await mcpClient.ListToolsAsync().ConfigureAwait(false);
-            return mcpTools.Select(tool => new McpServerToolsDomain
-            {
-                ToolName = tool.Name,
-                ToolDescription = tool.Description
-            });
+            return await mcpClient.ListToolsAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {

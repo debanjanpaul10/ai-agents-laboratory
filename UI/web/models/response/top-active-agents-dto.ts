@@ -1,4 +1,4 @@
-import { AgentDataDTO } from "./agent-data-dto";
+import { AgentDataDTO } from "@models/response/agent-data-dto";
 
 export class TopActiveAgentsDTO {
 	activeAgentsCount: number = 0;

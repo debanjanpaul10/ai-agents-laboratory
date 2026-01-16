@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { AgentDataDTO } from "@models/agent-data-dto";
-import { ToolSkillDTO } from "@models/tool-skill-dto";
+import { AgentDataDTO } from "@models/response/agent-data-dto";
+import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 
 export interface Environment {
 	production: boolean;
@@ -70,6 +70,7 @@ export interface ModifyAgentComponentProps {
 	onOpenVisionImagesFlyout: () => void;
 	selectedVisionImages: File[];
 	removedExistingImages: string[];
+	onOpenAssociateSkills: () => void;
 }
 
 export interface AuthenticatedAppProps {
@@ -124,6 +125,9 @@ export interface CreateAgentFlyoutProps {
 	selectedAiVisionImages: File[];
 	onOpenAiVisionFlyout: () => void;
 	onClearAiVisionImages: () => void;
+	selectedSkillGuids: string[];
+	onOpenAssociateSkills: () => void;
+	onClearSkillGuids: () => void;
 }
 
 // Union type for both new files and existing documents
@@ -166,4 +170,11 @@ export interface DeletePopupProps {
 	title: string;
 	description: string;
 	isLoading?: boolean;
+}
+
+export interface AssociateSkillsFlyoutProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onSkillsChange: (skillGuids: string[]) => void;
+	selectedSkillGuids: string[];
 }
