@@ -11,12 +11,10 @@ export default function McpToolsListFlyoutComponent({
 	isOpen: boolean;
 	onClose: () => void;
 }) {
-	const [mcpServerTools, setMcpServerTools] = useState<McpServerToolsDTO[]>(
-		[]
-	);
+	const [mcpServerTools, setMcpServerTools] = useState<McpServerToolsDTO[]>();
 
 	const McpServerToolsStoreData = useAppSelector<McpServerToolsDTO[]>(
-		(state) => state.ToolSkillsReducer.mcpServerTools
+		(state) => state.ToolSkillsReducer.mcpServerTools || []
 	);
 
 	const IsLoading = useAppSelector<boolean>(
@@ -24,9 +22,8 @@ export default function McpToolsListFlyoutComponent({
 	);
 
 	useEffect(() => {
-		if (Array.isArray(McpServerToolsStoreData)) {
-			setMcpServerTools(McpServerToolsStoreData);
-		}
+		console.log(McpServerToolsStoreData);
+		setMcpServerTools(McpServerToolsStoreData);
 	}, [McpServerToolsStoreData]);
 
 	if (!isOpen) return null;
@@ -47,7 +44,8 @@ export default function McpToolsListFlyoutComponent({
 									MCP Server Tools
 								</h3>
 								<p className="text-white/40 text-xs font-medium">
-									{mcpServerTools.length} tools discovered
+									{mcpServerTools?.length ?? 0} tools
+									discovered
 								</p>
 							</div>
 						</div>
@@ -78,7 +76,7 @@ export default function McpToolsListFlyoutComponent({
 									</div>
 								))}
 							</div>
-						) : mcpServerTools.length > 0 ? (
+						) : mcpServerTools && mcpServerTools.length > 0 ? (
 							mcpServerTools.map((tool, index) => (
 								<div
 									key={index}

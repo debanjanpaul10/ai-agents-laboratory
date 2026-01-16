@@ -74,6 +74,20 @@ export function ToggleMcpToolsDrawer(isOpen: boolean) {
 	};
 }
 
+export function GetAllMcpToolsAvailableSuccessAsync(data: any) {
+	return {
+		type: GET_ALL_MCP_SERVER_TOOLS,
+		payload: data,
+	};
+}
+
+export function GetAllMcpToolsAvailableFailedAsync() {
+	return {
+		type: GET_ALL_MCP_SERVER_TOOLS,
+		payload: [],
+	};
+}
+
 export function GetAllToolSkillsAsync(accessToken: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
@@ -158,19 +172,20 @@ export function GetAllMcpToolsAvailableAsync(
 		try {
 			dispatch(ToggleMcpToolsLoader(true));
 			dispatch(ToggleMcpToolsDrawer(true));
+
 			const response = await GetAllMcpToolsAvailableApiAsync(
 				mcpServerTool,
 				accessToken
 			);
-			if (response?.isSuccess && response?.responseData) {
-				dispatch({
-					type: GET_ALL_MCP_SERVER_TOOLS,
-					payload: response.responseData,
-				});
-			}
+			if (response?.isSuccess && response?.responseData)
+				dispatch(
+					GetAllMcpToolsAvailableSuccessAsync(response.responseData)
+				);
+			else dispatch(ToggleMcpToolsLoader(false));
 		} catch (error: any) {
 			console.error(error);
 			if (error.message) ShowErrorToaster(error.message);
+			dispatch(GetAllMcpToolsAvailableFailedAsync());
 		} finally {
 			dispatch(ToggleMcpToolsLoader(false));
 		}
