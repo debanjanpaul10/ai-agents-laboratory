@@ -19,6 +19,16 @@ internal static class Constants
         /// The Azure SQL database connection string constant.
         /// </summary>
         internal const string AzureSqlConnectionStringConstant = "AzureSqlConnectionString";
+
+        /// <summary>
+        /// The postgres SQL connection string constant.
+        /// </summary>
+        internal const string PostgreSQLConnectionStringConstant = "PostgreSQL:Connectionstring";
+
+        /// <summary>
+        /// The current sql service provider constant.
+        /// </summary>
+        internal const string CurrentSQLProviderConstant = "CurrentSQLProvider";
     }
 
     /// <summary>
@@ -78,5 +88,15 @@ internal static class Constants
         /// The not started constant
         /// </summary>
         public const string NotStartedConstant = "Not Started";
+
+        /// <summary>
+        /// The Postgres SQL constant.
+        /// </summary>
+        internal const string PostgreSQLConstant = "PostgreSQL";
+
+        /// <summary>
+        /// The Azure SQL constant.
+        /// </summary>
+        internal const string AzureSQLConstant = "AzureSQL";
     }
 }

@@ -45,4 +45,12 @@ public interface IToolSkillsHandler
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>A boolean for success/failure.</returns>
     Task<bool> DeleteExistingToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail);
+
+    /// <summary>
+    /// Gets all MCP tools available asynchronously.
+    /// </summary>
+    /// <param name="serverUrl">The MCP server url.</param>
+    /// <param name="currentUserEmail">The current user email.</param>
+    /// <returns>The list of <see cref="McpServerToolsDTO"/></returns>
+    Task<IEnumerable<McpServerToolsDTO>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail);
 }

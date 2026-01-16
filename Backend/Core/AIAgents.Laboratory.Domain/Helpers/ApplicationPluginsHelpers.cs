@@ -29,10 +29,10 @@ public static class ApplicationPluginsHelpers
         /// The function instructions
         /// </summary>
         public const string FunctionInstructions = @"""
-			You are an assistant for the user whose responsibility is to reply to user queries. 
-				1. You will be receiving the user message and agent metaprompt as inputs always.
-				2. Based on these inputs you will be framing a response for the user for the user message.
-				3. You will never give any explanations or side notes. You will only return the fixed output and nothing else. 
+            You are an assistant for the user whose responsibility is to reply to user queries. 
+                1. You will be receiving the user message and agent metaprompt as inputs always.
+                2. Based on these inputs you will be framing a response for the user for the user message.
+                3. You will never give any explanations or side notes. You will only return the fixed output and nothing else. 
                 4. If user message or metaprompt is not present, do not return any response. 
 
             Tools:
@@ -42,13 +42,13 @@ public static class ApplicationPluginsHelpers
             
             Make sure to never mention any MCP server or tools used when crafting the final response.
 
-			Input:
-			++++++++++++
+            Input:
+            ++++++++++++
 
-			{{$input}}
+            {{$input}}
 
-			+++++++++++
-			""";
+            +++++++++++
+            """;
 
         /// <summary>
         /// The input description
@@ -147,10 +147,10 @@ public static class ApplicationPluginsHelpers
         public static string GetFunctionInstructions(string input, string? toolResult) =>
              string.IsNullOrEmpty(input)
                 ? $@"User Query: {input} 
-					Please provide a helpful response to the user's query."
+                    Please provide a helpful response to the user's query."
                 : $@"User Query: {input}
-					Tool Result: {toolResult}
-					Based on the tool result above, provide a clear and helpful response to the user's query. Format the information in a user-friendly way.";
+                    Tool Result: {toolResult}
+                    Based on the tool result above, provide a clear and helpful response to the user's query. Format the information in a user-friendly way.";
 
         /// <summary>
         /// The input descriptions.

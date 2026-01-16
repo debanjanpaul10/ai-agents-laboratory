@@ -1,18 +1,46 @@
-import { useEffect } from "react";
-import { Store } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
+import { Button } from "@heroui/react";
 
 import { useAuth } from "@auth/AuthProvider";
 import { ShowErrorToaster } from "@shared/toaster";
 import { useAppDispatch, useAppSelector } from "@store/index";
-import { GetAllToolSkillsAsync } from "@store/tools-skills/actions";
+import {
+	GetAllToolSkillsAsync,
+	ToggleAddSkillDrawer,
+} from "@store/tools-skills/actions";
 import { GetAllConfigurations } from "@store/common/actions";
 import { FullScreenLoading } from "@components/common/spinner";
-import { MarketplaceConstants } from "@helpers/constants";
+import { DashboardConstants, MarketplaceConstants } from "@helpers/constants";
 import MainLayout from "@components/common/main-layout";
+import SkillsListComponent from "@components/marketplace/skills-list";
+import CreateSkillComponent from "@components/marketplace/create-skill";
+import EditSkillFlyoutComponent from "@components/marketplace/edit-skill";
+import McpToolsListFlyoutComponent from "@components/marketplace/mcp-tools-list";
+import { ToolSkillDTO } from "@models/response/tool-skill-dto";
+import { ToggleMcpToolsDrawer } from "@store/tools-skills/actions";
 
 export default function MarketplaceComponent() {
 	const dispatch = useAppDispatch();
 	const authContext = useAuth();
+
+	const [selectedSkill, setSelectedSkill] = useState<ToolSkillDTO | null>(
+		null
+	);
+	const [editFormData, setEditFormData] = useState<ToolSkillDTO>({
+		associatedAgents: [],
+		createdBy: "",
+		dateCreated: new Date(),
+		dateModified: new Date(),
+		modifiedBy: "",
+		toolSkillDisplayName: "",
+		toolSkillGuid: "",
+		toolSkillMcpServerUrl: "",
+		toolSkillTechnicalName: "",
+	});
+	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState<boolean>(false);
+	const [isMcpSkillsDrawerOpen, setIsMcpSkillsDrawerOpen] =
+		useState<boolean>(false);
 
 	const IsSkillsMarketPlaceLoading = useAppSelector(
 		(state) => state.ToolSkillsReducer.isToolSkillsLoading
@@ -20,6 +48,18 @@ export default function MarketplaceComponent() {
 
 	const ConfigurationsStoreData = useAppSelector(
 		(state) => state.CommonReducer.configurations
+	);
+
+	const ToolSkillsListStoreData = useAppSelector<ToolSkillDTO[]>(
+		(state) => state.ToolSkillsReducer.allToolSkills
+	);
+
+	const IsAddSkillDrawerOpenStoreData = useAppSelector(
+		(state) => state.ToolSkillsReducer.isAddSkillDrawerOpen
+	);
+
+	const IsMcpToolsFlyoutOpen = useAppSelector(
+		(state) => state.ToolSkillsReducer.isMcpToolsDrawerOpen
 	);
 
 	useEffect(() => {
@@ -33,6 +73,23 @@ export default function MarketplaceComponent() {
 			}
 		}
 	}, [authContext.isAuthenticated, authContext.isLoading]);
+
+	const handleSkillClick = (toolSkill: ToolSkillDTO) => {
+		setSelectedSkill(toolSkill);
+		setEditFormData({
+			associatedAgents: toolSkill.associatedAgents || {},
+			createdBy: toolSkill.createdBy || "",
+			dateCreated: toolSkill.dateCreated || new Date(),
+			dateModified: toolSkill.dateModified || new Date(),
+			modifiedBy: toolSkill.modifiedBy || "",
+			toolSkillDisplayName: toolSkill.toolSkillDisplayName || "",
+			toolSkillGuid: toolSkill.toolSkillGuid || "",
+			toolSkillMcpServerUrl: toolSkill.toolSkillMcpServerUrl || "",
+			toolSkillTechnicalName: toolSkill.toolSkillTechnicalName || "",
+		});
+
+		setIsEditDrawerOpen(true);
+	};
 
 	async function fetchToken() {
 		try {
@@ -65,31 +122,77 @@ export default function MarketplaceComponent() {
 		);
 	};
 
+	const handleCreateNewSkill = () => {
+		dispatch(ToggleAddSkillDrawer(true));
+	};
+
 	const renderAuthorizedMarketplace = () => {
 		return (
-			<MainLayout>
-				<div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] bg-white/5 rounded-3xl border border-white/10 p-8 text-center backdrop-blur-sm">
-					<div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-full mb-6">
-						{/* Using a lucide icon for Store if available, or just text */}
-						<Store className="h-40 w-40" />
-					</div>
-					<h1 className="text-3xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent mb-4">
-						{MarketplaceConstants.ComingSoonConstants.Header}
-					</h1>
-					<p className="text-white/60 max-w-md mx-auto text-lg">
-						{MarketplaceConstants.ComingSoonConstants.SubHeading}
-					</p>
+			<MainLayout contentClassName="p-0" isFullWidth={true}>
+				<div className="w-full h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-black">
+					<SkillsListComponent
+						toolSkillsList={ToolSkillsListStoreData}
+						handleSkillClick={handleSkillClick}
+						onClose={() => {}}
+						isDisabled={isAnyDrawerOpen}
+						showCloseButton={false}
+						actionButton={
+							<Button
+								onPress={handleCreateNewSkill}
+								className="bg-white/5 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-white font-medium px-6 rounded-xl transition-all duration-300 group shadow-lg"
+							>
+								<Plus className="w-4 h-4 mr-2 text-blue-400 group-hover:text-blue-300 group-hover:scale-110 transition-all" />
+								<span>Add New Skill</span>
+							</Button>
+						}
+					/>
+					<CreateSkillComponent />
+					<McpToolsListFlyoutComponent
+						isOpen={IsMcpToolsFlyoutOpen}
+						onClose={() => dispatch(ToggleMcpToolsDrawer(false))}
+					/>
 				</div>
+
+				{/* Backdrop Overlay */}
+				{isAnyDrawerOpen && (
+					<div
+						className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300"
+						onClick={() => {}}
+					/>
+				)}
+
+				{/* Edit Skill Drawer */}
+				{isEditDrawerOpen && (
+					<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/2 w-full">
+						<div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
+							<EditSkillFlyoutComponent
+								editFormData={editFormData}
+								selectedSkill={selectedSkill}
+								setEditFormData={setEditFormData}
+								setSelectedSkill={setSelectedSkill}
+								isEditDrawerOpen={isEditDrawerOpen}
+								onEditClose={() => setIsEditDrawerOpen(false)}
+								isDisabled={false}
+							/>
+						</div>
+					</div>
+				)}
 			</MainLayout>
 		);
 	};
+
+	const isAnyDrawerOpen =
+		isEditDrawerOpen ||
+		isMcpSkillsDrawerOpen ||
+		IsAddSkillDrawerOpenStoreData;
 
 	return !authContext.isAuthenticated ? (
 		handleUnAuthorizedUser()
 	) : IsSkillsMarketPlaceLoading ? (
 		<FullScreenLoading
 			isLoading={IsSkillsMarketPlaceLoading}
-			message={MarketplaceConstants.LoadingConstants.MainLoader}
+			message={DashboardConstants.LoadingConstants.MainLoader}
 		/>
 	) : (
 		renderAuthorizedMarketplace()

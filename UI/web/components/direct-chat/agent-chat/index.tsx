@@ -13,7 +13,7 @@ import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { DashboardConstants, ManageAgentConstants } from "@helpers/constants";
 import { ChatMessage } from "@shared/types";
 import { GenerateMessageId } from "@shared/utils";
-import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
+import { DirectChatRequestDTO } from "@models/request/direct-chat-request-dto";
 import { useAuth } from "@auth/AuthProvider";
 import { useAppDispatch, useAppSelector } from "@store/index";
 import {

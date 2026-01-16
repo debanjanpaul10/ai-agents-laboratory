@@ -4,7 +4,7 @@ import { Bot, ChevronsRight, Clock, Settings, Sparkles } from "lucide-react";
 import { AgentData } from "@shared/types";
 import { useAppSelector } from "@store/index";
 import { DashboardConstants } from "@helpers/constants";
-import { TopActiveAgentsDTO } from "@models/top-active-agents-dto";
+import { TopActiveAgentsDTO } from "@models/response/top-active-agents-dto";
 
 export default function ActiveAgentsTileComponent() {
 	const [agentsDataList, setAgentsDataList] = useState<AgentData[]>([]);

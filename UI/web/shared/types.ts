@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
-import { AgentDataDTO } from "@models/agent-data-dto";
+import { AgentDataDTO } from "@models/response/agent-data-dto";
+import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 
 export interface Environment {
 	production: boolean;
@@ -69,6 +70,7 @@ export interface ModifyAgentComponentProps {
 	onOpenVisionImagesFlyout: () => void;
 	selectedVisionImages: File[];
 	removedExistingImages: string[];
+	onOpenAssociateSkills: () => void;
 }
 
 export interface AuthenticatedAppProps {
@@ -78,6 +80,15 @@ export interface AuthenticatedAppProps {
 export interface AgentsListComponentProps {
 	agentsDataList: AgentDataDTO[];
 	handleAgentClick: (agent: AgentDataDTO) => void;
+	onClose: () => void;
+	isDisabled: boolean;
+	showCloseButton?: boolean;
+	actionButton?: React.ReactNode;
+}
+
+export interface SkillsListComponentProps {
+	toolSkillsList: ToolSkillDTO[];
+	handleSkillClick: (skill: ToolSkillDTO) => void;
 	onClose: () => void;
 	isDisabled: boolean;
 	showCloseButton?: boolean;
@@ -114,6 +125,9 @@ export interface CreateAgentFlyoutProps {
 	selectedAiVisionImages: File[];
 	onOpenAiVisionFlyout: () => void;
 	onClearAiVisionImages: () => void;
+	selectedSkillGuids: string[];
+	onOpenAssociateSkills: () => void;
+	onClearSkillGuids: () => void;
 }
 
 // Union type for both new files and existing documents
@@ -134,7 +148,33 @@ export interface FileUploadFlyoutProps {
 	};
 }
 
+export interface EditSkillFlyoutComponentProps {
+	editFormData: ToolSkillDTO;
+	selectedSkill: ToolSkillDTO | null;
+	setEditFormData: React.Dispatch<React.SetStateAction<ToolSkillDTO>>;
+	setSelectedSkill: React.Dispatch<React.SetStateAction<ToolSkillDTO | null>>;
+	isEditDrawerOpen: boolean;
+	onEditClose: () => void;
+	isDisabled: boolean;
+}
+
 export interface MainLayoutProps {
 	children: ReactNode;
 	title?: string;
+}
+
+export interface DeletePopupProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onDelete: () => void;
+	title: string;
+	description: string;
+	isLoading?: boolean;
+}
+
+export interface AssociateSkillsFlyoutProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onSkillsChange: (skillGuids: string[]) => void;
+	selectedSkillGuids: string[];
 }

@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
@@ -18,8 +19,10 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="mongoDatabaseService">The mongo db database service.</param>
 /// <param name="configuration">The configuration service.</param>
 /// <param name="documentIntelligenceService">The document intelligence service.</param>
+/// <param name="toolSkillsService">The tools skill service.</param>
 /// <seealso cref="IAgentsService" />
-public class AgentsService(ILogger<AgentsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, IDocumentIntelligenceService documentIntelligenceService) : IAgentsService
+public class AgentsService(ILogger<AgentsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService,
+    IDocumentIntelligenceService documentIntelligenceService, IToolSkillsService toolSkillsService) : IAgentsService
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -61,6 +64,8 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
 
             if (agentData.VisionImages is not null && agentData.VisionImages.Any() && IsAiVisionServiceAllowed)
                 await documentIntelligenceService.CreateAndProcessAiVisionImagesKeywordsAsync(agentData).ConfigureAwait(false);
+            if (agentData.AssociatedSkillGuids.Any())
+                await this.UpdateSkillsWithAssociatedAgentsDataAsync(agentData, userEmail).ConfigureAwait(false);
 
             agentData.PrepareAuditEntityData(userEmail);
             return await mongoDatabaseService.SaveDataAsync(agentData, MongoDatabaseName, AgentsDataCollectionName).ConfigureAwait(false);
@@ -171,11 +176,13 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
     /// Updates the existing agent data.
     /// </summary>
     /// <param name="updateDataDomain">The update agent data DTO model.</param>
+    /// <param name="userEmail">The current logged in user email address.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain)
+    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain, string userEmail)
     {
         ArgumentNullException.ThrowIfNull(updateDataDomain);
         ArgumentException.ThrowIfNullOrWhiteSpace(updateDataDomain.AgentId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(userEmail);
 
         try
         {
@@ -189,10 +196,11 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
             {
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentMetaPrompt, updateDataDomain.AgentMetaPrompt),
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentName, updateDataDomain.AgentName),
-                Builders<AgentDataDomain>.Update.Set(x => x.McpServerUrl, updateDataDomain.McpServerUrl),
                 Builders<AgentDataDomain>.Update.Set(x => x.IsPrivate, updateDataDomain.IsPrivate),
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentDescription, updateDataDomain.AgentDescription),
-                Builders<AgentDataDomain>.Update.Set(x => x.DateModified, DateTime.UtcNow)
+                Builders<AgentDataDomain>.Update.Set(x => x.DateModified, DateTime.UtcNow),
+                Builders<AgentDataDomain>.Update.Set(x => x.AssociatedSkillGuids, updateDataDomain.AssociatedSkillGuids),
+                Builders<AgentDataDomain>.Update.Set(x => x.ModifiedBy, userEmail)
             };
 
             if (IsKnowledgeBaseServiceAllowed)
@@ -200,6 +208,9 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
 
             if (IsAiVisionServiceAllowed)
                 await documentIntelligenceService.HandleAiVisionImagesDataUpdateAsync(updateDataDomain, updates, existingAgent).ConfigureAwait(false);
+
+            if (updateDataDomain.AssociatedSkillGuids.Any())
+                await this.UpdateSkillsWithAssociatedAgentsDataAsync(updateDataDomain, userEmail).ConfigureAwait(false);
 
             var update = Builders<AgentDataDomain>.Update.Combine(updates);
             return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, MongoDatabaseName, AgentsDataCollectionName).ConfigureAwait(false);
@@ -249,4 +260,27 @@ public class AgentsService(ILogger<AgentsService> logger, IConfiguration configu
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, agentId));
         }
     }
+
+    #region PRIVATE METHODS
+
+    /// <summary>
+    /// Updates the skills with associated agents data asynchronous.
+    /// </summary>
+    /// <param name="agentData">The agent data domain model.</param>
+    /// <param name="currentUserEmail">The current logged in user email.</param>
+    /// <returns>A task to wait on.</returns>
+    private async Task UpdateSkillsWithAssociatedAgentsDataAsync(AgentDataDomain agentData, string currentUserEmail)
+    {
+        var associatedAgentsData = new List<AssociatedAgentsSkillDataDomain>
+        {
+            new()
+            {
+                AgentGuid = agentData.AgentId,
+                AgentName = agentData.AgentName
+            }
+        };
+        await toolSkillsService.AssociateSkillAndAgentAsync(associatedAgentsData, agentData.AssociatedSkillGuids.First(), currentUserEmail);
+    }
+
+    #endregion
 }

@@ -5,6 +5,6 @@ export class CreateAgentDTO {
 	applicationName: string = "";
 	knowledgeBaseDocument: File[] | null = null;
 	isPrivate: boolean = false;
-	mcpServerUrl: string = "";
 	visionImages: File[] | null = null;
+	associatedSkillGuids: string[] = [];
 }

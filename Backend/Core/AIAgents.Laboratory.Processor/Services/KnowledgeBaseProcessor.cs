@@ -44,12 +44,19 @@ public class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingGenerato
             var fileType = Path.GetExtension(knowledgeBaseDocument.FileName);
             if (string.Equals(KnowledgeBaseConstants.FileContentTypes.PlainTextFiles, fileType, StringComparison.OrdinalIgnoreCase))
                 return this.ReadTextFileData(knowledgeBaseDocument);
+
             else if (string.Equals(KnowledgeBaseConstants.FileContentTypes.PdfFiles, fileType, StringComparison.OrdinalIgnoreCase))
                 return this.ReadPdfFileData(knowledgeBaseDocument);
+
             else if (KnowledgeBaseConstants.FileContentTypes.ExcelFiles.Split(KnowledgeBaseConstants.CommaSeparator).Contains(fileType))
                 return this.ReadSpreadsheetData(knowledgeBaseDocument);
+
             else if (KnowledgeBaseConstants.FileContentTypes.WordFiles.Split(KnowledgeBaseConstants.CommaSeparator).Contains(fileType))
                 return this.ReadWordFileData(knowledgeBaseDocument);
+
+            else if (string.Equals(KnowledgeBaseConstants.FileContentTypes.JsonFiles, fileType, StringComparison.OrdinalIgnoreCase))
+                return this.ReadTextFileData(knowledgeBaseDocument);
+
             else
                 throw new Exception(ExceptionConstants.UnsupportedFileTypeMessage);
         }

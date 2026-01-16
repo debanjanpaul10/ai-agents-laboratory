@@ -61,7 +61,7 @@ public static class DIContainer
         services.ConfigureAuthenticationServices(configuration);
 
         services.AddAPIAdapterDependencies().AddMessagingDependencies();
-        services.AddAIAgentDependencies(configuration).AddMongoDbAdapterDependencies(configuration).AddSqlServerDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
+        services.AddAIAgentDependencies(configuration).AddMongoDbAdapterDependencies(configuration).AddRelationalSqlDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
 
         services.AddDomainDependencies().AddProcessorDependencies(configuration);
         services.AddMemoryCache().AddCacheDependencies();

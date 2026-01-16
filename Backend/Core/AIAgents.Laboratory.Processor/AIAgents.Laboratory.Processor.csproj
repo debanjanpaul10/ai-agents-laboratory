@@ -18,6 +18,8 @@
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.68.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Google" Version="1.68.0-alpha" />
     <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.68.0-alpha" />
+    <PackageReference Include="Microsoft.Rest.ClientRuntime" Version="2.3.24" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>

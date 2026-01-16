@@ -85,14 +85,6 @@ public sealed record AgentDataDomain : BaseEntity
     public IList<KnowledgeBaseDocumentDomain> StoredKnowledgeBase { get; set; } = [];
 
     /// <summary>
-    /// Gets or sets the URL of the MCP server used for network communication.
-    /// </summary>
-    /// <value>
-    /// The MCP server URL.
-    /// </value>
-    public string? McpServerUrl { get; set; } = string.Empty;
-
-    /// <summary>
     /// Gets or sets the is private boolean flag.
     /// </summary>
     /// <value>
@@ -133,4 +125,10 @@ public sealed record AgentDataDomain : BaseEntity
     ///     The AI Vision images data value.
     /// </value>
     public IList<AiVisionImagesDomain?> AiVisionImagesData { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the associated skill guids.
+    /// </summary>
+    /// <value>The list of associated skill guids.</value>
+    public IList<string> AssociatedSkillGuids { get; set; } = [];
 }

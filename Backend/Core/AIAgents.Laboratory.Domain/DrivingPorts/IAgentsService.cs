@@ -34,8 +34,9 @@ public interface IAgentsService
     /// Updates the existing agent data.
     /// </summary>
     /// <param name="updateDataDomain">The update agent data domain model.</param>
+    /// <param name="userEmail">The current logged in user email address.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain);
+    Task<bool> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain, string userEmail);
 
     /// <summary>
     /// Deletes an existing agent data.

@@ -1,5 +1,5 @@
-import { AiVisionImagesDataDTO } from "./ai-vision-images-data-dto";
-import { CreateAgentDTO } from "./create-agent-dto";
+import { AiVisionImagesDataDTO } from "@models/response/ai-vision-images-data-dto";
+import { CreateAgentDTO } from "@models/request/create-agent-dto";
 
 export class AgentDataDTO extends CreateAgentDTO {
 	agentId: string = "";

@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { Download, Files, FileText, Images, ScanEye, View } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
-import { ToggleNewAgentDrawer } from "@store/common/actions";
-import CreateAgentFlyoutComponent from "@components/create-agent/agent-creator-flyout";
 import {
 	AiVisionImagesFlyoutPropsConstants,
 	KnowledgeBaseFlyoutPropsConstants,
 } from "@helpers/constants";
 import FileUploadFlyoutComponent from "@components/common/file-upload-flyout";
+import { ToggleNewAgentDrawer } from "@store/agents/actions";
+import CreateAgentFlyoutComponent from "@components/manage-agents/agent-creator-flyout";
+import AssociateSkillsFlyoutComponent from "@components/manage-agents/associate-skills";
 
 export default function CreateAgentComponent() {
 	const dispatch = useAppDispatch();
@@ -26,8 +27,12 @@ export default function CreateAgentComponent() {
 		File[]
 	>([]);
 
+	const [associateSkillsFlyoutOpen, setAssociateSkillsFlyoutOpen] =
+		useState<boolean>(false);
+	const [selectedSkillGuids, setSelectedSkillGuids] = useState<string[]>([]);
+
 	const IsDrawerOpenStoreData = useAppSelector(
-		(state) => state.CommonReducer.isNewAgentDrawerOpen
+		(state) => state.AgentsReducer.isNewAgentDrawerOpen
 	);
 
 	useEffect(() => {
@@ -37,6 +42,7 @@ export default function CreateAgentComponent() {
 			if (!IsDrawerOpenStoreData) {
 				setKnowledgeBaseFlyoutOpen(false);
 				setAiVisionImagesFlyoutOpen(false);
+				setAssociateSkillsFlyoutOpen(false);
 			}
 		}
 	}, [IsDrawerOpenStoreData]);
@@ -45,6 +51,7 @@ export default function CreateAgentComponent() {
 		dispatch(ToggleNewAgentDrawer(false));
 		setKnowledgeBaseFlyoutOpen(false); // Close knowledge base flyout when main flyout closes
 		setAiVisionImagesFlyoutOpen(false);
+		setAssociateSkillsFlyoutOpen(false);
 	};
 
 	const toggleKnowledgebaseFlyout = (isOpen: boolean) => {
@@ -63,17 +70,22 @@ export default function CreateAgentComponent() {
 		setSelectedAiVisionImages([]);
 	};
 
+	const toggleAssociateSkillsFlyout = (isOpen: boolean) => {
+		setAssociateSkillsFlyoutOpen(isOpen);
+	};
+
+	const handleClearSkillGuids = () => {
+		setSelectedSkillGuids([]);
+	};
+
 	return (
 		isDrawerOpen && (
 			<>
-				<div
-					className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 max-w-full"
-					onClick={onClose}
-				/>
+				<div className="fixed inset-0 bg-black/60 backdrop-blur-md z-40 transition-opacity duration-300 max-w-full" />
 
 				{knowledgeBaseFlyoutOpen && (
 					<div
-						className={`fixed top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out ${"right-1/3"}`}
+						className={`fixed top-0 md:w-1/2 h-screen z-[60] transition-all duration-500 ease-in-out ${"right-1/2"}`}
 					>
 						<div className="absolute inset-0 bg-gradient-to-r from-green-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-x border-white/10 shadow-2xl">
@@ -103,7 +115,7 @@ export default function CreateAgentComponent() {
 
 				{aiVisionImagesFlyoutOpen && (
 					<div
-						className={`fixed top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out ${"right-1/3"}`}
+						className={`fixed top-0 md:w-1/2 h-screen z-[60] transition-all duration-500 ease-in-out ${"right-1/2"}`}
 					>
 						<div className="absolute inset-0 bg-gradient-to-r from-green-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
 						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-x border-white/10 shadow-2xl">
@@ -130,7 +142,25 @@ export default function CreateAgentComponent() {
 					</div>
 				)}
 
-				<div className="fixed right-0 top-0 md:w-1/3 h-screen z-50 transition-all duration-500 ease-in-out">
+				{associateSkillsFlyoutOpen && (
+					<div
+						className={`fixed top-0 md:w-1/2 h-screen z-[60] transition-all duration-500 ease-in-out ${"right-1/2"}`}
+					>
+						<div className="absolute inset-0 bg-gradient-to-r from-green-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-x border-white/10 shadow-2xl">
+							<AssociateSkillsFlyoutComponent
+								isOpen={associateSkillsFlyoutOpen}
+								onClose={() =>
+									toggleAssociateSkillsFlyout(false)
+								}
+								onSkillsChange={setSelectedSkillGuids}
+								selectedSkillGuids={selectedSkillGuids}
+							/>
+						</div>
+					</div>
+				)}
+
+				<div className="fixed right-0 top-0 md:w-1/2 h-screen z-50 transition-all duration-500 ease-in-out">
 					<div className="absolute inset-0 bg-gradient-to-l from-purple-600/20 via-blue-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
 					<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
 						<CreateAgentFlyoutComponent
@@ -146,6 +176,11 @@ export default function CreateAgentComponent() {
 								toggleAiVisionFlyout(true)
 							}
 							onClearAiVisionImages={handleClearAiVisionImages}
+							selectedSkillGuids={selectedSkillGuids}
+							onOpenAssociateSkills={() =>
+								toggleAssociateSkillsFlyout(true)
+							}
+							onClearSkillGuids={handleClearSkillGuids}
 						/>
 					</div>
 				</div>

@@ -1,11 +1,12 @@
 import { GetAsync, PostAsync } from "@helpers/http-utility";
-import { AddBugReportDTO } from "@models/add-bug-report-dto";
-import { AgentDataDTO } from "@models/agent-data-dto";
-import { ChatRequestDTO } from "@models/chat-request-dto";
-import { CreateAgentDTO } from "@models/create-agent-dto";
-import { DirectChatRequestDTO } from "@models/direct-chat-request-dto";
-import { NewFeatureRequestDTO } from "@models/new-feature-request-dto";
-import { ToolSkillDTO } from "@models/tool-skill-dto";
+import { AddBugReportDTO } from "@models/request/add-bug-report-dto";
+import { AgentDataDTO } from "@models/response/agent-data-dto";
+import { ChatRequestDTO } from "@models/request/chat-request-dto";
+import { CreateAgentDTO } from "@models/request/create-agent-dto";
+import { DirectChatRequestDTO } from "@models/request/direct-chat-request-dto";
+import { McpServerToolRequestDTO } from "@models/request/mcp-server-tool-request-dto";
+import { NewFeatureRequestDTO } from "@models/request/new-feature-request-dto";
+import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 
 // #region AGENTS
 
@@ -105,10 +106,14 @@ export async function SubmitFeatureRequestDataApiAsync(
 	accessToken: string
 ) {
 	return await PostAsync(
-		"aiagents/submitfeaturerequest",
+		"aiagentslab/submitfeaturerequest",
 		newFeatureRequest,
 		accessToken
 	);
+}
+
+export async function GetTopActiveAgentsDataApiAsync(accessToken: string) {
+	return await GetAsync("aiagentslab/topactiveagents", accessToken);
 }
 
 // #endregion
@@ -127,7 +132,7 @@ export async function GetToolSkillBySkillIdApiAsync(
 }
 
 export async function AddNewToolSkillApiAsync(
-	toolSkillData: ToolSkillDTO,
+	toolSkillData: ToolSkillDTO | FormData,
 	accessToken: string
 ) {
 	return await PostAsync(
@@ -138,7 +143,7 @@ export async function AddNewToolSkillApiAsync(
 }
 
 export async function UpdateExistingToolSkillDataApiAsync(
-	updateToolSkillData: ToolSkillDTO,
+	updateToolSkillData: ToolSkillDTO | FormData,
 	accessToken: string
 ) {
 	return await PostAsync(
@@ -159,8 +164,15 @@ export async function DeleteExistingToolSkillBySkillIdApiAsync(
 	);
 }
 
-export async function GetTopActiveAgentsDataApiAsync(accessToken: string) {
-	return await GetAsync("aiagentslab/topactiveagents", accessToken);
+export async function GetAllMcpToolsAvailableApiAsync(
+	mcpServerTool: McpServerToolRequestDTO,
+	accessToken: string
+) {
+	return await PostAsync(
+		"toolskills/getallmcptoolsavailable",
+		mcpServerTool,
+		accessToken
+	);
 }
 
 // #endregion

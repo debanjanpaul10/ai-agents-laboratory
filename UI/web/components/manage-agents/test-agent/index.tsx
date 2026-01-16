@@ -3,7 +3,7 @@ import { Button } from "@heroui/react";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { Send, MessageSquare, Bot, Zap, ArrowRight } from "lucide-react";
 
-import { ChatRequestDTO } from "@models/chat-request-dto";
+import { ChatRequestDTO } from "@models/request/chat-request-dto";
 import { useAuth } from "@auth/AuthProvider";
 import { InvokeChatAgentAsync } from "@store/chat/actions";
 import { useAppDispatch } from "@store/index";

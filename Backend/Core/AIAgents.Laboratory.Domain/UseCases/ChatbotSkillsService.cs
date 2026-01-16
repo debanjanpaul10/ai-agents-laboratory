@@ -62,10 +62,7 @@ public class ChatbotSkillsService(ILogger<ChatbotSkillsService> logger, IAiServi
             }
 
             var response = await aiAgentServices.GetAiFunctionResponseAsync(followupQuestionsRequest, ChatbotPluginHelpers.PluginName, ChatbotPluginHelpers.GenerateFollowupQuestionsFunction.FunctionName).ConfigureAwait(false);
-            var cleanedResponse = response?.Trim().Trim('"').Replace("\\n", "").Replace("\n", "");
-            if (!string.IsNullOrEmpty(cleanedResponse) && cleanedResponse.StartsWith('[') && cleanedResponse.EndsWith(']'))
-                cleanedResponse = cleanedResponse.Replace("'", "\"");
-
+            var cleanedResponse = DomainUtilities.ExtractJsonFromMarkdown(response ?? string.Empty);
             return JsonSerializer.Deserialize<IEnumerable<string>>(cleanedResponse ?? "[]") ?? [];
         }
         catch (Exception ex)

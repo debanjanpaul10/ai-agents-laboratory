@@ -238,6 +238,11 @@ public static class RouteConstants
         /// The delete existing tool skill by skill id route.
         /// </summary>
         internal const string DeleteExistingToolSkillBySkillId_Route = "deletetoolskill/{skillId}";
+
+        /// <summary>
+        /// The get all MCP tools available route.
+        /// </summary>
+        internal const string GetAllMcpToolsAvailable_Route = "getallmcptoolsavailable";
     }
 
     /// <summary>

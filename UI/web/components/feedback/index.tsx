@@ -63,7 +63,7 @@ export default function FeedbackComponent() {
 			<>
 				<div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300 max-w-full">
 					<div
-						className="fixed left-0 top-0 md:w-1/3 h-screen z-[60] transition-all duration-500 ease-in-out"
+						className="fixed left-0 top-0 md:w-1/2 h-screen z-[60] transition-all duration-500 ease-in-out"
 						onClick={(e) => e.stopPropagation()}
 					>
 						<div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 blur-sm opacity-50 -z-10"></div>

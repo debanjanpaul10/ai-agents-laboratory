@@ -38,6 +38,22 @@ public class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSkillsServ
     }
 
     /// <summary>
+    /// Gets all MCP tools available asynchronously.
+    /// </summary>
+    /// <param name="serverUrl">The MCP server url.</param>
+    /// <param name="currentUserEmail">The current user email.</param>
+    /// <returns>The list of <see cref="McpServerToolsDTO"/></returns>
+    public async Task<IEnumerable<McpServerToolsDTO>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail)
+    {
+        var domainResult = await toolSkillsService.GetAllMcpToolsAvailableAsync(serverUrl, currentUserEmail).ConfigureAwait(false);
+        return domainResult.Select(tool => new McpServerToolsDTO
+        {
+            ToolName = tool.Name,
+            ToolDescription = tool.Description
+        });
+    }
+
+    /// <summary>
     /// Gets all the tool skill data asynchronously.
     /// </summary>
     /// <param name="userEmail">The current logged in user email.</param>

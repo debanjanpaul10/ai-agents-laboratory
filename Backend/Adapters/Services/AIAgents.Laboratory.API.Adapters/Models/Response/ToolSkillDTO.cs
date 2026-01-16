@@ -26,9 +26,9 @@ public sealed record ToolSkillDTO
     public string ToolSkillMcpServerUrl { get; set; } = string.Empty;
 
     /// <summary>
-    /// The list of associated agent guids.
+    /// The list of associated agents containing the agent guid and the agent name.
     /// </summary>
-    public IEnumerable<string> AssociatedAgentGuids { get; set; } = [];
+    public IList<AssociatedAgentsSkillDataDTO> AssociatedAgents { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the date created.
@@ -61,4 +61,5 @@ public sealed record ToolSkillDTO
     /// The modified by.
     /// </value>
     public string ModifiedBy { get; set; } = string.Empty;
+
 }
