@@ -19,6 +19,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="mongoDatabaseService">The mongo db database service.</param>
 /// <param name="configuration">The configuration service.</param>
 /// <param name="documentIntelligenceService">The document intelligence service.</param>
+/// <param name="toolSkillsService">The tools skill service.</param>
 /// <seealso cref="IAgentsService" />
 public class AgentsService(ILogger<AgentsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService,
     IDocumentIntelligenceService documentIntelligenceService, IToolSkillsService toolSkillsService) : IAgentsService
