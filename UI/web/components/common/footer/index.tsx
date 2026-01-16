@@ -1,5 +1,6 @@
-import { DashboardConstants } from "@helpers/constants";
 import { Bot } from "lucide-react";
+
+import { DashboardConstants } from "@helpers/constants";
 
 export default function FooterComponent() {
 	return (

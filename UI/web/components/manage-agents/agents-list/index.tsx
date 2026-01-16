@@ -13,7 +13,7 @@ import {
 	ChevronDown,
 } from "lucide-react";
 
-import { AgentDataDTO } from "@models/agent-data-dto";
+import { AgentDataDTO } from "@models/response/agent-data-dto";
 import { ManageAgentConstants } from "@helpers/constants";
 import { AgentsListComponentProps } from "@shared/types";
 
