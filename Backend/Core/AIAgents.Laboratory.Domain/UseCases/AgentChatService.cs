@@ -22,7 +22,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="aiServices">The AI services used to generate responses based on chat context and agent configuration.</param>
 /// <param name="toolSkillsService">The tool skills service used to manage and invoke external tools or skills associated with agents.</param>
 /// <seealso cref="IAgentChatService"/>
-public class AgentChatService(IConfiguration configuration, ILogger<AgentChatService> logger, IAgentsService agentsService,
+public sealed class AgentChatService(IConfiguration configuration, ILogger<AgentChatService> logger, IAgentsService agentsService,
     IKnowledgeBaseProcessor knowledgeBaseProcessor, IAiServices aiServices, IToolSkillsService toolSkillsService) : IAgentChatService
 {
     /// <summary>

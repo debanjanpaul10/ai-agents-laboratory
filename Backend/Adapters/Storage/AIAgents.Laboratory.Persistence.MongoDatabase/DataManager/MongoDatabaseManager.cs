@@ -12,7 +12,7 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
 /// <param name="mongoClient">The mongo db client.</param>
 /// <param name="logger">The logger service.</param>
 /// <seealso cref="IMongoDatabaseService"/>
-public class MongoDatabaseManager(IMongoClient mongoClient, ILogger<MongoDatabaseManager> logger) : IMongoDatabaseService
+public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<MongoDatabaseManager> logger) : IMongoDatabaseService
 {
     /// <summary>
     /// Gets the data from collection asynchronous with a filter condition.

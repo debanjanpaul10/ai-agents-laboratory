@@ -15,7 +15,7 @@ namespace AIAgents.Laboratory.Storage.Blobs.DataManager;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="storageClient">The Google Cloud Storage client instance.</param>
 /// <seealso cref="IBlobStorageManager"/>
-public class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logger, IConfiguration configuration, StorageClient storageClient) : IBlobStorageManager
+public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logger, IConfiguration configuration, StorageClient storageClient) : IBlobStorageManager
 {
     /// <summary>
     /// The Google Cloud Platform storage bucket name.
@@ -44,8 +44,8 @@ public class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logger, ICon
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, agentId);
 
             var folderNames = new List<string>();
-            if (!string.IsNullOrEmpty(GCPKnowledgeBaseFolderName)) folderNames.Add(GCPKnowledgeBaseFolderName);
-            if (!string.IsNullOrEmpty(GCPVisionImagesFolderName)) folderNames.Add(GCPVisionImagesFolderName);
+            if (!string.IsNullOrEmpty(this.GCPKnowledgeBaseFolderName)) folderNames.Add(this.GCPKnowledgeBaseFolderName);
+            if (!string.IsNullOrEmpty(this.GCPVisionImagesFolderName)) folderNames.Add(this.GCPVisionImagesFolderName);
 
             if (folderNames.Count == 0)
             {
@@ -63,12 +63,12 @@ public class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logger, ICon
                     string prefix = string.Format(GCPCloudStorageConstants.AgentFolderStructureFormat, folderName, agentId) + "/";
 
                     // List all objects with the specified prefix
-                    var objectsToDelete = storageClient.ListObjects(GCPStorageBucketName, prefix);
+                    var objectsToDelete = storageClient.ListObjects(this.GCPStorageBucketName, prefix);
 
                     // Iterate through all objects with the prefix
                     var deleteTasks = new List<Task>();
                     foreach (var obj in objectsToDelete)
-                        deleteTasks.Add(storageClient.DeleteObjectAsync(GCPStorageBucketName, obj.Name));
+                        deleteTasks.Add(storageClient.DeleteObjectAsync(this.GCPStorageBucketName, obj.Name));
 
                     // Wait for all deletions to complete
                     if (deleteTasks.Count > 0)
@@ -103,17 +103,16 @@ public class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logger, ICon
     /// <returns>The public URL for the document.</returns>
     public async Task<string> UploadDocumentsToStorageAsync(IFormFile documentFile, string agentGuid, UploadedFileType fileType)
     {
+        if (documentFile.Length == 0) return string.Empty;
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, documentFile.FileName);
 
-            if (documentFile.Length == 0) return string.Empty;
-
             string GCPCloudBucketName = configuration[AzureAppConfigurationConstants.GCPBucketNameConstant] ?? throw new InvalidOperationException(ExceptionConstants.GCPBucketNotConfiguredExceptionMessage);
             var folderName = fileType switch
             {
-                UploadedFileType.AiVisionImageDocument => GCPVisionImagesFolderName,
-                UploadedFileType.KnowledgeBaseDocument => GCPKnowledgeBaseFolderName,
+                UploadedFileType.AiVisionImageDocument => this.GCPVisionImagesFolderName,
+                UploadedFileType.KnowledgeBaseDocument => this.GCPKnowledgeBaseFolderName,
                 _ => string.Empty,
             };
 

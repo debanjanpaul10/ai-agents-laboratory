@@ -13,7 +13,7 @@ namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
 /// The Chatbot Plugins.
 /// </summary>
 /// <param name="logger">The logger service.</param>
-public class ChatbotPlugins(ILogger<ChatbotPlugins> logger)
+public sealed class ChatbotPlugins(ILogger<ChatbotPlugins> logger)
 {
     /// <summary>
     /// Detects the user intent function.

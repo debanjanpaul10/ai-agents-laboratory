@@ -8,13 +8,12 @@ using Microsoft.EntityFrameworkCore;
 namespace AIAgents.Laboratory.Persistence.SQLDatabase.Repositories;
 
 /// <summary>
-/// The Generic Repository Class.
+/// The generic repository implementation.
 /// </summary>
-/// <typeparam name="TEntity">The Type Entity.</typeparam>
-/// <param name="context">The SQL DB context.</param>
-/// <seealso cref="IRepository"/>
+/// <typeparam name="TEntity">The entity type.</typeparam>
+/// <param name="context">The SQL db context.</param>
 [ExcludeFromCodeCoverage]
-public class GenericRepository<TEntity>(SqlDbContext context) : IRepository<TEntity> where TEntity : class
+public sealed class GenericRepository<TEntity>(SqlDbContext context) : IRepository<TEntity> where TEntity : class
 {
     /// <summary>
     /// Adds a new entity to the repository.
@@ -87,9 +86,7 @@ public class GenericRepository<TEntity>(SqlDbContext context) : IRepository<TEnt
 
         if (pageSize > 0)
         {
-            if (pageSize > 100)
-                pageSize = 100;
-
+            if (pageSize > 100) pageSize = 100;
             query = query.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
         }
 

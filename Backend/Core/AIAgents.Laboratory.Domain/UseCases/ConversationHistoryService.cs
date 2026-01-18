@@ -15,7 +15,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="logger">The logger service.</param>
 /// <param name="mongoDatabaseService">The mongo database service.</param>
 /// <seealso cref="IConversationHistoryService"/>
-public class ConversationHistoryService(ILogger<ConversationHistoryService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService) : IConversationHistoryService
+public sealed class ConversationHistoryService(ILogger<ConversationHistoryService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService) : IConversationHistoryService
 {
     /// <summary>
     /// The mongo database name configuration value.

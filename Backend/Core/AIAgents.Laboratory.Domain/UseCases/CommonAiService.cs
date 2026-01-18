@@ -18,7 +18,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="logger">The logger service.</param>
 /// <param name="cacheService">The cache service.</param>
 /// <seealso cref="ICommonAiService"/>
-public class CommonAiService(IConfiguration configuration, ILogger<CommonAiService> logger, IAgentStatusStore agentStatusStore, ICacheService cacheService, IAgentsService agentsService) : ICommonAiService
+public sealed class CommonAiService(IConfiguration configuration, ILogger<CommonAiService> logger, IAgentStatusStore agentStatusStore, ICacheService cacheService, IAgentsService agentsService) : ICommonAiService
 {
     /// <summary>
     /// Gets the current model identifier.

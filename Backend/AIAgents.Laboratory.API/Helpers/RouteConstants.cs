@@ -254,5 +254,25 @@ public static class RouteConstants
         /// The get all workspaces route.
         /// </summary>
         internal const string GetAllWorkspaces_Route = "getallworkspaces";
+
+        /// <summary>
+        /// The get workspace by workspace id route.
+        /// </summary>
+        internal const string GetWorkspaceByWorkspaceId_Route = "getworkspace/{workspaceId}";
+
+        /// <summary>
+        /// The add new workspace route.
+        /// </summary>
+        internal const string AddNewWorkspace_Route = "createworkspace";
+
+        /// <summary>
+        /// The update existing workspace route.
+        /// </summary>
+        internal const string UpdateExistingWorkspace_Route = "updateworkspace";
+
+        /// <summary>
+        /// The delete existing workspace route.
+        /// </summary>
+        internal const string DeleteExistingWorkspace_Route = "deleteworkspace/{workspaceGuidId}";
     }
 }

@@ -19,7 +19,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToolSkillsHandler toolSkillsHandler) : BaseController(httpContextAccessor)
+public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IToolSkillsHandler toolSkillsHandler) : BaseController(httpContextAccessor)
 {
     /// <summary>
     /// Gets the list of all active tool skills asynchronously.

@@ -21,7 +21,7 @@ namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 /// <param name="kernel">The kernel instance used to access AI plugins and services.</param>
 /// <param name="mcpClientServices">The mcp client services.</param>
 /// <seealso cref="IAiServices"/>
-public class AiServices(ILogger<AiServices> logger, Kernel kernel, IMcpClientServices mcpClientServices) : IAiServices
+public sealed class AiServices(ILogger<AiServices> logger, Kernel kernel, IMcpClientServices mcpClientServices) : IAiServices
 {
     /// <summary>
     /// The json options

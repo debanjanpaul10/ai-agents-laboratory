@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Reflection.Metadata;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
@@ -23,7 +22,8 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="blobStorageManager">The storage manager used to upload and manage images in cloud storage. Cannot be null.</param>
 /// <param name="visionProcessor">The processor used to analyze images and extract keywords using AI vision capabilities. Cannot be null.</param>
 /// <seealso cref="IDocumentIntelligenceService"/>
-public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> logger, IConfiguration configuration, IKnowledgeBaseProcessor knowledgeBaseProcessor, IBlobStorageManager blobStorageManager, IVisionProcessor visionProcessor) : IDocumentIntelligenceService
+public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> logger, IConfiguration configuration, IKnowledgeBaseProcessor knowledgeBaseProcessor,
+    IBlobStorageManager blobStorageManager, IVisionProcessor visionProcessor) : IDocumentIntelligenceService
 {
     /// <summary>
     /// The configuration value for allowed knowledge base file formats.

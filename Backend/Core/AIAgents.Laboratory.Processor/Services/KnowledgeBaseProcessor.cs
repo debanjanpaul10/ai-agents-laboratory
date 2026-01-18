@@ -25,7 +25,7 @@ namespace AIAgents.Laboratory.Processor.Services;
 /// <seealso cref="IKnowledgeBaseProcessor"/>
 #pragma warning disable SKEXP0001
 #pragma warning disable SKEXP0050
-public class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingGenerator<string, Embedding<float>> embeddingGeneratorService, ILogger<KnowledgeBaseProcessor> logger) : IKnowledgeBaseProcessor
+public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingGenerator<string, Embedding<float>> embeddingGeneratorService, ILogger<KnowledgeBaseProcessor> logger) : IKnowledgeBaseProcessor
 {
     /// <summary>
     /// Detects the file type of the specified knowledge base document and reads its content accordingly.
@@ -266,7 +266,8 @@ public class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingGenerato
             foreach (var paragraph in body.Elements<Paragraph>())
             {
                 var text = paragraph.InnerText;
-                if (!string.IsNullOrWhiteSpace(text)) stringBuilder.AppendLine(text.Trim());
+                if (!string.IsNullOrWhiteSpace(text))
+                    stringBuilder.AppendLine(text.Trim());
             }
 
             return stringBuilder.ToString();

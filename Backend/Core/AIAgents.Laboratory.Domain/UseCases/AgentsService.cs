@@ -21,7 +21,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="documentIntelligenceService">The document intelligence service.</param>
 /// <param name="toolSkillsService">The tools skill service.</param>
 /// <seealso cref="IAgentsService" />
-public class AgentsService(ILogger<AgentsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService,
+public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService,
     IDocumentIntelligenceService documentIntelligenceService, IToolSkillsService toolSkillsService) : IAgentsService
 {
     /// <summary>

@@ -19,7 +19,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="mcpClientServices">The MCP client services.</param>
 /// <seealso cref="IToolSkillsService"/>
-public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, IMcpClientServices mcpClientServices) : IToolSkillsService
+public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, IMcpClientServices mcpClientServices) : IToolSkillsService
 {
     /// <summary>
     /// The mongo database name configuration value.

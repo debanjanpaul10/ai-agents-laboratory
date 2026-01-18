@@ -13,7 +13,7 @@ namespace AIAgents.Laboratory.Persistence.Caching.Services;
 /// <param name="logger">The logger.</param>
 /// <param name="configuration">The configuration.</param>
 /// <seealso cref="ICacheService"/>
-public class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger, IConfiguration configuration) : ICacheService
+public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger, IConfiguration configuration) : ICacheService
 {
     /// <summary>
     /// The is cache service enabled.
@@ -111,8 +111,7 @@ public class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger
     /// <returns>The boolean for success/failure.</returns>
     public bool SetCacheData<T>(string key, T value, TimeSpan expirationTime)
     {
-        if (IsCacheServiceEnabled)
-            return false;
+        if (this.IsCacheServiceEnabled) return false;
 
         if (string.IsNullOrEmpty(key))
         {

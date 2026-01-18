@@ -17,7 +17,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="configuration">The configuration.</param>
 /// <param name="feedbackDataManager">The feedback data manager.</param>
 /// <seealso cref="IFeedbackService"/>
-public class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, IFeedbackDataManager feedbackDataManager) : IFeedbackService
+public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, IFeedbackDataManager feedbackDataManager) : IFeedbackService
 {
     /// <summary>
     /// Adds the new bug report data asynchronous.

@@ -13,7 +13,7 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <param name="agentsService">The agents service.</param>
 /// <param name="mapper">The mapper service.</param>
 /// <seealso cref="AIAgents.Laboratory.API.Adapters.Contracts.IAgentsHandler" />
-public class AgentsHandler(IMapper mapper, IAgentsService agentsService) : IAgentsHandler
+public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) : IAgentsHandler
 {
     /// <summary>
     /// Creates the new agent asynchronous.
