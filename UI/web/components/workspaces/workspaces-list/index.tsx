@@ -1,6 +1,5 @@
-import { WorkspacesConstants } from "@helpers/constants";
+import { useMemo, useState } from "react";
 import { Button, Input } from "@heroui/react";
-import { WorkspacesListComponentProps } from "@shared/types";
 import {
 	Bot,
 	Calendar,
@@ -13,7 +12,9 @@ import {
 	User,
 	X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+
+import { WorkspacesListComponentProps } from "@shared/types";
+import { WorkspacesConstants } from "@helpers/constants";
 
 export default function WorkspacesListComponent({
 	workspacesList,
