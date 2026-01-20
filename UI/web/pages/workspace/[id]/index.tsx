@@ -1,41 +1,111 @@
 import { useRouter } from "next/router";
-import { Laptop, MoveLeft } from "lucide-react";
-import { Button, Tooltip } from "@heroui/react";
+import { useEffect, useState } from "react";
 
 import MainLayout from "@components/common/main-layout";
 import { WorkspacesConstants } from "@helpers/constants";
+import { useAppDispatch, useAppSelector } from "@store/index";
+import { useAuth } from "@auth/AuthProvider";
+import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
+import { GetWorkspaceByWorkspaceIdAsync } from "@store/workspaces/actions";
+import { FullScreenLoading } from "@components/common/spinner";
+import { GetAllConfigurations } from "@store/common/actions";
+import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
+import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
+import AssociatedAgentsChatPaneComponent from "@components/workspace/associated-agents-chat";
+import AssociatedAgentsListPaneComponent from "@components/workspace/associated-agents-list";
 
 export default function WorkspaceComponent() {
+	const dispatch = useAppDispatch();
+	const authContext = useAuth();
 	const router = useRouter();
 
-	const moveBack = () => {
-		router.push("/workspaces");
+	const [selectedAgent, setSelectedAgent] =
+		useState<WorkspaceAgentsDataDTO | null>(null);
+
+	const ConfigurationsStoreData = useAppSelector(
+		(state) => state.CommonReducer.configurations,
+	);
+	const IsWorkspaceLoadingStoreData = useAppSelector<boolean>(
+		(state) => state.WorkspacesReducer.isWorkspacesLoading,
+	);
+	const WorkspaceDetailsData = useAppSelector<AgentsWorkspaceDTO>(
+		(state) => state.WorkspacesReducer.workspaceData,
+	);
+
+	useEffect(() => {
+		if (authContext.isAuthenticated && !authContext.isLoading) {
+			if (router.query.id) {
+				GetWorkspaceByWorkspaceId(router.query.id.toString());
+			}
+			if (
+				!ConfigurationsStoreData ||
+				Object.keys(ConfigurationsStoreData).length === 0
+			)
+				GetAllConfigurationsData();
+		}
+	}, [router.query.id]);
+
+	async function fetchToken() {
+		try {
+			if (authContext.isAuthenticated && !authContext.isLoading)
+				return await authContext.getAccessToken();
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		}
+	}
+
+	async function GetWorkspaceByWorkspaceId(workspaceId: string) {
+		const token = await fetchToken();
+		token && dispatch(GetWorkspaceByWorkspaceIdAsync(workspaceId, token));
+	}
+
+	async function GetAllConfigurationsData() {
+		const token = await fetchToken();
+		token && dispatch(GetAllConfigurations(token));
+	}
+
+	const handleAgentSelection = (agent: WorkspaceAgentsDataDTO) => {
+		if (selectedAgent && selectedAgent.agentGuid !== agent.agentGuid) {
+			ShowSuccessToaster("Previous conversation history cleared");
+		}
+		setSelectedAgent(agent);
 	};
 
-	return (
-		<MainLayout>
-			<div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] bg-white/5 rounded-3xl border border-white/10 p-8 text-center backdrop-blur-sm">
-				<div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-full mb-6">
-					<Laptop className="h-40 w-40" />
-				</div>
-				<h1 className="text-3xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent mb-4">
-					{WorkspacesConstants.ComingSoonConstants.Header}
-				</h1>
-				<p className="text-white/60 max-w-md mx-auto text-lg">
-					{WorkspacesConstants.ComingSoonConstants.SubHeading}
-				</p>
+	const handleUnAuthorizedUser = () => {
+		return (
+			<FullScreenLoading
+				isLoading={true}
+				message={
+					WorkspacesConstants.LoadingConstants.LoginRedirectLoader
+				}
+			/>
+		);
+	};
 
-				<div className="bg-gradient-to-r from-red-500 to-pink-600 p-6 mb-6 mt-5">
-					<Tooltip
-						content="Move back"
-						showArrow={true}
-						placement="bottom-start"
-						offset={15}
-					>
-						<Button onPress={moveBack} isIconOnly>
-							<MoveLeft className="h-10 w-10" />
-						</Button>
-					</Tooltip>
+	return !authContext.isAuthenticated ? (
+		handleUnAuthorizedUser()
+	) : IsWorkspaceLoadingStoreData ? (
+		<FullScreenLoading
+			isLoading={IsWorkspaceLoadingStoreData}
+			message={WorkspacesConstants.LoadingConstants.MainLoader}
+		/>
+	) : (
+		<MainLayout isFullWidth={true} contentClassName="p-0">
+			<div className="h-[calc(100vh)] flex flex-col md:flex-row gap-0 rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+				<div className="w-1/2 h-full flex-shrink-0">
+					<AssociatedAgentsListPaneComponent
+						selectedAgent={selectedAgent}
+						setSelectedAgent={handleAgentSelection}
+						workspaceDetailsData={WorkspaceDetailsData}
+					/>
+				</div>
+
+				<div className="w-1/2 h-full">
+					<AssociatedAgentsChatPaneComponent
+						key={selectedAgent?.agentGuid}
+						selectedAgent={selectedAgent}
+					/>
 				</div>
 			</div>
 		</MainLayout>

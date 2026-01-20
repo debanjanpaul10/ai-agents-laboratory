@@ -12,7 +12,6 @@ import { WorkspacesConstants } from "@helpers/constants";
 import MainLayout from "@components/common/main-layout";
 import {
 	GetAllWorkspacesDataAsync,
-	GetWorkspaceByWorkspaceIdAsync,
 	ToggleAssociateAgentsDrawer,
 	ToggleCreateWorkspaceDrawer,
 } from "@store/workspaces/actions";
@@ -40,7 +39,6 @@ export default function WorkspacesComponent() {
 		modifiedBy: "",
 		workspaceUsers: [],
 	});
-
 	const [selectedAgentGuids, setSelectedAgentGuids] = useState<Set<string>>(
 		new Set(),
 	);
@@ -48,19 +46,15 @@ export default function WorkspacesComponent() {
 	const IsWorkspacesLoading = useAppSelector(
 		(state) => state.WorkspacesReducer.isWorkspacesLoading,
 	);
-
 	const ConfigurationsStoreData = useAppSelector(
 		(state) => state.CommonReducer.configurations,
 	);
-
 	const WorkspacesListStoreData = useAppSelector(
 		(state) => state.WorkspacesReducer.allWorkspaces,
 	);
-
 	const IsAddWorkspaceDrawerOpenStoreData = useAppSelector(
 		(state) => state.WorkspacesReducer.isAddWorkspaceDrawerOpen,
 	);
-
 	const IsAssociateAgentsDrawerOpenStoreData = useAppSelector(
 		(state) => state.WorkspacesReducer.isAssociateAgentsDrawerOpen,
 	);
@@ -71,9 +65,8 @@ export default function WorkspacesComponent() {
 			if (
 				!ConfigurationsStoreData ||
 				Object.keys(ConfigurationsStoreData).length === 0
-			) {
+			)
 				GetAllConfigurationsData();
-			}
 		}
 	}, [authContext.isAuthenticated, authContext.isLoading]);
 
@@ -97,11 +90,6 @@ export default function WorkspacesComponent() {
 		token && dispatch(GetAllWorkspacesDataAsync(token));
 	}
 
-	async function GetWorkspaceByWorkspaceId(workspaceId: string) {
-		const token = await fetchToken();
-		token && dispatch(GetWorkspaceByWorkspaceIdAsync(workspaceId, token));
-	}
-
 	const handleUnAuthorizedUser = () => {
 		return (
 			<FullScreenLoading
@@ -121,77 +109,8 @@ export default function WorkspacesComponent() {
 		setSelectedAgentGuids(selectedGuids);
 	};
 
-	const handleExistingWorkspaceClick = (workspaceId: string) => {
-		GetWorkspaceByWorkspaceId(workspaceId);
-		router.push(`/workspace/${workspaceId}`);
-	};
-
 	const isAnyDrawerOpen =
 		isEditDrawerOpen || IsAddWorkspaceDrawerOpenStoreData;
-
-	const renderAuthorizedWorkspaces = () => {
-		return (
-			<MainLayout contentClassName="p-0" isFullWidth={true}>
-				<div className="w-full h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-black">
-					<WorkspacesListComponent
-						workspacesList={WorkspacesListStoreData}
-						handleWorkspaceClick={(workspaceId: string) =>
-							handleExistingWorkspaceClick(workspaceId)
-						}
-						onClose={() => {}}
-						isDisabled={isAnyDrawerOpen}
-						showCloseButton={false}
-						actionButton={
-							<Button
-								onPress={handleCreateNewWorkspaceClick}
-								className="bg-white/5 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-white font-medium px-6 rounded-xl transition-all duration-300 group shadow-lg"
-							>
-								<Plus className="w-4 h-4 mr-2 text-blue-400 group-hover:text-blue-300 group-hover:scale-110 transition-all" />
-								<span>Add New Workspace</span>
-							</Button>
-						}
-					/>
-					<CreateWorkspaceComponent />
-					{!IsAddWorkspaceDrawerOpenStoreData && (
-						<AssociateAgentsFlyoutComponent
-							isOpen={IsAssociateAgentsDrawerOpenStoreData}
-							onClose={() =>
-								dispatch(ToggleAssociateAgentsDrawer(false))
-							}
-							selectedAgentGuids={selectedAgentGuids}
-							onSelectionComplete={handleAgentSelectionComplete}
-						/>
-					)}
-				</div>
-
-				{/* Backdrop Overlay */}
-				{isAnyDrawerOpen && (
-					<div
-						className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300"
-						onClick={() => {}}
-					/>
-				)}
-
-				{/* Edit Workspace Drawer */}
-				{isEditDrawerOpen && (
-					<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/2 w-full">
-						<div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
-						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
-							<EditWorkspaceFlyoutComponent
-								editFormData={editFormData}
-								selectedWorkspace={selectedWorkspace}
-								setEditFormData={setEditFormData}
-								setSelectedWorkspace={setSelectedWorkspace}
-								isEditDrawerOpen={isEditDrawerOpen}
-								onEditClose={() => setIsEditDrawerOpen(false)}
-								isDisabled={false}
-							/>
-						</div>
-					</div>
-				)}
-			</MainLayout>
-		);
-	};
 
 	return !authContext.isAuthenticated ? (
 		handleUnAuthorizedUser()
@@ -201,6 +120,64 @@ export default function WorkspacesComponent() {
 			message={WorkspacesConstants.LoadingConstants.MainLoader}
 		/>
 	) : (
-		renderAuthorizedWorkspaces()
+		<MainLayout contentClassName="p-0" isFullWidth={true}>
+			<div className="w-full h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-black">
+				<WorkspacesListComponent
+					workspacesList={WorkspacesListStoreData}
+					handleWorkspaceClick={(workspaceId: string) =>
+						router.push(`/workspace/${workspaceId}`)
+					}
+					onClose={() => {}}
+					isDisabled={isAnyDrawerOpen}
+					showCloseButton={false}
+					actionButton={
+						<Button
+							onPress={handleCreateNewWorkspaceClick}
+							className="bg-white/5 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-white font-medium px-6 rounded-xl transition-all duration-300 group shadow-lg"
+						>
+							<Plus className="w-4 h-4 mr-2 text-blue-400 group-hover:text-blue-300 group-hover:scale-110 transition-all" />
+							<span>Add New Workspace</span>
+						</Button>
+					}
+				/>
+				<CreateWorkspaceComponent />
+				{!IsAddWorkspaceDrawerOpenStoreData && (
+					<AssociateAgentsFlyoutComponent
+						isOpen={IsAssociateAgentsDrawerOpenStoreData}
+						onClose={() =>
+							dispatch(ToggleAssociateAgentsDrawer(false))
+						}
+						selectedAgentGuids={selectedAgentGuids}
+						onSelectionComplete={handleAgentSelectionComplete}
+					/>
+				)}
+			</div>
+
+			{/* Backdrop Overlay */}
+			{isAnyDrawerOpen && (
+				<div
+					className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300"
+					onClick={() => {}}
+				/>
+			)}
+
+			{/* Edit Workspace Drawer */}
+			{isEditDrawerOpen && (
+				<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/2 w-full">
+					<div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
+					<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
+						<EditWorkspaceFlyoutComponent
+							editFormData={editFormData}
+							selectedWorkspace={selectedWorkspace}
+							setEditFormData={setEditFormData}
+							setSelectedWorkspace={setSelectedWorkspace}
+							isEditDrawerOpen={isEditDrawerOpen}
+							onEditClose={() => setIsEditDrawerOpen(false)}
+							isDisabled={false}
+						/>
+					</div>
+				</div>
+			)}
+		</MainLayout>
 	);
 }
