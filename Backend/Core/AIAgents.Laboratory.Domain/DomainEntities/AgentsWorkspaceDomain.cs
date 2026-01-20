@@ -30,7 +30,7 @@ public sealed record AgentsWorkspaceDomain : BaseEntity
     /// <summary>
     /// Gets or sets the active agents name and active agents guids.
     /// </summary>
-    public Dictionary<string, string> ActiveAgentsListInWorkspace { get; set; } = [];
+    public IEnumerable<WorkspaceAgentsDataDomain> ActiveAgentsListInWorkspace { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the active users in the workspace.

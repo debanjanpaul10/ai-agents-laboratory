@@ -25,7 +25,7 @@ export default function MarketplaceComponent() {
 	const authContext = useAuth();
 
 	const [selectedSkill, setSelectedSkill] = useState<ToolSkillDTO | null>(
-		null
+		null,
 	);
 	const [editFormData, setEditFormData] = useState<ToolSkillDTO>({
 		associatedAgents: [],
@@ -39,27 +39,25 @@ export default function MarketplaceComponent() {
 		toolSkillTechnicalName: "",
 	});
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState<boolean>(false);
-	const [isMcpSkillsDrawerOpen, setIsMcpSkillsDrawerOpen] =
-		useState<boolean>(false);
 
 	const IsSkillsMarketPlaceLoading = useAppSelector(
-		(state) => state.ToolSkillsReducer.isToolSkillsLoading
+		(state) => state.ToolSkillsReducer.isToolSkillsLoading,
 	);
 
 	const ConfigurationsStoreData = useAppSelector(
-		(state) => state.CommonReducer.configurations
+		(state) => state.CommonReducer.configurations,
 	);
 
 	const ToolSkillsListStoreData = useAppSelector<ToolSkillDTO[]>(
-		(state) => state.ToolSkillsReducer.allToolSkills
+		(state) => state.ToolSkillsReducer.allToolSkills,
 	);
 
 	const IsAddSkillDrawerOpenStoreData = useAppSelector(
-		(state) => state.ToolSkillsReducer.isAddSkillDrawerOpen
+		(state) => state.ToolSkillsReducer.isAddSkillDrawerOpen,
 	);
 
 	const IsMcpToolsFlyoutOpen = useAppSelector(
-		(state) => state.ToolSkillsReducer.isMcpToolsDrawerOpen
+		(state) => state.ToolSkillsReducer.isMcpToolsDrawerOpen,
 	);
 
 	useEffect(() => {
@@ -126,6 +124,8 @@ export default function MarketplaceComponent() {
 		dispatch(ToggleAddSkillDrawer(true));
 	};
 
+	const isAnyDrawerOpen = isEditDrawerOpen || IsAddSkillDrawerOpenStoreData;
+
 	const renderAuthorizedMarketplace = () => {
 		return (
 			<MainLayout contentClassName="p-0" isFullWidth={true}>
@@ -181,11 +181,6 @@ export default function MarketplaceComponent() {
 			</MainLayout>
 		);
 	};
-
-	const isAnyDrawerOpen =
-		isEditDrawerOpen ||
-		isMcpSkillsDrawerOpen ||
-		IsAddSkillDrawerOpenStoreData;
 
 	return !authContext.isAuthenticated ? (
 		handleUnAuthorizedUser()

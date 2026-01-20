@@ -59,6 +59,7 @@ export const DashboardConstants = {
 		CheckingAuthentication: "Checking authentication",
 		CreateNewSkill: "Saving Skill details",
 		McpToolsListLoading: "Getting the available MCP tools",
+		CreateNewWorkspace: "Saving workspace details",
 	},
 };
 
@@ -101,6 +102,15 @@ export const WorkspacesConstants = {
 		Header: "Agents Workspaces Coming Soon",
 		SubHeading:
 			"Create your own custom workspaces and add multiple agents to test and work on.",
+	},
+	Headers: {
+		Header: "Agents Workspaces",
+		SubText:
+			"Create new workspaces to test your agents in these playgrounds",
+	},
+	CreateWorkspaceConstants: {
+		Header: "Add New Workspace",
+		SubHeader: "Create a new workspace as playground for your agents",
 	},
 };
 

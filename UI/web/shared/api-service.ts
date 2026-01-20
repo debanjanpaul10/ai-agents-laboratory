@@ -7,6 +7,7 @@ import { DirectChatRequestDTO } from "@models/request/direct-chat-request-dto";
 import { McpServerToolRequestDTO } from "@models/request/mcp-server-tool-request-dto";
 import { NewFeatureRequestDTO } from "@models/request/new-feature-request-dto";
 import { ToolSkillDTO } from "@models/response/tool-skill-dto";
+import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 
 // #region AGENTS
 
@@ -181,6 +182,49 @@ export async function GetAllMcpToolsAvailableApiAsync(
 
 export async function GetAllWorkspacesDataApiAsync(accessToken: string) {
 	return await GetAsync("workspaces/getallworkspaces", accessToken);
+}
+
+export async function GetWorkspaceByWorkspaceIdApiAsync(
+	workspaceId: string,
+	accessToken: string
+) {
+	return await GetAsync(
+		`workspaces/getworkspace/${workspaceId}`,
+		accessToken
+	);
+}
+
+export async function CreateNewWorkspaceApiAsync(
+	agentsWorkspaceData: AgentsWorkspaceDTO | FormData,
+	accessToken: string
+) {
+	return await PostAsync(
+		"workspaces/createworkspace",
+		agentsWorkspaceData,
+		accessToken
+	);
+}
+
+export async function DeleteExistingWorkspaceApiAsync(
+	workspaceGuidId: string,
+	accessToken: string
+) {
+	return await PostAsync(
+		`workspaces/deleteworkspace/${workspaceGuidId}`,
+		null,
+		accessToken
+	);
+}
+
+export async function UpdateExistingWorkspaceDataApiAsync(
+	agentsWorkspaceData: AgentsWorkspaceDTO | FormData,
+	accessToken: string
+) {
+	return await PostAsync(
+		"workspaces/updateworkspace",
+		agentsWorkspaceData,
+		accessToken
+	);
 }
 
 // #endregion

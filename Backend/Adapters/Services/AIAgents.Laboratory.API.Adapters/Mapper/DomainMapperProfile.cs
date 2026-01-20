@@ -51,5 +51,6 @@ public class DomainMapperProfile : Profile
         CreateMap<ToolSkillDomain, ToolSkillDTO>().ReverseMap()
             .ForMember(destination => destination.IsActive, options => options.Ignore());
         CreateMap<AgentsWorkspaceDomain, AgentsWorkspaceDTO>().ReverseMap();
+        CreateMap<WorkspaceAgentsDataDomain, WorkspaceAgentsDataDTO>().ReverseMap();
     }
 }

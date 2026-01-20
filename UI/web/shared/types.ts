@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { AgentDataDTO } from "@models/response/agent-data-dto";
 import { ToolSkillDTO } from "@models/response/tool-skill-dto";
+import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 
 export interface Environment {
 	production: boolean;
@@ -95,6 +96,15 @@ export interface SkillsListComponentProps {
 	actionButton?: React.ReactNode;
 }
 
+export interface WorkspacesListComponentProps {
+	workspacesList: AgentsWorkspaceDTO[];
+	handleWorkspaceClick: (workspaceId: string) => void;
+	onClose: () => void;
+	isDisabled: boolean;
+	showCloseButton?: boolean;
+	actionButton?: React.ReactNode;
+}
+
 export interface ChatMessage {
 	id: string;
 	type: "user" | "bot";
@@ -153,6 +163,18 @@ export interface EditSkillFlyoutComponentProps {
 	selectedSkill: ToolSkillDTO | null;
 	setEditFormData: React.Dispatch<React.SetStateAction<ToolSkillDTO>>;
 	setSelectedSkill: React.Dispatch<React.SetStateAction<ToolSkillDTO | null>>;
+	isEditDrawerOpen: boolean;
+	onEditClose: () => void;
+	isDisabled: boolean;
+}
+
+export interface EditWorkspaceFlyoutComponentProps {
+	editFormData: AgentsWorkspaceDTO;
+	selectedWorkspace: AgentsWorkspaceDTO | null;
+	setEditFormData: React.Dispatch<React.SetStateAction<AgentsWorkspaceDTO>>;
+	setSelectedWorkspace: React.Dispatch<
+		React.SetStateAction<AgentsWorkspaceDTO | null>
+	>;
 	isEditDrawerOpen: boolean;
 	onEditClose: () => void;
 	isDisabled: boolean;

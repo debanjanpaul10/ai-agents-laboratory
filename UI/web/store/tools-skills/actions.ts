@@ -24,6 +24,7 @@ import {
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 import { McpServerToolRequestDTO } from "@models/request/mcp-server-tool-request-dto";
+import { ToolSkillsToasterConstants } from "@helpers/toaster-constants";
 
 export function ToggleToolSkillsLoader(isLoading: boolean): ReduxStoreType {
 	return {
@@ -43,13 +44,6 @@ export function ToggleCreateSkillLoader(isLoading: boolean) {
 	return {
 		type: TOGGLE_CREATE_SKILLS_LOADER,
 		payload: isLoading,
-	};
-}
-
-export function ToggleEditSkillDrawer(isOpen: boolean) {
-	return {
-		type: TOGGLE_EDIT_SKILLS_LOADER,
-		payload: isOpen,
 	};
 }
 
@@ -152,7 +146,7 @@ export function AddNewToolSkillAsync(
 
 				dispatch(ToggleAddSkillDrawer(false));
 				dispatch(GetAllToolSkillsAsync(accessToken) as any);
-				ShowSuccessToaster("Skill created successfully");
+				ShowSuccessToaster(ToolSkillsToasterConstants.CREATE_SKILL);
 			}
 		} catch (error: any) {
 			console.error(error);
@@ -204,7 +198,7 @@ export function UpdateExistingToolSkillAsync(
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch(GetAllToolSkillsAsync(accessToken) as any);
-				ShowSuccessToaster("Skill updated successfully");
+				ShowSuccessToaster(ToolSkillsToasterConstants.UPDATE_SKILL);
 			}
 		} catch (error: any) {
 			console.error(error);
@@ -228,7 +222,7 @@ export function DeleteExistingToolSkillAsync(
 			);
 			if (response?.isSuccess) {
 				dispatch(GetAllToolSkillsAsync(accessToken) as any);
-				ShowSuccessToaster("Skill deleted successfully");
+				ShowSuccessToaster(ToolSkillsToasterConstants.DELETE_SKILL);
 			}
 		} catch (error: any) {
 			console.error(error);

@@ -1,3 +1,5 @@
+using AIAgents.Laboratory.API.Adapters.Models.Request;
+
 namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 
 /// <summary>
@@ -18,7 +20,7 @@ public sealed record AgentsWorkspaceDTO
     /// <summary>
     /// Gets or sets the active agents name and active agents guids.
     /// </summary>
-    public Dictionary<string, string> ActiveAgentsListInWorkspace { get; set; } = [];
+    public IEnumerable<WorkspaceAgentsDataDTO> ActiveAgentsListInWorkspace { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the active users in the workspace.

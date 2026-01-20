@@ -18,6 +18,7 @@ import { ToggleDirectChatLoader } from "@store/common/actions";
 import { DirectChatRequestDTO } from "@models/request/direct-chat-request-dto";
 import { ConversationHistoryDTO } from "@models/response/conversation-history-dto";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
+import { ChatToasterConstants } from "@helpers/toaster-constants";
 
 export function InvokeChatAgentAsync(
 	chatRequest: ChatRequestDTO,
@@ -54,16 +55,15 @@ export function ClearConversationHistoryAsync(accessToken: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleDirectChatLoader(true));
-			const response = await ClearConversationHistoryForUserApiAsync(
-				accessToken
-			);
+			const response =
+				await ClearConversationHistoryForUserApiAsync(accessToken);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: CLEAR_CONVERSATION_HISTORY,
 					payload: response.responseData,
 				});
 
-				ShowSuccessToaster("Conversation history cleared succesfully!");
+				ShowSuccessToaster(ChatToasterConstants.CLEAR_CONVERSATION);
 				return response.responseData as boolean;
 			}
 			return null;
@@ -105,9 +105,8 @@ export function GetConversationHistoryDataForUserAsync(accessToken: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleDirectChatLoader(true));
-			const response = await GetConversationHistoryDataForUserApiAsync(
-				accessToken
-			);
+			const response =
+				await GetConversationHistoryDataForUserApiAsync(accessToken);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: GET_CONVERSATION_HISTORY,

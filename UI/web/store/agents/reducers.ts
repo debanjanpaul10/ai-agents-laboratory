@@ -8,6 +8,7 @@ import {
 	TOGGLE_AGENT_CREATE_SPINNER,
 	TOGGLE_EDIT_AGENT_SPINNER,
 	TOGGLE_NEW_AGENT_DRAWER,
+	TOGGLE_AGENTS_LIST_LOADING,
 } from "@store/agents/actionTypes";
 
 const initialState: any = {
@@ -20,6 +21,7 @@ const initialState: any = {
 	isChatDataLoading: false,
 	isEditAgentDataLoading: false,
 	isNewAgentDrawerOpen: false,
+	isAgentsListLoading: false,
 };
 
 export function AgentsReducer(state = initialState, action: any) {
@@ -77,6 +79,12 @@ export function AgentsReducer(state = initialState, action: any) {
 			return {
 				...state,
 				isNewAgentDrawerOpen: action.payload,
+			};
+		}
+		case TOGGLE_AGENTS_LIST_LOADING: {
+			return {
+				...state,
+				isAgentsListLoading: action.payload,
 			};
 		}
 		default: {

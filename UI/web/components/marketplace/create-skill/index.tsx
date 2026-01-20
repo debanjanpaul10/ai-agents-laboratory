@@ -41,19 +41,15 @@ export default function CreateSkillComponent() {
 	});
 
 	const IsDrawerOpenStoreData = useAppSelector(
-		(state) => state.ToolSkillsReducer.isAddSkillDrawerOpen
+		(state) => state.ToolSkillsReducer.isAddSkillDrawerOpen,
 	);
 
 	const IsCreateSkillLoading = useAppSelector(
-		(state) => state.ToolSkillsReducer.isCreateSkillLoading
-	);
-
-	const IsMcpToolsFlyoutOpen = useAppSelector(
-		(state) => state.ToolSkillsReducer.isMcpToolsDrawerOpen
+		(state) => state.ToolSkillsReducer.isCreateSkillLoading,
 	);
 
 	const IsMcpToolsLoading = useAppSelector(
-		(state) => state.ToolSkillsReducer.isMcpToolsLoading
+		(state) => state.ToolSkillsReducer.isMcpToolsLoading,
 	);
 
 	useEffect(() => {
@@ -76,7 +72,7 @@ export default function CreateSkillComponent() {
 		}
 	}, [IsDrawerOpenStoreData, authContext.user]);
 
-	const onClose = () => {
+	const onCloseFlyout = () => {
 		dispatch(ToggleAddSkillDrawer(false));
 	};
 
@@ -137,7 +133,7 @@ export default function CreateSkillComponent() {
 			<>
 				<div
 					className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 max-w-full"
-					onClick={onClose}
+					onClick={onCloseFlyout}
 				/>
 
 				<div className="fixed right-0 top-0 md:w-1/2 h-screen z-50 transition-all duration-500 ease-in-out">
@@ -165,7 +161,7 @@ export default function CreateSkillComponent() {
 								</div>
 							</div>
 							<button
-								onClick={onClose}
+								onClick={onCloseFlyout}
 								className="p-2.5 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 transition-all duration-300 text-white/50 hover:text-red-400 group"
 							>
 								<X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
@@ -201,7 +197,7 @@ export default function CreateSkillComponent() {
 											onValueChange={(v) =>
 												handleInputChange(
 													"toolSkillDisplayName",
-													v
+													v,
 												)
 											}
 											startContent={
@@ -233,7 +229,7 @@ export default function CreateSkillComponent() {
 											onValueChange={(v) =>
 												handleInputChange(
 													"toolSkillTechnicalName",
-													v
+													v,
 												)
 											}
 											startContent={
@@ -266,7 +262,7 @@ export default function CreateSkillComponent() {
 												onValueChange={(v) =>
 													handleInputChange(
 														"toolSkillMcpServerUrl",
-														v
+														v,
 													)
 												}
 												startContent={
@@ -284,7 +280,7 @@ export default function CreateSkillComponent() {
 												className="h-[56px] w-[56px] min-w-[56px] bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-400/10 text-cyan-400 transition-all duration-300 rounded-2xl group/btn disabled:opacity-50 disabled:cursor-not-allowed"
 												onPress={() => {
 													GetAllMcpToolsAvailable(
-														formData.toolSkillMcpServerUrl
+														formData.toolSkillMcpServerUrl,
 													);
 												}}
 												isLoading={IsMcpToolsLoading}

@@ -72,13 +72,13 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     /// <param name="agentsWorkspaceData">The workspace data dto model.</param>
     /// <returns>A boolean for success/failure.</returns>
     [HttpPost(WorkspacesRoutes.AddNewWorkspace_Route)]
-    [Consumes(MediaTypeNames.Multipart.FormData)]
+    [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = CreateNewWorkspaceAction.Summary, Description = CreateNewWorkspaceAction.Description, OperationId = CreateNewWorkspaceAction.OperationId)]
-    public async Task<ResponseDTO> CreateNewWorkspaceAsync([FromForm] AgentsWorkspaceDTO agentsWorkspaceData)
+    public async Task<ResponseDTO> CreateNewWorkspaceAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
     {
         ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
         if (base.IsRequestAuthorized())
@@ -121,13 +121,13 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     /// <param name="agentsWorkspaceData">The agents workspace data dto model.</param>
     /// <returns>The boolean for success/failure.</returns>
     [HttpPost(WorkspacesRoutes.UpdateExistingWorkspace_Route)]
-    [Consumes(MediaTypeNames.Multipart.FormData)]
+    [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = UpdateExistingWorkspaceDataAction.Summary, Description = UpdateExistingWorkspaceDataAction.Description, OperationId = UpdateExistingWorkspaceDataAction.OperationId)]
-    public async Task<ResponseDTO> UpdateExistingWorkspaceDataAsync([FromForm] AgentsWorkspaceDTO agentsWorkspaceData)
+    public async Task<ResponseDTO> UpdateExistingWorkspaceDataAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
     {
         ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
         if (base.IsRequestAuthorized())

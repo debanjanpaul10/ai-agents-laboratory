@@ -8,6 +8,7 @@ import { BugReportConstants, SeverityOptions } from "@helpers/constants";
 import { useAppDispatch } from "@store/index";
 import { ShowErrorToaster } from "@shared/toaster";
 import { AddBugReportDataAsync } from "@store/common/actions";
+import { CommonToasterConstants } from "@helpers/toaster-constants";
 
 export default function BugReportComponent({
 	onClose,
@@ -39,7 +40,7 @@ export default function BugReportComponent({
 			!formData.bugDescription.trim() ||
 			formData.bugSeverity === 0
 		) {
-			ShowErrorToaster("Please fill in all required fields");
+			ShowErrorToaster(CommonToasterConstants.REQURED_FIELDS_MISSING);
 			return;
 		}
 

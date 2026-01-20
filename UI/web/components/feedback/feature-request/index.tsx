@@ -8,6 +8,7 @@ import { useAuth } from "@auth/AuthProvider";
 import { useAppDispatch } from "@store/index";
 import { SubmitFeatureRequestDataAsync } from "@store/common/actions";
 import { NewFeatureRequestConstants } from "@helpers/constants";
+import { CommonToasterConstants } from "@helpers/toaster-constants";
 
 export default function FeatureRequestComponent({
 	onClose,
@@ -33,7 +34,7 @@ export default function FeatureRequestComponent({
 
 	async function handleSubmit() {
 		if (!formData.title.trim() || !formData.description.trim()) {
-			ShowErrorToaster("Please fill in all required fields");
+			ShowErrorToaster(CommonToasterConstants.REQURED_FIELDS_MISSING);
 			return;
 		}
 
