@@ -1,5 +1,5 @@
 using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 
 namespace AIAgents.Laboratory.Domain.DrivingPorts;
 
@@ -33,4 +33,11 @@ public interface ICommonAiService
     /// <param name="key">The key name used to identify the configuration group. Cannot be null or empty.</param>
     /// <returns>A dictionary containing configuration key-value pairs for the specified key name.</returns>
     Dictionary<string, string> GetConfigurationByKeyName(string key);
+
+    /// <summary>
+    /// Gets the top active agents data list and the agents count asynchronously.
+    /// </summary>
+    /// <param name="userName">The current logged in user.</param>
+    /// <returns>A tupple containing the list of agents and the top 3 active ai agents.</returns>
+    Task<(int ActiveAgentsCount, IEnumerable<AgentDataDomain> TopActiveAgentsList)> GetTopActiveAgentsDataAsync(string userName);
 }

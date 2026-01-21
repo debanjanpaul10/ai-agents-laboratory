@@ -26,4 +26,11 @@ public interface ICommonAiHandler
     /// <param name="key">The key name used to identify the configuration group. Cannot be null or empty.</param>
     /// <returns>A dictionary containing configuration key-value pairs for the specified key name.</returns>
     Dictionary<string, string> GetConfigurationByKeyName(string key);
+
+    /// <summary>
+    /// Gets the list of top 3 active ai agents being used.
+    /// </summary>
+    /// <param name="userName">The user name of the current logged in user.</param>
+    /// <returns>The top active agents data DTO.</returns>
+    Task<TopActiveAgentsDTO> GetTopActiveAgentsDataAsync(string userName);
 }

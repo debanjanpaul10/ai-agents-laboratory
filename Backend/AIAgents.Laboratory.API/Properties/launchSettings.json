@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "AIAgents.Laboratory.API": {
+    "AIAgents.Lab API": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

@@ -25,7 +25,7 @@ namespace AIAgents.Laboratory.Processor.Services;
 /// <seealso cref="IKnowledgeBaseProcessor"/>
 #pragma warning disable SKEXP0001
 #pragma warning disable SKEXP0050
-public class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingGenerator<string, Embedding<float>> embeddingGeneratorService, ILogger<KnowledgeBaseProcessor> logger) : IKnowledgeBaseProcessor
+public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingGenerator<string, Embedding<float>> embeddingGeneratorService, ILogger<KnowledgeBaseProcessor> logger) : IKnowledgeBaseProcessor
 {
     /// <summary>
     /// Detects the file type of the specified knowledge base document and reads its content accordingly.
@@ -44,12 +44,19 @@ public class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingGenerato
             var fileType = Path.GetExtension(knowledgeBaseDocument.FileName);
             if (string.Equals(KnowledgeBaseConstants.FileContentTypes.PlainTextFiles, fileType, StringComparison.OrdinalIgnoreCase))
                 return this.ReadTextFileData(knowledgeBaseDocument);
+
             else if (string.Equals(KnowledgeBaseConstants.FileContentTypes.PdfFiles, fileType, StringComparison.OrdinalIgnoreCase))
                 return this.ReadPdfFileData(knowledgeBaseDocument);
+
             else if (KnowledgeBaseConstants.FileContentTypes.ExcelFiles.Split(KnowledgeBaseConstants.CommaSeparator).Contains(fileType))
                 return this.ReadSpreadsheetData(knowledgeBaseDocument);
+
             else if (KnowledgeBaseConstants.FileContentTypes.WordFiles.Split(KnowledgeBaseConstants.CommaSeparator).Contains(fileType))
                 return this.ReadWordFileData(knowledgeBaseDocument);
+
+            else if (string.Equals(KnowledgeBaseConstants.FileContentTypes.JsonFiles, fileType, StringComparison.OrdinalIgnoreCase))
+                return this.ReadTextFileData(knowledgeBaseDocument);
+
             else
                 throw new Exception(ExceptionConstants.UnsupportedFileTypeMessage);
         }
@@ -259,7 +266,8 @@ public class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingGenerato
             foreach (var paragraph in body.Elements<Paragraph>())
             {
                 var text = paragraph.InnerText;
-                if (!string.IsNullOrWhiteSpace(text)) stringBuilder.AppendLine(text.Trim());
+                if (!string.IsNullOrWhiteSpace(text))
+                    stringBuilder.AppendLine(text.Trim());
             }
 
             return stringBuilder.ToString();

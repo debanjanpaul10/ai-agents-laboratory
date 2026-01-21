@@ -9,7 +9,7 @@ namespace AIAgents.Laboratory.Messaging.Adapters.Services;
 /// The Agent Status Hub for real-time notifications.
 /// </summary>
 /// <seealso cref="Microsoft.AspNetCore.SignalR.Hub" />
-public class AgentStatusHub(IAgentStatusStore agentStatusStore) : Hub
+public sealed class AgentStatusHub(IAgentStatusStore agentStatusStore) : Hub
 {
     /// <summary>
     /// Gets the current status of the agent.

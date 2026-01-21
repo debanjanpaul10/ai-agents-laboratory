@@ -35,13 +35,15 @@ public interface IAgentsHandler
     /// Updates the existing agent data.
     /// </summary>
     /// <param name="updateAgentData">The update agent data DTO model.</param>
+    /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData);
+    Task<bool> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData, string currentUserEmail);
 
     /// <summary>
     /// Deletes an existing agent data.
     /// </summary>
     /// <param name="agentId">The agent id.</param>
+    /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> DeleteExistingAgentDataAsync(string agentId);
+    Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail);
 }

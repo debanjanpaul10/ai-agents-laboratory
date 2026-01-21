@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
-using AIAgents.Laboratory.SemanticKernel.Adapters.Contracts;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -13,7 +13,7 @@ namespace AIAgents.Laboratory.Persistence.SQLDatabase.DataManagers;
 /// <param name="dbContext">The sql db context.</param>
 /// <seealso cref="IUnitOfWork"/>
 [ExcludeFromCodeCoverage]
-public class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
+public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
 {
     /// <summary>
     /// The repositories dictionary to hold repositories for different entity types.
@@ -34,10 +34,10 @@ public class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
     public IRepository<TEntity> Repository<TEntity>() where TEntity : class
     {
         var type = typeof(TEntity);
-        if (!_repositories.TryGetValue(type, out var repository))
+        if (!this._repositories.TryGetValue(type, out var repository))
         {
             repository = new GenericRepository<TEntity>(dbContext);
-            _repositories[type] = repository;
+            this._repositories[type] = repository;
         }
 
         return (IRepository<TEntity>)repository;
@@ -49,7 +49,7 @@ public class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
     /// <returns>A task to wait on.</returns>
     public async Task BeginTransactionAsync()
     {
-        _transaction = await dbContext.Database.BeginTransactionAsync();
+        this._transaction = await dbContext.Database.BeginTransactionAsync();
     }
 
     /// <summary>
@@ -59,10 +59,8 @@ public class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
     public async Task CommitAsync()
     {
         await dbContext.SaveChangesAsync();
-        if (_transaction is not null)
-        {
-            await _transaction.CommitAsync();
-        }
+        if (this._transaction is not null)
+            await this._transaction.CommitAsync();
     }
 
     /// <summary>
@@ -71,10 +69,8 @@ public class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
     /// <returns>A task to wait on.</returns>
     public async Task RollbackAsync()
     {
-        if (_transaction is not null)
-        {
-            await _transaction.RollbackAsync();
-        }
+        if (this._transaction is not null)
+            await this._transaction.RollbackAsync();
     }
 
     /// <summary>
@@ -92,7 +88,7 @@ public class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
     public void Dispose()
     {
         dbContext.Dispose();
-        _transaction?.Dispose();
+        this._transaction?.Dispose();
         GC.SuppressFinalize(this);
     }
 

@@ -20,7 +20,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler agentsHandler) : BaseController(httpContext)
+public sealed class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler agentsHandler) : BaseController(httpContext)
 {
     /// <summary>
     /// Creates the new agent asynchronous.
@@ -42,8 +42,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
         {
             var result = await agentsHandler.CreateNewAgentAsync(agentData, UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
-
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -63,9 +62,8 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
     public async Task<ResponseDTO> GetAllAgentsDataAsync()
     {
         var result = await agentsHandler.GetAllAgentsDataAsync(base.UserEmail).ConfigureAwait(false);
-        if (result is not null && result.Any()) return HandleSuccessRequestResponse(result);
-
-        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        if (result is not null) return HandleSuccessRequestResponse(result);
+        else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -85,8 +83,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
 
         var result = await agentsHandler.GetAgentDataByIdAsync(agentId, base.UserEmail).ConfigureAwait(false);
         if (result is not null) return HandleSuccessRequestResponse(result);
-
-        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 
     /// <summary>
@@ -95,7 +92,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
     /// <param name="updateAgentData">The update agent data.</param>
     /// <returns>The agent data dto.</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    [HttpPost(AgentsRoutes.UpdateExistingAgent_Route)]
+    [HttpPut(AgentsRoutes.UpdateExistingAgent_Route)]
     [ProducesResponseType(typeof(AgentDataDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -106,10 +103,9 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
         ArgumentNullException.ThrowIfNull(updateAgentData);
         if (IsRequestAuthorized())
         {
-            var result = await agentsHandler.UpdateExistingAgentDataAsync(updateAgentData).ConfigureAwait(false);
+            var result = await agentsHandler.UpdateExistingAgentDataAsync(updateAgentData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
-
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -120,7 +116,7 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
     /// </summary>
     /// <param name="agentId">The agent identifier.</param>
     /// <returns>The boolean for success/failure.</returns>
-    [HttpPost(AgentsRoutes.DeleteExistingAgent_Route)]
+    [HttpDelete(AgentsRoutes.DeleteExistingAgent_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -131,10 +127,9 @@ public class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler a
         ArgumentException.ThrowIfNullOrEmpty(agentId);
         if (IsRequestAuthorized())
         {
-            var result = await agentsHandler.DeleteExistingAgentDataAsync(agentId).ConfigureAwait(false);
+            var result = await agentsHandler.DeleteExistingAgentDataAsync(agentId, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
-
-            return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();

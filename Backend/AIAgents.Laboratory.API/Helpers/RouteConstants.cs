@@ -202,5 +202,82 @@ public static class RouteConstants
         /// The submit feature request route.
         /// </summary>
         internal const string SubmitFeatureRequest_Route = "submitfeaturerequest";
+
+        /// <summary>
+        /// The route constant for getting top 3 active ai agents.
+        /// </summary>
+        internal const string GetTopActiveAgents_Route = "topactiveagents";
+    }
+
+    /// <summary>
+    /// The route constants class for Tool Skills Controller.
+    /// </summary>
+    internal static class ToolSkillsRoutes
+    {
+        /// <summary>
+        /// The add new tool skill route.
+        /// </summary>
+        internal const string AddNewToolSkill_Route = "addtoolskill";
+
+        /// <summary>
+        /// The update existing tool skill route.
+        /// </summary>
+        internal const string UpdateExistingToolSkillData_Route = "updatetoolskill";
+
+        /// <summary>
+        /// The get all tool skills data route.
+        /// </summary>
+        internal const string GetAllToolSkills_Route = "getalltoolskills";
+
+        /// <summary>
+        /// The get tool skill by skill id route.
+        /// </summary>
+        internal const string GetToolSkillBySkillId_Route = "gettoolskill/{skillId}";
+
+        /// <summary>
+        /// The delete existing tool skill by skill id route.
+        /// </summary>
+        internal const string DeleteExistingToolSkillBySkillId_Route = "deletetoolskill/{skillId}";
+
+        /// <summary>
+        /// The get all MCP tools available route.
+        /// </summary>
+        internal const string GetAllMcpToolsAvailable_Route = "getallmcptoolsavailable";
+    }
+
+    /// <summary>
+    /// The route constants for Workspaces Controller.
+    /// </summary>
+    internal static class WorkspacesRoutes
+    {
+        /// <summary>
+        /// The get all workspaces route.
+        /// </summary>
+        internal const string GetAllWorkspaces_Route = "getallworkspaces";
+
+        /// <summary>
+        /// The get workspace by workspace id route.
+        /// </summary>
+        internal const string GetWorkspaceByWorkspaceId_Route = "getworkspace/{workspaceId}";
+
+        /// <summary>
+        /// The add new workspace route.
+        /// </summary>
+        internal const string AddNewWorkspace_Route = "createworkspace";
+
+        /// <summary>
+        /// The update existing workspace route.
+        /// </summary>
+        internal const string UpdateExistingWorkspace_Route = "updateworkspace";
+
+        /// <summary>
+        /// The delete existing workspace route.
+        /// </summary>
+        internal const string DeleteExistingWorkspace_Route = "deleteworkspace/{workspaceGuidId}";
+
+        /// <summary>
+        /// The invoke workspace agent route.
+        /// </summary>
+        internal const string InvokeWorkspaceAgent_Route = "invokeworkspaceagent";
     }
 }

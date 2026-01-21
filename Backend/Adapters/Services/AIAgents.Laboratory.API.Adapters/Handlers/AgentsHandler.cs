@@ -13,7 +13,7 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <param name="agentsService">The agents service.</param>
 /// <param name="mapper">The mapper service.</param>
 /// <seealso cref="AIAgents.Laboratory.API.Adapters.Contracts.IAgentsHandler" />
-public class AgentsHandler(IMapper mapper, IAgentsService agentsService) : IAgentsHandler
+public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) : IAgentsHandler
 {
     /// <summary>
     /// Creates the new agent asynchronous.
@@ -58,20 +58,22 @@ public class AgentsHandler(IMapper mapper, IAgentsService agentsService) : IAgen
     /// Updates the existing agent data.
     /// </summary>
     /// <param name="updateAgentData">The update agent data DTO model.</param>
+    /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData)
+    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData, string currentUserEmail)
     {
         var domainRequest = mapper.Map<AgentDataDomain>(updateAgentData);
-        return await agentsService.UpdateExistingAgentDataAsync(domainRequest).ConfigureAwait(false);
+        return await agentsService.UpdateExistingAgentDataAsync(domainRequest, currentUserEmail).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Deletes an existing agent data.
     /// </summary>
     /// <param name="agentId">The agent id.</param>
+    /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> DeleteExistingAgentDataAsync(string agentId)
+    public async Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail)
     {
-        return await agentsService.DeleteExistingAgentDataAsync(agentId).ConfigureAwait(false);
+        return await agentsService.DeleteExistingAgentDataAsync(agentId, currentUserEmail).ConfigureAwait(false);
     }
 }

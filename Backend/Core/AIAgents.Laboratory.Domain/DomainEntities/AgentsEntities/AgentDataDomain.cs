@@ -9,7 +9,7 @@ namespace AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 /// The Agent Data Domain model.
 /// </summary>
 [BsonIgnoreExtraElements]
-public sealed record AgentDataDomain
+public sealed record AgentDataDomain : BaseEntity
 {
     /// <summary>
     /// Gets or sets the identifier.
@@ -38,6 +38,14 @@ public sealed record AgentDataDomain
     public string AgentName { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the agent description.
+    /// </summary>
+    /// <value>
+    /// The value of agent description.
+    /// </value>
+    public string AgentDescription { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the agent meta prompt.
     /// </summary>
     /// <value>
@@ -52,21 +60,6 @@ public sealed record AgentDataDomain
     /// The name of the application.
     /// </value>
     public string ApplicationName { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the isactive boolean flag.
-    /// </summary>
-    public bool IsActive { get; set; } = true;
-
-    /// <summary>
-    /// Gets or sets the created by identifier.
-    /// </summary>
-    public string CreatedBy { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the date created.
-    /// </summary>
-    public DateTime DateCreated { get; set; }
 
     /// <summary>
     /// Gets or sets the knowledge base document.
@@ -90,14 +83,6 @@ public sealed record AgentDataDomain
     /// The knowledge base document domain.
     /// </value>
     public IList<KnowledgeBaseDocumentDomain> StoredKnowledgeBase { get; set; } = [];
-
-    /// <summary>
-    /// Gets or sets the URL of the MCP server used for network communication.
-    /// </summary>
-    /// <value>
-    /// The MCP server URL.
-    /// </value>
-    public string? McpServerUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the is private boolean flag.
@@ -140,4 +125,10 @@ public sealed record AgentDataDomain
     ///     The AI Vision images data value.
     /// </value>
     public IList<AiVisionImagesDomain?> AiVisionImagesData { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the associated skill guids.
+    /// </summary>
+    /// <value>The list of associated skill guids.</value>
+    public IList<string> AssociatedSkillGuids { get; set; } = [];
 }

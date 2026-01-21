@@ -7,7 +7,7 @@ namespace AIAgents.Laboratory.Messaging.Adapters.Services;
 /// The Agent Status Store.
 /// </summary>
 /// <seealso cref="AIAgents.Laboratory.Domain.DrivenPorts.IAgentStatusStore" />
-public class AgentStatusStore : IAgentStatusStore
+public sealed class AgentStatusStore : IAgentStatusStore
 {
     /// <summary>
     /// The lock object.
@@ -32,21 +32,21 @@ public class AgentStatusStore : IAgentStatusStore
     /// </returns>
     public bool TryUpdate(bool newValue, out AgentStatus updated)
     {
-        lock (_lock)
+        lock (this._lock)
         {
-            if (Current.IsAvailable == newValue)
+            if (this.Current.IsAvailable == newValue)
             {
-                updated = Current;
+                updated = this.Current;
                 return false;
             }
 
-            Current = new AgentStatus
+            this.Current = new()
             {
                 IsAvailable = newValue,
                 UpdatedAt = DateTimeOffset.UtcNow
             };
 
-            updated = Current;
+            updated = this.Current;
             return true;
         }
     }

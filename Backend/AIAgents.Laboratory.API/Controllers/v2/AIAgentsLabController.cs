@@ -20,7 +20,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICommonAiHandler commonAiHandler, IFeedbackHandler feedbackHandler) : BaseController(httpContextAccessor)
+public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICommonAiHandler commonAiHandler, IFeedbackHandler feedbackHandler) : BaseController(httpContextAccessor)
 {
     /// <summary>
     /// Gets the configurations data for application.
@@ -118,6 +118,27 @@ public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICo
             if (result) return HandleSuccessRequestResponse(result);
 
             return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
+    }
+
+    /// <summary>
+    /// Gets the list of top active agents.
+    /// </summary>
+    /// <returns>The top active agents data DTO.</returns>
+    [HttpGet(CommonRoutes.GetTopActiveAgents_Route)]
+    [ProducesResponseType(typeof(TopActiveAgentsDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ResponseDTO> GetTopActiveAgentsDataAsync()
+    {
+        if (base.IsRequestAuthorized())
+        {
+            var result = await commonAiHandler.GetTopActiveAgentsDataAsync(base.UserEmail).ConfigureAwait(false);
+            if (result is not null) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status500InternalServerError, ExceptionConstants.AiServicesDownMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();

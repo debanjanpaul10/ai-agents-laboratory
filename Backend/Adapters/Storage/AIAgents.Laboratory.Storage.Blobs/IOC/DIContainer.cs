@@ -22,8 +22,16 @@ public static class DIContainer
     /// <param name="services">The services collection.</param>
     /// <param name="configuration">The configuration service.</param>
     /// <returns>The updated services collection.</returns>
-    public static IServiceCollection AddBlobStorageDependencies(this IServiceCollection services, IConfiguration configuration) =>
-        services.AddGoogleCloudStorageDependencies(configuration);
+    public static IServiceCollection AddBlobStorageDependencies(this IServiceCollection services, IConfiguration configuration)
+    {
+        var currentCloudStorageService = configuration[AzureAppConfigurationConstants.CloudStorageServiceConstant] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+        return currentCloudStorageService switch
+        {
+            CloudinaryConstants.CloudinaryStorageService => services.AddCloudinaryDependencies(configuration),
+            GCPCloudStorageConstants.GCPStorageService => services.AddGoogleCloudStorageDependencies(configuration),
+            _ => services,
+        };
+    }
 
     /// <summary>
     /// Adds the cloudinary storage dependencies.

@@ -8,7 +8,7 @@ internal static class SwaggerConstants
     /// <summary>
     /// The Skills Controller.
     /// </summary>
-    internal static class SkillsController
+    internal static class ChatbotSkillsController
     {
         /// <summary>
         /// Swagger documentation for GetSQLQueryMarkdownResponseAsync
@@ -297,9 +297,9 @@ internal static class SwaggerConstants
         }
 
         /// <summary>
-		/// Swagger documentation for AddBugReportDataAsync
-		/// </summary>
-		internal static class AddBugReportDataAction
+        /// Swagger documentation for AddBugReportDataAsync
+        /// </summary>
+        internal static class AddBugReportDataAction
         {
             internal const string Summary = "Adds the bug report data asynchronous.";
             internal const string Description = "Creates a new bug report documentation by user/member to be reviewed by devs and fixed.";
@@ -316,4 +316,138 @@ internal static class SwaggerConstants
             internal const string OperationId = nameof(SubmitFeatureRequestDataAction);
         }
     }
+
+    /// <summary>
+    /// Swagger documentation for ToolSkillsController.
+    /// </summary>
+    internal static class ToolSkillsController
+    {
+        /// <summary>
+        /// Swagger documentation for GetAllToolSkillsAsync.
+        /// </summary>
+        internal static class GetAllToolSkillsAction
+        {
+            internal const string Summary = "Gets all the tool skills.";
+            internal const string Description = "Gets the list of all the existing skills for all tools present in the system.";
+            internal const string OperationId = nameof(GetAllToolSkillsAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for GetToolSkillBySkillIdAsync.
+        /// </summary>
+        internal static class GetToolSkillBySkillIdAction
+        {
+            internal const string Summary = "Gets a single tool skill by skill id.";
+            internal const string Description = "Gets the single tool skill by its corresponding skill id.";
+            internal const string OperationId = nameof(GetToolSkillBySkillIdAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for AddNewToolSkillAsync.
+        /// </summary>
+        internal static class AddNewToolSkillAction
+        {
+            internal const string Summary = "Creates a new tool skill.";
+            internal const string Description = "Creates a new tool skill that will be used by the agents via the marketplace.";
+            internal const string OperationId = nameof(AddNewToolSkillAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for UpdateExistingToolSkillDataAsync.
+        /// </summary>
+        internal static class UpdateExistingToolSkillDataAction
+        {
+            internal const string Summary = "Updates an existing tool.";
+            internal const string Description = "Updates an existing tool data present in the marketplace.";
+            internal const string OperationId = nameof(UpdateExistingToolSkillDataAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for DeleteExistingToolSkillBySkillIdAsync.
+        /// </summary>
+        internal static class DeleteExistingToolSkillBySkillIdAction
+        {
+            internal const string Summary = "Deletes an existing tool data.";
+            internal const string Description = "Deletes an existing tool data based on the skill id from the marketplace.";
+            internal const string OperationId = nameof(DeleteExistingToolSkillBySkillIdAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for GetAllMcpToolsAvailableAsync.
+        /// </summary>
+        internal static class GetAllMcpToolsAvailableAction
+        {
+            internal const string Summary = "Gets all the MCP tools available from the given MCP server url.";
+            internal const string Description = "Gets the list of all the available MCP tools present in given MCP server.";
+            internal const string OperationId = nameof(GetAllMcpToolsAvailableAction);
+        }
+
+    }
+
+    /// <summary>
+    /// Swagger documentation for WorkspacesController.
+    /// </summary>
+    internal static class WorkspacesController
+    {
+        /// <summary>
+        /// Swagger documentation for GetAllWorkspacesAsync.
+        /// </summary>
+        internal static class GetAllWorkspacesAction
+        {
+            internal const string Summary = "Gets all the workspaces list data.";
+            internal const string Description = "Gets the list of all the available workspaces in the system.";
+            internal const string OperationId = nameof(GetAllWorkspacesAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for GetWorkspaceByWorkspaceIdAsync.
+        /// </summary>
+        internal static class GetWorkspaceByWorkspaceIdAction
+        {
+            internal const string Summary = "Gets the workspace data by workspace id.";
+            internal const string Description = "Gets a single workspace data by the workspace id passed.";
+            internal const string OperationId = nameof(GetWorkspaceByWorkspaceIdAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for CreateNewWorkspaceAsync.
+        /// </summary>
+        internal static class CreateNewWorkspaceAction
+        {
+            internal const string Summary = "Creates a new workspace.";
+            internal const string Description = "Creates a new workspace in the system for agents to be created under.";
+            internal const string OperationId = nameof(CreateNewWorkspaceAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for DeleteExistingWorkspaceAsync.
+        /// </summary>
+        internal static class DeleteExistingWorkspaceAction
+        {
+            internal const string Summary = "Deletes an existing workspace.";
+            internal const string Description = "Deletes an existing workspace from the system based on the workspace guid id passed.";
+            internal const string OperationId = nameof(DeleteExistingWorkspaceAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for UpdateExistingWorkspaceDataAsync.
+        /// </summary>
+        internal static class UpdateExistingWorkspaceDataAction
+        {
+            internal const string Summary = "Updates an existing workspace data.";
+            internal const string Description = "Updates an existing workspace data in the system.";
+            internal const string OperationId = nameof(UpdateExistingWorkspaceDataAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for InvokeWorkspaceAgentAsync.
+        /// </summary>
+        internal static class InvokeWorkspaceAgentAction
+        {
+            internal const string Summary = "Invokes the workspace agent via chat.";
+            internal const string Description = "Invokes the workspace agent via chat with the user prompt and agent metadata.";
+            internal const string OperationId = nameof(InvokeWorkspaceAgentAction);
+        }
+    }
 }
+

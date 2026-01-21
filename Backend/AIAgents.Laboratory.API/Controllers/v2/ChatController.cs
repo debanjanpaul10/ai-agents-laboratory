@@ -18,7 +18,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandler chatHandler) : BaseController(httpContextAccessor)
+public sealed class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandler chatHandler) : BaseController(httpContextAccessor)
 {
     /// <summary>
     /// Invokes the chat agent asynchronous.
@@ -35,11 +35,14 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
     public async Task<ResponseDTO> InvokeChatAgentAsync([FromBody] ChatRequestDTO chatRequestDTO)
     {
         ArgumentNullException.ThrowIfNull(chatRequestDTO);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
+            if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
 
-        var result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
-        if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
-
-        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleUnAuthorizedRequestResponse();
     }
 
     /// <summary>
@@ -58,10 +61,14 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
         ArgumentNullException.ThrowIfNull(userChatMessage);
         ArgumentException.ThrowIfNullOrEmpty(userChatMessage.UserMessage);
 
-        var result = await chatHandler.GetDirectChatResponseAsync(userChatMessage.UserMessage, UserEmail).ConfigureAwait(false);
-        if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await chatHandler.GetDirectChatResponseAsync(userChatMessage.UserMessage, UserEmail).ConfigureAwait(false);
+            if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
 
-        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleUnAuthorizedRequestResponse();
     }
 
     /// <summary>
@@ -76,10 +83,14 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
     [SwaggerOperation(Summary = ClearConversationHistoryForUserAction.Summary, Description = ClearConversationHistoryForUserAction.Description, OperationId = ClearConversationHistoryForUserAction.OperationId)]
     public async Task<ResponseDTO> ClearConversationHistoryForUserAsync()
     {
-        var result = await chatHandler.ClearConversationHistoryForUserAsync(base.UserEmail).ConfigureAwait(false);
-        if (result) return HandleSuccessRequestResponse(result);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await chatHandler.ClearConversationHistoryForUserAsync(base.UserEmail).ConfigureAwait(false);
+            if (result) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeClearedMessageConstant);
+        }
 
-        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeClearedMessageConstant);
+        return HandleUnAuthorizedRequestResponse();
     }
 
     /// <summary>
@@ -94,9 +105,13 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
     [SwaggerOperation(Summary = GetConversationHistoryDataForUserAction.Summary, Description = GetConversationHistoryDataForUserAction.Description, OperationId = GetConversationHistoryDataForUserAction.OperationId)]
     public async Task<ResponseDTO> GetConversationHistoryDataForUserAsync()
     {
-        var result = await chatHandler.GetConversationHistoryDataAsync(base.UserEmail).ConfigureAwait(false);
-        if (result is not null) return HandleSuccessRequestResponse(result);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await chatHandler.GetConversationHistoryDataAsync(base.UserEmail).ConfigureAwait(false);
+            if (result is not null) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeFetchedMessageConstant);
+        }
 
-        return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeFetchedMessageConstant);
+        return HandleUnAuthorizedRequestResponse();
     }
 }

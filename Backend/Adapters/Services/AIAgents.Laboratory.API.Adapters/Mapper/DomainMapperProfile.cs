@@ -11,7 +11,7 @@ namespace AIAgents.Laboratory.API.Adapters.Mapper;
 /// <summary>
 /// The Domain Mapper Profile Class.
 /// </summary>
-/// <seealso cref="AutoMapper.Profile" />
+/// <seealso cref="Profile" />
 public class DomainMapperProfile : Profile
 {
     /// <summary>
@@ -21,7 +21,6 @@ public class DomainMapperProfile : Profile
     {
         CreateMap<SkillsInputDTO, SkillsInputDomain>();
         CreateMap<NltosqlInputDTO, NltosqlInputDomain>();
-        CreateMap<BugSeverityInputDTO, BugSeverityInput>();
         CreateMap<UserQueryRequestDTO, UserRequestDomain>();
         CreateMap<FollowupQuestionsRequestDTO, FollowupQuestionsRequestDomain>();
         CreateMap<CreateAgentDTO, AgentDataDomain>();
@@ -37,21 +36,22 @@ public class DomainMapperProfile : Profile
             .ForMember(destination => destination.Title, options => options.MapFrom(source => source.Title))
             .ForMember(destination => destination.Description, options => options.MapFrom(source => source.Description))
             .ForMember(destination => destination.CreatedBy, options => options.MapFrom(source => source.CreatedBy));
+        CreateMap<WorkspaceAgentChatRequestDTO, WorkspaceAgentChatRequestDomain>();
 
-        CreateMap<TagResponse, TagResponseDTO>();
-        CreateMap<ModerationContentResponse, ModerationContentResponseDTO>();
-        CreateMap<RewriteResponse, RewriteResponseDTO>();
         CreateMap<AgentStatus, AgentStatusDTO>();
-        CreateMap<BugSeverityResponse, BugSeverityResponseDTO>();
         CreateMap<AIAgentResponseDomain, AIAgentResponseDTO>();
         CreateMap<ChatHistoryDomain, ChatHistoryDTO>();
         CreateMap<ConversationHistoryDomain, ConversationHistoryDTO>();
+        CreateMap<AssociatedAgentsSkillDataDomain, AssociatedAgentsSkillDataDTO>();
 
         CreateMap<AgentDataDomain, AgentDataDTO>().ReverseMap()
             .ForMember(dest => dest.AgentId, opt => opt.MapFrom(src => src.AgentId));
-        CreateMap<BaseResponse, BaseResponseDTO>().ReverseMap();
         CreateMap<ChatRequestDTO, ChatRequestDomain>().ReverseMap();
         CreateMap<AiVisionImagesDomain, AiVisionImagesDataDTO>().ReverseMap()
             .ForMember(destination => destination.ImageKeywords, options => options.Ignore());
+        CreateMap<ToolSkillDomain, ToolSkillDTO>().ReverseMap()
+            .ForMember(destination => destination.IsActive, options => options.Ignore());
+        CreateMap<AgentsWorkspaceDomain, AgentsWorkspaceDTO>().ReverseMap();
+        CreateMap<WorkspaceAgentsDataDomain, WorkspaceAgentsDataDTO>().ReverseMap();
     }
 }

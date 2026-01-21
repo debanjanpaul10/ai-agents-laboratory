@@ -1,5 +1,6 @@
 using System.Globalization;
 using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
@@ -17,7 +18,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="logger">The logger service.</param>
 /// <param name="cacheService">The cache service.</param>
 /// <seealso cref="ICommonAiService"/>
-public class CommonAiService(IConfiguration configuration, ILogger<CommonAiService> logger, IAgentStatusStore agentStatusStore, ICacheService cacheService) : ICommonAiService
+public sealed class CommonAiService(IConfiguration configuration, ILogger<CommonAiService> logger, IAgentStatusStore agentStatusStore, ICacheService cacheService, IAgentsService agentsService) : ICommonAiService
 {
     /// <summary>
     /// Gets the current model identifier.
@@ -128,6 +129,31 @@ public class CommonAiService(IConfiguration configuration, ILogger<CommonAiServi
         finally
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationByKeyName), DateTime.UtcNow, key));
+        }
+    }
+
+    /// <summary>
+    /// Gets the top active agents data list and the agents count asynchronously.
+    /// </summary>
+    /// <param name="userName">The current logged in user.</param>
+    /// <returns>A tupple containing the list of agents and the top 3 active ai agents.</returns>
+    public async Task<(int ActiveAgentsCount, IEnumerable<AgentDataDomain> TopActiveAgentsList)> GetTopActiveAgentsDataAsync(string userName)
+    {
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, userName);
+
+            var activeAgentsList = await agentsService.GetAllAgentsDataAsync(userName).ConfigureAwait(false);
+            return (activeAgentsList.Count(), [.. activeAgentsList.OrderByDescending(x => x.DateModified).Take(3)]);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, ex.Message);
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, userName);
         }
     }
 }

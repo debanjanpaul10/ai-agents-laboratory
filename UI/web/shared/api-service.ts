@@ -1,0 +1,233 @@
+import {
+	DeleteAsync,
+	GetAsync,
+	PostAsync,
+	PutAsync,
+} from "@helpers/http-utility";
+import { AddBugReportDTO } from "@models/request/add-bug-report-dto";
+import { AgentDataDTO } from "@models/response/agent-data-dto";
+import { ChatRequestDTO } from "@models/request/chat-request-dto";
+import { CreateAgentDTO } from "@models/request/create-agent-dto";
+import { DirectChatRequestDTO } from "@models/request/direct-chat-request-dto";
+import { McpServerToolRequestDTO } from "@models/request/mcp-server-tool-request-dto";
+import { NewFeatureRequestDTO } from "@models/request/new-feature-request-dto";
+import { ToolSkillDTO } from "@models/response/tool-skill-dto";
+import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
+
+// #region AGENTS
+
+export async function GetAgentsApiAsync(accessToken: string) {
+	return await GetAsync("agents/getallagents", accessToken);
+}
+
+export async function GetAgentByIdApiAsync(
+	agentId: string,
+	accessToken: string,
+) {
+	return await GetAsync(`agents/getagentbyid/${agentId}`, accessToken);
+}
+
+export async function CreateNewAgentApiAsync(
+	newAgentData: CreateAgentDTO | FormData,
+	accessToken: string,
+) {
+	return await PostAsync("agents/createagent", newAgentData, accessToken);
+}
+
+export async function UpdateExistingAgentApiAsync(
+	updateAgentData: AgentDataDTO | FormData,
+	accessToken: string,
+) {
+	return await PutAsync("agents/updateagent", updateAgentData, accessToken);
+}
+
+export async function DeleteExistingAgentApiAsync(
+	agentId: string,
+	accessToken: string,
+) {
+	return await DeleteAsync(`agents/deleteagent/${agentId}`, accessToken);
+}
+
+// #endregion
+
+// #region CHAT
+
+export async function InvokeChatAgentApiAsync(
+	chatRequest: ChatRequestDTO,
+	accessToken: string,
+) {
+	return await PostAsync("chat/invokeagent", chatRequest, accessToken);
+}
+
+export async function GetDirectChatResponseApiAsync(
+	chatRequest: DirectChatRequestDTO,
+	accessToken: string,
+) {
+	return await PostAsync("chat/directchat", chatRequest, accessToken);
+}
+
+export async function ClearConversationHistoryForUserApiAsync(
+	accessToken: string,
+) {
+	return await PostAsync("chat/clearconversation", null, accessToken);
+}
+
+export async function GetConversationHistoryDataForUserApiAsync(
+	accessToken: string,
+) {
+	return await GetAsync("chat/getconversationhistory", accessToken);
+}
+
+// #endregion
+
+// #region COMMON
+
+export async function GetConfigurationsDataApiAsync(accessToken: string) {
+	return await GetAsync("aiagentslab/getconfigurations", accessToken);
+}
+
+export async function GetConfigurationByKeyNameApiAsync(
+	keyName: string,
+	accessToken: string,
+) {
+	return await GetAsync(
+		`aiagentslab/getconfigurationbykey/${keyName}`,
+		accessToken,
+	);
+}
+
+export async function AddBugReportDataApiAsync(
+	addBugReport: AddBugReportDTO,
+	accessToken: string,
+) {
+	return await PostAsync(
+		"aiagentslab/addbugreport",
+		addBugReport,
+		accessToken,
+	);
+}
+
+export async function SubmitFeatureRequestDataApiAsync(
+	newFeatureRequest: NewFeatureRequestDTO,
+	accessToken: string,
+) {
+	return await PostAsync(
+		"aiagentslab/submitfeaturerequest",
+		newFeatureRequest,
+		accessToken,
+	);
+}
+
+export async function GetTopActiveAgentsDataApiAsync(accessToken: string) {
+	return await GetAsync("aiagentslab/topactiveagents", accessToken);
+}
+
+// #endregion
+
+// #region MARKETPLACE
+
+export async function GetAllToolSkillsApiAsync(accessToken: string) {
+	return await GetAsync("toolskills/getalltoolskills", accessToken);
+}
+
+export async function GetToolSkillBySkillIdApiAsync(
+	skillId: string,
+	accessToken: string,
+) {
+	return await GetAsync(`toolskills/gettoolskill/${skillId}`, accessToken);
+}
+
+export async function AddNewToolSkillApiAsync(
+	toolSkillData: ToolSkillDTO | FormData,
+	accessToken: string,
+) {
+	return await PostAsync(
+		"toolskills/addtoolskill",
+		toolSkillData,
+		accessToken,
+	);
+}
+
+export async function UpdateExistingToolSkillDataApiAsync(
+	updateToolSkillData: ToolSkillDTO | FormData,
+	accessToken: string,
+) {
+	return await PutAsync(
+		"toolskills/updatetoolskill",
+		updateToolSkillData,
+		accessToken,
+	);
+}
+
+export async function DeleteExistingToolSkillBySkillIdApiAsync(
+	skillId: string,
+	accessToken: string,
+) {
+	return await DeleteAsync(
+		`toolskills/deletetoolskill/${skillId}`,
+		accessToken,
+	);
+}
+
+export async function GetAllMcpToolsAvailableApiAsync(
+	mcpServerTool: McpServerToolRequestDTO,
+	accessToken: string,
+) {
+	return await PostAsync(
+		"toolskills/getallmcptoolsavailable",
+		mcpServerTool,
+		accessToken,
+	);
+}
+
+// #endregion
+
+// #region WORKSPACES
+
+export async function GetAllWorkspacesDataApiAsync(accessToken: string) {
+	return await GetAsync("workspaces/getallworkspaces", accessToken);
+}
+
+export async function GetWorkspaceByWorkspaceIdApiAsync(
+	workspaceId: string,
+	accessToken: string,
+) {
+	return await GetAsync(
+		`workspaces/getworkspace/${workspaceId}`,
+		accessToken,
+	);
+}
+
+export async function CreateNewWorkspaceApiAsync(
+	agentsWorkspaceData: AgentsWorkspaceDTO | FormData,
+	accessToken: string,
+) {
+	return await PostAsync(
+		"workspaces/createworkspace",
+		agentsWorkspaceData,
+		accessToken,
+	);
+}
+
+export async function DeleteExistingWorkspaceApiAsync(
+	workspaceGuidId: string,
+	accessToken: string,
+) {
+	return await DeleteAsync(
+		`workspaces/deleteworkspace/${workspaceGuidId}`,
+		accessToken,
+	);
+}
+
+export async function UpdateExistingWorkspaceDataApiAsync(
+	agentsWorkspaceData: AgentsWorkspaceDTO | FormData,
+	accessToken: string,
+) {
+	return await PutAsync(
+		"workspaces/updateworkspace",
+		agentsWorkspaceData,
+		accessToken,
+	);
+}
+
+// #endregion

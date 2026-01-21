@@ -210,6 +210,11 @@ internal static class ProcessorConstants
             /// The excel files.
             /// </summary>
             internal const string ExcelFiles = ".xls, .xlsx, .xlsm";
+
+            /// <summary>
+            /// The JSON files.
+            /// </summary>
+            internal const string JsonFiles = ".json";
         }
     }
 

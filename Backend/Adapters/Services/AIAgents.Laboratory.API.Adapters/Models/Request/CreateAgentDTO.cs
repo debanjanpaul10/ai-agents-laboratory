@@ -16,6 +16,14 @@ public record CreateAgentDTO
     public string AgentName { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the agent description.
+    /// </summary>
+    /// <value>
+    /// The value of agent description.
+    /// </value>
+    public string AgentDescription { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the agent meta prompt.
     /// </summary>
     /// <value>
@@ -53,14 +61,6 @@ public record CreateAgentDTO
     public bool IsPrivate { get; set; } = false;
 
     /// <summary>
-    /// Gets or sets the URL of the MCP server used for network communication.
-    /// </summary>
-    /// <value>
-    /// The MCP server URL.
-    /// </value>
-    public string? McpServerUrl { get; set; }
-
-    /// <summary>
     /// Gets or sets the AI Vision images files.
     /// </summary>
     /// <value>
@@ -75,4 +75,10 @@ public record CreateAgentDTO
     ///     The removed AI vision images value.
     /// </value>
     public IList<string> RemovedAiVisionImages { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the associated skill guids.
+    /// </summary>
+    /// <value>The list of associated skill guids.</value>
+    public IList<string> AssociatedSkillGuids { get; set; } = [];
 }

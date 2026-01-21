@@ -33,6 +33,12 @@ public sealed record AgentDataDTO : CreateAgentDTO
     public DateTime DateCreated { get; set; }
 
     /// <summary>
+    /// Gets or sets the date modified.
+    /// </summary>
+    /// <value>The date modified.</value>
+    public DateTime DateModified { get; set; }
+
+    /// <summary>
     /// Gets or sets the is default chatbot boolean flag.
     /// </summary>
     /// <value>

@@ -12,7 +12,7 @@ namespace AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
 /// The application plugins class containing plugins for individual applications.
 /// </summary>
 /// <param name="logger">The logger service.</param>
-public class ApplicationPlugins(ILogger<ApplicationPlugins> logger)
+public sealed class ApplicationPlugins(ILogger<ApplicationPlugins> logger)
 {
     /// <summary>
     /// Gets the chat message response asynchronous.
@@ -22,7 +22,9 @@ public class ApplicationPlugins(ILogger<ApplicationPlugins> logger)
     /// <returns>The AI response.</returns>
     [KernelFunction(GetChatMessageResponseFunction.FunctionName)]
     [Description(GetChatMessageResponseFunction.FunctionDescription)]
-    public async Task<string> GetChatMessageResponseAsync(Kernel kernel, [Description(GetChatMessageResponseFunction.InputDescription)] string input)
+    public async Task<string> GetChatMessageResponseAsync(
+        Kernel kernel,
+        [Description(GetChatMessageResponseFunction.InputDescription)] string input)
     {
         try
         {

@@ -14,7 +14,7 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <param name="agentChatService">The agent chat service.</param>
 /// <param name="directChatService">The direct chat service.</param>
 /// <seealso cref="IChatHandler" />
-public class ChatHandler(IMapper mapper, IAgentChatService agentChatService, IDirectChatService directChatService) : IChatHandler
+public sealed class ChatHandler(IMapper mapper, IAgentChatService agentChatService, IDirectChatService directChatService) : IChatHandler
 {
     #region DIRECT CHAT SERVICE
 

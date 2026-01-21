@@ -15,7 +15,7 @@ namespace AIAgents.Laboratory.Processor.Services;
 /// <param name="configuration">The application configuration used to retrieve computer vision service credentials and endpoints.</param>
 /// <param name="logger">The logger instance used to record diagnostic and operational information for the vision processing operations.</param>
 /// <seealso cref="IVisionProcessor"/>
-public class VisionProcessor(IConfiguration configuration, ILogger<VisionProcessor> logger) : IVisionProcessor
+public sealed class VisionProcessor(IConfiguration configuration, ILogger<VisionProcessor> logger) : IVisionProcessor
 {
     /// <summary>
     /// Asynchronously extracts text data from an image located at the specified URL using a computer vision service.

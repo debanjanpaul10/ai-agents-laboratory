@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
-using AIAgents.Laboratory.SemanticKernel.Adapters.Contracts;
+using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -14,14 +15,14 @@ namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 /// <param name="configuration">The configuration.</param>
 /// <param name="logger">The logger used to record diagnostic and operational information for the service.</param>
 /// <seealso cref="IMcpClientServices"/>
-public class McpClientServices(IConfiguration configuration, ILogger<McpClientServices> logger) : IMcpClientServices
+public sealed class McpClientServices(IConfiguration configuration, ILogger<McpClientServices> logger) : IMcpClientServices
 {
     /// <summary>
     /// Asynchronously retrieves all available MCP client tools from the specified MCP server endpoint.
     /// </summary>
     /// <param name="mcpServerUrl">The URL of the MCP server endpoint from which to retrieve the list of client tools. Must be a valid, absolute URI.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see
-    /// cref="McpClientTool"/> objects representing the available client tools. The collection will be empty if no tools are found.</returns>
+    /// cref="McpServerToolsDomain"/> objects representing the available client tools. The collection will be empty if no tools are found.</returns>
     public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAsync(string mcpServerUrl)
     {
         try
@@ -73,6 +74,8 @@ public class McpClientServices(IConfiguration configuration, ILogger<McpClientSe
         }
     }
 
+    #region PRIVATE METHODS
+
     /// <summary>
     /// Creates the MCP client asynchronous.
     /// </summary>
@@ -107,4 +110,6 @@ public class McpClientServices(IConfiguration configuration, ILogger<McpClientSe
             logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateMcpClientAsync), DateTime.UtcNow);
         }
     }
+
+    #endregion
 }

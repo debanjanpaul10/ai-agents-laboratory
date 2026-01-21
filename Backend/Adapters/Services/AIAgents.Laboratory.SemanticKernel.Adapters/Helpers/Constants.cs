@@ -145,6 +145,32 @@ internal static class Constants
     }
 
     /// <summary>
+    /// The ChatGpt AI constants.
+    /// </summary>
+    internal static class ChatGptAiConstants
+    {
+        /// <summary>
+        /// The service provider name
+        /// </summary>
+        internal const string ServiceProviderName = "OpenAiGpt";
+
+        /// <summary>
+        /// The model identifier
+        /// </summary>
+        internal const string ModelId = "ChatGpt:ModelId";
+
+        /// <summary>
+        /// The API key
+        /// </summary>
+        internal const string ApiKey = "ChatGpt:ApiKey";
+
+        /// <summary>
+        /// The API endpoint
+        /// </summary>
+        internal const string ApiEndpoint = "ChatGpt:Endpoint";
+    }
+
+    /// <summary>
     /// Logging constants.
     /// </summary>
     internal static class LoggingConstants
