@@ -4,7 +4,6 @@ using AIAgents.Laboratory.SemanticKernel.Adapters.InvocationFilter;
 using AIAgents.Laboratory.SemanticKernel.Adapters.Plugins;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using static AIAgents.Laboratory.SemanticKernel.Adapters.Helpers.Constants;
 
@@ -37,17 +36,25 @@ internal static class KernelFactory
                 var geminiApiKey = configuration[GoogleGeminiAiConstants.GeminiAPIKeyConstant];
                 if (string.IsNullOrEmpty(geminiModelId) || string.IsNullOrEmpty(geminiApiKey))
                     throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
-
-                kernelBuilder.AddGoogleAIGeminiChatCompletion(geminiModelId, geminiApiKey);
+                kernelBuilder.AddGoogleAIGeminiChatCompletion(modelId: geminiModelId, apiKey: geminiApiKey);
                 break;
+
             case PerplexityAiConstants.ServiceProviderName:
                 var perplexityModelId = configuration[PerplexityAiConstants.ModelId];
                 var perplexityApiKey = configuration[PerplexityAiConstants.ApiKey];
                 var perplexityApiEndpoint = configuration[PerplexityAiConstants.ApiEndpoint];
                 if (string.IsNullOrEmpty(perplexityModelId) || string.IsNullOrEmpty(perplexityApiKey) || string.IsNullOrEmpty(perplexityApiEndpoint))
                     throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
+                kernelBuilder.AddOpenAIChatCompletion(modelId: perplexityModelId, apiKey: perplexityApiKey, endpoint: new Uri(perplexityApiEndpoint));
+                break;
 
-                kernelBuilder.AddOpenAIChatCompletion(perplexityModelId, apiKey: perplexityApiKey, endpoint: new Uri(perplexityApiEndpoint));
+            case ChatGptAiConstants.ServiceProviderName:
+                var chatGptModelId = configuration[ChatGptAiConstants.ModelId];
+                var chatGptApiKey = configuration[ChatGptAiConstants.ApiKey];
+                var chatGptApiEndpoint = configuration[ChatGptAiConstants.ApiEndpoint];
+                if (string.IsNullOrEmpty(chatGptModelId) || string.IsNullOrEmpty(chatGptApiKey) || string.IsNullOrEmpty(chatGptApiEndpoint))
+                    throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
+                kernelBuilder.AddAzureOpenAIChatCompletion(deploymentName: chatGptModelId, endpoint: chatGptApiEndpoint, apiKey: chatGptApiKey);
                 break;
 
             default:
