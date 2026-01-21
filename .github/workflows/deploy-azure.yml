@@ -27,7 +27,7 @@ on:
             deploy_db:
                 description: "AIAgents.Laboratory.Database"
                 required: false
-                default: true
+                default: false
                 type: boolean
 
 jobs:
