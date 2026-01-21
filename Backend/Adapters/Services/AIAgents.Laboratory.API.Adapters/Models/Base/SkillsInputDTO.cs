@@ -1,4 +1,4 @@
-﻿namespace AIAgents.Laboratory.API.Adapters.Models.Request;
+﻿namespace AIAgents.Laboratory.API.Adapters.Models.Base;
 
 /// <summary>
 /// The Skills input dto model class.

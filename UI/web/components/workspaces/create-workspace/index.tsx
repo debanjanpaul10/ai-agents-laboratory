@@ -27,7 +27,6 @@ import {
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
 import { GetAllAgentsDataAsync } from "@store/agents/actions";
 
-
 export default function CreateWorkspaceComponent({
 	onOpenAssociateAgents,
 }: {
@@ -44,6 +43,7 @@ export default function CreateWorkspaceComponent({
 		activeAgentsListInWorkspace: [],
 		agentWorkspaceGuid: "",
 		agentWorkspaceName: "",
+		isGroupChatEnabled: false,
 		createdBy: "",
 		dateCreated: new Date(),
 		dateModified: new Date(),
@@ -146,6 +146,7 @@ export default function CreateWorkspaceComponent({
 			activeAgentsListInWorkspace: [],
 			agentWorkspaceGuid: "",
 			agentWorkspaceName: "",
+			isGroupChatEnabled: false,
 			createdBy: "",
 			dateCreated: new Date(),
 			dateModified: new Date(),

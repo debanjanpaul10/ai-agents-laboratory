@@ -87,6 +87,26 @@ internal static class Constants
         /// The unauthorized user exception message constant.
         /// </summary>
         internal const string UnauthorizedUserExceptionMessage = "The user does not have sufficient permissions to do this action!";
+
+        /// <summary>
+        /// The groupchat not enabled exception message.
+        /// </summary>
+        internal const string GroupchatNotEnabledExceptionMessage = "Group chat feature is not enabled for this workspace!";
+
+        /// <summary>
+        /// The orchestrator response format invalid exception message.
+        /// </summary>
+        internal const string OrchestratorResponseFormatInvalidExceptionMessage = "The response from orchestrator is in invalid format!";
+
+        /// <summary>
+        /// The orchestrator loop limit reached exception message.
+        /// </summary>
+        internal const string OrchestratorLoopLimitReachedExceptionMessage = "The orchestrator has reached the maximum allowed loop limit!";
+
+        /// <summary>
+        /// The orchestrator agent not available exception message.
+        /// </summary>
+        internal const string OrchestratorAgentNotAvailableExceptionMessage = "The requested agent '{0}' is not available to process the user query!";
     }
 
     /// <summary>

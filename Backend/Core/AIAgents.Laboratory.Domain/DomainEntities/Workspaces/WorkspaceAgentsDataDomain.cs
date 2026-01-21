@@ -1,4 +1,4 @@
-namespace AIAgents.Laboratory.Domain.DomainEntities;
+namespace AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 
 /// <summary>
 /// The Workspace agents data domain model.

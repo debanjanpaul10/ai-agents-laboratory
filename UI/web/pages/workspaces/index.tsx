@@ -35,6 +35,7 @@ export default function WorkspacesComponent() {
 		activeAgentsListInWorkspace: [],
 		agentWorkspaceGuid: "",
 		agentWorkspaceName: "",
+		isGroupChatEnabled: false,
 		createdBy: "",
 		dateCreated: new Date(),
 		dateModified: new Date(),

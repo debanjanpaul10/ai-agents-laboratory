@@ -1,3 +1,4 @@
+using AIAgents.Laboratory.API.Adapters.Models.Base;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 
 namespace AIAgents.Laboratory.API.Adapters.Contracts;

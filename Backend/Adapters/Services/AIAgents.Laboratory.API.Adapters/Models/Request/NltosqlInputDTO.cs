@@ -1,9 +1,11 @@
-﻿namespace AIAgents.Laboratory.API.Adapters.Models.Request;
+﻿using AIAgents.Laboratory.API.Adapters.Models.Base;
+
+namespace AIAgents.Laboratory.API.Adapters.Models.Request;
 
 /// <summary>
 /// The NL to SQL input DTO.
 /// </summary>
-/// <seealso cref="AIAgents.Laboratory.API.Adapters.Models.Request.SkillsInputDTO" />
+/// <seealso cref="Base.SkillsInputDTO" />
 public sealed record NltosqlInputDTO : SkillsInputDTO
 {
     /// <summary>

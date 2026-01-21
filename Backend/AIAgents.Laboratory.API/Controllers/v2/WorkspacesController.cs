@@ -1,5 +1,6 @@
 using System.Net.Mime;
 using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Models.Base;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -158,6 +159,27 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
         ArgumentNullException.ThrowIfNull(chatRequestDTO);
 
         var result = await workspacesHandler.InvokeWorkspaceAgentAsync(chatRequestDTO).ConfigureAwait(false);
+        if (!string.IsNullOrWhiteSpace(result)) return HandleSuccessRequestResponse(result);
+        else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+    }
+
+    /// <summary>
+    /// Gets the workspace group chat response.
+    /// </summary>
+    /// <param name="chatRequestDTO">The workspace agent chat request dto model.</param>
+    /// <returns>The response from the group chat.</returns>
+    [HttpPost(WorkspacesRoutes.GetWorkspaceGroupChatResponse_Route)]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = GetWorkspaceGroupChatResponseAction.Summary, Description = GetWorkspaceGroupChatResponseAction.Description, OperationId = GetWorkspaceGroupChatResponseAction.OperationId)]
+    public async Task<ResponseDTO> GetWorkspaceGroupChatResponseAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO)
+    {
+        ArgumentNullException.ThrowIfNull(chatRequestDTO);
+
+        var result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(chatRequestDTO).ConfigureAwait(false);
         if (!string.IsNullOrWhiteSpace(result)) return HandleSuccessRequestResponse(result);
         else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }

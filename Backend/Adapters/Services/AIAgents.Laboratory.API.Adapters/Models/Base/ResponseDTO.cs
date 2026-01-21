@@ -1,4 +1,4 @@
-﻿namespace AIAgents.Laboratory.API.Adapters.Models.Response;
+﻿namespace AIAgents.Laboratory.API.Adapters.Models.Base;
 
 /// <summary>
 /// The Response DTO.

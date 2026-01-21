@@ -279,5 +279,10 @@ public static class RouteConstants
         /// The invoke workspace agent route.
         /// </summary>
         internal const string InvokeWorkspaceAgent_Route = "invokeworkspaceagent";
+
+        /// <summary>
+        /// The get workspace group chat response route.
+        /// </summary>
+        internal const string GetWorkspaceGroupChatResponse_Route = "workspacegroupchatresponse";
     }
 }
