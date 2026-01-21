@@ -27,7 +27,7 @@ on:
             deploy_db:
                 description: "AIAgents.Laboratory.Database"
                 required: false
-                default: true
+                default: false
                 type: boolean
 
 jobs:
@@ -80,7 +80,7 @@ jobs:
             - name: Deploy to Azure App Service
               uses: Azure/webapps-deploy@v2
               with:
-                  app-name: app-webapi-ai-agents-lab
+                  app-name: ${{ vars.AZURE_WEBAPI_NAME }}
                   slot-name: production
                   publish-profile: ${{ secrets.AZURE_WEBAPI_PUBLISH_PROFILE }}
                   package: ./publish-api

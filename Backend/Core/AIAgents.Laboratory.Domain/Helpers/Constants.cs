@@ -82,6 +82,11 @@ internal static class Constants
         /// The configuration key does not exists exception message.
         /// </summary>
         internal const string ConfigurationKeyNotFoundExceptionMessage = "The configuration key does not exists!";
+
+        /// <summary>
+        /// The unauthorized user exception message constant.
+        /// </summary>
+        internal const string UnauthorizedUserExceptionMessage = "The user does not have sufficient permissions to do this action!";
     }
 
     /// <summary>

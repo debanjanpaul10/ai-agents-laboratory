@@ -73,7 +73,8 @@ public static class DomainUtilities
             endIndex = response.LastIndexOf(']');
         }
 
-        if (startIndex != -1 && endIndex != -1 && endIndex > startIndex) return response.Substring(startIndex, endIndex - startIndex + 1);
+        if (startIndex != -1 && endIndex != -1 && endIndex > startIndex)
+            return response.Substring(startIndex, endIndex - startIndex + 1);
 
         return response.Trim();
     }

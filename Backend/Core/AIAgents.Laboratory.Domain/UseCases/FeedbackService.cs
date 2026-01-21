@@ -17,7 +17,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="configuration">The configuration.</param>
 /// <param name="feedbackDataManager">The feedback data manager.</param>
 /// <seealso cref="IFeedbackService"/>
-public class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, IFeedbackDataManager feedbackDataManager) : IFeedbackService
+public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, IFeedbackDataManager feedbackDataManager) : IFeedbackService
 {
     /// <summary>
     /// Adds the new bug report data asynchronous.
@@ -61,13 +61,15 @@ public class FeedbackService(ILogger<FeedbackService> logger, IConfiguration con
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonSerializer.Serialize(featureRequestData)));
             var isFeedbackFeatureEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsFeedbackFeatureEnabled], out var isEnabled) && isEnabled;
-            if (isFeedbackFeatureEnabled)
+            if (!isFeedbackFeatureEnabled)
+            {
+                return false;
+            }
+            else
             {
                 featureRequestData.PrepareNewFeatureRequestDataDomain();
                 return await feedbackDataManager.AddNewFeatureRequestDataAsync(featureRequestData).ConfigureAwait(false);
             }
-
-            return false;
         }
         catch (Exception ex)
         {

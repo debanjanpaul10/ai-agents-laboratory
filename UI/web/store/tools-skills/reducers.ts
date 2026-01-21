@@ -42,28 +42,10 @@ export function ToolSkillsReducer(state = initialState, action: any) {
 				isCreateSkillLoading: action.payload,
 			};
 		}
-		case GET_ALL_TOOLS_SKILLS: {
-			return {
-				...state,
-				allToolSkills: action.payload,
-			};
-		}
-		case GET_TOOL_SKILL_BY_ID: {
-			return {
-				...state,
-				toolSkills: action.payload,
-			};
-		}
 		case TOGGLE_ADD_SKILL_DRAWER: {
 			return {
 				...state,
 				isAddSkillDrawerOpen: action.payload,
-			};
-		}
-		case GET_ALL_MCP_SERVER_TOOLS: {
-			return {
-				...state,
-				mcpServerTools: action.payload,
 			};
 		}
 		case TOGGLE_MCP_TOOLS_LOADER: {
@@ -76,6 +58,25 @@ export function ToolSkillsReducer(state = initialState, action: any) {
 			return {
 				...state,
 				isMcpToolsDrawerOpen: action.payload,
+			};
+		}
+		case GET_ALL_TOOLS_SKILLS: {
+			return {
+				...state,
+				allToolSkills: action.payload,
+			};
+		}
+		case GET_TOOL_SKILL_BY_ID: {
+			return {
+				...state,
+				toolSkills: action.payload,
+			};
+		}
+
+		case GET_ALL_MCP_SERVER_TOOLS: {
+			return {
+				...state,
+				mcpServerTools: action.payload,
 			};
 		}
 

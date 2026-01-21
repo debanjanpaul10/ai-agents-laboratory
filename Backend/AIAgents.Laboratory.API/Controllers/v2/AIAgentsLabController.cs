@@ -20,7 +20,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICommonAiHandler commonAiHandler, IFeedbackHandler feedbackHandler) : BaseController(httpContextAccessor)
+public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, ICommonAiHandler commonAiHandler, IFeedbackHandler feedbackHandler) : BaseController(httpContextAccessor)
 {
     /// <summary>
     /// Gets the configurations data for application.

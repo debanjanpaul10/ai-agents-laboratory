@@ -12,7 +12,7 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <param name="mapper">The auto mapper service.</param>
 /// <param name="toolSkillsService">The tool skills service.</param>
 /// <seealso cref="IToolSkillsHandler"/>
-public class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSkillsService) : IToolSkillsHandler
+public sealed class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSkillsService) : IToolSkillsHandler
 {
     /// <summary>
     /// Adds a new tool skill asynchronously.

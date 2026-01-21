@@ -1,4 +1,3 @@
-using System.Globalization;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using Microsoft.AspNetCore.SignalR;
@@ -20,7 +19,7 @@ namespace AIAgents.Laboratory.Messaging.Adapters.Services;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="logger">The logger service.</param>
 /// <seealso cref="Microsoft.Extensions.Hosting.BackgroundService" />
-public class AgentStatusWatcher(ILogger<AgentStatusWatcher> logger, IConfiguration configuration, IAgentStatusStore agentStatusStore, IHubContext<AgentStatusHub> agentHub) : BackgroundService
+public sealed class AgentStatusWatcher(ILogger<AgentStatusWatcher> logger, IConfiguration configuration, IAgentStatusStore agentStatusStore, IHubContext<AgentStatusHub> agentHub) : BackgroundService
 {
     /// <summary>
     /// This method is called when the <see cref="T:Microsoft.Extensions.Hosting.IHostedService" /> starts. The implementation should return a task that represents
@@ -32,7 +31,7 @@ public class AgentStatusWatcher(ILogger<AgentStatusWatcher> logger, IConfigurati
     /// </remarks>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(AgentStatusWatcher), DateTime.UtcNow, string.Empty));
+        logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(AgentStatusWatcher), DateTime.UtcNow, string.Empty);
         while (!stoppingToken.IsCancellationRequested)
         {
             try

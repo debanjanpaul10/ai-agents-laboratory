@@ -15,7 +15,7 @@ namespace AIAgents.Laboratory.SemanticKernel.Adapters.AIServices;
 /// <param name="configuration">The configuration.</param>
 /// <param name="logger">The logger used to record diagnostic and operational information for the service.</param>
 /// <seealso cref="IMcpClientServices"/>
-public class McpClientServices(IConfiguration configuration, ILogger<McpClientServices> logger) : IMcpClientServices
+public sealed class McpClientServices(IConfiguration configuration, ILogger<McpClientServices> logger) : IMcpClientServices
 {
     /// <summary>
     /// Asynchronously retrieves all available MCP client tools from the specified MCP server endpoint.
@@ -74,6 +74,8 @@ public class McpClientServices(IConfiguration configuration, ILogger<McpClientSe
         }
     }
 
+    #region PRIVATE METHODS
+
     /// <summary>
     /// Creates the MCP client asynchronous.
     /// </summary>
@@ -108,4 +110,6 @@ public class McpClientServices(IConfiguration configuration, ILogger<McpClientSe
             logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateMcpClientAsync), DateTime.UtcNow);
         }
     }
+
+    #endregion
 }

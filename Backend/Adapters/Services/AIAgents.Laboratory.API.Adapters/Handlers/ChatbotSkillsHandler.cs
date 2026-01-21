@@ -1,4 +1,3 @@
-using System;
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.Domain.DomainEntities;
@@ -8,7 +7,13 @@ using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
-public class ChatbotSkillsHandler(IMapper mapper, IChatbotSkillsService aiSkillsService) : IChatbotSkillsHandler
+/// <summary>
+/// The chatbot skills api adapter handler.
+/// </summary>
+/// <param name="mapper">The auto mapper service.</param>
+/// <param name="chatbotSkillsService">The AI chatbot skills service.</param>
+/// <seealso cref="IChatbotSkillsHandler"/>
+public sealed class ChatbotSkillsHandler(IMapper mapper, IChatbotSkillsService chatbotSkillsService) : IChatbotSkillsHandler
 {
     /// <summary>
     /// Detects the user intent asynchronous.
@@ -20,7 +25,7 @@ public class ChatbotSkillsHandler(IMapper mapper, IChatbotSkillsService aiSkills
     public async Task<string> DetectUserIntentAsync(UserQueryRequestDTO userQueryRequest)
     {
         var domainRequest = mapper.Map<UserRequestDomain>(userQueryRequest);
-        return await aiSkillsService.DetectUserIntentAsync(domainRequest).ConfigureAwait(false);
+        return await chatbotSkillsService.DetectUserIntentAsync(domainRequest).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -31,7 +36,7 @@ public class ChatbotSkillsHandler(IMapper mapper, IChatbotSkillsService aiSkills
     public async Task<IEnumerable<string>> GetFollowupQuestionsResponseAsync(FollowupQuestionsRequestDTO followupQuestionsRequest)
     {
         var domainInput = mapper.Map<FollowupQuestionsRequestDomain>(followupQuestionsRequest);
-        return await aiSkillsService.GetFollowupQuestionsResponseAsync(domainInput).ConfigureAwait(false);
+        return await chatbotSkillsService.GetFollowupQuestionsResponseAsync(domainInput).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -43,7 +48,7 @@ public class ChatbotSkillsHandler(IMapper mapper, IChatbotSkillsService aiSkills
     /// </returns>
     public async Task<string> GetSQLQueryMarkdownResponseAsync(string input)
     {
-        return await aiSkillsService.GetSQLQueryMarkdownResponseAsync(input).ConfigureAwait(false);
+        return await chatbotSkillsService.GetSQLQueryMarkdownResponseAsync(input).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -56,7 +61,7 @@ public class ChatbotSkillsHandler(IMapper mapper, IChatbotSkillsService aiSkills
     public async Task<string> GetNLToSQLResponseAsync(NltosqlInputDTO nltosqlInput)
     {
         var domainInput = mapper.Map<NltosqlInputDomain>(nltosqlInput);
-        return await aiSkillsService.HandleNLToSQLResponseAsync(domainInput).ConfigureAwait(false);
+        return await chatbotSkillsService.HandleNLToSQLResponseAsync(domainInput).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -69,7 +74,7 @@ public class ChatbotSkillsHandler(IMapper mapper, IChatbotSkillsService aiSkills
     public async Task<string> GetRAGTextResponseAsync(SkillsInputDTO skillsInput)
     {
         var domainInput = mapper.Map<SkillsInputDomain>(skillsInput);
-        return await aiSkillsService.HandleRAGTextResponseAsync(domainInput).ConfigureAwait(false);
+        return await chatbotSkillsService.HandleRAGTextResponseAsync(domainInput).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -80,6 +85,6 @@ public class ChatbotSkillsHandler(IMapper mapper, IChatbotSkillsService aiSkills
     /// </returns>
     public async Task<string> GetUserGreetingResponseAsync()
     {
-        return await aiSkillsService.HandleUserGreetingIntentAsync().ConfigureAwait(false);
+        return await chatbotSkillsService.HandleUserGreetingIntentAsync().ConfigureAwait(false);
     }
 }

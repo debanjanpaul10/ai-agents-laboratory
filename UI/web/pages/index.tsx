@@ -2,7 +2,6 @@ import AuthenticatedApp from "@components/common/providers/authenticated-app";
 import CreateAgentComponent from "@components/manage-agents/create-agent";
 import FeedbackComponent from "@components/feedback";
 import DashboardComponent from "@pages/dashboard";
-import MarketplaceComponent from "@pages/marketplace";
 
 export default function Home() {
 	return (
@@ -10,7 +9,6 @@ export default function Home() {
 			<DashboardComponent />
 			<CreateAgentComponent />
 			<FeedbackComponent />
-			<MarketplaceComponent />
 		</AuthenticatedApp>
 	);
 }

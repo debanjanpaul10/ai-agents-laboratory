@@ -17,8 +17,8 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="aiServices">The AI services provider used to generate chatbot responses based on conversation history and user input.</param>
 /// <param name="conversationHistoryService">The service responsible for managing and persisting user conversation history.</param>
 /// <seealso cref="IDirectChatService"/>
-public class DirectChatService(ILogger<AgentChatService> logger, IConfiguration configuration,
-    IAgentsService agentsService, IAiServices aiServices, IConversationHistoryService conversationHistoryService) : IDirectChatService
+public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfiguration configuration, IAgentsService agentsService,
+    IAiServices aiServices, IConversationHistoryService conversationHistoryService) : IDirectChatService
 {
     /// <summary>
     /// Gets the chatbot response.

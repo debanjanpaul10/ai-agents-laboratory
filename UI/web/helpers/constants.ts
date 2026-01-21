@@ -3,6 +3,11 @@ export const metadata = {
 	description: "AI Agents Laboratory Application",
 };
 
+export const RouteConstants = {
+	Workspaces: "/workspaces",
+	Home: "/",
+};
+
 export const DashboardConstants = {
 	ManageAgentsTile: {
 		SubText: "Configure, monitor, control and test your AI agents.",
@@ -59,6 +64,7 @@ export const DashboardConstants = {
 		CheckingAuthentication: "Checking authentication",
 		CreateNewSkill: "Saving Skill details",
 		McpToolsListLoading: "Getting the available MCP tools",
+		CreateNewWorkspace: "Saving workspace details",
 	},
 };
 
@@ -95,12 +101,40 @@ export const WorkspacesConstants = {
 	LoadingConstants: {
 		MainLoader: "Loading AI Agents Workspaces",
 		LoginRedirectLoader: "Redirecting to Login",
+		UpdateWorkspace: "Updating workspace details",
 	},
 
 	ComingSoonConstants: {
 		Header: "Agents Workspaces Coming Soon",
 		SubHeading:
 			"Create your own custom workspaces and add multiple agents to test and work on.",
+	},
+	Headers: {
+		Header: "Agents Workspaces",
+		SubText:
+			"Create new workspaces to test your agents in these playgrounds",
+	},
+	CreateWorkspaceConstants: {
+		Header: "Add New Workspace",
+		SubHeader: "Create a new workspace as playground for your agents",
+	},
+};
+
+export const RunWorkspaceConstants = {
+	Headers: {
+		Header: "Start chatting ...",
+		SubHeader: "Send a message to chat with the agent.",
+	},
+	AgentsPane: {
+		NoAgentsHeader: "No Agents",
+		NoAgentsSubHeader:
+			"This workspace doesn't have any agents associated yet.",
+	},
+	ChatPane: {
+		SelectAgentHeader: "Select an Agent",
+		SelectAgentSubheader:
+			"Choose an agent from the list on the left to start a conversation",
+		SubTitle: "AI Agent",
 	},
 };
 

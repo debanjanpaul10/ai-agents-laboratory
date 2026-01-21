@@ -23,6 +23,7 @@ import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 import { AddBugReportDTO } from "@models/request/add-bug-report-dto";
 import { FEEDBACK_TYPES } from "@shared/types";
 import { NewFeatureRequestDTO } from "@models/request/new-feature-request-dto";
+import { CommonToasterConstants } from "@helpers/toaster-constants";
 
 export function ToggleDirectChatDrawer(isOpen: boolean) {
 	return {
@@ -130,7 +131,7 @@ export function AddBugReportDataAsync(
 					type: ADD_NEW_BUG_REPORT,
 					payload: response.responseData,
 				});
-				ShowSuccessToaster("New Bug report created successfully");
+				ShowSuccessToaster(CommonToasterConstants.BUG_REPORT_ADDED);
 				dispatch(ToggleFeedbackDrawer(false, FEEDBACK_TYPES.BUGREPORT));
 
 				return response.responseData as {};
@@ -160,7 +161,9 @@ export function SubmitFeatureRequestDataAsync(
 					type: ADD_NEW_FEATURE_REQUEST,
 					payload: response.responseData,
 				});
-				ShowSuccessToaster("New Feature Request sent successfully");
+				ShowSuccessToaster(
+					CommonToasterConstants.FEATURE_REQUEST_ADDED
+				);
 				dispatch(
 					ToggleFeedbackDrawer(false, FEEDBACK_TYPES.NEWFEATURE)
 				);

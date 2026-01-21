@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Reflection.Metadata;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
@@ -23,7 +22,8 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="blobStorageManager">The storage manager used to upload and manage images in cloud storage. Cannot be null.</param>
 /// <param name="visionProcessor">The processor used to analyze images and extract keywords using AI vision capabilities. Cannot be null.</param>
 /// <seealso cref="IDocumentIntelligenceService"/>
-public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> logger, IConfiguration configuration, IKnowledgeBaseProcessor knowledgeBaseProcessor, IBlobStorageManager blobStorageManager, IVisionProcessor visionProcessor) : IDocumentIntelligenceService
+public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> logger, IConfiguration configuration, IKnowledgeBaseProcessor knowledgeBaseProcessor,
+    IBlobStorageManager blobStorageManager, IVisionProcessor visionProcessor) : IDocumentIntelligenceService
 {
     /// <summary>
     /// The configuration value for allowed knowledge base file formats.
@@ -78,8 +78,8 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentData.AgentId);
 
-            if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any() || string.IsNullOrEmpty(AllowedKnowledgebaseFileFormats)) return;
-            DocumentHandlerService.ValidateUploadedFiles(agentData.KnowledgeBaseDocument, AllowedKnowledgebaseFileFormats);
+            if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any() || string.IsNullOrEmpty(this.AllowedKnowledgebaseFileFormats)) return;
+            DocumentHandlerService.ValidateUploadedFiles(agentData.KnowledgeBaseDocument, this.AllowedKnowledgebaseFileFormats);
 
             foreach (var uploadedDocument in agentData.KnowledgeBaseDocument)
                 await blobStorageManager.UploadDocumentsToStorageAsync(uploadedDocument, agentData.AgentId, UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
@@ -133,9 +133,9 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
             }
 
             // 2. Process any newly uploaded knowledge base documents
-            if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Any() && !string.IsNullOrEmpty(AllowedKnowledgebaseFileFormats))
+            if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Any() && !string.IsNullOrEmpty(this.AllowedKnowledgebaseFileFormats))
             {
-                DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.KnowledgeBaseDocument, AllowedKnowledgebaseFileFormats);
+                DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.KnowledgeBaseDocument, this.AllowedKnowledgebaseFileFormats);
                 foreach (var uploadedFile in updateDataDomain.KnowledgeBaseDocument)
                     await blobStorageManager.UploadDocumentsToStorageAsync(uploadedFile, updateDataDomain.AgentId, UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
 
@@ -188,8 +188,8 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow, agentData.AgentId);
 
-            if (agentData.VisionImages is null || !agentData.VisionImages.Any() || string.IsNullOrEmpty(AllowedAiVisionImagesFileFormats)) return;
-            DocumentHandlerService.ValidateUploadedFiles(agentData.VisionImages, AllowedAiVisionImagesFileFormats);
+            if (agentData.VisionImages is null || !agentData.VisionImages.Any() || string.IsNullOrEmpty(this.AllowedAiVisionImagesFileFormats)) return;
+            DocumentHandlerService.ValidateUploadedFiles(agentData.VisionImages, this.AllowedAiVisionImagesFileFormats);
             foreach (var image in agentData.VisionImages)
             {
                 if (image is null) continue;
@@ -250,9 +250,9 @@ public class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> lo
             }
 
             // Step 2: Process newly updated ai vision images
-            if (updateDataDomain.VisionImages is not null && updateDataDomain.VisionImages.Any() && !string.IsNullOrEmpty(AllowedAiVisionImagesFileFormats))
+            if (updateDataDomain.VisionImages is not null && updateDataDomain.VisionImages.Any() && !string.IsNullOrEmpty(this.AllowedAiVisionImagesFileFormats))
             {
-                DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.VisionImages, AllowedAiVisionImagesFileFormats);
+                DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.VisionImages, this.AllowedAiVisionImagesFileFormats);
                 foreach (var image in updateDataDomain.VisionImages)
                 {
                     if (image is null) continue;

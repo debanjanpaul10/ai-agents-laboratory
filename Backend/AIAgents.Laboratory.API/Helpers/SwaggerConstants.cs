@@ -384,14 +384,69 @@ internal static class SwaggerConstants
 
     }
 
+    /// <summary>
+    /// Swagger documentation for WorkspacesController.
+    /// </summary>
     internal static class WorkspacesController
     {
+        /// <summary>
+        /// Swagger documentation for GetAllWorkspacesAsync.
+        /// </summary>
         internal static class GetAllWorkspacesAction
         {
             internal const string Summary = "Gets all the workspaces list data.";
-
             internal const string Description = "Gets the list of all the available workspaces in the system.";
             internal const string OperationId = nameof(GetAllWorkspacesAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for GetWorkspaceByWorkspaceIdAsync.
+        /// </summary>
+        internal static class GetWorkspaceByWorkspaceIdAction
+        {
+            internal const string Summary = "Gets the workspace data by workspace id.";
+            internal const string Description = "Gets a single workspace data by the workspace id passed.";
+            internal const string OperationId = nameof(GetWorkspaceByWorkspaceIdAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for CreateNewWorkspaceAsync.
+        /// </summary>
+        internal static class CreateNewWorkspaceAction
+        {
+            internal const string Summary = "Creates a new workspace.";
+            internal const string Description = "Creates a new workspace in the system for agents to be created under.";
+            internal const string OperationId = nameof(CreateNewWorkspaceAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for DeleteExistingWorkspaceAsync.
+        /// </summary>
+        internal static class DeleteExistingWorkspaceAction
+        {
+            internal const string Summary = "Deletes an existing workspace.";
+            internal const string Description = "Deletes an existing workspace from the system based on the workspace guid id passed.";
+            internal const string OperationId = nameof(DeleteExistingWorkspaceAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for UpdateExistingWorkspaceDataAsync.
+        /// </summary>
+        internal static class UpdateExistingWorkspaceDataAction
+        {
+            internal const string Summary = "Updates an existing workspace data.";
+            internal const string Description = "Updates an existing workspace data in the system.";
+            internal const string OperationId = nameof(UpdateExistingWorkspaceDataAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for InvokeWorkspaceAgentAsync.
+        /// </summary>
+        internal static class InvokeWorkspaceAgentAction
+        {
+            internal const string Summary = "Invokes the workspace agent via chat.";
+            internal const string Description = "Invokes the workspace agent via chat with the user prompt and agent metadata.";
+            internal const string OperationId = nameof(InvokeWorkspaceAgentAction);
         }
     }
 }

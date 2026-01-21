@@ -19,7 +19,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="mcpClientServices">The MCP client services.</param>
 /// <seealso cref="IToolSkillsService"/>
-public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, IMcpClientServices mcpClientServices) : IToolSkillsService
+public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, IMcpClientServices mcpClientServices) : IToolSkillsService
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -112,6 +112,9 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
             var filter = Builders<ToolSkillDomain>.Filter.Where(tsd => tsd.IsActive && tsd.ToolSkillGuid == toolSkillId);
             var allToolSkills = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, ToolSkillsCollectionName, filter);
             var updateToolSkill = allToolSkills.FirstOrDefault() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+
+            if (updateToolSkill.CreatedBy != currentUserEmail)
+                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
 
             var updates = new List<UpdateDefinition<ToolSkillDomain>>
             {
@@ -236,6 +239,9 @@ public class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration
                 Builders<ToolSkillDomain>.Filter.Eq(x => x.ToolSkillGuid, updateToolSkillData.ToolSkillGuid));
             var toolSkillsData = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, ToolSkillsCollectionName, filter).ConfigureAwait(false);
             var existingToolSkill = toolSkillsData.FirstOrDefault() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+
+            if (existingToolSkill.CreatedBy != currentUserEmail)
+                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
 
             var updates = new List<UpdateDefinition<ToolSkillDomain>>
             {

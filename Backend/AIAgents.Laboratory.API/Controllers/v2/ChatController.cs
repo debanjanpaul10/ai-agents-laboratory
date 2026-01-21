@@ -18,7 +18,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandler chatHandler) : BaseController(httpContextAccessor)
+public sealed class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandler chatHandler) : BaseController(httpContextAccessor)
 {
     /// <summary>
     /// Invokes the chat agent asynchronous.
@@ -35,10 +35,14 @@ public class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandl
     public async Task<ResponseDTO> InvokeChatAgentAsync([FromBody] ChatRequestDTO chatRequestDTO)
     {
         ArgumentNullException.ThrowIfNull(chatRequestDTO);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
+            if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
 
-        var result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
-        if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
-        else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleUnAuthorizedRequestResponse();
     }
 
     /// <summary>

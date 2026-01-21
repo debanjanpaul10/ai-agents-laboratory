@@ -1,4 +1,6 @@
+using System.Net.Mime;
 using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,7 +19,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public class WorkspacesController(IHttpContextAccessor httpContextAccessor, IWorkspacesHandler workspacesHandler) : BaseController(httpContextAccessor)
+public sealed class WorkspacesController(IHttpContextAccessor httpContextAccessor, IWorkspacesHandler workspacesHandler) : BaseController(httpContextAccessor)
 {
     /// <summary>
     /// Gets the list of all available workspaces available.
@@ -39,5 +41,124 @@ public class WorkspacesController(IHttpContextAccessor httpContextAccessor, IWor
         }
 
         return HandleUnAuthorizedRequestResponse();
+    }
+
+    /// <summary>
+    /// Gets the workspace by workspace id.
+    /// </summary>
+    /// <param name="workspaceId">The workspace guid id.</param>
+    /// <returns>The agents workspace dto model.</returns>
+    [HttpGet(WorkspacesRoutes.GetWorkspaceByWorkspaceId_Route)]
+    [ProducesResponseType(typeof(AgentsWorkspaceDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = GetWorkspaceByWorkspaceIdAction.Summary, Description = GetWorkspaceByWorkspaceIdAction.Description, OperationId = GetWorkspaceByWorkspaceIdAction.OperationId)]
+    public async Task<ResponseDTO> GetWorkspaceByWorkspaceIdAsync([FromRoute] string workspaceId)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(workspaceId);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await workspacesHandler.GetWorkspaceByWorkspaceIdAsync(workspaceId, base.UserEmail).ConfigureAwait(false);
+            if (result is not null) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
+    }
+
+    /// <summary>
+    /// Creates a new workspace.
+    /// </summary>
+    /// <param name="agentsWorkspaceData">The workspace data dto model.</param>
+    /// <returns>A boolean for success/failure.</returns>
+    [HttpPost(WorkspacesRoutes.AddNewWorkspace_Route)]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = CreateNewWorkspaceAction.Summary, Description = CreateNewWorkspaceAction.Description, OperationId = CreateNewWorkspaceAction.OperationId)]
+    public async Task<ResponseDTO> CreateNewWorkspaceAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
+    {
+        ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await workspacesHandler.CreateNewWorkspaceAsync(agentsWorkspaceData, base.UserEmail).ConfigureAwait(false);
+            if (result) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
+    }
+
+    /// <summary>
+    /// Deletes an existing workspace.
+    /// </summary>
+    /// <param name="workspaceGuidId">The workspace guid id.</param>
+    /// <returns>A boolean for success/failure.</returns>
+    [HttpDelete(WorkspacesRoutes.DeleteExistingWorkspace_Route)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = DeleteExistingWorkspaceAction.Summary, Description = DeleteExistingWorkspaceAction.Description, OperationId = DeleteExistingWorkspaceAction.OperationId)]
+    public async Task<ResponseDTO> DeleteExistingWorkspaceAsync([FromRoute] string workspaceGuidId)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(workspaceGuidId);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await workspacesHandler.DeleteExistingWorkspaceAsync(workspaceGuidId, base.UserEmail).ConfigureAwait(false);
+            if (result) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
+    }
+
+    /// <summary>
+    /// Updates an existing workspace.
+    /// </summary>
+    /// <param name="agentsWorkspaceData">The agents workspace data dto model.</param>
+    /// <returns>The boolean for success/failure.</returns>
+    [HttpPut(WorkspacesRoutes.UpdateExistingWorkspace_Route)]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = UpdateExistingWorkspaceDataAction.Summary, Description = UpdateExistingWorkspaceDataAction.Description, OperationId = UpdateExistingWorkspaceDataAction.OperationId)]
+    public async Task<ResponseDTO> UpdateExistingWorkspaceDataAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
+    {
+        ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await workspacesHandler.UpdateExistingWorkspaceDataAsync(agentsWorkspaceData, base.UserEmail).ConfigureAwait(false);
+            if (result) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
+    }
+
+    /// <summary>
+    /// Invokes the workspace agent via chat.
+    /// </summary>
+    /// <param name="chatRequestDTO">The chat request DTO model.</param>
+    /// <returns>The ai agent response string.</returns>
+    [HttpPost(WorkspacesRoutes.InvokeWorkspaceAgent_Route)]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = InvokeWorkspaceAgentAction.Summary, Description = InvokeWorkspaceAgentAction.Description, OperationId = InvokeWorkspaceAgentAction.OperationId)]
+    public async Task<ResponseDTO> InvokeWorkspaceAgentAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO)
+    {
+        ArgumentNullException.ThrowIfNull(chatRequestDTO);
+
+        var result = await workspacesHandler.InvokeWorkspaceAgentAsync(chatRequestDTO).ConfigureAwait(false);
+        if (!string.IsNullOrWhiteSpace(result)) return HandleSuccessRequestResponse(result);
+        else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
     }
 }

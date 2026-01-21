@@ -5,6 +5,7 @@ import {
 	GET_AGENT_BY_ID,
 	GET_ALL_AGENTS_DATA,
 	TOGGLE_AGENT_CREATE_SPINNER,
+	TOGGLE_AGENTS_LIST_LOADING as TOGGLE_AGENTS_LIST_LOADER,
 	TOGGLE_CHAT_RESPONSE_SPINNER,
 	TOGGLE_EDIT_AGENT_SPINNER,
 	TOGGLE_NEW_AGENT_DRAWER,
@@ -21,6 +22,8 @@ import { CreateAgentDTO } from "@models/request/create-agent-dto";
 import { AgentDataDTO } from "@models/response/agent-data-dto";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 import { ToggleMainLoader } from "@store/common/actions";
+import { AgentsToasterConstants } from "@helpers/toaster-constants";
+import { ToggleAssociateAgentsDrawer } from "@store/workspaces/actions";
 
 export function ToggleNewAgentDrawer(isOpen: boolean) {
 	return {
@@ -50,10 +53,25 @@ export function ToggleEditAgentSpinner(isLoading: boolean) {
 	};
 }
 
-export function GetAllAgentsDataAsync(accessToken: string) {
+export function ToggleAgentsListLoader(isLoading: boolean) {
+	return {
+		type: TOGGLE_AGENTS_LIST_LOADER,
+		payload: isLoading,
+	};
+}
+
+export function GetAllAgentsDataAsync(
+	accessToken: string,
+	isFromManageAgents: boolean = false,
+) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
+			if (isFromManageAgents) {
+				dispatch(ToggleAgentsListLoader(true));
+				dispatch(ToggleAssociateAgentsDrawer(true));
+			}
 			dispatch(ToggleMainLoader(true));
+
 			const response = await GetAgentsApiAsync(accessToken);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -65,6 +83,7 @@ export function GetAllAgentsDataAsync(accessToken: string) {
 			console.error(error);
 			if (error.message) ShowErrorToaster(error.message);
 		} finally {
+			if (isFromManageAgents) dispatch(ToggleAgentsListLoader(false));
 			dispatch(ToggleMainLoader(false));
 		}
 	};
@@ -89,14 +108,14 @@ export function GetAgentDataByIdAsync(agentId: string, accessToken: string) {
 
 export function CreateNewAgentAsync(
 	newAgentData: CreateAgentDTO | FormData,
-	accessToken: string
+	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleCreateAgentSpinner(true));
 			const response = await CreateNewAgentApiAsync(
 				newAgentData,
-				accessToken
+				accessToken,
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -106,7 +125,7 @@ export function CreateNewAgentAsync(
 
 				dispatch(ToggleNewAgentDrawer(false));
 				dispatch(GetAllAgentsDataAsync(accessToken) as any);
-				ShowSuccessToaster("Agent created successfully");
+				ShowSuccessToaster(AgentsToasterConstants.CREATE_AGENT);
 			}
 		} catch (error: any) {
 			console.error(error);
@@ -119,14 +138,14 @@ export function CreateNewAgentAsync(
 
 export function UpdateExistingAgentDataAsync(
 	existingAgentData: AgentDataDTO | FormData,
-	accessToken: string
+	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleEditAgentSpinner(true));
 			const response = await UpdateExistingAgentApiAsync(
 				existingAgentData,
-				accessToken
+				accessToken,
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -134,7 +153,7 @@ export function UpdateExistingAgentDataAsync(
 					payload: response.responseData,
 				});
 				dispatch(GetAllAgentsDataAsync(accessToken) as any);
-				ShowSuccessToaster("Agent updated successfully!");
+				ShowSuccessToaster(AgentsToasterConstants.UPDATE_AGENT);
 			}
 		} catch (error: any) {
 			console.error(error);
@@ -147,14 +166,14 @@ export function UpdateExistingAgentDataAsync(
 
 export function DeleteExistingAgentDataAsync(
 	agentId: string,
-	accessToken: string
+	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleMainLoader(true));
 			const response = await DeleteExistingAgentApiAsync(
 				agentId,
-				accessToken
+				accessToken,
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -163,7 +182,7 @@ export function DeleteExistingAgentDataAsync(
 				});
 
 				dispatch(GetAllAgentsDataAsync(accessToken) as any);
-				ShowSuccessToaster("Agent deleted successfully!");
+				ShowSuccessToaster(AgentsToasterConstants.DELETE_AGENT);
 			}
 		} catch (error: any) {
 			console.error(error);

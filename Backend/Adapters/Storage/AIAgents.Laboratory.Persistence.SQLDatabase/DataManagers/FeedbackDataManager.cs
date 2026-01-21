@@ -13,7 +13,7 @@ namespace AIAgents.Laboratory.Persistence.SQLDatabase.DataManagers;
 /// <param name="unitOfWork">The unit of work.</param>
 /// <param name="logger">The logger service.</param>
 /// <seealso cref="IFeedbackDataManager" />
-public class FeedbackDataManager(IUnitOfWork unitOfWork, ILogger<FeedbackDataManager> logger) : IFeedbackDataManager
+public sealed class FeedbackDataManager(IUnitOfWork unitOfWork, ILogger<FeedbackDataManager> logger) : IFeedbackDataManager
 {
     /// <summary>
     /// Adds the new bug report data asynchronous.

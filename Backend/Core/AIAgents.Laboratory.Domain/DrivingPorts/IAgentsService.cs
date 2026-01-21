@@ -42,6 +42,7 @@ public interface IAgentsService
     /// Deletes an existing agent data.
     /// </summary>
     /// <param name="agentId">The agent id.</param>
+    /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> DeleteExistingAgentDataAsync(string agentId);
+    Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail);
 }

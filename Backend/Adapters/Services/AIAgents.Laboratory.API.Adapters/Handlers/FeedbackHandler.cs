@@ -12,7 +12,7 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <param name="mapper">The auto mapper.</param>
 /// <param name="feedbackService">The feedback service.</param>
 /// <seealso cref="IFeedbackHandler"/>
-public class FeedbackHandler(IMapper mapper, IFeedbackService feedbackService) : IFeedbackHandler
+public sealed class FeedbackHandler(IMapper mapper, IFeedbackService feedbackService) : IFeedbackHandler
 {
     /// <summary>
     /// Adds the new bug report data asynchronous.

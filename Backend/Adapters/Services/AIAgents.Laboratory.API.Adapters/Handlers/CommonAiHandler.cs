@@ -11,7 +11,7 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <param name="commonAiService">The common ai service.</param>
 /// <param name="mapper">The mapper.</param>
 /// <seealso cref="AIAgents.Laboratory.API.Adapters.Contracts.ICommonAiHandler" />
-public class CommonAiHandler(ICommonAiService commonAiService, IMapper mapper) : ICommonAiHandler
+public sealed class CommonAiHandler(ICommonAiService commonAiService, IMapper mapper) : ICommonAiHandler
 {
     /// <summary>
     /// Gets the agent current status.

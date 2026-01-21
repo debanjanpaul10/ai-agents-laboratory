@@ -16,7 +16,7 @@ namespace AIAgents.Laboratory.Storage.Blobs.DataManager;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="cloudinary">The Cloudinary client instance.</param>
 /// <seealso cref="ICloudinaryStorageManager"/>
-public class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> logger, IConfiguration configuration, ICloudinary cloudinary) : IBlobStorageManager
+public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> logger, IConfiguration configuration, ICloudinary cloudinary) : IBlobStorageManager
 {
     /// <summary>
     /// The Cloudinary knowledge base folder name.
@@ -40,8 +40,8 @@ public class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> logger, 
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, agentId);
 
             var folderNames = new List<string>();
-            if (!string.IsNullOrEmpty(CloudinaryKnowledgeBaseFolderName)) folderNames.Add(CloudinaryKnowledgeBaseFolderName);
-            if (!string.IsNullOrEmpty(CloudinaryVisionImagesFolderName)) folderNames.Add(CloudinaryVisionImagesFolderName);
+            if (!string.IsNullOrEmpty(this.CloudinaryKnowledgeBaseFolderName)) folderNames.Add(this.CloudinaryKnowledgeBaseFolderName);
+            if (!string.IsNullOrEmpty(this.CloudinaryVisionImagesFolderName)) folderNames.Add(this.CloudinaryVisionImagesFolderName);
 
             if (folderNames.Count == 0) return false;
 
@@ -107,8 +107,8 @@ public class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> logger, 
             if (documentFile.Length == 0) return string.Empty;
             var folderName = fileType switch
             {
-                UploadedFileType.AiVisionImageDocument => CloudinaryVisionImagesFolderName,
-                UploadedFileType.KnowledgeBaseDocument => CloudinaryKnowledgeBaseFolderName,
+                UploadedFileType.AiVisionImageDocument => this.CloudinaryVisionImagesFolderName,
+                UploadedFileType.KnowledgeBaseDocument => this.CloudinaryKnowledgeBaseFolderName,
                 _ => string.Empty,
             };
 

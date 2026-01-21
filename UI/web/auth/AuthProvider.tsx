@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 
 import { FullScreenLoading } from "@components/common/spinner";
 import { AuthContextType, AuthProviderProps, User } from "@shared/types";
-import { DashboardConstants } from "@helpers/constants";
+import { DashboardConstants, RouteConstants } from "@helpers/constants";
 
 const defaultAuthContext: AuthContextType = {
 	user: null,
@@ -47,8 +47,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	}, [accounts, inProgress]);
 
 	useEffect(() => {
-		if (!isLoading && !isAuthenticated && router.pathname !== "/") {
-			router.push("/");
+		if (
+			!isLoading &&
+			!isAuthenticated &&
+			router.pathname !== RouteConstants.Home
+		) {
+			router.push(RouteConstants.Home);
 		}
 	}, [isLoading, isAuthenticated, router.pathname]);
 

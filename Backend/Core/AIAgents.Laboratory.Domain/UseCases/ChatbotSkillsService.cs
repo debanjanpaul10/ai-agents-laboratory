@@ -16,7 +16,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="aiAgentServices">The AI agent services.</param>
 /// <param name="logger">The logger service.</param>
 /// <seealso cref="AIAgents.Laboratory.Domain.DrivingPorts.IChatbotSkillsService" />
-public class ChatbotSkillsService(ILogger<ChatbotSkillsService> logger, IAiServices aiAgentServices) : IChatbotSkillsService
+public sealed class ChatbotSkillsService(ILogger<ChatbotSkillsService> logger, IAiServices aiAgentServices) : IChatbotSkillsService
 {
     /// <summary>
     /// Detects the user intent asynchronous.
