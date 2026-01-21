@@ -47,15 +47,13 @@ export default function EditSkillFlyoutComponent({
 	const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
 
 	const IsEditSkillLoading = useAppSelector(
-		(state) => state.ToolSkillsReducer.isEditSkillLoading
+		(state) => state.ToolSkillsReducer.isEditSkillLoading,
 	);
-
 	const IsMcpToolsLoading = useAppSelector(
-		(state) => state.ToolSkillsReducer.isMcpToolsLoading
+		(state) => state.ToolSkillsReducer.isMcpToolsLoading,
 	);
-
 	const IsToolSkillLoading = useAppSelector(
-		(state) => state.ToolSkillsReducer.isToolSkillsLoading
+		(state) => state.ToolSkillsReducer.isToolSkillsLoading,
 	);
 
 	const handleInputChange = (field: keyof ToolSkillDTO, value: string) => {
@@ -73,18 +71,18 @@ export default function EditSkillFlyoutComponent({
 		form.append("toolSkillDisplayName", editFormData.toolSkillDisplayName);
 		form.append(
 			"toolSkillTechnicalName",
-			editFormData.toolSkillTechnicalName
+			editFormData.toolSkillTechnicalName,
 		);
 		form.append(
 			"toolSkillMcpServerUrl",
-			editFormData.toolSkillMcpServerUrl
+			editFormData.toolSkillMcpServerUrl,
 		);
 
 		const token = await authContext.getAccessToken();
 		token && dispatch(UpdateExistingToolSkillAsync(form, token));
 	}
 
-	async function handleSkillDelete() {
+	async function HandleSkillDelete() {
 		const token = await authContext.getAccessToken();
 		var skillId = editFormData.toolSkillGuid;
 		token && dispatch(DeleteExistingToolSkillAsync(skillId, token));
@@ -273,7 +271,7 @@ export default function EditSkillFlyoutComponent({
 										onValueChange={(v) =>
 											handleInputChange(
 												"toolSkillDisplayName",
-												v
+												v,
 											)
 										}
 										disabled={
@@ -305,7 +303,7 @@ export default function EditSkillFlyoutComponent({
 										onValueChange={(v) =>
 											handleInputChange(
 												"toolSkillTechnicalName",
-												v
+												v,
 											)
 										}
 										disabled={
@@ -338,7 +336,7 @@ export default function EditSkillFlyoutComponent({
 											onValueChange={(v) =>
 												handleInputChange(
 													"toolSkillMcpServerUrl",
-													v
+													v,
 												)
 											}
 											disabled={
@@ -360,7 +358,7 @@ export default function EditSkillFlyoutComponent({
 											className="h-[56px] w-[56px] min-w-[56px] bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-400/10 text-cyan-400 transition-all duration-300 rounded-2xl group/btn disabled:opacity-50 disabled:cursor-not-allowed"
 											onPress={() => {
 												GetAllMcpToolsAvailable(
-													editFormData.toolSkillMcpServerUrl
+													editFormData.toolSkillMcpServerUrl,
 												);
 											}}
 											isLoading={IsMcpToolsLoading}
@@ -392,7 +390,7 @@ export default function EditSkillFlyoutComponent({
 				<DeletePopupComponent
 					isOpen={isDeletePopupOpen}
 					onClose={() => setIsDeletePopupOpen(false)}
-					onDelete={handleSkillDelete}
+					onDelete={HandleSkillDelete}
 					title="Delete Skill"
 					description={`Are you sure you want to delete "${editFormData.toolSkillDisplayName}"? This action cannot be undone and will remove the skill from any associated agents.`}
 					isLoading={IsToolSkillLoading}

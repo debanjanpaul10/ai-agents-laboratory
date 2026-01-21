@@ -71,7 +71,7 @@ export default function AssociateAgentsFlyoutComponent({
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed top-0 right-0 md:right-1/2 md:w-1/2 w-full h-screen z-[60] transition-all duration-500 ease-in-out">
+		<div className="fixed top-0 left-0 h-screen z-[60] transition-all duration-500 ease-in-out md:w-1/2 w-full">
 			<div className="absolute inset-0 bg-gradient-to-l from-indigo-600/20 via-blue-600/20 to-transparent blur-sm opacity-50 -z-10"></div>
 			<div className="relative h-full bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl flex flex-col">
 				{/* HEADER */}

@@ -7,8 +7,10 @@ import {
 	Filter,
 	Laptop,
 	Notebook,
+	Pencil,
 	Search,
 	SortAsc,
+	Trash2,
 	User,
 	X,
 } from "lucide-react";
@@ -23,6 +25,7 @@ export default function WorkspacesListComponent({
 	isDisabled,
 	showCloseButton = true,
 	actionButton,
+	onEditWorkspace,
 }: WorkspacesListComponentProps) {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [selectedCreator, setSelectedCreator] = useState<string>("all");
@@ -256,10 +259,29 @@ export default function WorkspacesListComponent({
 										<div className="bg-gradient-to-br from-orange-500 to-pink-500 p-3 rounded-xl shadow-lg shadow-blue-500/20">
 											<Notebook className="w-6 h-6 text-white" />
 										</div>
-										<div className="flex items-center space-x-1 bg-blue-500/10 px-2 py-1 rounded-full border border-blue-500/20">
-											<span className="text-blue-400 text-[10px] font-medium uppercase tracking-wider">
-												Workspace
-											</span>
+										<div className="relative">
+											<div className="flex items-center space-x-1 bg-blue-500/10 px-2 py-1 rounded-full border border-blue-500/20 group-hover:opacity-0 transition-opacity duration-300">
+												<span className="text-blue-400 text-[10px] font-medium uppercase tracking-wider">
+													Workspace
+												</span>
+											</div>
+											<div className="absolute top-0 right-0 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-[-2px]">
+												{onEditWorkspace && (
+													<button
+														onClick={(e) => {
+															e.preventDefault();
+															e.stopPropagation();
+															onEditWorkspace(
+																workspace,
+															);
+														}}
+														className="p-1.5 bg-white/10 hover:bg-blue-500/20 text-white/70 hover:text-white rounded-lg backdrop-blur-md transition-all border border-white/5 hover:border-blue-500/30"
+														title="Edit Workspace"
+													>
+														<Pencil className="w-3.5 h-3.5" />
+													</button>
+												)}
+											</div>
 										</div>
 									</div>
 

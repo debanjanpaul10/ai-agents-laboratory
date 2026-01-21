@@ -1,4 +1,5 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivingPorts;
@@ -58,6 +59,17 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     {
         var domainResult = await workspacesService.GetWorkspaceByWorkspaceIdAsync(workspaceId, currentUserEmail).ConfigureAwait(false);
         return mapper.Map<AgentsWorkspaceDTO>(domainResult);
+    }
+
+    /// <summary>
+    /// Invoke the workspace agent with user message and get the response.
+    /// </summary>
+    /// <param name="chatRequestDTO">The chat request dto model.</param>
+    /// <returns>The string response from AI.</returns>
+    public async Task<string> InvokeWorkspaceAgentAsync(WorkspaceAgentChatRequestDTO chatRequestDTO)
+    {
+        var domainInput = mapper.Map<WorkspaceAgentChatRequestDomain>(chatRequestDTO);
+        return await workspacesService.InvokeWorkspaceAgentAsync(domainInput).ConfigureAwait(false);
     }
 
     /// <summary>

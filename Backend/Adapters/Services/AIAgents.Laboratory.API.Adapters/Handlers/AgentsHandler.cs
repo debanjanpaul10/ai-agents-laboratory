@@ -70,9 +70,10 @@ public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) 
     /// Deletes an existing agent data.
     /// </summary>
     /// <param name="agentId">The agent id.</param>
+    /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> DeleteExistingAgentDataAsync(string agentId)
+    public async Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail)
     {
-        return await agentsService.DeleteExistingAgentDataAsync(agentId).ConfigureAwait(false);
+        return await agentsService.DeleteExistingAgentDataAsync(agentId, currentUserEmail).ConfigureAwait(false);
     }
 }

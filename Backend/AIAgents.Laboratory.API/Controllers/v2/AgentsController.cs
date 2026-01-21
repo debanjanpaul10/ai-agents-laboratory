@@ -92,7 +92,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IAgentsHa
     /// <param name="updateAgentData">The update agent data.</param>
     /// <returns>The agent data dto.</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    [HttpPost(AgentsRoutes.UpdateExistingAgent_Route)]
+    [HttpPut(AgentsRoutes.UpdateExistingAgent_Route)]
     [ProducesResponseType(typeof(AgentDataDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -116,7 +116,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IAgentsHa
     /// </summary>
     /// <param name="agentId">The agent identifier.</param>
     /// <returns>The boolean for success/failure.</returns>
-    [HttpPost(AgentsRoutes.DeleteExistingAgent_Route)]
+    [HttpDelete(AgentsRoutes.DeleteExistingAgent_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -127,7 +127,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IAgentsHa
         ArgumentException.ThrowIfNullOrEmpty(agentId);
         if (IsRequestAuthorized())
         {
-            var result = await agentsHandler.DeleteExistingAgentDataAsync(agentId).ConfigureAwait(false);
+            var result = await agentsHandler.DeleteExistingAgentDataAsync(agentId, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
             else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }

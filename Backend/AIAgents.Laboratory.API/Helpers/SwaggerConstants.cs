@@ -438,6 +438,16 @@ internal static class SwaggerConstants
             internal const string Description = "Updates an existing workspace data in the system.";
             internal const string OperationId = nameof(UpdateExistingWorkspaceDataAction);
         }
+
+        /// <summary>
+        /// Swagger documentation for InvokeWorkspaceAgentAsync.
+        /// </summary>
+        internal static class InvokeWorkspaceAgentAction
+        {
+            internal const string Summary = "Invokes the workspace agent via chat.";
+            internal const string Description = "Invokes the workspace agent via chat with the user prompt and agent metadata.";
+            internal const string OperationId = nameof(InvokeWorkspaceAgentAction);
+        }
     }
 }
 

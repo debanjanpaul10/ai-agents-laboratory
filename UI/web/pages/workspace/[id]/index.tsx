@@ -13,6 +13,7 @@ import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.d
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import AssociatedAgentsChatPaneComponent from "@components/workspace/associated-agents-chat";
 import AssociatedAgentsListPaneComponent from "@components/workspace/associated-agents-list";
+import { CommonToasterConstants } from "@helpers/toaster-constants";
 
 export default function WorkspaceComponent() {
 	const dispatch = useAppDispatch();
@@ -67,7 +68,9 @@ export default function WorkspaceComponent() {
 
 	const handleAgentSelection = (agent: WorkspaceAgentsDataDTO) => {
 		if (selectedAgent && selectedAgent.agentGuid !== agent.agentGuid) {
-			ShowSuccessToaster("Previous conversation history cleared");
+			ShowSuccessToaster(
+				CommonToasterConstants.PREVIOUS_CONVERSATION_CLEARED,
+			);
 		}
 		setSelectedAgent(agent);
 	};

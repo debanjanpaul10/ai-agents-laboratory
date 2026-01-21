@@ -61,13 +61,15 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonSerializer.Serialize(featureRequestData)));
             var isFeedbackFeatureEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsFeedbackFeatureEnabled], out var isEnabled) && isEnabled;
-            if (isFeedbackFeatureEnabled)
+            if (!isFeedbackFeatureEnabled)
+            {
+                return false;
+            }
+            else
             {
                 featureRequestData.PrepareNewFeatureRequestDataDomain();
                 return await feedbackDataManager.AddNewFeatureRequestDataAsync(featureRequestData).ConfigureAwait(false);
             }
-
-            return false;
         }
         catch (Exception ex)
         {

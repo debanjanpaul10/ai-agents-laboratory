@@ -12,12 +12,13 @@ import { WorkspacesConstants } from "@helpers/constants";
 import MainLayout from "@components/common/main-layout";
 import {
 	GetAllWorkspacesDataAsync,
-	ToggleAssociateAgentsDrawer,
 	ToggleCreateWorkspaceDrawer,
+	DeleteExistingWorkspaceAsync,
 } from "@store/workspaces/actions";
 import WorkspacesListComponent from "@components/workspaces/workspaces-list";
 import CreateWorkspaceComponent from "@components/workspaces/create-workspace";
 import EditWorkspaceFlyoutComponent from "@components/workspaces/edit-workspace";
+import DeletePopupComponent from "@components/common/delete-popup";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import AssociateAgentsFlyoutComponent from "@components/workspaces/associate-agents";
 
@@ -27,6 +28,7 @@ export default function WorkspacesComponent() {
 	const router = useRouter();
 
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState<boolean>(false);
+	const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
 	const [selectedWorkspace, setSelectedWorkspace] =
 		useState<AgentsWorkspaceDTO | null>(null);
 	const [editFormData, setEditFormData] = useState<AgentsWorkspaceDTO>({
@@ -39,9 +41,16 @@ export default function WorkspacesComponent() {
 		modifiedBy: "",
 		workspaceUsers: [],
 	});
-	const [selectedAgentGuids, setSelectedAgentGuids] = useState<Set<string>>(
-		new Set(),
-	);
+
+	const [associateAgentsState, setAssociateAgentsState] = useState<{
+		isOpen: boolean;
+		selectedGuids: Set<string>;
+		onComplete: ((selected: Set<string>) => void) | null;
+	}>({
+		isOpen: false,
+		selectedGuids: new Set(),
+		onComplete: null,
+	});
 
 	const IsWorkspacesLoading = useAppSelector(
 		(state) => state.WorkspacesReducer.isWorkspacesLoading,
@@ -54,9 +63,6 @@ export default function WorkspacesComponent() {
 	);
 	const IsAddWorkspaceDrawerOpenStoreData = useAppSelector(
 		(state) => state.WorkspacesReducer.isAddWorkspaceDrawerOpen,
-	);
-	const IsAssociateAgentsDrawerOpenStoreData = useAppSelector(
-		(state) => state.WorkspacesReducer.isAssociateAgentsDrawerOpen,
 	);
 
 	useEffect(() => {
@@ -105,8 +111,48 @@ export default function WorkspacesComponent() {
 		dispatch(ToggleCreateWorkspaceDrawer(true));
 	};
 
-	const handleAgentSelectionComplete = (selectedGuids: Set<string>) => {
-		setSelectedAgentGuids(selectedGuids);
+	const handleEditWorkspace = (workspace: AgentsWorkspaceDTO) => {
+		setSelectedWorkspace(workspace);
+		setEditFormData(workspace);
+		setIsEditDrawerOpen(true);
+	};
+
+	const handleOpenAssociateAgents = (
+		currentSelection: Set<string>,
+		onComplete: (selected: Set<string>) => void,
+	) => {
+		setAssociateAgentsState({
+			isOpen: true,
+			selectedGuids: currentSelection,
+			onComplete,
+		});
+	};
+
+	const handleAssociateAgentsClose = () => {
+		setAssociateAgentsState((prev) => ({ ...prev, isOpen: false }));
+	};
+
+	const handleAssociateAgentsSelectionComplete = (
+		selectedGuids: Set<string>,
+	) => {
+		if (associateAgentsState.onComplete) {
+			associateAgentsState.onComplete(selectedGuids);
+		}
+	};
+
+	const confirmDeleteWorkspace = async () => {
+		if (!selectedWorkspace?.agentWorkspaceGuid) return;
+		const token = await fetchToken();
+		if (token) {
+			await dispatch(
+				DeleteExistingWorkspaceAsync(
+					selectedWorkspace.agentWorkspaceGuid,
+					token,
+				) as any,
+			);
+			setIsDeletePopupOpen(false);
+			setSelectedWorkspace(null);
+		}
 	};
 
 	const isAnyDrawerOpen =
@@ -127,6 +173,7 @@ export default function WorkspacesComponent() {
 					handleWorkspaceClick={(workspaceId: string) =>
 						router.push(`/workspace/${workspaceId}`)
 					}
+					onEditWorkspace={handleEditWorkspace}
 					onClose={() => {}}
 					isDisabled={isAnyDrawerOpen}
 					showCloseButton={false}
@@ -140,17 +187,25 @@ export default function WorkspacesComponent() {
 						</Button>
 					}
 				/>
-				<CreateWorkspaceComponent />
-				{!IsAddWorkspaceDrawerOpenStoreData && (
-					<AssociateAgentsFlyoutComponent
-						isOpen={IsAssociateAgentsDrawerOpenStoreData}
-						onClose={() =>
-							dispatch(ToggleAssociateAgentsDrawer(false))
-						}
-						selectedAgentGuids={selectedAgentGuids}
-						onSelectionComplete={handleAgentSelectionComplete}
-					/>
-				)}
+				<CreateWorkspaceComponent
+					onOpenAssociateAgents={handleOpenAssociateAgents}
+				/>
+				<AssociateAgentsFlyoutComponent
+					isOpen={associateAgentsState.isOpen}
+					onClose={handleAssociateAgentsClose}
+					selectedAgentGuids={associateAgentsState.selectedGuids}
+					onSelectionComplete={handleAssociateAgentsSelectionComplete}
+				/>
+
+				{/* Delete Popup */}
+				<DeletePopupComponent
+					isOpen={isDeletePopupOpen}
+					onClose={() => setIsDeletePopupOpen(false)}
+					onDelete={confirmDeleteWorkspace}
+					title="Delete Workspace"
+					description="Are you sure you want to delete this workspace? This action cannot be undone and will remove all associated data."
+					isLoading={IsWorkspacesLoading}
+				/>
 			</div>
 
 			{/* Backdrop Overlay */}
@@ -174,6 +229,7 @@ export default function WorkspacesComponent() {
 							isEditDrawerOpen={isEditDrawerOpen}
 							onEditClose={() => setIsEditDrawerOpen(false)}
 							isDisabled={false}
+							onOpenAssociateAgents={handleOpenAssociateAgents}
 						/>
 					</div>
 				</div>

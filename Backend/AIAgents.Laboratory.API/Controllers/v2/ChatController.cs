@@ -35,10 +35,14 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICh
     public async Task<ResponseDTO> InvokeChatAgentAsync([FromBody] ChatRequestDTO chatRequestDTO)
     {
         ArgumentNullException.ThrowIfNull(chatRequestDTO);
+        if (base.IsRequestAuthorized())
+        {
+            var result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
+            if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
 
-        var result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
-        if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
-        else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleUnAuthorizedRequestResponse();
     }
 
     /// <summary>

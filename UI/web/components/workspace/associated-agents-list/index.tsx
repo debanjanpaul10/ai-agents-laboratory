@@ -34,10 +34,6 @@ export default function AssociatedAgentsListPaneComponent({
 		);
 	}, [workspaceDetailsData?.activeAgentsListInWorkspace]);
 
-	const moveBack = () => {
-		router.push(RouteConstants.Workspaces);
-	};
-
 	const handleAgentClick = (agent: WorkspaceAgentsDataDTO) => {
 		setSelectedAgent(agent);
 	};
@@ -65,7 +61,9 @@ export default function AssociatedAgentsListPaneComponent({
 				</div>
 				<Tooltip content="Back to workspaces">
 					<Button
-						onPress={moveBack}
+						onPress={() => {
+							router.push(RouteConstants.Workspaces);
+						}}
 						isIconOnly
 						className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 text-white/70 hover:text-red-400"
 					>

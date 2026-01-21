@@ -1,4 +1,5 @@
 using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
@@ -16,7 +17,8 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="logger">The logger service.</param>
 /// <param name="configuration">The configuration service.</param>
 /// <param name="mongoDatabaseService">The mongo db service.</param>
-public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService) : IWorkspacesService
+/// <param name="agentChatService">The agent chat service.</param>
+public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, IAgentChatService agentChatService) : IWorkspacesService
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -76,6 +78,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
             var filter = Builders<AgentsWorkspaceDomain>.Filter.Where(ws => ws.IsActive && ws.AgentWorkspaceGuid == workspaceGuidId);
             var allWorkspaces = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, WorkspacesCollectionName, filter);
             var updateWorkspace = allWorkspaces.FirstOrDefault() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+
+            if (updateWorkspace.CreatedBy != currentUserEmail)
+                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
 
             var updates = new List<UpdateDefinition<AgentsWorkspaceDomain>>
             {
@@ -155,6 +160,47 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     }
 
     /// <summary>
+    /// Invoke the workspace agent with user message and get the response.
+    /// </summary>
+    /// <param name="chatRequest">The chat request domain model.</param>
+    /// <returns>The string response from AI.</returns>
+    public async Task<string> InvokeWorkspaceAgentAsync(WorkspaceAgentChatRequestDomain chatRequest)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.WorkspaceId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.AgentId);
+
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));
+
+            if (string.IsNullOrWhiteSpace(chatRequest.ConversationId)) chatRequest.ConversationId = Guid.NewGuid().ToString();
+
+            var workspaceDetails = await this.GetWorkspaceByWorkspaceIdAsync(chatRequest.WorkspaceId, chatRequest.ApplicationName).ConfigureAwait(false)
+                ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+            var agentDetails = workspaceDetails.ActiveAgentsListInWorkspace.FirstOrDefault(agent => agent.AgentGuid == chatRequest.AgentId)
+                ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+
+            var agentChatRequestModel = new ChatRequestDomain()
+            {
+                AgentId = agentDetails.AgentGuid,
+                AgentName = agentDetails.AgentName,
+                ConversationId = chatRequest.ConversationId,
+                UserMessage = chatRequest.UserMessage,
+            };
+            return await agentChatService.GetAgentChatResponseAsync(agentChatRequestModel).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, ex.Message);
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));
+        }
+    }
+
+    /// <summary>
     /// Updates the existing workspace data.
     /// </summary>
     /// <param name="agentsWorkspaceData">The agents workspace data domain model.</param>
@@ -173,6 +219,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
                    Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.AgentWorkspaceGuid, agentsWorkspaceData.AgentWorkspaceGuid));
             var allWorkspacesData = await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.WorkspacesCollectionName, filter).ConfigureAwait(false);
             var existingWorkspaceData = allWorkspacesData.FirstOrDefault() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+
+            if (!existingWorkspaceData.WorkspaceUsers.Contains(currentUserEmail))
+                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
 
             var updates = new List<UpdateDefinition<AgentsWorkspaceDomain>>
             {

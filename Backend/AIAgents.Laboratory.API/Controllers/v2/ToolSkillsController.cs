@@ -97,7 +97,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     /// </summary>
     /// <param name="updateToolSkillData">The updated tool skill data dto model.</param>
     /// <returns>The boolean for <c>success/failure.</c></returns>
-    [HttpPost(ToolSkillsRoutes.UpdateExistingToolSkillData_Route)]
+    [HttpPut(ToolSkillsRoutes.UpdateExistingToolSkillData_Route)]
     [Consumes(MediaTypeNames.Multipart.FormData)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -122,7 +122,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     /// </summary>
     /// <param name="skillId">The tool skill id.</param>
     /// <returns>The boolean for <c>success/failure.</c></returns>
-    [HttpPost(ToolSkillsRoutes.DeleteExistingToolSkillBySkillId_Route)]
+    [HttpDelete(ToolSkillsRoutes.DeleteExistingToolSkillBySkillId_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

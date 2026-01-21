@@ -36,6 +36,7 @@ public class DomainMapperProfile : Profile
             .ForMember(destination => destination.Title, options => options.MapFrom(source => source.Title))
             .ForMember(destination => destination.Description, options => options.MapFrom(source => source.Description))
             .ForMember(destination => destination.CreatedBy, options => options.MapFrom(source => source.CreatedBy));
+        CreateMap<WorkspaceAgentChatRequestDTO, WorkspaceAgentChatRequestDomain>();
 
         CreateMap<AgentStatus, AgentStatusDTO>();
         CreateMap<AIAgentResponseDomain, AIAgentResponseDTO>();

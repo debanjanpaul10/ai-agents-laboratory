@@ -103,6 +103,7 @@ export interface WorkspacesListComponentProps {
 	isDisabled: boolean;
 	showCloseButton?: boolean;
 	actionButton?: React.ReactNode;
+	onEditWorkspace?: (workspace: AgentsWorkspaceDTO) => void;
 }
 
 export interface ChatMessage {
@@ -178,6 +179,10 @@ export interface EditWorkspaceFlyoutComponentProps {
 	isEditDrawerOpen: boolean;
 	onEditClose: () => void;
 	isDisabled: boolean;
+	onOpenAssociateAgents: (
+		currentSelection: Set<string>,
+		onComplete: (selected: Set<string>) => void,
+	) => void;
 }
 
 export interface MainLayoutProps {

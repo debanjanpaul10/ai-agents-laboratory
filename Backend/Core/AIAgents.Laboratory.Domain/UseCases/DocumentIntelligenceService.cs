@@ -78,8 +78,8 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentData.AgentId);
 
-            if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any() || string.IsNullOrEmpty(AllowedKnowledgebaseFileFormats)) return;
-            DocumentHandlerService.ValidateUploadedFiles(agentData.KnowledgeBaseDocument, AllowedKnowledgebaseFileFormats);
+            if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any() || string.IsNullOrEmpty(this.AllowedKnowledgebaseFileFormats)) return;
+            DocumentHandlerService.ValidateUploadedFiles(agentData.KnowledgeBaseDocument, this.AllowedKnowledgebaseFileFormats);
 
             foreach (var uploadedDocument in agentData.KnowledgeBaseDocument)
                 await blobStorageManager.UploadDocumentsToStorageAsync(uploadedDocument, agentData.AgentId, UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
@@ -133,9 +133,9 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             }
 
             // 2. Process any newly uploaded knowledge base documents
-            if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Any() && !string.IsNullOrEmpty(AllowedKnowledgebaseFileFormats))
+            if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Any() && !string.IsNullOrEmpty(this.AllowedKnowledgebaseFileFormats))
             {
-                DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.KnowledgeBaseDocument, AllowedKnowledgebaseFileFormats);
+                DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.KnowledgeBaseDocument, this.AllowedKnowledgebaseFileFormats);
                 foreach (var uploadedFile in updateDataDomain.KnowledgeBaseDocument)
                     await blobStorageManager.UploadDocumentsToStorageAsync(uploadedFile, updateDataDomain.AgentId, UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
 
@@ -188,8 +188,8 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow, agentData.AgentId);
 
-            if (agentData.VisionImages is null || !agentData.VisionImages.Any() || string.IsNullOrEmpty(AllowedAiVisionImagesFileFormats)) return;
-            DocumentHandlerService.ValidateUploadedFiles(agentData.VisionImages, AllowedAiVisionImagesFileFormats);
+            if (agentData.VisionImages is null || !agentData.VisionImages.Any() || string.IsNullOrEmpty(this.AllowedAiVisionImagesFileFormats)) return;
+            DocumentHandlerService.ValidateUploadedFiles(agentData.VisionImages, this.AllowedAiVisionImagesFileFormats);
             foreach (var image in agentData.VisionImages)
             {
                 if (image is null) continue;
@@ -250,9 +250,9 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             }
 
             // Step 2: Process newly updated ai vision images
-            if (updateDataDomain.VisionImages is not null && updateDataDomain.VisionImages.Any() && !string.IsNullOrEmpty(AllowedAiVisionImagesFileFormats))
+            if (updateDataDomain.VisionImages is not null && updateDataDomain.VisionImages.Any() && !string.IsNullOrEmpty(this.AllowedAiVisionImagesFileFormats))
             {
-                DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.VisionImages, AllowedAiVisionImagesFileFormats);
+                DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.VisionImages, this.AllowedAiVisionImagesFileFormats);
                 foreach (var image in updateDataDomain.VisionImages)
                 {
                     if (image is null) continue;

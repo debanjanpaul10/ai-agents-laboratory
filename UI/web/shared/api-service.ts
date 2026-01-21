@@ -1,4 +1,9 @@
-import { GetAsync, PostAsync } from "@helpers/http-utility";
+import {
+	DeleteAsync,
+	GetAsync,
+	PostAsync,
+	PutAsync,
+} from "@helpers/http-utility";
 import { AddBugReportDTO } from "@models/request/add-bug-report-dto";
 import { AgentDataDTO } from "@models/response/agent-data-dto";
 import { ChatRequestDTO } from "@models/request/chat-request-dto";
@@ -17,30 +22,30 @@ export async function GetAgentsApiAsync(accessToken: string) {
 
 export async function GetAgentByIdApiAsync(
 	agentId: string,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await GetAsync(`agents/getagentbyid/${agentId}`, accessToken);
 }
 
 export async function CreateNewAgentApiAsync(
 	newAgentData: CreateAgentDTO | FormData,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await PostAsync("agents/createagent", newAgentData, accessToken);
 }
 
 export async function UpdateExistingAgentApiAsync(
 	updateAgentData: AgentDataDTO | FormData,
-	accessToken: string
+	accessToken: string,
 ) {
-	return await PostAsync("agents/updateagent", updateAgentData, accessToken);
+	return await PutAsync("agents/updateagent", updateAgentData, accessToken);
 }
 
 export async function DeleteExistingAgentApiAsync(
 	agentId: string,
-	accessToken: string
+	accessToken: string,
 ) {
-	return await PostAsync(`agents/deleteagent/${agentId}`, null, accessToken);
+	return await DeleteAsync(`agents/deleteagent/${agentId}`, accessToken);
 }
 
 // #endregion
@@ -49,26 +54,26 @@ export async function DeleteExistingAgentApiAsync(
 
 export async function InvokeChatAgentApiAsync(
 	chatRequest: ChatRequestDTO,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await PostAsync("chat/invokeagent", chatRequest, accessToken);
 }
 
 export async function GetDirectChatResponseApiAsync(
 	chatRequest: DirectChatRequestDTO,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await PostAsync("chat/directchat", chatRequest, accessToken);
 }
 
 export async function ClearConversationHistoryForUserApiAsync(
-	accessToken: string
+	accessToken: string,
 ) {
 	return await PostAsync("chat/clearconversation", null, accessToken);
 }
 
 export async function GetConversationHistoryDataForUserApiAsync(
-	accessToken: string
+	accessToken: string,
 ) {
 	return await GetAsync("chat/getconversationhistory", accessToken);
 }
@@ -83,33 +88,33 @@ export async function GetConfigurationsDataApiAsync(accessToken: string) {
 
 export async function GetConfigurationByKeyNameApiAsync(
 	keyName: string,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await GetAsync(
 		`aiagentslab/getconfigurationbykey/${keyName}`,
-		accessToken
+		accessToken,
 	);
 }
 
 export async function AddBugReportDataApiAsync(
 	addBugReport: AddBugReportDTO,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await PostAsync(
 		"aiagentslab/addbugreport",
 		addBugReport,
-		accessToken
+		accessToken,
 	);
 }
 
 export async function SubmitFeatureRequestDataApiAsync(
 	newFeatureRequest: NewFeatureRequestDTO,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await PostAsync(
 		"aiagentslab/submitfeaturerequest",
 		newFeatureRequest,
-		accessToken
+		accessToken,
 	);
 }
 
@@ -127,52 +132,51 @@ export async function GetAllToolSkillsApiAsync(accessToken: string) {
 
 export async function GetToolSkillBySkillIdApiAsync(
 	skillId: string,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await GetAsync(`toolskills/gettoolskill/${skillId}`, accessToken);
 }
 
 export async function AddNewToolSkillApiAsync(
 	toolSkillData: ToolSkillDTO | FormData,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await PostAsync(
 		"toolskills/addtoolskill",
 		toolSkillData,
-		accessToken
+		accessToken,
 	);
 }
 
 export async function UpdateExistingToolSkillDataApiAsync(
 	updateToolSkillData: ToolSkillDTO | FormData,
-	accessToken: string
+	accessToken: string,
 ) {
-	return await PostAsync(
+	return await PutAsync(
 		"toolskills/updatetoolskill",
 		updateToolSkillData,
-		accessToken
+		accessToken,
 	);
 }
 
 export async function DeleteExistingToolSkillBySkillIdApiAsync(
 	skillId: string,
-	accessToken: string
+	accessToken: string,
 ) {
-	return await PostAsync(
+	return await DeleteAsync(
 		`toolskills/deletetoolskill/${skillId}`,
-		null,
-		accessToken
+		accessToken,
 	);
 }
 
 export async function GetAllMcpToolsAvailableApiAsync(
 	mcpServerTool: McpServerToolRequestDTO,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await PostAsync(
 		"toolskills/getallmcptoolsavailable",
 		mcpServerTool,
-		accessToken
+		accessToken,
 	);
 }
 
@@ -186,44 +190,43 @@ export async function GetAllWorkspacesDataApiAsync(accessToken: string) {
 
 export async function GetWorkspaceByWorkspaceIdApiAsync(
 	workspaceId: string,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await GetAsync(
 		`workspaces/getworkspace/${workspaceId}`,
-		accessToken
+		accessToken,
 	);
 }
 
 export async function CreateNewWorkspaceApiAsync(
 	agentsWorkspaceData: AgentsWorkspaceDTO | FormData,
-	accessToken: string
+	accessToken: string,
 ) {
 	return await PostAsync(
 		"workspaces/createworkspace",
 		agentsWorkspaceData,
-		accessToken
+		accessToken,
 	);
 }
 
 export async function DeleteExistingWorkspaceApiAsync(
 	workspaceGuidId: string,
-	accessToken: string
+	accessToken: string,
 ) {
-	return await PostAsync(
+	return await DeleteAsync(
 		`workspaces/deleteworkspace/${workspaceGuidId}`,
-		null,
-		accessToken
+		accessToken,
 	);
 }
 
 export async function UpdateExistingWorkspaceDataApiAsync(
 	agentsWorkspaceData: AgentsWorkspaceDTO | FormData,
-	accessToken: string
+	accessToken: string,
 ) {
-	return await PostAsync(
+	return await PutAsync(
 		"workspaces/updateworkspace",
 		agentsWorkspaceData,
-		accessToken
+		accessToken,
 	);
 }
 

@@ -274,5 +274,10 @@ public static class RouteConstants
         /// The delete existing workspace route.
         /// </summary>
         internal const string DeleteExistingWorkspace_Route = "deleteworkspace/{workspaceGuidId}";
+
+        /// <summary>
+        /// The invoke workspace agent route.
+        /// </summary>
+        internal const string InvokeWorkspaceAgent_Route = "invokeworkspaceagent";
     }
 }

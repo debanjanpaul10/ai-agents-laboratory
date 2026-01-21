@@ -1,3 +1,4 @@
+using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 
 namespace AIAgents.Laboratory.API.Adapters.Contracts;
@@ -45,4 +46,11 @@ public interface IWorkspacesHandler
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
     Task<bool> UpdateExistingWorkspaceDataAsync(AgentsWorkspaceDTO agentsWorkspaceData, string currentUserEmail);
+
+    /// <summary>
+    /// Invoke the workspace agent with user message and get the response.
+    /// </summary>
+    /// <param name="chatRequestDTO">The chat request dto model.</param>
+    /// <returns>The string response from AI.</returns>
+    Task<string> InvokeWorkspaceAgentAsync(WorkspaceAgentChatRequestDTO chatRequestDTO);
 }

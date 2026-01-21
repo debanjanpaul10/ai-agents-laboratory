@@ -24,4 +24,5 @@ export const CommonToasterConstants = {
 	BUG_REPORT_ADDED: "New Bug report created successfully",
 	FEATURE_REQUEST_ADDED: "New Feature Request sent successfully",
 	REQURED_FIELDS_MISSING: "Please fill in all required fields",
+	PREVIOUS_CONVERSATION_CLEARED: "Previous conversation history cleared",
 };

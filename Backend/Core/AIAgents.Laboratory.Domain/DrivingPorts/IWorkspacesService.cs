@@ -46,4 +46,11 @@ public interface IWorkspacesService
     /// <returns>A boolean for <c>success/failure.</c></returns>
     Task<bool> UpdateExistingWorkspaceDataAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail);
 
+    /// <summary>
+    /// Invoke the workspace agent with user message and get the response.
+    /// </summary>
+    /// <param name="chatRequest">The chat request domain model.</param>
+    /// <returns>The string response from AI.</returns>
+    Task<string> InvokeWorkspaceAgentAsync(WorkspaceAgentChatRequestDomain chatRequest);
+
 }

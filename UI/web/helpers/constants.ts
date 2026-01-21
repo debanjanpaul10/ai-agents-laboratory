@@ -101,6 +101,7 @@ export const WorkspacesConstants = {
 	LoadingConstants: {
 		MainLoader: "Loading AI Agents Workspaces",
 		LoginRedirectLoader: "Redirecting to Login",
+		UpdateWorkspace: "Updating workspace details",
 	},
 
 	ComingSoonConstants: {

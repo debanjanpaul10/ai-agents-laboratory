@@ -7,12 +7,12 @@ import {
 	Bot,
 	UserPlus,
 	Sparkles,
-	Check,
 	RotateCcw,
 	Type,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button, Input, Chip } from "@heroui/react";
+import { cn } from "@heroui/react";
 
 import { useAuth } from "@auth/AuthProvider";
 import { FullScreenLoading } from "@components/common/spinner";
@@ -26,10 +26,16 @@ import {
 } from "@store/workspaces/actions";
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
 import { GetAllAgentsDataAsync } from "@store/agents/actions";
-import AssociateAgentsFlyoutComponent from "../associate-agents";
-import { cn } from "@heroui/react";
 
-export default function CreateWorkspaceComponent() {
+
+export default function CreateWorkspaceComponent({
+	onOpenAssociateAgents,
+}: {
+	onOpenAssociateAgents: (
+		currentSelection: Set<string>,
+		onComplete: (selected: Set<string>) => void,
+	) => void;
+}) {
 	const dispatch = useAppDispatch();
 	const authContext = useAuth();
 
@@ -49,9 +55,6 @@ export default function CreateWorkspaceComponent() {
 	const [selectedAgentGuids, setSelectedAgentGuids] = useState<Set<string>>(
 		new Set(),
 	);
-
-	const [isAssociateAgentsOpen, setIsAssociateAgentsOpen] =
-		useState<boolean>(false);
 
 	const IsAddWorkspaceDrawerOpenStoreData = useAppSelector(
 		(state) => state.WorkspacesReducer.isAddWorkspaceDrawerOpen,
@@ -311,9 +314,12 @@ export default function CreateWorkspaceComponent() {
 										<Button
 											isIconOnly
 											className="h-[56px] w-[56px] min-w-[56px] bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-400/10 text-cyan-400 transition-all duration-300 rounded-2xl group/btn"
-											onPress={() => {
-												GetAllAvailableAgents();
-												setIsAssociateAgentsOpen(true);
+											onPress={async () => {
+												await GetAllAvailableAgents();
+												onOpenAssociateAgents(
+													selectedAgentGuids,
+													handleAgentSelectionComplete,
+												);
 											}}
 											isLoading={IsAgentsListLoading}
 											title="View All Agents"
@@ -449,12 +455,6 @@ export default function CreateWorkspaceComponent() {
 						</div>
 					</div>
 				</div>
-				<AssociateAgentsFlyoutComponent
-					isOpen={isAssociateAgentsOpen}
-					onClose={() => setIsAssociateAgentsOpen(false)}
-					selectedAgentGuids={selectedAgentGuids}
-					onSelectionComplete={handleAgentSelectionComplete}
-				/>
 			</>
 		)
 	);
