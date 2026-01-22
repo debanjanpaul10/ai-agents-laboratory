@@ -33,7 +33,7 @@ public interface IAiServices
     /// </summary>
     /// <param name="userMessage">The user message data.</param>
     /// <param name="conversationDataDomain">The conversation history data domain.</param>
-    /// <param name="agentPrompt">The agent prompt message.</param>
+    /// <param name="agentMetaPrompt">The agent meta prompt value.</param>
     /// <returns>The AI chatbot response.</returns>
-    Task<string> GetChatbotResponseAsync(ConversationHistoryDomain conversationDataDomain, string userMessage, string agentPrompt);
+    Task<string> GetChatbotResponseAsync(ConversationHistoryDomain conversationDataDomain, string userMessage, string agentMetaPrompt);
 }

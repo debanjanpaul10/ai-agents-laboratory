@@ -145,7 +145,7 @@ public static class ApplicationPluginsHelpers
         /// <param name="toolResult">The tool result.</param>
         /// <returns>The function instructions.</returns>
         public static string GetFunctionInstructions(string input, string? toolResult) =>
-             string.IsNullOrEmpty(input)
+             string.IsNullOrEmpty(toolResult)
                 ? $@"User Query: {input} 
                     Please provide a helpful response to the user's query."
                 : $@"User Query: {input}
