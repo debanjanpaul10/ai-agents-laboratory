@@ -4,12 +4,12 @@ using System.Security.Claims;
 using AIAgents.Laboratory.API.Adapters.IOC;
 using AIAgents.Laboratory.API.Controllers;
 using AIAgents.Laboratory.Domain.IOC;
+using AIAgents.Laboratory.Infrastructure.AgentsFramework.IOC;
 using AIAgents.Laboratory.Messaging.Adapters.IOC;
 using AIAgents.Laboratory.Persistence.Caching.IOC;
 using AIAgents.Laboratory.Persistence.MongoDatabase.IOC;
 using AIAgents.Laboratory.Persistence.SQLDatabase.IOC;
 using AIAgents.Laboratory.Processor.IOC;
-using AIAgents.Laboratory.SemanticKernel.Adapters.IOC;
 using AIAgents.Laboratory.Storage.Blobs.IOC;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -61,7 +61,7 @@ public static class DIContainer
         services.ConfigureAuthenticationServices(configuration);
 
         services.AddAPIAdapterDependencies().AddMessagingDependencies();
-        services.AddAIAgentDependencies(configuration).AddMongoDbAdapterDependencies(configuration).AddRelationalSqlDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
+        services.AddAgentsFrameworkDependencies(configuration).AddMongoDbAdapterDependencies(configuration).AddRelationalSqlDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
 
         services.AddDomainDependencies().AddProcessorDependencies(configuration);
         services.AddMemoryCache().AddCacheDependencies();

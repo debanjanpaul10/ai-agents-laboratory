@@ -9,6 +9,7 @@
 	<ItemGroup>
 		<PackageReference Include="Automapper" Version="16.0.0" />
 		<PackageReference Include="Azure.Identity" Version="1.18.0-beta.2" />
+		<PackageReference Include="Microsoft.SemanticKernel.Connectors.Google" Version="1.69.0-alpha" />
 	</ItemGroup>
 
 	<ItemGroup>

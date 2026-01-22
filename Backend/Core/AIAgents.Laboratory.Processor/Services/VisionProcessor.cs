@@ -28,7 +28,7 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, string.Empty);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl);
 
             IList<string> imageTextData = [];
 
@@ -66,7 +66,7 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, string.Empty);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl);
         }
     }
 

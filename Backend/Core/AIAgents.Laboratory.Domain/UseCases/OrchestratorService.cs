@@ -54,7 +54,7 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
                 var orchestratorResponse = await aiServices.GetChatbotResponseAsync(
                     conversationDataDomain: conversationHistory,
                     userMessage: string.Empty,
-                    agentPrompt: orchestratorSystemPrompt).ConfigureAwait(false);
+                    agentMetaPrompt: orchestratorSystemPrompt).ConfigureAwait(false);
 
                 // Add Orchestrator's own response to history to maintain context
                 conversationHistory.ChatHistory.Add(new ChatHistoryDomain
