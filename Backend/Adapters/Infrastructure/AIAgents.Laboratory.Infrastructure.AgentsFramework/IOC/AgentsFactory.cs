@@ -113,11 +113,6 @@ internal static class AgentsFactory
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
-        // Validate configuration
-        var validationErrors = configuration.Validate();
-        if (validationErrors.Count != 0)
-            throw new InvalidOperationException(string.Format(ExceptionConstants.InvalidAgentConfigurationExceptionMessage, string.Join(", ", validationErrors)));
-
         var currentAiServiceProvider = configuration.ServiceProvider;
         IEnumerable<string> availableAiServiceProviders = [GoogleGeminiAiConstants.ServiceProviderName, PerplexityAiConstants.ServiceProviderName, ChatGptAiConstants.ServiceProviderName];
         if (availableAiServiceProviders.Contains(currentAiServiceProvider, StringComparer.OrdinalIgnoreCase))

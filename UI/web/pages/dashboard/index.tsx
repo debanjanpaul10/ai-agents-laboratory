@@ -22,11 +22,11 @@ export default function DashboardComponent() {
 	const authContext = useAuth();
 
 	const IsLoadingStoreData = useAppSelector(
-		(state) => state.CommonReducer.isLoading
+		(state) => state.CommonReducer.isLoading,
 	);
 
 	const ConfigurationsStoreData = useAppSelector(
-		(state) => state.CommonReducer.configurations
+		(state) => state.CommonReducer.configurations,
 	);
 
 	useEffect(() => {
@@ -60,45 +60,31 @@ export default function DashboardComponent() {
 		}
 	}
 
-	const handleUnAuthorizedUser = () => {
-		return (
-			<FullScreenLoading
-				isLoading={true}
-				message={
-					DashboardConstants.LoadingConstants.LoginRedirectLoader
-				}
-			/>
-		);
-	};
-
-	const renderAuthorizedDashboard = () => {
-		return (
-			<MainLayout isFullWidth={true} contentClassName="p-6">
-				<div className="space-y-6">
-					<WelcomeCardComponent />
-
-					{/* Main Grid */}
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-						<ActiveAgentsTileComponent />
-						<QuickActionsTileComponent />
-						<SystemHealthTileComponent />
-					</div>
-				</div>
-				<DirectChatComponent />
-				<FeedbackComponent />
-				<FooterComponent />
-			</MainLayout>
-		);
-	};
-
 	return !authContext.isAuthenticated ? (
-		handleUnAuthorizedUser()
+		<FullScreenLoading
+			isLoading={true}
+			message={DashboardConstants.LoadingConstants.LoginRedirectLoader}
+		/>
 	) : IsLoadingStoreData ? (
 		<FullScreenLoading
 			isLoading={IsLoadingStoreData}
 			message={DashboardConstants.LoadingConstants.MainLoader}
 		/>
 	) : (
-		renderAuthorizedDashboard()
+		<MainLayout isFullWidth={true} contentClassName="p-6">
+			<div className="space-y-6">
+				<WelcomeCardComponent />
+
+				{/* Main Grid */}
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+					<ActiveAgentsTileComponent />
+					<QuickActionsTileComponent />
+					<SystemHealthTileComponent />
+				</div>
+			</div>
+			<DirectChatComponent />
+			<FeedbackComponent />
+			<FooterComponent />
+		</MainLayout>
 	);
 }

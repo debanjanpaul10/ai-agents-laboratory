@@ -3,7 +3,6 @@ using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
-using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.ApplicationPluginsHelpers;
@@ -42,8 +41,9 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
                         agentsData.Add(agentData);
             }).ConfigureAwait(false);
 
-            var orchestratorSystemPrompt = OrchestratorAgentHelper.GenerateOrchestratorSystemPrompt(agentsData);
-            var conversationHistory = OrchestratorAgentHelper.InitializeOrchestratorConversation(chatRequest);
+            var agentsList = agentsData.Select(agent => $"{agent.AgentName}: {agent.AgentDescription}");
+            var orchestratorSystemPrompt = SystemOrchestratorFunction.GetFunctionInstructions(string.Join("\n", agentsList));
+            ConversationHistoryDomain conversationHistory = new();
 
             var loopCount = 0;
             while (loopCount < SystemOrchestratorFunction.MAX_ORCHESTRATOR_LOOPS)
@@ -53,7 +53,7 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
                 // Call Orchestrator
                 var orchestratorResponse = await aiServices.GetChatbotResponseAsync(
                     conversationDataDomain: conversationHistory,
-                    userMessage: string.Empty,
+                    userMessage: chatRequest.UserMessage,
                     agentMetaPrompt: orchestratorSystemPrompt).ConfigureAwait(false);
 
                 // Add Orchestrator's own response to history to maintain context
@@ -64,11 +64,13 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
                 });
 
                 // Parse Orchestrator Response
-                var parsedResponse = OrchestratorAgentHelper.ParseOrchestratorResponse(orchestratorResponse);
+                var parsedResponse = JsonConvert.DeserializeObject<OrchestratorResponseDomain>(orchestratorResponse);
                 if (parsedResponse?.Type == SystemOrchestratorFunction.OrchestratorResponseTypeFinalResponse)
                     return parsedResponse.Content;
+
                 else if (parsedResponse?.Type == SystemOrchestratorFunction.OrchestratorResponseTypeDelegate)
                     await this.DelegateToAgentAsync(agentsData, chatRequest, conversationHistory, parsedResponse).ConfigureAwait(false);
+
                 else
                     return ExceptionConstants.OrchestratorResponseFormatInvalidExceptionMessage;
             }
