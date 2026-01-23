@@ -139,7 +139,6 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     public async Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(string workspaceId, string currentUserEmail)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(workspaceId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
         try
         {

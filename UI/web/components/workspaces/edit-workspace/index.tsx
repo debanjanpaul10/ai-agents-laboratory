@@ -46,7 +46,6 @@ export default function EditWorkspaceFlyoutComponent({
 	const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
 	const [newUserEmail, setNewUserEmail] = useState("");
 
-
 	const IsEditWorkspaceLoading = useAppSelector<boolean>(
 		(state) => state.WorkspacesReducer.isEditWorkspaceLoading,
 	);
@@ -65,7 +64,7 @@ export default function EditWorkspaceFlyoutComponent({
 
 	const handleInputChange = (
 		field: keyof AgentsWorkspaceDTO,
-		value: string,
+		value: string | boolean,
 	) => {
 		setEditFormData((prev) => ({ ...prev, [field]: value }));
 	};
@@ -222,6 +221,33 @@ export default function EditWorkspaceFlyoutComponent({
 												"bg-white/5 border-white/10 hover:border-emerald-500/30 focus-within:!border-emerald-500/50 transition-all min-h-[56px] rounded-2xl",
 										}}
 									/>
+								</div>
+							</div>
+
+							<div className="space-y-4 bg-white/5 p-3 rounded-2xl">
+								<div className="flex items-center justify-between">
+									<label className="text-white/80 font-semibold text-sm ml-1">
+										Agent Group Chat{" "}
+										<span className="text-red-400">
+											(Preview)
+										</span>
+									</label>
+									<label className="relative inline-flex items-end cursor-pointer">
+										<input
+											type="checkbox"
+											checked={
+												editFormData.isGroupChatEnabled
+											}
+											onChange={(e) =>
+												handleInputChange(
+													"isGroupChatEnabled",
+													e.target.checked,
+												)
+											}
+											className="sr-only peer"
+										/>
+										<div className="relative w-12 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/50 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-500 peer-checked:after:bg-white"></div>
+									</label>
 								</div>
 							</div>
 
@@ -459,7 +485,7 @@ export default function EditWorkspaceFlyoutComponent({
 				<DeletePopupComponent
 					isOpen={isDeletePopupOpen}
 					onClose={() => setIsDeletePopupOpen(false)}
-					onDelete={HandleWorkspaceDelete}
+					onAction={HandleWorkspaceDelete}
 					title="Delete Workspace"
 					description={`Are you sure you want to delete "${editFormData.agentWorkspaceName}"? This action cannot be undone and will remove all associated data.`}
 					isLoading={IsEditWorkspaceLoading}

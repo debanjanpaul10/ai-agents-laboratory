@@ -1,6 +1,7 @@
 import {
 	GET_ALL_WORKSPACES,
 	GET_WORKSPACE_BY_ID,
+	GET_WORKSPACE_GROUP_CHAT_RESPONSE,
 	TOGGLE_ASSOCIATE_AGENTS_DRAWER,
 	TOGGLE_CREATE_WORKSPACE_DRAWER,
 	TOGGLE_CREATE_WORKSPACE_LOADER,
@@ -16,6 +17,7 @@ const initialState: any = {
 	isAddWorkspaceLoading: false,
 	isAddWorkspaceDrawerOpen: false,
 	isAssociateAgentsDrawerOpen: false,
+	workspaceGroupChatResponse: {},
 };
 
 export function WorkspacesReducer(state = initialState, action: any) {
@@ -60,6 +62,12 @@ export function WorkspacesReducer(state = initialState, action: any) {
 			return {
 				...state,
 				workspaceData: action.payload,
+			};
+		}
+		case GET_WORKSPACE_GROUP_CHAT_RESPONSE: {
+			return {
+				...state,
+				workspaceGroupChatResponse: action.payload,
 			};
 		}
 

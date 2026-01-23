@@ -1,10 +1,8 @@
-import React from "react";
 import { Button } from "@heroui/react";
-import { AlertTriangle, X, Trash2 } from "lucide-react";
-
 import { PopupComponentProps } from "@shared/types";
+import { AlertTriangle, Check, X } from "lucide-react";
 
-export default function DeletePopupComponent({
+export default function GroupChatPopupComponent({
 	isOpen,
 	onClose,
 	onAction,
@@ -67,9 +65,9 @@ export default function DeletePopupComponent({
 								className="h-14 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white font-bold text-lg hover:shadow-2xl hover:shadow-red-500/40 transition-all duration-300 rounded-2xl group border border-white/10"
 							>
 								{!isLoading && (
-									<Trash2 className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+									<Check className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
 								)}
-								<span>Confirm Delete</span>
+								<span>Confirm</span>
 							</Button>
 
 							<Button

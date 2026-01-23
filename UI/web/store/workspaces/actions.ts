@@ -15,10 +15,14 @@ import {
 	DeleteExistingWorkspaceApiAsync,
 	GetAllWorkspacesDataApiAsync,
 	GetWorkspaceByWorkspaceIdApiAsync,
+	GetWorkspaceGroupChatResponseApiAsync,
 	UpdateExistingWorkspaceDataApiAsync,
 } from "@shared/api-service";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import { WorkspaceToasterConstants } from "@helpers/toaster-constants";
+import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
+import { ToggleChatResponseSpinner } from "@store/agents/actions";
+import { GET_CHAT_RESPONSE } from "@store/chat/actionTypes";
 
 export function ToggleWorkspacesLoader(isLoading: boolean) {
 	return {
@@ -176,6 +180,36 @@ export function UpdateExistingWorkspaceDataAsync(
 			if (error.message) ShowErrorToaster(error.message);
 		} finally {
 			dispatch(ToggleEditWorkspacesLoader(false));
+		}
+	};
+}
+
+export function GetWorkspaceGroupChatResponseAsync(
+	chatRequestDto: WorkspaceAgentChatRequestDTO,
+	accessToken: string,
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleChatResponseSpinner(true));
+			const response = await GetWorkspaceGroupChatResponseApiAsync(
+				chatRequestDto,
+				accessToken,
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: GET_CHAT_RESPONSE,
+					payload: response.responseData,
+				});
+
+				return response.responseData as string;
+			}
+
+			return null;
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleChatResponseSpinner(false));
 		}
 	};
 }
