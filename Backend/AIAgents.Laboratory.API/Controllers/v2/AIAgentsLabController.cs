@@ -28,7 +28,6 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     /// Gets the configurations data for application.
     /// </summary>
     /// <returns>The dictionary containing the key-value pair.</returns>
-    [AllowAnonymous]
     [HttpGet(CommonRoutes.GetConfigurations_Route)]
     [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

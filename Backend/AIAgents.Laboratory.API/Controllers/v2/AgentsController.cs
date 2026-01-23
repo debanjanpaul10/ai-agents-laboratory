@@ -54,7 +54,6 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     /// Gets all agents data asynchronous.
     /// </summary>
     /// <returns>The list of <see cref="CreateAgentDTO"/></returns>
-    [AllowAnonymous]
     [HttpGet(AgentsRoutes.GetAllAgents_Route)]
     [ProducesResponseType(typeof(IEnumerable<AgentDataDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
