@@ -26,7 +26,7 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, mcpServerUrl);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
 
             var mcpClient = await this.CreateMcpClientAsync(mcpServerUrl).ConfigureAwait(false);
             return await mcpClient.ListToolsAsync().ConfigureAwait(false);
@@ -38,7 +38,7 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, mcpServerUrl);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
         }
     }
 
@@ -84,7 +84,7 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateMcpClientAsync), DateTime.UtcNow, mcpServerUrl);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateMcpClientAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
 
             var aiAgentsToken = await TokenHelper.GetAiAgentsLabTokenAsync(configuration, logger).ConfigureAwait(false);
             var transportOptions = new HttpClientTransportOptions
@@ -106,8 +106,25 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateMcpClientAsync), DateTime.UtcNow, mcpServerUrl);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateMcpClientAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
         }
+    }
+
+    /// <summary>
+    /// Sanitizes a string value for safe logging by removing line breaks and control characters.
+    /// </summary>
+    /// <param name="value">The value to sanitize.</param>
+    /// <returns>The sanitized value suitable for logging.</returns>
+    private static string SanitizeForLogging(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return value;
+        }
+
+        var withoutLineEndings = value.Replace("\r", string.Empty).Replace("\n", string.Empty);
+        var sanitizedChars = withoutLineEndings.Where(c => !char.IsControl(c) || c == '\t');
+        return new string(sanitizedChars.ToArray());
     }
 
     #endregion
