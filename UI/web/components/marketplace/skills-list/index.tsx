@@ -35,8 +35,8 @@ export default function SkillsListComponent({
 		const agents = [
 			...new Set(
 				toolSkillsList.flatMap((skill) =>
-					Object.keys(skill.associatedAgents || {})
-				)
+					Object.keys(skill.associatedAgents || {}),
+				),
 			),
 		];
 		return agents.sort();
@@ -45,7 +45,7 @@ export default function SkillsListComponent({
 	const uniqueCreators = useMemo(() => {
 		const creators = [
 			...new Set(
-				toolSkillsList.map((skill) => skill.createdBy || "Unknown")
+				toolSkillsList.map((skill) => skill.createdBy || "Unknown"),
 			),
 		];
 		return creators.sort();
@@ -70,7 +70,7 @@ export default function SkillsListComponent({
 			const matchesAgent =
 				selectedAgent === "all" ||
 				Object.keys(skill.associatedAgents || {}).includes(
-					selectedAgent
+					selectedAgent,
 				);
 
 			// Creator filter
@@ -88,12 +88,12 @@ export default function SkillsListComponent({
 			switch (sortBy) {
 				case "name":
 					comparison = (a.toolSkillDisplayName || "").localeCompare(
-						b.toolSkillDisplayName || ""
+						b.toolSkillDisplayName || "",
 					);
 					break;
 				case "technical":
 					comparison = (a.toolSkillTechnicalName || "").localeCompare(
-						b.toolSkillTechnicalName || ""
+						b.toolSkillTechnicalName || "",
 					);
 					break;
 				case "date":
@@ -169,7 +169,7 @@ export default function SkillsListComponent({
 							<Search className="w-4 h-4 text-white/40" />
 						}
 						classNames={{
-							input: "bg-white/5 border-white/10 text-white placeholder:text-white/40",
+							input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 p-3",
 							inputWrapper:
 								"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-blue-500/50",
 						}}
@@ -240,7 +240,7 @@ export default function SkillsListComponent({
 								const [newSortBy, newSortOrder] =
 									e.target.value.split("-");
 								setSortBy(
-									newSortBy as "name" | "date" | "technical"
+									newSortBy as "name" | "date" | "technical",
 								);
 								setSortOrder(newSortOrder as "asc" | "desc");
 							}}
@@ -375,7 +375,7 @@ export default function SkillsListComponent({
 											<span>
 												Added{" "}
 												{new Date(
-													skill.dateCreated
+													skill.dateCreated,
 												).toLocaleDateString()}
 											</span>
 										</div>
