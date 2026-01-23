@@ -201,6 +201,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             {
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentMetaPrompt, updateDataDomain.AgentMetaPrompt),
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentName, updateDataDomain.AgentName),
+                Builders<AgentDataDomain>.Update.Set(x => x.ApplicationName, updateDataDomain.ApplicationName),
                 Builders<AgentDataDomain>.Update.Set(x => x.IsPrivate, updateDataDomain.IsPrivate),
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentDescription, updateDataDomain.AgentDescription),
                 Builders<AgentDataDomain>.Update.Set(x => x.DateModified, DateTime.UtcNow),
