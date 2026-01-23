@@ -16,11 +16,12 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// </summary>
 /// <param name="httpContextAccessor">The http context accessor.</param>
 /// <param name="workspacesHandler">The workspaces api adapter handler.</param>
+/// <param name="configuration">The configuration.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public sealed class WorkspacesController(IHttpContextAccessor httpContextAccessor, IWorkspacesHandler workspacesHandler) : BaseController(httpContextAccessor)
+public sealed class WorkspacesController(IHttpContextAccessor httpContextAccessor, IWorkspacesHandler workspacesHandler, IConfiguration configuration) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Gets the list of all available workspaces available.
@@ -34,7 +35,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [SwaggerOperation(Summary = GetAllWorkspacesAction.Summary, Description = GetAllWorkspacesAction.Description, OperationId = GetAllWorkspacesAction.OperationId)]
     public async Task<ResponseDTO> GetAllWorkspacesAsync()
     {
-        if (base.IsRequestAuthorized())
+        if (base.IsAuthorized())
         {
             var result = await workspacesHandler.GetAllWorkspacesAsync(base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);
@@ -58,7 +59,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     public async Task<ResponseDTO> GetWorkspaceByWorkspaceIdAsync([FromRoute] string workspaceId)
     {
         ArgumentException.ThrowIfNullOrEmpty(workspaceId);
-        if (base.IsRequestAuthorized())
+        if (base.IsAuthorized())
         {
             var result = await workspacesHandler.GetWorkspaceByWorkspaceIdAsync(workspaceId, base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);
@@ -83,7 +84,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     public async Task<ResponseDTO> CreateNewWorkspaceAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
     {
         ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
-        if (base.IsRequestAuthorized())
+        if (base.IsAuthorized())
         {
             var result = await workspacesHandler.CreateNewWorkspaceAsync(agentsWorkspaceData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
@@ -107,7 +108,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     public async Task<ResponseDTO> DeleteExistingWorkspaceAsync([FromRoute] string workspaceGuidId)
     {
         ArgumentException.ThrowIfNullOrEmpty(workspaceGuidId);
-        if (base.IsRequestAuthorized())
+        if (base.IsAuthorized())
         {
             var result = await workspacesHandler.DeleteExistingWorkspaceAsync(workspaceGuidId, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
@@ -132,7 +133,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     public async Task<ResponseDTO> UpdateExistingWorkspaceDataAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
     {
         ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
-        if (base.IsRequestAuthorized())
+        if (base.IsAuthorized())
         {
             var result = await workspacesHandler.UpdateExistingWorkspaceDataAsync(agentsWorkspaceData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
@@ -157,10 +158,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     public async Task<ResponseDTO> InvokeWorkspaceAgentAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO)
     {
         ArgumentNullException.ThrowIfNull(chatRequestDTO);
+        if (base.IsAuthorized())
+        {
+            var result = await workspacesHandler.InvokeWorkspaceAgentAsync(chatRequestDTO).ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(result)) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
 
-        var result = await workspacesHandler.InvokeWorkspaceAgentAsync(chatRequestDTO).ConfigureAwait(false);
-        if (!string.IsNullOrWhiteSpace(result)) return HandleSuccessRequestResponse(result);
-        else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleUnAuthorizedRequestResponse();
     }
 
     /// <summary>
@@ -178,9 +183,13 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     public async Task<ResponseDTO> GetWorkspaceGroupChatResponseAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO)
     {
         ArgumentNullException.ThrowIfNull(chatRequestDTO);
+        if (base.IsAuthorized())
+        {
+            var result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(chatRequestDTO).ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(result)) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
 
-        var result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(chatRequestDTO).ConfigureAwait(false);
-        if (!string.IsNullOrWhiteSpace(result)) return HandleSuccessRequestResponse(result);
-        else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        return HandleUnAuthorizedRequestResponse();
     }
 }

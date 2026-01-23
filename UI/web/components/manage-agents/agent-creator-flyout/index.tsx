@@ -58,10 +58,10 @@ export default function CreateAgentFlyoutComponent({
 	});
 
 	const IsCreateAgentLoading = useAppSelector(
-		(state) => state.AgentsReducer.isAgentCreateSpinnerLoading
+		(state) => state.AgentsReducer.isAgentCreateSpinnerLoading,
 	);
 	const ConfigurationsStoreData = useAppSelector(
-		(state) => state.CommonReducer.configurations
+		(state) => state.CommonReducer.configurations,
 	);
 
 	// Disable background scrolling when drawer is open
@@ -134,7 +134,7 @@ export default function CreateAgentFlyoutComponent({
 
 	const handleInputChange = (
 		field: string,
-		value: string | File | boolean | null
+		value: string | File | boolean | null,
 	) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
@@ -177,12 +177,12 @@ export default function CreateAgentFlyoutComponent({
 									{selectedKnowledgeFiles.length > 0
 										? `${
 												selectedKnowledgeFiles.length
-										  } file${
+											} file${
 												selectedKnowledgeFiles.length !==
 												1
 													? "s"
 													: ""
-										  } selected`
+											} selected`
 										: "Choose files"}
 								</span>
 								{selectedKnowledgeFiles.length > 0 && (
@@ -236,12 +236,12 @@ export default function CreateAgentFlyoutComponent({
 									{selectedAiVisionImages.length > 0
 										? `${
 												selectedAiVisionImages.length
-										  } file${
+											} file${
 												selectedAiVisionImages.length !==
 												1
 													? "s"
 													: ""
-										  } selected`
+											} selected`
 										: "Choose images"}
 								</span>
 								{selectedAiVisionImages.length > 0 && (
@@ -297,7 +297,7 @@ export default function CreateAgentFlyoutComponent({
 												selectedSkillGuids.length !== 1
 													? "s"
 													: ""
-										  } associated`
+											} associated`
 										: "Associate skills"}
 								</span>
 								{selectedSkillGuids.length > 0 && (
@@ -385,7 +385,7 @@ export default function CreateAgentFlyoutComponent({
 								onChange={(e) =>
 									handleInputChange(
 										"agentName",
-										e.target.value
+										e.target.value,
 									)
 								}
 								placeholder={
@@ -398,7 +398,7 @@ export default function CreateAgentFlyoutComponent({
 									<Sparkles className="w-5 h-5 text-purple-400 mr-2" />
 								}
 								classNames={{
-									input: "text-white placeholder:text-white/20",
+									input: "text-white placeholder:text-white/20 p-3",
 									inputWrapper:
 										"bg-white/5 border-white/10 hover:border-purple-500/30 focus-within:!border-purple-500/50 transition-all min-h-[56px] rounded-2xl",
 								}}
@@ -415,7 +415,7 @@ export default function CreateAgentFlyoutComponent({
 								onChange={(e) =>
 									handleInputChange(
 										"applicationName",
-										e.target.value
+										e.target.value,
 									)
 								}
 								placeholder={
@@ -428,7 +428,7 @@ export default function CreateAgentFlyoutComponent({
 									<Bot className="w-5 h-5 text-blue-400 mr-2" />
 								}
 								classNames={{
-									input: "text-white placeholder:text-white/20",
+									input: "text-white placeholder:text-white/20 p-3",
 									inputWrapper:
 										"bg-white/5 border-white/10 hover:border-blue-500/30 focus-within:!border-blue-500/50 transition-all min-h-[56px] rounded-2xl",
 								}}
@@ -455,7 +455,7 @@ export default function CreateAgentFlyoutComponent({
 									onChange={(e) =>
 										handleInputChange(
 											"agentDescription",
-											e.target.value
+											e.target.value,
 										)
 									}
 									rows={4}
@@ -482,7 +482,7 @@ export default function CreateAgentFlyoutComponent({
 									onChange={(e) =>
 										handleInputChange(
 											"agentMetaPrompt",
-											e.target.value
+											e.target.value,
 										)
 									}
 									placeholder={
@@ -540,7 +540,7 @@ export default function CreateAgentFlyoutComponent({
 										onChange={(e) =>
 											handleInputChange(
 												"isPrivate",
-												e.target.checked
+												e.target.checked,
 											)
 										}
 										className="sr-only peer"

@@ -13,12 +13,13 @@ namespace AIAgents.Laboratory.API.Controllers.v1;
 /// The AI Chatbot skills controller.
 /// </summary>
 /// <param name="httpContextAccessor">The http context accessor.</param>
+/// <param name="configuration">The configuration.</param>
 /// <param name="skillsHandler">The skills handler adapter.</param>
 /// <seealso cref="BaseController" />
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV1)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public class ChatbotSkillsController(IHttpContextAccessor httpContextAccessor, IChatbotSkillsHandler skillsHandler) : BaseController(httpContextAccessor)
+public class ChatbotSkillsController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IChatbotSkillsHandler skillsHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Detects the user intent asynchronous.
