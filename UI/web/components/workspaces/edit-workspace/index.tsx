@@ -28,6 +28,7 @@ import {
 	DeleteExistingWorkspaceAsync,
 	UpdateExistingWorkspaceDataAsync,
 } from "@store/workspaces/actions";
+import GroupChatPopupComponent from "@components/common/group-chat-popup";
 
 export default function EditWorkspaceFlyoutComponent({
 	editFormData,
@@ -44,7 +45,9 @@ export default function EditWorkspaceFlyoutComponent({
 	const { accounts } = useMsal();
 
 	const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
-	const [newUserEmail, setNewUserEmail] = useState("");
+	const [newUserEmail, setNewUserEmail] = useState<string>("");
+	const [isGroupChatEnablePopupOpen, setIsGroupChatEnablePopupOpen] =
+		useState<boolean>(false);
 
 	const IsEditWorkspaceLoading = useAppSelector<boolean>(
 		(state) => state.WorkspacesReducer.isEditWorkspaceLoading,
@@ -238,12 +241,17 @@ export default function EditWorkspaceFlyoutComponent({
 											checked={
 												editFormData.isGroupChatEnabled
 											}
-											onChange={(e) =>
-												handleInputChange(
-													"isGroupChatEnabled",
-													e.target.checked,
-												)
-											}
+											onChange={(e) => {
+												if (e.target.checked === true)
+													setIsGroupChatEnablePopupOpen(
+														true,
+													);
+												else
+													handleInputChange(
+														"isGroupChatEnabled",
+														false,
+													);
+											}}
 											className="sr-only peer"
 										/>
 										<div className="relative w-12 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/50 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-500 peer-checked:after:bg-white"></div>
@@ -488,6 +496,20 @@ export default function EditWorkspaceFlyoutComponent({
 					onAction={HandleWorkspaceDelete}
 					title="Delete Workspace"
 					description={`Are you sure you want to delete "${editFormData.agentWorkspaceName}"? This action cannot be undone and will remove all associated data.`}
+					isLoading={IsEditWorkspaceLoading}
+				/>
+
+				<GroupChatPopupComponent
+					isOpen={isGroupChatEnablePopupOpen}
+					onClose={() => setIsGroupChatEnablePopupOpen(false)}
+					onAction={() => {
+						handleInputChange("isGroupChatEnabled", true);
+						setIsGroupChatEnablePopupOpen(false);
+					}}
+					title="Enable group chat?"
+					description={
+						"Are you sure you want to enable this feature? It is still in preview stages! There might be some inaccuracies and bugs!"
+					}
 					isLoading={IsEditWorkspaceLoading}
 				/>
 			</>
