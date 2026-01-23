@@ -247,5 +247,10 @@ internal static class Constants
         /// The user email claim constant.
         /// </summary>
         public const string UserEmailClaimConstant = "preferred_username";
+
+        /// <summary>
+        /// The client id claim constant.
+        /// </summary>
+        public const string ClientIdClaimConstant = "aud";
     }
 }

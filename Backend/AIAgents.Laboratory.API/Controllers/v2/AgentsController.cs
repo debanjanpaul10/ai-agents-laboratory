@@ -16,12 +16,13 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// The Agents Controller class.
 /// </summary>
 /// <param name="httpContext">The http context accessor.</param>
+/// <param name="configuration">The configuration.</param>
 /// <param name="agentsHandler">The agents handler service.</param>
 /// <seealso cref="BaseController" />
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public sealed class AgentsController(IHttpContextAccessor httpContext, IAgentsHandler agentsHandler) : BaseController(httpContext)
+public sealed class AgentsController(IHttpContextAccessor httpContext, IConfiguration configuration, IAgentsHandler agentsHandler) : BaseController(httpContext, configuration)
 {
     /// <summary>
     /// Creates the new agent asynchronous.
@@ -39,7 +40,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IAgentsHa
     public async Task<ResponseDTO> CreateNewAgentAsync([FromForm] CreateAgentDTO agentData)
     {
         ArgumentNullException.ThrowIfNull(agentData);
-        if (base.IsRequestAuthorized())
+        if (base.IsAuthorized())
         {
             var result = await agentsHandler.CreateNewAgentAsync(agentData, UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
@@ -102,7 +103,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IAgentsHa
     public async Task<ResponseDTO> UpdateExistingAgentDataAsync([FromForm] AgentDataDTO updateAgentData)
     {
         ArgumentNullException.ThrowIfNull(updateAgentData);
-        if (IsRequestAuthorized())
+        if (IsAuthorized())
         {
             var result = await agentsHandler.UpdateExistingAgentDataAsync(updateAgentData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
@@ -126,7 +127,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IAgentsHa
     public async Task<ResponseDTO> DeleteExistingAgentDataAsync([FromRoute] string agentId)
     {
         ArgumentException.ThrowIfNullOrEmpty(agentId);
-        if (IsRequestAuthorized())
+        if (IsAuthorized())
         {
             var result = await agentsHandler.DeleteExistingAgentDataAsync(agentId, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);

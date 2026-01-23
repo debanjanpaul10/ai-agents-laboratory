@@ -6,32 +6,45 @@ using static AIAgents.Laboratory.API.Helpers.Constants;
 namespace AIAgents.Laboratory.API.Controllers;
 
 /// <summary>
-/// The Base Controller Class.
+/// The base controller.
 /// </summary>
-/// <seealso cref="Microsoft.AspNetCore.Mvc.ControllerBase" />
+/// <param name="httpContextAccessor">The http context accessor.</param>
+/// <param name="configuration">The configuration.</param>
+/// <seealso cref="ControllerBase"/>
 [Authorize]
-public abstract class BaseController : ControllerBase
+public abstract class BaseController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration) : ControllerBase
 {
     /// <summary>
-    /// The user email
+    /// The user email.
     /// </summary>
-    protected string UserEmail = string.Empty;
+    protected string UserEmail = HeaderConstants.NotApplicableStringConstant;
 
     /// <summary>
-    /// Initializes a new instance of <see cref="BaseController"/>
+    /// Determines whether the request is authorized.
     /// </summary>
-    /// <param name="httpContextAccessor">The http context accessor.</param>
-    protected BaseController(IHttpContextAccessor httpContextAccessor)
+    /// <returns>The boolean <c>true</c> if the request is authorized, otherwise <c>false</c>.</returns>
+    protected bool IsAuthorized()
     {
         if (httpContextAccessor.HttpContext is not null && httpContextAccessor.HttpContext?.User is not null)
         {
+            // User Authentication
             var userEmail = httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.UserEmailClaimConstant))?.Value;
-
             if (!string.IsNullOrEmpty(userEmail))
+            {
                 this.UserEmail = userEmail;
-            else
-                this.UserEmail = HeaderConstants.NotApplicableStringConstant;
+                return true;
+            }
+
+            // Application Client ID authentication
+            var clientIdClaim = this.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.ClientIdClaimConstant))?.Value;
+            if (!string.IsNullOrEmpty(clientIdClaim))
+            {
+                var aiAgentsClientIdFromConfig = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant] ?? string.Empty;
+                return clientIdClaim.Equals(aiAgentsClientIdFromConfig, StringComparison.OrdinalIgnoreCase);
+            }
         }
+
+        return false;
     }
 
     /// <summary>
@@ -72,13 +85,4 @@ public abstract class BaseController : ControllerBase
             ResponseData = ExceptionConstants.UnauthorizedAccessMessageConstant,
             StatusCode = StatusCodes.Status401Unauthorized,
         };
-
-    /// <summary>
-    /// Handles request authentication response.
-    /// </summary>
-    /// <returns>The boolean for authentication.</returns>
-    protected bool IsRequestAuthorized()
-    {
-        return !string.IsNullOrEmpty(this.UserEmail);
-    }
 }
