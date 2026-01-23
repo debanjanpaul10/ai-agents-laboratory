@@ -122,22 +122,22 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
     /// </summary>
     /// <param name="userMessage">The user message data.</param>
     /// <param name="conversationDataDomain">The conversation history data domain.</param>
-    /// <param name="agentPrompt">The agent prompt.</param>
+    /// <param name="agentMetaPrompt">The agent meta prompt.</param>
     /// <returns>The AI chatbot aiResponse.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when userMessage, conversationDataDomain, or agentPrompt is null or empty.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when userMessage, conversationDataDomain, or agentMetaPrompt is null or empty.</exception>
     /// <exception cref="InvalidOperationException">Thrown when agent configuration is invalid or chat completion fails.</exception>
     /// <exception cref="TimeoutException">Thrown when the chat completion call times out.</exception>
     /// <exception cref="Exception">Thrown when an unexpected error occurs during chat completion.</exception>
-    public async Task<string> GetChatbotResponseAsync(ConversationHistoryDomain conversationDataDomain, string userMessage, string agentPrompt)
+    public async Task<string> GetChatbotResponseAsync(ConversationHistoryDomain conversationDataDomain, string userMessage, string agentMetaPrompt)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userMessage);
-        ArgumentException.ThrowIfNullOrWhiteSpace(agentPrompt);
+        ArgumentException.ThrowIfNullOrWhiteSpace(agentMetaPrompt);
 
         try
         {
             var chatMessages = new List<ChatMessage>
             {
-                new(ChatRole.System, agentPrompt),
+                new(ChatRole.System, agentMetaPrompt),
                 new(ChatRole.User, userMessage)
             };
 
@@ -163,7 +163,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userMessage, agentPrompt }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userMessage, agentMetaPrompt }));
         }
     }
 
