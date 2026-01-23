@@ -202,7 +202,7 @@ export default function WorkspacesComponent() {
 				<DeletePopupComponent
 					isOpen={isDeletePopupOpen}
 					onClose={() => setIsDeletePopupOpen(false)}
-					onDelete={confirmDeleteWorkspace}
+					onAction={confirmDeleteWorkspace}
 					title="Delete Workspace"
 					description="Are you sure you want to delete this workspace? This action cannot be undone and will remove all associated data."
 					isLoading={IsWorkspacesLoading}

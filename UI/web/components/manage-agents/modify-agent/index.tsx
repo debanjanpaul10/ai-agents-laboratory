@@ -59,18 +59,18 @@ export default function ModifyAgentComponent({
 	const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
 
 	const IsEditAgentDataLoading = useAppSelector(
-		(state) => state.AgentsReducer.isEditAgentDataLoading
+		(state) => state.AgentsReducer.isEditAgentDataLoading,
 	);
 	const ConfigurationStoreData = useAppSelector(
-		(state) => state.CommonReducer.configurations
+		(state) => state.CommonReducer.configurations,
 	);
 	const IsGlobalLoading = useAppSelector(
-		(state) => state.CommonReducer.isLoading
+		(state) => state.CommonReducer.isLoading,
 	);
 
 	const handleInputChange = (
 		field: string,
-		value: string | File | boolean | null
+		value: string | File | boolean | null,
 	) => {
 		setEditFormData((prev: any) => ({ ...prev, [field]: value }));
 	};
@@ -130,7 +130,7 @@ export default function ModifyAgentComponent({
 		const token = await authContext.getAccessToken();
 		if (token) {
 			await dispatch(
-				DeleteExistingAgentDataAsync(editFormData.agentId, token)
+				DeleteExistingAgentDataAsync(editFormData.agentId, token),
 			);
 			setIsDeletePopupOpen(false);
 			handleEditClose();
@@ -160,7 +160,7 @@ export default function ModifyAgentComponent({
 					<p className="text-white/60">
 						<span className="text-white/80">Created:</span>{" "}
 						{`${new Date(
-							selectedAgent.dateCreated
+							selectedAgent.dateCreated,
 						).toDateString()}`}
 					</p>
 					<p className="text-white/60">
@@ -242,7 +242,7 @@ export default function ModifyAgentComponent({
 		const existingDocs =
 			(selectedAgent?.knowledgeBaseDocument as File[] | null) ?? [];
 		const visibleExistingDocs = existingDocs.filter(
-			(doc) => !removedExistingDocuments.includes(doc.name)
+			(doc) => !removedExistingDocuments.includes(doc.name),
 		);
 		const existingCount = visibleExistingDocs.length;
 		const totalCount = selectedKnowledgeFiles.length + existingCount;
@@ -267,7 +267,7 @@ export default function ModifyAgentComponent({
 									{totalCount > 0
 										? `${totalCount} file${
 												totalCount !== 1 ? "s" : ""
-										  } selected`
+											} selected`
 										: "Choose files"}
 								</span>
 								{hasAnyFiles && (
@@ -305,7 +305,7 @@ export default function ModifyAgentComponent({
 		const existingImages = selectedAgent?.aiVisionImagesData ?? [];
 		const visibleExistingImages = existingImages.filter(
 			(image: any) =>
-				!removedExistingImages.includes(image.imageName || image.name)
+				!removedExistingImages.includes(image.imageName || image.name),
 		);
 		const existingCount = visibleExistingImages.length;
 		const totalCount = selectedVisionImages.length + existingCount;
@@ -330,7 +330,7 @@ export default function ModifyAgentComponent({
 									{totalCount > 0
 										? `${totalCount} file${
 												totalCount !== 1 ? "s" : ""
-										  } selected`
+											} selected`
 										: "Choose images"}
 								</span>
 								{hasAnyFiles && (
@@ -386,7 +386,7 @@ export default function ModifyAgentComponent({
 									{totalCount > 0
 										? `${totalCount} skill${
 												totalCount !== 1 ? "s" : ""
-										  } associated`
+											} associated`
 										: "Associate skills"}
 								</span>
 								{totalCount > 0 && (
@@ -500,7 +500,7 @@ export default function ModifyAgentComponent({
 							onChange={(e) =>
 								handleInputChange(
 									"agentDescription",
-									e.target.value
+									e.target.value,
 								)
 							}
 							rows={6}
@@ -527,7 +527,7 @@ export default function ModifyAgentComponent({
 							onChange={(e) =>
 								handleInputChange(
 									"applicationName",
-									e.target.value
+									e.target.value,
 								)
 							}
 							radius="full"
@@ -584,7 +584,7 @@ export default function ModifyAgentComponent({
 									onChange={(e) =>
 										handleInputChange(
 											"isPrivate",
-											e.target.checked
+											e.target.checked,
 										)
 									}
 									disabled={
@@ -617,7 +617,7 @@ export default function ModifyAgentComponent({
 								onChange={(e) =>
 									handleInputChange(
 										"agentMetaPrompt",
-										e.target.value
+										e.target.value,
 									)
 								}
 								placeholder={
@@ -676,7 +676,7 @@ export default function ModifyAgentComponent({
 				<DeletePopupComponent
 					isOpen={isDeletePopupOpen}
 					onClose={() => setIsDeletePopupOpen(false)}
-					onDelete={handleAgentDelete}
+					onAction={handleAgentDelete}
 					title="Delete Agent"
 					description={`Are you sure you want to delete "${editFormData.agentName}"? All of its configurations and data will be permanently removed.`}
 					isLoading={IsGlobalLoading}
