@@ -15,9 +15,9 @@ namespace AIAgents.Laboratory.API.Controllers;
 public abstract class BaseController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration) : ControllerBase
 {
     /// <summary>
-    /// The user email.
+    /// The user email extracted from the token claims.
     /// </summary>
-    protected string UserEmail = HeaderConstants.NotApplicableStringConstant;
+    protected string UserEmail = httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.UserEmailClaimConstant))?.Value ?? HeaderConstants.NotApplicableStringConstant;
 
     /// <summary>
     /// Determines whether the request is authorized.
@@ -28,19 +28,15 @@ public abstract class BaseController(IHttpContextAccessor httpContextAccessor, I
         if (httpContextAccessor.HttpContext is not null && httpContextAccessor.HttpContext?.User is not null)
         {
             // User Authentication
-            var userEmail = httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.UserEmailClaimConstant))?.Value;
-            if (!string.IsNullOrEmpty(userEmail))
-            {
-                this.UserEmail = userEmail;
+            if (!string.IsNullOrEmpty(this.UserEmail) && !this.UserEmail.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
                 return true;
-            }
 
             // Application Client ID authentication
-            var clientIdClaim = this.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.ClientIdClaimConstant))?.Value;
-            if (!string.IsNullOrEmpty(clientIdClaim))
+            var currentClientId = this.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.ClientIdClaimConstant))?.Value;
+            if (!string.IsNullOrEmpty(currentClientId) && !currentClientId.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
             {
-                var aiAgentsClientIdFromConfig = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant] ?? string.Empty;
-                return clientIdClaim.Equals(aiAgentsClientIdFromConfig, StringComparison.OrdinalIgnoreCase);
+                var aiAgentsClientIdFromConfig = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant] ?? throw new Exception(ExceptionConstants.MissingConfigurationMessage);
+                return currentClientId.Equals(aiAgentsClientIdFromConfig, StringComparison.OrdinalIgnoreCase);
             }
         }
 
