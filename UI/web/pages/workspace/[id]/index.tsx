@@ -101,6 +101,9 @@ export default function WorkspaceComponent() {
 						selectedAgent={selectedAgent}
 						setSelectedAgent={handleAgentSelection}
 						workspaceDetailsData={WorkspaceDetailsData}
+						isGroupChatEnabled={
+							WorkspaceDetailsData.isGroupChatEnabled
+						}
 					/>
 				</div>
 
@@ -108,6 +111,7 @@ export default function WorkspaceComponent() {
 					<AssociatedAgentsChatPaneComponent
 						key={selectedAgent?.agentGuid}
 						selectedAgent={selectedAgent}
+						workspaceDetailsData={WorkspaceDetailsData}
 					/>
 				</div>
 			</div>

@@ -2,16 +2,16 @@ import React from "react";
 import { Button } from "@heroui/react";
 import { AlertTriangle, X, Trash2 } from "lucide-react";
 
-import { DeletePopupProps } from "@shared/types";
+import { PopupComponentProps } from "@shared/types";
 
 export default function DeletePopupComponent({
 	isOpen,
 	onClose,
-	onDelete,
+	onAction,
 	title,
 	description,
 	isLoading = false,
-}: DeletePopupProps) {
+}: PopupComponentProps) {
 	if (!isOpen) return null;
 
 	return (
@@ -62,7 +62,7 @@ export default function DeletePopupComponent({
 						{/* Action Buttons */}
 						<div className="mt-10 flex flex-col space-y-3">
 							<Button
-								onPress={onDelete}
+								onPress={onAction}
 								isLoading={isLoading}
 								className="h-14 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white font-bold text-lg hover:shadow-2xl hover:shadow-red-500/40 transition-all duration-300 rounded-2xl group border border-white/10"
 							>

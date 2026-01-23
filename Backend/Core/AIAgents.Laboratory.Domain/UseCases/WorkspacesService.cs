@@ -1,5 +1,5 @@
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
@@ -12,13 +12,16 @@ using static AIAgents.Laboratory.Domain.Helpers.Constants;
 namespace AIAgents.Laboratory.Domain.UseCases;
 
 /// <summary>
-/// The workspace service implementation.
+/// The Workspace Service implementation.
 /// </summary>
+/// <remarks>This service provides functionalities to manage workspaces, including creating, updating, deleting, and retrieving workspaces.</remarks>
 /// <param name="logger">The logger service.</param>
 /// <param name="configuration">The configuration service.</param>
 /// <param name="mongoDatabaseService">The mongo db service.</param>
 /// <param name="agentChatService">The agent chat service.</param>
-public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, IAgentChatService agentChatService) : IWorkspacesService
+/// <seealso cref="IWorkspacesService"/>
+public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService,
+    IAgentChatService agentChatService, IOrchestratorService orchestratorService) : IWorkspacesService
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -136,7 +139,6 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     public async Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(string workspaceId, string currentUserEmail)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(workspaceId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
         try
         {
@@ -160,6 +162,38 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     }
 
     /// <summary>
+    /// Gets the workspace group chat response.
+    /// </summary>
+    /// <param name="chatRequest">The workspace agent chat request dto model.</param>
+    /// <returns>The group chat response.</returns>
+    public async Task<string> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDomain chatRequest)
+    {
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));
+            if (string.IsNullOrWhiteSpace(chatRequest.ConversationId))
+                chatRequest.ConversationId = Guid.NewGuid().ToString();
+
+            var workspaceDetails = await this.GetWorkspaceByWorkspaceIdAsync(chatRequest.WorkspaceId, chatRequest.ApplicationName).ConfigureAwait(false)
+                ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+
+            if (!workspaceDetails.IsGroupChatEnabled)
+                throw new Exception(ExceptionConstants.GroupchatNotEnabledExceptionMessage);
+
+            return await orchestratorService.GetOrchestratorAgentResponseAsync(chatRequest, workspaceDetails).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, ex.Message);
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));
+        }
+    }
+
+    /// <summary>
     /// Invoke the workspace agent with user message and get the response.
     /// </summary>
     /// <param name="chatRequest">The chat request domain model.</param>
@@ -168,12 +202,14 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.WorkspaceId);
         ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.AgentId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.UserMessage);
 
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));
 
-            if (string.IsNullOrWhiteSpace(chatRequest.ConversationId)) chatRequest.ConversationId = Guid.NewGuid().ToString();
+            if (string.IsNullOrWhiteSpace(chatRequest.ConversationId))
+                chatRequest.ConversationId = Guid.NewGuid().ToString();
 
             var workspaceDetails = await this.GetWorkspaceByWorkspaceIdAsync(chatRequest.WorkspaceId, chatRequest.ApplicationName).ConfigureAwait(false)
                 ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);

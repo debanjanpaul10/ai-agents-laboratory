@@ -5,6 +5,7 @@ export class AgentsWorkspaceDTO {
 	agentWorkspaceName: string = "";
 	activeAgentsListInWorkspace: WorkspaceAgentsDataDTO[] = [];
 	workspaceUsers: string[] = [];
+	isGroupChatEnabled: boolean = false;
 	dateCreated: Date = new Date();
 	createdBy: string = "";
 	dateModified: Date = new Date();

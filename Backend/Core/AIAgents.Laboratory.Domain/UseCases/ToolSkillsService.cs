@@ -197,7 +197,6 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
     public async Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
         try
         {

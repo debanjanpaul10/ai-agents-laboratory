@@ -1,3 +1,4 @@
+using AIAgents.Laboratory.API.Adapters.Models.Base;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 
 namespace AIAgents.Laboratory.API.Adapters.Models.Response;
@@ -5,7 +6,8 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 /// <summary>
 /// The Agents Workspace DTO model.
 /// </summary>
-public sealed record AgentsWorkspaceDTO
+/// <seealso cref="BaseModelDTO"/>
+public sealed record AgentsWorkspaceDTO : BaseModelDTO
 {
     /// <summary>
     /// Gets or sets the agent workspace guid id.
@@ -28,34 +30,8 @@ public sealed record AgentsWorkspaceDTO
     public IEnumerable<string> WorkspaceUsers { get; set; } = [];
 
     /// <summary>
-    /// Gets or sets the date created.
+    /// Gets or sets a value indicating whether group chat is enabled.
     /// </summary>
-    /// <value>
-    /// The date created.
-    /// </value>
-    public DateTime DateCreated { get; set; } = DateTime.UtcNow;
-
-    /// <summary>
-    /// Gets or sets the created by.
-    /// </summary>
-    /// <value>
-    /// The created by.
-    /// </value>
-    public string CreatedBy { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the date modified.
-    /// </summary>
-    /// <value>
-    /// The date modified.
-    /// </value>
-    public DateTime DateModified { get; set; } = DateTime.UtcNow;
-
-    /// <summary>
-    /// Gets or sets the modified by.
-    /// </summary>
-    /// <value>
-    /// The modified by.
-    /// </value>
-    public string ModifiedBy { get; set; } = string.Empty;
+    /// <value>The value indicating whether group chat is enabled.</value>
+    public bool IsGroupChatEnabled { get; set; }
 }

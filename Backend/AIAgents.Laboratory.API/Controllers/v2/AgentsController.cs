@@ -1,5 +1,6 @@
 ﻿using System.Net.Mime;
 using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Models.Base;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using Microsoft.AspNetCore.Authorization;

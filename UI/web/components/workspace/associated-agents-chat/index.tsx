@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Tooltip } from "@heroui/react";
-import { Bot, MessageSquare, Send } from "lucide-react";
+import { Bot, MessageSquare, Send, Users } from "lucide-react";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 
 import {
@@ -16,11 +16,16 @@ import { useAuth } from "@auth/AuthProvider";
 import { ShowErrorToaster } from "@shared/toaster";
 import { InvokeChatAgentAsync } from "@store/chat/actions";
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
+import { GetWorkspaceGroupChatResponseAsync } from "@store/workspaces/actions";
+import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
+import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 
 export default function AssociatedAgentsChatPaneComponent({
 	selectedAgent,
+	workspaceDetailsData,
 }: {
 	selectedAgent: WorkspaceAgentsDataDTO | null;
+	workspaceDetailsData: AgentsWorkspaceDTO;
 }) {
 	const dispatch = useAppDispatch();
 	const authContext = useAuth();
@@ -71,11 +76,19 @@ export default function AssociatedAgentsChatPaneComponent({
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === "Enter" && !e.shiftKey) {
 			e.preventDefault();
-			sendChatbotRequest();
+			handleSendChatRequest();
 		}
 	};
 
-	const sendChatbotRequest = async () => {
+	const handleSendChatRequest = () => {
+		if (!selectedAgent) return;
+
+		if (selectedAgent.agentGuid === "group-chat-guid")
+			SendGroupChatRequest();
+		else SendChatbotRequest();
+	};
+
+	async function SendGroupChatRequest() {
 		if (!userInput.trim() || !selectedAgent) return;
 
 		const userMessage: ChatMessage = {
@@ -83,7 +96,61 @@ export default function AssociatedAgentsChatPaneComponent({
 			type: "user" as const,
 			content: userInput,
 		};
+		setMessages((prev) => [...prev, userMessage]);
+		setUserInput("");
+		// Reset textarea height and scrollbar after clearing input
+		if (textareaRef.current) {
+			textareaRef.current.style.height = "auto";
+			setShowScrollbar(false);
+		}
 
+		try {
+			setIsLoading(true);
+			const chatRequest: WorkspaceAgentChatRequestDTO = {
+				agentId: "",
+				applicationName: "",
+				conversationId: GenerateMessageId(),
+				userMessage: userInput,
+				workspaceId: workspaceDetailsData.agentWorkspaceGuid,
+			};
+
+			const accessToken = await fetchToken();
+			if (accessToken) {
+				const aiResponse = (await (
+					dispatch as ThunkDispatch<any, any, Action>
+				)(
+					GetWorkspaceGroupChatResponseAsync(
+						chatRequest,
+						accessToken,
+					),
+				)) as string | null;
+
+				if (aiResponse) {
+					const botMessage = {
+						id: GenerateMessageId(),
+						type: "bot" as const,
+						content: aiResponse,
+					};
+
+					setMessages((prev) => [...prev, botMessage]);
+				}
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			setIsLoading(false);
+		}
+	}
+
+	async function SendChatbotRequest() {
+		if (!userInput.trim() || !selectedAgent) return;
+
+		const userMessage: ChatMessage = {
+			id: GenerateMessageId(),
+			type: "user" as const,
+			content: userInput,
+		};
 		setMessages((prev) => [...prev, userMessage]);
 		setUserInput("");
 
@@ -93,9 +160,8 @@ export default function AssociatedAgentsChatPaneComponent({
 			setShowScrollbar(false);
 		}
 
-		setIsLoading(true);
-
 		try {
+			setIsLoading(true);
 			const chatRequest: ChatRequestDTO = {
 				userMessage: userMessage.content.trim(),
 				conversationId: GenerateMessageId(),
@@ -120,12 +186,13 @@ export default function AssociatedAgentsChatPaneComponent({
 					setMessages((prev) => [...prev, botMessage]);
 				}
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}
 
 	return !selectedAgent ? (
 		<div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl text-center p-8">
@@ -144,15 +211,27 @@ export default function AssociatedAgentsChatPaneComponent({
 			{/* Chat Header */}
 			<div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
 				<div className="flex items-center space-x-3">
-					<div className="bg-gradient-to-r from-cyan-500 to-blue-600 p-2 rounded-xl">
-						<Bot className="w-5 h-5 text-white" />
+					<div
+						className={`p-2 rounded-xl ${
+							selectedAgent.agentGuid === "group-chat-guid"
+								? "bg-gradient-to-r from-purple-500 to-pink-600"
+								: "bg-gradient-to-r from-cyan-500 to-blue-600"
+						}`}
+					>
+						{selectedAgent.agentGuid === "group-chat-guid" ? (
+							<Users className="w-5 h-5 text-white" />
+						) : (
+							<Bot className="w-5 h-5 text-white" />
+						)}
 					</div>
 					<div>
 						<h2 className="text-xl font-bold bg-gradient-to-r from-white via-cyan-100 to-blue-100 bg-clip-text text-transparent">
 							{selectedAgent.agentName}
 						</h2>
 						<p className="text-white/60 text-sm">
-							{RunWorkspaceConstants.ChatPane.SubTitle}
+							{selectedAgent.agentGuid === "group-chat-guid"
+								? "Active conversation with all agents"
+								: RunWorkspaceConstants.ChatPane.SubTitle}
 						</p>
 					</div>
 				</div>
@@ -176,10 +255,14 @@ export default function AssociatedAgentsChatPaneComponent({
 							<MessageSquare className="w-12 h-12 text-white/40" />
 						</div>
 						<h3 className="text-white/80 text-lg font-medium mb-2">
-							{RunWorkspaceConstants.Headers.Header}
+							{selectedAgent.agentGuid === "group-chat-guid"
+								? "Group Chat"
+								: RunWorkspaceConstants.Headers.Header}
 						</h3>
 						<p className="text-white/60 text-sm max-w-sm">
-							{RunWorkspaceConstants.Headers.SubHeader}
+							{selectedAgent.agentGuid === "group-chat-guid"
+								? "Collaborate with all your agents in one place."
+								: RunWorkspaceConstants.Headers.SubHeader}
 						</p>
 					</div>
 				) : (
@@ -258,11 +341,15 @@ export default function AssociatedAgentsChatPaneComponent({
 						/>
 					</div>
 					<Button
-						onPress={sendChatbotRequest}
+						onPress={handleSendChatRequest}
 						disabled={!userInput.trim() || isLoading}
 						radius="full"
 						title="Send message"
-						className="mb-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 px-3 py-3 disabled:opacity-50"
+						className={`mb-3 text-white font-semibold transition-all duration-300 px-3 py-3 disabled:opacity-50 ${
+							selectedAgent.agentGuid === "group-chat-guid"
+								? "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700"
+								: "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
+						}`}
 					>
 						<Send className="w-4 h-4" />
 					</Button>

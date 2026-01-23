@@ -1,4 +1,4 @@
-﻿using AIAgents.Laboratory.API.Adapters.Models.Response;
+﻿using AIAgents.Laboratory.API.Adapters.Models.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static AIAgents.Laboratory.API.Helpers.Constants;

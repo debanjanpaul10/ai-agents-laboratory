@@ -1,5 +1,8 @@
-﻿namespace AIAgents.Laboratory.Domain.DomainEntities;
+﻿namespace AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 
+/// <summary>
+/// The workspace agent chat request domain model.
+/// </summary>
 public sealed record WorkspaceAgentChatRequestDomain
 {
     /// <summary>
