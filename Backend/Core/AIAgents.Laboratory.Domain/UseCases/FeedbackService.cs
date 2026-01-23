@@ -26,6 +26,8 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
     /// <returns>The boolean for success/failure.</returns>
     public async Task<bool> AddNewBugReportDataAsync(BugReportData bugReportData)
     {
+        ArgumentNullException.ThrowIfNull(bugReportData);
+
         try
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonSerializer.Serialize(bugReportData)));
@@ -57,6 +59,8 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
     /// <returns>The boolean for success/failure.</returns>
     public async Task<bool> AddNewFeatureRequestDataAsync(NewFeatureRequestData featureRequestData)
     {
+        ArgumentNullException.ThrowIfNull(featureRequestData);
+
         try
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonSerializer.Serialize(featureRequestData)));
