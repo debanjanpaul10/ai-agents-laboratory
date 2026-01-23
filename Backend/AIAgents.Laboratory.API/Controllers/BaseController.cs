@@ -17,7 +17,7 @@ public abstract class BaseController(IHttpContextAccessor httpContextAccessor, I
     /// <summary>
     /// The user email extracted from the token claims.
     /// </summary>
-    protected string UserEmail = httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.UserEmailClaimConstant))?.Value ?? HeaderConstants.NotApplicableStringConstant;
+    protected string UserEmail => httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.UserEmailClaimConstant))?.Value ?? HeaderConstants.NotApplicableStringConstant;
 
     /// <summary>
     /// Determines whether the request is authorized.
