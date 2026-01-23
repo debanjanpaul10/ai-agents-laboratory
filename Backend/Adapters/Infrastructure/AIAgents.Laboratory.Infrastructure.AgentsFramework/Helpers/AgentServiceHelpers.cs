@@ -34,6 +34,9 @@ internal static class AgentServiceHelpers
         if (string.IsNullOrWhiteSpace(errorMessage))
             return ExceptionConstants.SomethingWentWrongMessage;
 
+        // Keep a copy of the original message to detect if redactions were applied
+        var original = errorMessage;
+
         // Remove potential API keys, tokens, or other sensitive information
         var sanitized = errorMessage;
 
@@ -49,6 +52,15 @@ internal static class AgentServiceHelpers
         // Remove connection strings
         sanitized = System.Text.RegularExpressions.Regex.Replace(sanitized, @"password\s*=\s*[^;]+", "password=[REDACTED]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         sanitized = System.Text.RegularExpressions.Regex.Replace(sanitized, @"pwd\s*=\s*[^;]+", "pwd=[REDACTED]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        // If any redaction occurred, avoid storing potentially sensitive content at all
+        if (!string.Equals(original, sanitized, StringComparison.Ordinal))
+            return ExceptionConstants.SomethingWentWrongMessage;
+
+        // Enforce a maximum length to reduce risk of logging large, detailed messages
+        const int maxLength = 256;
+        if (sanitized.Length > maxLength)
+            return sanitized.Substring(0, maxLength) + "... (truncated)";
 
         return sanitized;
     }
