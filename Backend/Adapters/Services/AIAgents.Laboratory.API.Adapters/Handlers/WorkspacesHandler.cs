@@ -1,7 +1,7 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AutoMapper;
 
@@ -47,6 +47,17 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     {
         var domainResult = await workspacesService.GetAllWorkspacesAsync(userName).ConfigureAwait(false);
         return mapper.Map<IEnumerable<AgentsWorkspaceDTO>>(domainResult);
+    }
+
+    /// <summary>
+    /// Gets the workspace group chat response.
+    /// </summary>
+    /// <param name="chatRequest">The workspace agent chat request dto model.</param>
+    /// <returns>The group chat response.</returns>
+    public async Task<string> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDTO chatRequest)
+    {
+        var domainInput = mapper.Map<WorkspaceAgentChatRequestDomain>(chatRequest);
+        return await workspacesService.GetWorkspaceGroupChatResponseAsync(domainInput).ConfigureAwait(false);
     }
 
     /// <summary>

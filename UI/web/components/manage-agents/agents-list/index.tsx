@@ -26,14 +26,14 @@ export default function AgentsListComponent({
 	actionButton,
 }: AgentsListComponentProps) {
 	const [currentAgentsData, setCurrentAgentsData] = useState<AgentDataDTO[]>(
-		[]
+		[],
 	);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedApplication, setSelectedApplication] =
 		useState<string>("all");
 	const [selectedCreator, setSelectedCreator] = useState<string>("all");
 	const [sortBy, setSortBy] = useState<"name" | "date" | "application">(
-		"date"
+		"date",
 	);
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
@@ -52,8 +52,8 @@ export default function AgentsListComponent({
 		const apps = [
 			...new Set(
 				agentsDataList.map(
-					(agent) => agent.applicationName || "Unknown"
-				)
+					(agent) => agent.applicationName || "Unknown",
+				),
 			),
 		];
 		return apps.sort();
@@ -92,12 +92,12 @@ export default function AgentsListComponent({
 			switch (sortBy) {
 				case "name":
 					comparison = (a.agentName || "").localeCompare(
-						b.agentName || ""
+						b.agentName || "",
 					);
 					break;
 				case "application":
 					comparison = (a.applicationName || "").localeCompare(
-						b.applicationName || ""
+						b.applicationName || "",
 					);
 					break;
 				case "date":
@@ -173,7 +173,7 @@ export default function AgentsListComponent({
 							<Search className="w-4 h-4 text-white/40" />
 						}
 						classNames={{
-							input: "bg-white/5 border-white/10 text-white placeholder:text-white/40",
+							input: "p-3 bg-white/5 border-white/10 text-white placeholder:text-white/40",
 							inputWrapper:
 								"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-blue-500/50",
 						}}
@@ -219,7 +219,10 @@ export default function AgentsListComponent({
 								const [newSortBy, newSortOrder] =
 									e.target.value.split("-");
 								setSortBy(
-									newSortBy as "name" | "date" | "application"
+									newSortBy as
+										| "name"
+										| "date"
+										| "application",
 								);
 								setSortOrder(newSortOrder as "asc" | "desc");
 							}}
@@ -372,14 +375,14 @@ export default function AgentsListComponent({
 												<span>
 													Created{" "}
 													{new Date(
-														agent.dateCreated
+														agent.dateCreated,
 													).toLocaleDateString()}
 												</span>
 											</div>
 										</div>
 									</div>
 								</div>
-							)
+							),
 						)}
 					</div>
 				) : (

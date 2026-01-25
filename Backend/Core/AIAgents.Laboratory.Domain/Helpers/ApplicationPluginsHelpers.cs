@@ -145,7 +145,7 @@ public static class ApplicationPluginsHelpers
         /// <param name="toolResult">The tool result.</param>
         /// <returns>The function instructions.</returns>
         public static string GetFunctionInstructions(string input, string? toolResult) =>
-             string.IsNullOrEmpty(input)
+             string.IsNullOrEmpty(toolResult)
                 ? $@"User Query: {input} 
                     Please provide a helpful response to the user's query."
                 : $@"User Query: {input}
@@ -167,5 +167,68 @@ public static class ApplicationPluginsHelpers
             /// </summary>
             public const string ToolResult = "The response received from executing the tool.";
         }
+    }
+
+    /// <summary>
+    /// The System Orchestrator Function.
+    /// </summary>
+    public static class SystemOrchestratorFunction
+    {
+        /// <summary>
+        /// The function name
+        /// </summary>
+        public const string FunctionName = nameof(SystemOrchestratorFunction);
+
+        /// <summary>
+        /// The max orchestrator loops
+        /// </summary>
+        public const int MAX_ORCHESTRATOR_LOOPS = 10;
+
+        /// <summary>
+        /// The orchestrator response type delegate
+        /// </summary>
+        public const string OrchestratorResponseTypeDelegate = "delegate";
+
+        /// <summary>
+        /// The orchestrator response type final response
+        /// </summary>
+        public const string OrchestratorResponseTypeFinalResponse = "response";
+
+        /// <summary>
+        /// The function instructions
+        /// </summary>
+        /// <param name="agentsList">The list of agents.</param>
+        /// <returns>The function instruction string.</returns>
+        public static string GetFunctionInstructions(string agentsList) =>
+            $@"
+                You are an intelligent Orchestrator Agent responsible for managing a group chat between a user and multiple AI agents.
+                Your goal is to answer the user's request by coordinating with the available agents.
+
+                ### Available Agents:
+                    {agentsList}
+
+                ### Instructions:
+                    1. Analyze the user's request and the current conversation history.
+                    2. Decide if you can answer the request directly (ONLY if it's a simple greeting or if the task is complete) or if you need to delegate to a specific agent.
+                    3. If you need to delegate:
+                       - Choose the most appropriate agent from the list.
+                       - Provide clear instructions to that agent based on the user's request or previous agents' outputs.
+                    4. If the task is complete or you have the final answer, provide the final response to the user.
+
+                ### Response Format:
+                    You must respond in strictly valid JSON format. Do not include any other text.
+        
+                **Option 1: Delegate to an Agent**
+                {{
+                    ""type"": ""delegate"",
+                    ""agentName"": ""Exact Agent Name from List"",
+                    ""instruction"": ""Specific instruction for the agent""
+                }}
+
+                **Option 2: Final Response**
+                {{
+                    ""type"": ""response"",
+                    ""content"": ""The final answer to the user""
+                }}";
     }
 }

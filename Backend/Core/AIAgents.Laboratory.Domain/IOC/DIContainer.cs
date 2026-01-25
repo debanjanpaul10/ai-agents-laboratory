@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,5 +27,6 @@ public static class DIContainer
             .AddScoped<IFeedbackService, FeedbackService>()
             .AddScoped<IDocumentIntelligenceService, DocumentIntelligenceService>()
             .AddScoped<IToolSkillsService, ToolSkillsService>()
-            .AddScoped<IWorkspacesService, WorkspacesService>();
+            .AddScoped<IWorkspacesService, WorkspacesService>()
+            .AddScoped<IOrchestratorService, OrchestratorService>();
 }

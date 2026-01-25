@@ -13,6 +13,7 @@ import { McpServerToolRequestDTO } from "@models/request/mcp-server-tool-request
 import { NewFeatureRequestDTO } from "@models/request/new-feature-request-dto";
 import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
+import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
 
 // #region AGENTS
 
@@ -226,6 +227,17 @@ export async function UpdateExistingWorkspaceDataApiAsync(
 	return await PutAsync(
 		"workspaces/updateworkspace",
 		agentsWorkspaceData,
+		accessToken,
+	);
+}
+
+export async function GetWorkspaceGroupChatResponseApiAsync(
+	chatRequestDto: WorkspaceAgentChatRequestDTO,
+	accessToken: string,
+) {
+	return await PostAsync(
+		"workspaces/workspacegroupchatresponse",
+		chatRequestDto,
 		accessToken,
 	);
 }

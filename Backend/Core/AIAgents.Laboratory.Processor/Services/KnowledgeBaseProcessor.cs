@@ -12,6 +12,7 @@ using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Text;
+using Newtonsoft.Json;
 using static AIAgents.Laboratory.Processor.Helpers.ProcessorConstants;
 
 namespace AIAgents.Laboratory.Processor.Services;
@@ -23,8 +24,8 @@ namespace AIAgents.Laboratory.Processor.Services;
 /// <param name="embeddingGeneratorService">The embedding generation service.</param>
 /// <param name="logger">The logger service.</param>
 /// <seealso cref="IKnowledgeBaseProcessor"/>
-#pragma warning disable SKEXP0001
 #pragma warning disable SKEXP0050
+#pragma warning disable SKEXP0001
 public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingGenerator<string, Embedding<float>> embeddingGeneratorService, ILogger<KnowledgeBaseProcessor> logger) : IKnowledgeBaseProcessor
 {
     /// <summary>
@@ -86,7 +87,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, agentId);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { query, agentId }));
 
             var queryEmbeddingResult = await embeddingGeneratorService.GenerateAsync(query).ConfigureAwait(false);
             var queryEmbedding = queryEmbeddingResult.Vector;
@@ -106,7 +107,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, agentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { query, agentId }));
         }
     }
 
@@ -126,7 +127,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
 
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId);
 
             // Ensure the collection exists before upserting records
             var collections = new List<string>();
@@ -156,12 +157,12 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message);
             throw;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId);
         }
     }
 
@@ -178,6 +179,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
     private string ReadSpreadsheetData(KnowledgeBaseDocumentDomain knowledgeBaseFile)
     {
         ArgumentNullException.ThrowIfNull(knowledgeBaseFile);
+
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadSpreadsheetData), DateTime.UtcNow, knowledgeBaseFile.FileName);

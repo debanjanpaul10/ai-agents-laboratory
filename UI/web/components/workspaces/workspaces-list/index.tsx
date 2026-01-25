@@ -138,7 +138,7 @@ export default function WorkspacesListComponent({
 							<Search className="w-4 h-4 text-white/40" />
 						}
 						classNames={{
-							input: "bg-white/5 border-white/10 text-white placeholder:text-white/40",
+							input: "bg-white/5 border-white/10 text-white placeholder:text-white/40 p-3",
 							inputWrapper:
 								"bg-white/5 border-white/10 hover:border-white/20 focus-within:border-blue-500/50",
 						}}

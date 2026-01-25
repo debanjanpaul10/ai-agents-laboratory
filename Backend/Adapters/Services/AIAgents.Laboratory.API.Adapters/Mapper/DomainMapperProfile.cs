@@ -1,9 +1,11 @@
-﻿using AIAgents.Laboratory.API.Adapters.Models.Request;
+﻿using AIAgents.Laboratory.API.Adapters.Models.Base;
+using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.SkillsEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Mapper;

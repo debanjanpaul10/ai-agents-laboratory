@@ -28,11 +28,12 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
     /// <returns>The AI response.</returns>
     public async Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(userQuery);
+        ArgumentException.ThrowIfNullOrWhiteSpace(userEmail);
+
         try
         {
             logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery));
-
-            ArgumentException.ThrowIfNullOrEmpty(userQuery);
 
             var chatbotAgentGuid = configuration[AzureAppConfigurationConstants.AIChatbotAgentId] ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
             var agentDataTask = agentsService.GetAgentDataByIdAsync(chatbotAgentGuid, userEmail);
@@ -42,13 +43,6 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
             var conversationHistoryData = conversationHistoryTask.Result;
             var agentMetaprompt = agentDataTask.Result.AgentMetaPrompt;
             var chatHistoryList = conversationHistoryData.ChatHistory.ToList();
-            chatHistoryList.Add(new ChatHistoryDomain
-            {
-                Role = ChatbotHelperConstants.UserRoleConstant,
-                Content = userQuery
-            });
-            conversationHistoryData.ChatHistory = chatHistoryList;
-            await conversationHistoryService.SaveMessageToConversationHistoryAsync(conversationHistoryData).ConfigureAwait(false);
 
             var aiResponse = await aiServices.GetChatbotResponseAsync(conversationHistoryData, userQuery, agentMetaprompt).ConfigureAwait(false);
             chatHistoryList.Add(new ChatHistoryDomain

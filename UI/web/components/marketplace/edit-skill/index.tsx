@@ -390,7 +390,7 @@ export default function EditSkillFlyoutComponent({
 				<DeletePopupComponent
 					isOpen={isDeletePopupOpen}
 					onClose={() => setIsDeletePopupOpen(false)}
-					onDelete={HandleSkillDelete}
+					onAction={HandleSkillDelete}
 					title="Delete Skill"
 					description={`Are you sure you want to delete "${editFormData.toolSkillDisplayName}"? This action cannot be undone and will remove the skill from any associated agents.`}
 					isLoading={IsToolSkillLoading}

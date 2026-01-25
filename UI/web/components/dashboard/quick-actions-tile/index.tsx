@@ -83,37 +83,30 @@ export default function QuickActionsTileComponent() {
 				{/* Actions Grid */}
 				<div className="flex flex-col space-y-3 flex-1">
 					{actions.map((action, index) => {
-						const Content = () => (
-							<div className="flex items-center justify-between w-full">
-								<div className="flex items-center space-x-4">
-									<div
-										className={`p-2.5 rounded-lg bg-gradient-to-br ${action.gradient} ${action.shadow} shadow-lg`}
-									>
-										{action.icon}
-									</div>
-									<div className="text-left">
-										<p className="font-semibold text-white text-sm">
-											{action.label}
-										</p>
-										<p className="text-gray-400 text-xs">
-											{action.description}
-										</p>
-									</div>
-								</div>
-								<ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all" />
-							</div>
-						);
-
-						const className =
-							"w-full bg-gray-700/30 hover:bg-gray-700/50 backdrop-blur-sm rounded-xl p-3 border border-gray-600/30 hover:border-white/20 transition-all duration-300 group";
-
 						return (
 							<button
 								key={index}
 								onClick={action.onClick}
-								className={className}
+								className="w-full bg-gray-700/30 hover:bg-gray-700/50 backdrop-blur-sm rounded-xl p-3 border border-gray-600/30 hover:border-white/20 transition-all duration-300 group cursor-pointer"
 							>
-								<Content />
+								<div className="flex items-center justify-between w-full">
+									<div className="flex items-center space-x-4">
+										<div
+											className={`p-2.5 rounded-lg bg-gradient-to-br ${action.gradient} ${action.shadow} shadow-lg`}
+										>
+											{action.icon}
+										</div>
+										<div className="text-left">
+											<p className="font-semibold text-white text-sm">
+												{action.label}
+											</p>
+											<p className="text-gray-400 text-xs">
+												{action.description}
+											</p>
+										</div>
+									</div>
+									<ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all" />
+								</div>
 							</button>
 						);
 					})}

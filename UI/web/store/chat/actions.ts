@@ -22,14 +22,14 @@ import { ChatToasterConstants } from "@helpers/toaster-constants";
 
 export function InvokeChatAgentAsync(
 	chatRequest: ChatRequestDTO,
-	accessToken: string
+	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleChatResponseSpinner(true));
 			const response = await InvokeChatAgentApiAsync(
 				chatRequest,
-				accessToken
+				accessToken,
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -64,6 +64,9 @@ export function ClearConversationHistoryAsync(accessToken: string) {
 				});
 
 				ShowSuccessToaster(ChatToasterConstants.CLEAR_CONVERSATION);
+				dispatch(
+					GetConversationHistoryDataForUserAsync(accessToken) as any,
+				);
 				return response.responseData as boolean;
 			}
 			return null;
@@ -78,13 +81,13 @@ export function ClearConversationHistoryAsync(accessToken: string) {
 
 export function GetDirectChatResponseAsync(
 	userMessage: DirectChatRequestDTO,
-	accessToken: string
+	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			const response = await GetDirectChatResponseApiAsync(
 				userMessage,
-				accessToken
+				accessToken,
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({

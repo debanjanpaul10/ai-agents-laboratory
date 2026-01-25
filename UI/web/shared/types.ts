@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { AgentDataDTO } from "@models/response/agent-data-dto";
 import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
+import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
 
 export interface Environment {
 	production: boolean;
@@ -197,6 +198,22 @@ export interface DeletePopupProps {
 	title: string;
 	description: string;
 	isLoading?: boolean;
+}
+
+export interface PopupComponentProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onAction: () => void;
+	title: string;
+	description: string;
+	isLoading?: boolean;
+}
+
+export interface AssociatedAgentsListPaneProps {
+	workspaceDetailsData: AgentsWorkspaceDTO;
+	selectedAgent: WorkspaceAgentsDataDTO | null;
+	setSelectedAgent: (agent: WorkspaceAgentsDataDTO) => void;
+	isGroupChatEnabled: boolean;
 }
 
 export interface AssociateSkillsFlyoutProps {

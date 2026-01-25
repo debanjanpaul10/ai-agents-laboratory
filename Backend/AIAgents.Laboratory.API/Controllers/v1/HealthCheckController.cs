@@ -11,12 +11,13 @@ namespace AIAgents.Laboratory.API.Controllers.v1;
 /// The Health Check Endpoint API controller.
 /// </summary>
 /// <param name="commonAiHandler">The common AI handler.</param>
+/// <param name="configuration">The configuration.</param>
 /// <param name="httpContextAccessor">The http context accessor.</param>
 /// <seealso cref="BaseController" />
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV1)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public class HealthCheckController(IHttpContextAccessor httpContextAccessor, ICommonAiHandler commonAiHandler) : BaseController(httpContextAccessor)
+public class HealthCheckController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ICommonAiHandler commonAiHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Gets the agent status.

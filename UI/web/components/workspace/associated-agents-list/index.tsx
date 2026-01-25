@@ -12,16 +12,14 @@ import {
 
 import { RouteConstants, RunWorkspaceConstants } from "@helpers/constants";
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
+import { AssociatedAgentsListPaneProps } from "@shared/types";
 
 export default function AssociatedAgentsListPaneComponent({
 	workspaceDetailsData,
 	selectedAgent,
 	setSelectedAgent,
-}: {
-	workspaceDetailsData: any;
-	selectedAgent: any;
-	setSelectedAgent: (agent: WorkspaceAgentsDataDTO) => void;
-}) {
+	isGroupChatEnabled,
+}: AssociatedAgentsListPaneProps) {
 	const router = useRouter();
 
 	const [activeAssociatedAgents, setActiveAssociatedAgents] = useState<
@@ -98,7 +96,43 @@ export default function AssociatedAgentsListPaneComponent({
 
 			{/* Agents List */}
 			<div className="flex-1 overflow-y-auto p-4 space-y-2">
-				{activeAssociatedAgents.length === 0 ? (
+				{isGroupChatEnabled && (
+					<button
+						onClick={() =>
+							handleAgentClick({
+								agentGuid: "group-chat-guid",
+								agentName: "Group Chat",
+							} as WorkspaceAgentsDataDTO)
+						}
+						className={`w-full text-left p-4 rounded-lg border transition-all duration-200 cursor-pointer ${
+							selectedAgent?.agentGuid === "group-chat-guid"
+								? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 shadow-lg shadow-purple-500/20"
+								: "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+						}`}
+					>
+						<div className="flex items-center space-x-3">
+							<div
+								className={`p-2 rounded-lg ${
+									selectedAgent?.agentGuid ===
+									"group-chat-guid"
+										? "bg-gradient-to-r from-purple-500 to-pink-600"
+										: "bg-white/10"
+								}`}
+							>
+								<Users className="w-5 h-5 text-white" />
+							</div>
+							<div className="flex-1 min-w-0">
+								<h4 className="text-white font-medium text-sm truncate">
+									Group Chat
+								</h4>
+								<p className="text-white/60 text-xs truncate">
+									Chat with all agents
+								</p>
+							</div>
+						</div>
+					</button>
+				)}
+				{activeAssociatedAgents.length === 0 && !isGroupChatEnabled ? (
 					<div className="flex flex-col items-center justify-center h-full text-center p-6">
 						<div className="bg-white/5 backdrop-blur-sm rounded-full p-6 mb-4">
 							<Bot className="w-12 h-12 text-white/40" />

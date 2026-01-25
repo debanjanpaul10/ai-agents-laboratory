@@ -448,6 +448,16 @@ internal static class SwaggerConstants
             internal const string Description = "Invokes the workspace agent via chat with the user prompt and agent metadata.";
             internal const string OperationId = nameof(InvokeWorkspaceAgentAction);
         }
+
+        /// <summary>
+        /// Swagger documentation for GetWorkspaceGroupChatResponseAsync.
+        /// </summary>
+        internal static class GetWorkspaceGroupChatResponseAction
+        {
+            internal const string Summary = "Gets the workspace group chat response data.";
+            internal const string Description = "Calls the LLM directly with user message for workspace group chat.";
+            internal const string OperationId = nameof(GetWorkspaceGroupChatResponseAction);
+        }
     }
 }
 

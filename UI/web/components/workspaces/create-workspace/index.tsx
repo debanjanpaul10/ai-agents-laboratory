@@ -9,6 +9,7 @@ import {
 	Sparkles,
 	RotateCcw,
 	Type,
+	GlobeLock,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button, Input, Chip } from "@heroui/react";
@@ -26,7 +27,7 @@ import {
 } from "@store/workspaces/actions";
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
 import { GetAllAgentsDataAsync } from "@store/agents/actions";
-
+import GroupChatPopupComponent from "@components/common/group-chat-popup";
 
 export default function CreateWorkspaceComponent({
 	onOpenAssociateAgents,
@@ -44,30 +45,29 @@ export default function CreateWorkspaceComponent({
 		activeAgentsListInWorkspace: [],
 		agentWorkspaceGuid: "",
 		agentWorkspaceName: "",
+		isGroupChatEnabled: false,
 		createdBy: "",
 		dateCreated: new Date(),
 		dateModified: new Date(),
 		modifiedBy: "",
 		workspaceUsers: [],
 	});
-
 	const [newUserEmail, setNewUserEmail] = useState("");
 	const [selectedAgentGuids, setSelectedAgentGuids] = useState<Set<string>>(
 		new Set(),
 	);
+	const [isGroupChatEnablePopupOpen, setIsGroupChatEnablePopupOpen] =
+		useState<boolean>(false);
 
 	const IsAddWorkspaceDrawerOpenStoreData = useAppSelector(
 		(state) => state.WorkspacesReducer.isAddWorkspaceDrawerOpen,
 	);
-
 	const IsCreateWorkspaceLoadingStoreData = useAppSelector(
 		(state) => state.WorkspacesReducer.isAddWorkspaceLoading,
 	);
-
 	const agentsListData = useAppSelector(
 		(state) => state.AgentsReducer.agentsListData,
 	);
-
 	const IsAgentsListLoading = useAppSelector(
 		(state) => state.AgentsReducer.isAgentsListLoading,
 	);
@@ -86,7 +86,7 @@ export default function CreateWorkspaceComponent({
 
 	const handleInputChange = (
 		field: keyof AgentsWorkspaceDTO,
-		value: string,
+		value: string | boolean,
 	) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
@@ -146,6 +146,7 @@ export default function CreateWorkspaceComponent({
 			activeAgentsListInWorkspace: [],
 			agentWorkspaceGuid: "",
 			agentWorkspaceName: "",
+			isGroupChatEnabled: false,
 			createdBy: "",
 			dateCreated: new Date(),
 			dateModified: new Date(),
@@ -330,6 +331,41 @@ export default function CreateWorkspaceComponent({
 										</Button>
 									</div>
 								</div>
+
+								<div className="space-y-4 bg-white/5 p-3 rounded-2xl">
+									<div className="flex items-center justify-between">
+										<label className="text-white/80 font-semibold text-sm ml-1">
+											Agent Group Chat{" "}
+											<span className="text-red-400">
+												(Preview)
+											</span>
+										</label>
+										<label className="relative inline-flex items-end cursor-pointer">
+											<input
+												type="checkbox"
+												checked={
+													formData.isGroupChatEnabled
+												}
+												onChange={(e) => {
+													if (
+														e.target.checked ===
+														true
+													)
+														setIsGroupChatEnablePopupOpen(
+															true,
+														);
+													else
+														handleInputChange(
+															"isGroupChatEnabled",
+															false,
+														);
+												}}
+												className="sr-only peer"
+											/>
+											<div className="relative w-12 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/50 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-500 peer-checked:after:bg-white"></div>
+										</label>
+									</div>
+								</div>
 							</div>
 
 							{/* User Management Section */}
@@ -346,7 +382,7 @@ export default function CreateWorkspaceComponent({
 										<label className="text-white/80 font-semibold text-sm ml-1">
 											Add Member Email
 										</label>
-										<div className="flex space-x-3">
+										<div className="flex space-x-3 mt-1">
 											<Input
 												value={newUserEmail}
 												onValueChange={setNewUserEmail}
@@ -455,6 +491,20 @@ export default function CreateWorkspaceComponent({
 						</div>
 					</div>
 				</div>
+
+				<GroupChatPopupComponent
+					isOpen={isGroupChatEnablePopupOpen}
+					onClose={() => setIsGroupChatEnablePopupOpen(false)}
+					onAction={() => {
+						handleInputChange("isGroupChatEnabled", true);
+						setIsGroupChatEnablePopupOpen(false);
+					}}
+					title="Enable group chat?"
+					description={
+						"Are you sure you want to enable this feature? It is still in preview stages! There might be some inaccuracies and bugs!"
+					}
+					isLoading={IsCreateWorkspaceLoadingStoreData}
+				/>
 			</>
 		)
 	);

@@ -1,8 +1,10 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Models.Base;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using static AIAgents.Laboratory.API.Helpers.AuthorizationTypes;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ChatController;
@@ -13,12 +15,13 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// The Chat API Controller class.
 /// </summary>
 /// <param name="httpContextAccessor">The http context accessor.</param>
+/// <param name="configuration">The configuration.</param>
 /// <param name="chatHandler">The Chat API adapter handler.</param>
 /// <seealso cref="BaseController" />
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public sealed class ChatController(IHttpContextAccessor httpContextAccessor, IChatHandler chatHandler) : BaseController(httpContextAccessor)
+public sealed class ChatController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IChatHandler chatHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Invokes the chat agent asynchronous.
@@ -35,7 +38,7 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICh
     public async Task<ResponseDTO> InvokeChatAgentAsync([FromBody] ChatRequestDTO chatRequestDTO)
     {
         ArgumentNullException.ThrowIfNull(chatRequestDTO);
-        if (base.IsRequestAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
             if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
@@ -61,7 +64,7 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICh
         ArgumentNullException.ThrowIfNull(userChatMessage);
         ArgumentException.ThrowIfNullOrEmpty(userChatMessage.UserMessage);
 
-        if (base.IsRequestAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await chatHandler.GetDirectChatResponseAsync(userChatMessage.UserMessage, UserEmail).ConfigureAwait(false);
             if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
@@ -83,7 +86,7 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICh
     [SwaggerOperation(Summary = ClearConversationHistoryForUserAction.Summary, Description = ClearConversationHistoryForUserAction.Description, OperationId = ClearConversationHistoryForUserAction.OperationId)]
     public async Task<ResponseDTO> ClearConversationHistoryForUserAsync()
     {
-        if (base.IsRequestAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await chatHandler.ClearConversationHistoryForUserAsync(base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
@@ -105,7 +108,7 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICh
     [SwaggerOperation(Summary = GetConversationHistoryDataForUserAction.Summary, Description = GetConversationHistoryDataForUserAction.Description, OperationId = GetConversationHistoryDataForUserAction.OperationId)]
     public async Task<ResponseDTO> GetConversationHistoryDataForUserAsync()
     {
-        if (base.IsRequestAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await chatHandler.GetConversationHistoryDataAsync(base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);

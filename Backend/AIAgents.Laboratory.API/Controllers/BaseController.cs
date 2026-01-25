@@ -1,4 +1,5 @@
-﻿using AIAgents.Laboratory.API.Adapters.Models.Response;
+﻿using AIAgents.Laboratory.API.Adapters.Models.Base;
+using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static AIAgents.Laboratory.API.Helpers.Constants;
@@ -6,32 +7,40 @@ using static AIAgents.Laboratory.API.Helpers.Constants;
 namespace AIAgents.Laboratory.API.Controllers;
 
 /// <summary>
-/// The Base Controller Class.
+/// The base controller.
 /// </summary>
-/// <seealso cref="Microsoft.AspNetCore.Mvc.ControllerBase" />
+/// <param name="httpContextAccessor">The http context accessor.</param>
+/// <param name="configuration">The configuration.</param>
+/// <seealso cref="ControllerBase"/>
 [Authorize]
-public abstract class BaseController : ControllerBase
+public abstract class BaseController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration) : ControllerBase
 {
     /// <summary>
-    /// The user email
+    /// The user email extracted from the token claims.
     /// </summary>
-    protected string UserEmail = string.Empty;
+    protected string UserEmail => httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.UserEmailClaimConstant))?.Value ?? HeaderConstants.NotApplicableStringConstant;
 
     /// <summary>
-    /// Initializes a new instance of <see cref="BaseController"/>
+    /// Determines whether the request is authorized based on the authorization type.
     /// </summary>
-    /// <param name="httpContextAccessor">The http context accessor.</param>
-    protected BaseController(IHttpContextAccessor httpContextAccessor)
+    /// <param name="authorizationType">The authorization type.</param>
+    /// <returns>The boolean <c>true</c> if the request is authorized, otherwise <c>false</c>.</returns>
+    /// <exception cref="Exception">Thrown when the configuration is missing.</exception>
+    protected bool IsAuthorized(AuthorizationTypes authorizationType)
     {
         if (httpContextAccessor.HttpContext is not null && httpContextAccessor.HttpContext?.User is not null)
         {
-            var userEmail = httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.UserEmailClaimConstant))?.Value;
+            // User Authentication
+            if (authorizationType == AuthorizationTypes.UserBased)
+                if (!string.IsNullOrEmpty(this.UserEmail) && !this.UserEmail.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
+                    return true && this.CheckApplicationLevelAuthorization();
 
-            if (!string.IsNullOrEmpty(userEmail))
-                this.UserEmail = userEmail;
-            else
-                this.UserEmail = HeaderConstants.NotApplicableStringConstant;
+            // Application Authentication
+            if (authorizationType == AuthorizationTypes.ApplicationBased)
+                return this.CheckApplicationLevelAuthorization();
         }
+
+        return false;
     }
 
     /// <summary>
@@ -74,11 +83,17 @@ public abstract class BaseController : ControllerBase
         };
 
     /// <summary>
-    /// Handles request authentication response.
+    /// Checks the application level authorization.
     /// </summary>
-    /// <returns>The boolean for authentication.</returns>
-    protected bool IsRequestAuthorized()
+    /// <returns><c>true</c> if the application is authorized, otherwise <c>false</c>.</returns>
+    /// <exception cref="Exception">Thrown when the configuration is missing.</exception>
+    private bool CheckApplicationLevelAuthorization()
     {
-        return !string.IsNullOrEmpty(this.UserEmail);
+        var currentClientId = this.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.ClientIdClaimConstant))?.Value;
+        var aiAgentsClientIdFromConfig = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant] ?? throw new Exception(ExceptionConstants.MissingConfigurationMessage);
+        if (!string.IsNullOrEmpty(currentClientId) && !currentClientId.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
+            return currentClientId.Equals(aiAgentsClientIdFromConfig, StringComparison.OrdinalIgnoreCase);
+
+        return false;
     }
 }
