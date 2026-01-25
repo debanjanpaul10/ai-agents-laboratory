@@ -5,6 +5,7 @@ using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using static AIAgents.Laboratory.API.Helpers.AuthorizationTypes;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ToolSkillsController;
@@ -35,7 +36,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [SwaggerOperation(Summary = GetAllToolSkillsAction.Summary, Description = GetAllToolSkillsAction.Description, OperationId = GetAllToolSkillsAction.OperationId)]
     public async Task<ResponseDTO> GetAllToolSkillsAsync()
     {
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await toolSkillsHandler.GetAllToolSkillsAsync(base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);
@@ -59,7 +60,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     public async Task<ResponseDTO> GetToolSkillBySkillIdAsync([FromRoute] string skillId)
     {
         ArgumentException.ThrowIfNullOrEmpty(skillId);
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await toolSkillsHandler.GetToolSkillBySkillIdAsync(skillId, base.UserEmail).ConfigureAwait(false);
             if (result is not null && result.ToolSkillGuid is not null) return HandleSuccessRequestResponse(result);
@@ -84,7 +85,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     public async Task<ResponseDTO> AddNewToolSkillAsync([FromForm] ToolSkillDTO toolSkillData)
     {
         ArgumentNullException.ThrowIfNull(toolSkillData);
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await toolSkillsHandler.AddNewToolSkillAsync(toolSkillData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
@@ -109,7 +110,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     public async Task<ResponseDTO> UpdateExistingToolSkillDataAsync([FromForm] ToolSkillDTO updateToolSkillData)
     {
         ArgumentNullException.ThrowIfNull(updateToolSkillData);
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await toolSkillsHandler.UpdateExistingToolSkillDataAsync(updateToolSkillData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
@@ -133,7 +134,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     public async Task<ResponseDTO> DeleteExistingToolSkillBySkillIdAsync([FromRoute] string skillId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await toolSkillsHandler.DeleteExistingToolSkillBySkillIdAsync(skillId, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
@@ -158,7 +159,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     {
         ArgumentNullException.ThrowIfNull(mcpServerToolRequest);
         ArgumentException.ThrowIfNullOrWhiteSpace(mcpServerToolRequest.ServerUrl);
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await toolSkillsHandler.GetAllMcpToolsAvailableAsync(mcpServerToolRequest.ServerUrl, base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);

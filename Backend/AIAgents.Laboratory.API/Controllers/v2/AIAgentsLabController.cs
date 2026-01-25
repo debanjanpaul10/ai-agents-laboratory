@@ -2,9 +2,9 @@ using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Base;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using static AIAgents.Laboratory.API.Helpers.AuthorizationTypes;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ConfigurationController;
@@ -36,7 +36,7 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     [SwaggerOperation(Summary = GetConfigurationsDataAction.Summary, Description = GetConfigurationsDataAction.Description, OperationId = GetConfigurationsDataAction.OperationId)]
     public ResponseDTO GetConfigurationsData()
     {
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = commonAiHandler.GetConfigurationsData(base.UserEmail);
             if (result is not null && result.Count > 0) return HandleSuccessRequestResponse(result);
@@ -60,7 +60,7 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     public ResponseDTO GetConfigurationByKeyName([FromRoute] string configKey)
     {
         ArgumentException.ThrowIfNullOrEmpty(configKey, ExceptionConstants.MissingConfigurationMessage);
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = commonAiHandler.GetConfigurationByKeyName(configKey);
             if (result is not null && result.Count > 0) return HandleSuccessRequestResponse(result);
@@ -84,7 +84,7 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     public async Task<ResponseDTO> AddBugReportDataAsync([FromBody] AddBugReportDTO addBugReport)
     {
         ArgumentNullException.ThrowIfNull(addBugReport, ExceptionConstants.InvalidBugReportDataMessage);
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             addBugReport.CreatedBy = base.UserEmail;
             var result = await feedbackHandler.AddNewBugReportDataAsync(addBugReport).ConfigureAwait(false);
@@ -109,7 +109,7 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     public async Task<ResponseDTO> SubmitFeatureRequestDataAsync([FromBody] NewFeatureRequestDTO newFeatureRequest)
     {
         ArgumentNullException.ThrowIfNull(newFeatureRequest, ExceptionConstants.InvalidFeatureRequestDataMessage);
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             newFeatureRequest.CreatedBy = base.UserEmail;
             var result = await feedbackHandler.AddNewFeatureRequestDataAsync(newFeatureRequest).ConfigureAwait(false);
@@ -131,7 +131,7 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ResponseDTO> GetTopActiveAgentsDataAsync()
     {
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await commonAiHandler.GetTopActiveAgentsDataAsync(base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);

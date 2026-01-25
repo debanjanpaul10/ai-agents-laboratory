@@ -3,9 +3,9 @@ using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Base;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using static AIAgents.Laboratory.API.Helpers.AuthorizationTypes;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.AgentsController;
@@ -40,7 +40,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     public async Task<ResponseDTO> CreateNewAgentAsync([FromForm] CreateAgentDTO agentData)
     {
         ArgumentNullException.ThrowIfNull(agentData);
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await agentsHandler.CreateNewAgentAsync(agentData, UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
@@ -62,7 +62,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [SwaggerOperation(Summary = GetAllAgentsDataAction.Summary, Description = GetAllAgentsDataAction.Description, OperationId = GetAllAgentsDataAction.OperationId)]
     public async Task<ResponseDTO> GetAllAgentsDataAsync()
     {
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await agentsHandler.GetAllAgentsDataAsync(base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);
@@ -86,7 +86,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     public async Task<ResponseDTO> GetAgentDataByIdAsync([FromRoute] string agentId)
     {
         ArgumentException.ThrowIfNullOrEmpty(agentId);
-        if (base.IsAuthorized())
+        if (base.IsAuthorized(UserBased))
         {
             var result = await agentsHandler.GetAgentDataByIdAsync(agentId, base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);
@@ -111,7 +111,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     public async Task<ResponseDTO> UpdateExistingAgentDataAsync([FromForm] AgentDataDTO updateAgentData)
     {
         ArgumentNullException.ThrowIfNull(updateAgentData);
-        if (IsAuthorized())
+        if (IsAuthorized(UserBased))
         {
             var result = await agentsHandler.UpdateExistingAgentDataAsync(updateAgentData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
@@ -135,7 +135,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     public async Task<ResponseDTO> DeleteExistingAgentDataAsync([FromRoute] string agentId)
     {
         ArgumentException.ThrowIfNullOrEmpty(agentId);
-        if (IsAuthorized())
+        if (IsAuthorized(UserBased))
         {
             var result = await agentsHandler.DeleteExistingAgentDataAsync(agentId, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
