@@ -3,6 +3,7 @@ using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.ApplicationPluginsHelpers;
@@ -26,7 +27,7 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
     /// <param name="chatRequest">The chat request domain model.</param>
     /// <param name="workspaceDetails">The workspace details.</param>
     /// <returns>The orchestrator agent response.</returns>
-    public async Task<string> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails)
+    public async Task<GroupChatResponseDomain> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails)
     {
         try
         {
@@ -44,6 +45,7 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
             var agentsList = agentsData.Select(agent => $"{agent.AgentName}: {agent.AgentDescription}");
             var orchestratorSystemPrompt = SystemOrchestratorFunction.GetFunctionInstructions(string.Join("\n", agentsList));
             ConversationHistoryDomain conversationHistory = new();
+            IList<string> agentsInvoked = [];
 
             var loopCount = 0;
             while (loopCount < SystemOrchestratorFunction.MAX_ORCHESTRATOR_LOOPS)
@@ -66,16 +68,16 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
                 // Parse Orchestrator Response
                 var parsedResponse = JsonConvert.DeserializeObject<OrchestratorResponseDomain>(orchestratorResponse);
                 if (parsedResponse?.Type == SystemOrchestratorFunction.OrchestratorResponseTypeFinalResponse)
-                    return parsedResponse.Content;
+                    return OrchestratorHelpers.PrepareGroupChatResponseDomain(parsedResponse.Content, agentsInvoked);
 
                 else if (parsedResponse?.Type == SystemOrchestratorFunction.OrchestratorResponseTypeDelegate)
-                    await this.DelegateToAgentAsync(agentsData, chatRequest, conversationHistory, parsedResponse).ConfigureAwait(false);
+                    await this.DelegateToAgentAsync(agentsData, chatRequest, conversationHistory, parsedResponse, agentsInvoked).ConfigureAwait(false);
 
                 else
-                    return ExceptionConstants.OrchestratorResponseFormatInvalidExceptionMessage;
+                    return OrchestratorHelpers.PrepareGroupChatResponseDomain(ExceptionConstants.OrchestratorResponseFormatInvalidExceptionMessage, agentsInvoked);
             }
 
-            return ExceptionConstants.OrchestratorLoopLimitReachedExceptionMessage;
+            return OrchestratorHelpers.PrepareGroupChatResponseDomain(ExceptionConstants.OrchestratorLoopLimitReachedExceptionMessage, agentsInvoked);
         }
         catch (Exception ex)
         {
@@ -97,8 +99,9 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
     /// <param name="chatRequest">The chat request.</param>
     /// <param name="conversationHistory">The conversation history.</param>
     /// <param name="parsedResponse">The parsed response.</param>
-    private async Task DelegateToAgentAsync(IList<AgentDataDomain> agentsData, WorkspaceAgentChatRequestDomain chatRequest,
-        ConversationHistoryDomain conversationHistory, OrchestratorResponseDomain parsedResponse)
+    /// <param name="agentsInvoked">The list of agents invoked.</param>
+    private async Task DelegateToAgentAsync(IList<AgentDataDomain> agentsData, WorkspaceAgentChatRequestDomain chatRequest, ConversationHistoryDomain conversationHistory,
+        OrchestratorResponseDomain parsedResponse, IList<string> agentsInvoked)
     {
         try
         {
@@ -106,7 +109,6 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
 
             var targetAgentName = parsedResponse.AgentName;
             var targetAgent = agentsData.FirstOrDefault(a => a.AgentName.Equals(targetAgentName, StringComparison.OrdinalIgnoreCase));
-
             if (targetAgent is null)
             {
                 // Agent not found, let orchestrator know
@@ -118,11 +120,14 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
                 return;
             }
 
+            // Track the invoked agent
+            agentsInvoked.Add(targetAgentName);
+
             // Invoke the Agent
             var agentChatRequestModel = new ChatRequestDomain()
             {
                 AgentId = targetAgent.AgentId,
-                AgentName = targetAgent.AgentName,
+                AgentName = targetAgentName,
                 ConversationId = chatRequest.ConversationId,
                 UserMessage = parsedResponse.Instruction,
             };
@@ -132,7 +137,7 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
             conversationHistory.ChatHistory.Add(new ChatHistoryDomain
             {
                 Role = ChatbotHelperConstants.UserRoleConstant,
-                Content = $"[{targetAgent.AgentName}]: {agentResponse}"
+                Content = $"[{targetAgentName}]: {agentResponse}"
             });
         }
         catch (Exception ex)

@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents the result of a tool selection process within an AI agent.
 /// </summary>
-public class ToolSelectionResultDomain
+public sealed record ToolSelectionResultDomain
 {
     /// <summary>
     /// Gets or sets the name of the tool.

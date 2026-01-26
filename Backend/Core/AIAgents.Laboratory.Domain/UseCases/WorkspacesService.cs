@@ -19,6 +19,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="mongoDatabaseService">The mongo db service.</param>
 /// <param name="agentChatService">The agent chat service.</param>
+/// <param name="orchestratorService">The orchestrator service.</param>
 /// <seealso cref="IWorkspacesService"/>
 public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService,
     IAgentChatService agentChatService, IOrchestratorService orchestratorService) : IWorkspacesService
@@ -166,8 +167,10 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// </summary>
     /// <param name="chatRequest">The workspace agent chat request dto model.</param>
     /// <returns>The group chat response.</returns>
-    public async Task<string> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDomain chatRequest)
+    public async Task<GroupChatResponseDomain> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDomain chatRequest)
     {
+        ArgumentNullException.ThrowIfNull(chatRequest);
+
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));

@@ -1,9 +1,4 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using AIAgents.Laboratory.Domain.Helpers;
-using Microsoft.Extensions.AI;
-using Newtonsoft.Json;
-using static AIAgents.Laboratory.Infrastructure.AgentsFramework.Helpers.Constants;
+﻿using static AIAgents.Laboratory.Infrastructure.AgentsFramework.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Infrastructure.AgentsFramework.Helpers;
 
@@ -12,18 +7,6 @@ namespace AIAgents.Laboratory.Infrastructure.AgentsFramework.Helpers;
 /// </summary>
 internal static class AgentServiceHelpers
 {
-    /// <summary>
-    /// Deserializes tool selection result with proper error handling.
-    /// </summary>
-    /// <param name="toolSelectionResultResponse">The tool selection result response.</param>
-    /// <returns>The deserialized tool selection result.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when deserialization fails.</exception>
-    internal static ToolSelectionResultDomain DeserializeToolSelectionResult(string toolSelectionResultResponse)
-    {
-        var extractedJson = DomainUtilities.ExtractJsonFromMarkdown(toolSelectionResultResponse);
-        return JsonConvert.DeserializeObject<ToolSelectionResultDomain>(extractedJson) ?? throw new InvalidOperationException(ExceptionConstants.DefaultAIExceptionMessage);
-    }
-
     /// <summary>
     /// Sanitizes error messages to prevent sensitive information exposure.
     /// </summary>
@@ -60,17 +43,10 @@ internal static class AgentServiceHelpers
         // Enforce a maximum length to reduce risk of logging large, detailed messages
         const int maxLength = 256;
         if (sanitized.Length > maxLength)
-            return sanitized.Substring(0, maxLength) + "... (truncated)";
+            return string.Concat(sanitized.AsSpan(0, maxLength), "... (truncated)");
 
         return sanitized;
     }
-
-    /// <summary>
-    /// Sanitizes service provider information for logging.
-    /// </summary>
-    /// <param name="serviceProvider">The service provider name.</param>
-    /// <returns>The sanitized service provider name.</returns>
-    internal static string SanitizeServiceProvider(string? serviceProvider) => string.IsNullOrWhiteSpace(serviceProvider) ? "[UNKNOWN]" : serviceProvider;
 
     /// <summary>
     /// Validates input parameters for AI function calls.
@@ -102,42 +78,4 @@ internal static class AgentServiceHelpers
         if (string.IsNullOrWhiteSpace(mcpServerUrl))
             throw new ArgumentNullException(nameof(mcpServerUrl), ExceptionConstants.SomethingWentWrongMessage);
     }
-
-    /// <summary>
-    /// Builds chat messages from conversation history and current user message.
-    /// </summary>
-    /// <param name="conversationDataDomain">The conversation history data domain.</param>
-    /// <param name="userMessage">The current user message.</param>
-    /// <param name="agentPrompt">The agent prompt.</param>
-    /// <returns>A list of chat messages.</returns>
-    internal static List<Models.ChatMessage> BuildChatMessages(ConversationHistoryDomain conversationDataDomain, string userMessage, string agentPrompt)
-    {
-        var chatMessages = new List<Models.ChatMessage>
-        {
-            new() { Role = ChatRole.System.ToString().ToLowerInvariant(), Content = agentPrompt }
-        };
-
-        // Add conversation history if available
-        if (conversationDataDomain.ChatHistory is not null)
-            foreach (var message in conversationDataDomain.ChatHistory)
-                chatMessages.Add(new Models.ChatMessage { Role = message.Role, Content = message.Content });
-
-        // Add the current user message
-        chatMessages.Add(new Models.ChatMessage { Role = ArgumentsConstants.UserRoleConstant, Content = userMessage });
-        return chatMessages;
-    }
-
-    /// <summary>
-    /// Converts string role to ChatRole enum.
-    /// </summary>
-    /// <param name="role">The current chat role.</param>
-    /// <returns>The chat role.</returns>
-    internal static ChatRole ConvertToChatRole(string role) =>
-        role.ToLowerInvariant() switch
-        {
-            "user" => ChatRole.User,
-            "assistant" => ChatRole.Assistant,
-            "system" => ChatRole.System,
-            _ => ChatRole.User
-        };
 }

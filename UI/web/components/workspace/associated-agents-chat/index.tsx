@@ -19,6 +19,7 @@ import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.d
 import { GetWorkspaceGroupChatResponseAsync } from "@store/workspaces/actions";
 import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
+import { GroupChatResponseDTO } from "@models/response/group-chat-response.dto";
 
 export default function AssociatedAgentsChatPaneComponent({
 	selectedAgent,
@@ -123,13 +124,13 @@ export default function AssociatedAgentsChatPaneComponent({
 						chatRequest,
 						accessToken,
 					),
-				)) as string | null;
+				)) as GroupChatResponseDTO | null;
 
-				if (aiResponse) {
+				if (aiResponse?.agentResponse) {
 					const botMessage = {
 						id: GenerateMessageId(),
 						type: "bot" as const,
-						content: aiResponse,
+						content: aiResponse.agentResponse,
 					};
 
 					setMessages((prev) => [...prev, botMessage]);

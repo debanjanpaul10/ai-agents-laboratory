@@ -59,5 +59,5 @@ public interface IWorkspacesHandler
     /// </summary>
     /// <param name="chatRequest">The workspace agent chat request dto model.</param>
     /// <returns>The group chat response.</returns>
-    Task<string> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDTO chatRequest);
+    Task<GroupChatResponseDTO> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDTO chatRequest);
 }

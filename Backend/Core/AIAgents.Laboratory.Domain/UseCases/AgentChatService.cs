@@ -65,7 +65,7 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
             };
 
             // Get data from Knowledge Base if configured
-            if (IsKnowledgeBaseServiceAllowed && (agentData.KnowledgeBaseDocument is not null || agentData.StoredKnowledgeBase is not null))
+            if (IsKnowledgeBaseServiceAllowed && agentData.HasKnowledgeBaseContent())
                 chatMessage.KnowledgeBase = await knowledgeBaseProcessor.GetRelevantKnowledgeAsync(chatRequest.UserMessage, agentData.AgentId).ConfigureAwait(false);
 
             // Use AI Vision services if configured
