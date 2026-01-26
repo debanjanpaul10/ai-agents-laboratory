@@ -108,7 +108,6 @@ public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logge
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, documentFile.FileName);
 
-            string GCPCloudBucketName = configuration[AzureAppConfigurationConstants.GCPBucketNameConstant] ?? throw new InvalidOperationException(ExceptionConstants.GCPBucketNotConfiguredExceptionMessage);
             var folderName = fileType switch
             {
                 UploadedFileType.AiVisionImageDocument => this.GCPVisionImagesFolderName,
@@ -121,13 +120,13 @@ public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logge
 
             using var stream = documentFile.OpenReadStream();
             var uploadedObject = await storageClient.UploadObjectAsync(
-                bucket: GCPCloudBucketName,
+                bucket: this.GCPStorageBucketName,
                 objectName: objectName,
                 contentType: documentFile.ContentType,
                 source: stream).ConfigureAwait(false);
 
             // Construct the public URL for the uploaded object
-            return string.Format(GCPCloudStorageConstants.PublicUrlConstant, GCPCloudBucketName, objectName);
+            return string.Format(GCPCloudStorageConstants.PublicUrlConstant, this.GCPStorageBucketName, objectName);
         }
         catch (Exception ex)
         {
