@@ -126,7 +126,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             var hasChanges = false;
 
             // 1. Remove any existing documents whose names are in RemovedKnowledgeBaseDocuments
-            if (updateDataDomain.RemovedKnowledgeBaseDocuments is not null && updateDataDomain.RemovedKnowledgeBaseDocuments.Any())
+            if (updateDataDomain.RemovedKnowledgeBaseDocuments?.Count > 0)
             {
                 var removedSet = new HashSet<string>(updateDataDomain.RemovedKnowledgeBaseDocuments, StringComparer.OrdinalIgnoreCase);
                 updatedStoredKnowledgeBase = [.. updatedStoredKnowledgeBase.Where(doc => !removedSet.Contains(doc.FileName))];
@@ -134,7 +134,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             }
 
             // 2. Process any newly uploaded knowledge base documents
-            if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Any() && !string.IsNullOrEmpty(this.AllowedKnowledgebaseFileFormats))
+            if (updateDataDomain.KnowledgeBaseDocument?.Count > 0 && !string.IsNullOrEmpty(this.AllowedKnowledgebaseFileFormats))
             {
                 DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.KnowledgeBaseDocument, this.AllowedKnowledgebaseFileFormats);
                 foreach (var uploadedFile in updateDataDomain.KnowledgeBaseDocument)
