@@ -24,4 +24,12 @@ public interface IBlobStorageManager
     /// <param name="agentId">The agent id.</param>
     /// <returns>A boolean for success/failure.</returns>
     Task<bool> DeleteDocumentsFolderAndDataAsync(string agentId);
+
+    /// <summary>
+    /// Downloads a file from blob storage.
+    /// </summary>
+    /// <param name="agentGuid">The agent guid id.</param>
+    /// <param name="fileName">The file name.</param>
+    /// <returns>The download file link.</returns>
+    Task<string> DownloadFileFromBlobStorageAsync(string agentGuid, string fileName);
 }

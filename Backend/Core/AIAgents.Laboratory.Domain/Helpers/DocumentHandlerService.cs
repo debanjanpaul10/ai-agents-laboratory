@@ -50,7 +50,7 @@ internal static class DocumentHandlerService
             await file.CopyToAsync(memoryStream).ConfigureAwait(false);
             knowledgeBaseFiles.Add(new KnowledgeBaseDocumentDomain
             {
-                FileName = file.FileName,
+                FileName = Path.GetFileName(file.FileName),
                 ContentType = file.ContentType,
                 FileContent = memoryStream.ToArray(),
                 FileSize = file.Length,

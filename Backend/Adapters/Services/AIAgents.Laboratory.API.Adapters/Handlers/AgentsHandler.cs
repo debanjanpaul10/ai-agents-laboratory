@@ -76,4 +76,15 @@ public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) 
     {
         return await agentsService.DeleteExistingAgentDataAsync(agentId, currentUserEmail).ConfigureAwait(false);
     }
+
+    /// <summary>
+    /// Downloads the knowledgebase file asynchronous.
+    /// </summary>
+    /// <param name="agentGuid">The agent guid id.</param>
+    /// <param name="fileName">The file name.</param>
+    /// <returns>The downloaded file url</returns>
+    public async Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName)
+    {
+        return await agentsService.DownloadKnowledgebaseFileAsync(agentGuid, fileName).ConfigureAwait(false);
+    }
 }
