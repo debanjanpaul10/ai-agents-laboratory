@@ -7,9 +7,9 @@ import {
 	Check,
 	X,
 } from "lucide-react";
+import { cn } from "@heroui/react";
 
 import { useAppSelector } from "@store/index";
-import { cn } from "@heroui/react";
 
 export default function AssociateAgentsFlyoutComponent({
 	isOpen,
@@ -22,17 +22,16 @@ export default function AssociateAgentsFlyoutComponent({
 	selectedAgentGuids: Set<string>;
 	onSelectionComplete: (selectedGuids: Set<string>) => void;
 }) {
-	const AgentsListStoreData = useAppSelector(
-		(state) => state.AgentsReducer.agentsListData,
-	);
-
-	const IsLoading = useAppSelector(
-		(state) => state.AgentsReducer.isAgentsListLoading,
-	);
-
 	const [searchQuery, setSearchQuery] = useState("");
 	const [localSelectedGuids, setLocalSelectedGuids] = useState<Set<string>>(
 		new Set(selectedAgentGuids),
+	);
+
+	const AgentsListStoreData = useAppSelector(
+		(state) => state.AgentsReducer.agentsListData,
+	);
+	const IsLoading = useAppSelector(
+		(state) => state.AgentsReducer.isAgentsListLoading,
 	);
 
 	useEffect(() => {

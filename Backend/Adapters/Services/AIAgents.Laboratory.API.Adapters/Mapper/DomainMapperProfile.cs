@@ -47,7 +47,7 @@ public class DomainMapperProfile : Profile
         CreateMap<AssociatedAgentsSkillDataDomain, AssociatedAgentsSkillDataDTO>();
 
         CreateMap<AgentDataDomain, AgentDataDTO>().ReverseMap()
-            .ForMember(dest => dest.AgentId, opt => opt.MapFrom(src => src.AgentId));
+            .ForMember(destination => destination.AgentId, opt => opt.MapFrom(source => source.AgentId));
         CreateMap<ChatRequestDTO, ChatRequestDomain>().ReverseMap();
         CreateMap<AiVisionImagesDomain, AiVisionImagesDataDTO>().ReverseMap()
             .ForMember(destination => destination.ImageKeywords, options => options.Ignore());
@@ -55,5 +55,6 @@ public class DomainMapperProfile : Profile
             .ForMember(destination => destination.IsActive, options => options.Ignore());
         CreateMap<AgentsWorkspaceDomain, AgentsWorkspaceDTO>().ReverseMap();
         CreateMap<WorkspaceAgentsDataDomain, WorkspaceAgentsDataDTO>().ReverseMap();
+        CreateMap<GroupChatResponseDomain, GroupChatResponseDTO>().ReverseMap();
     }
 }

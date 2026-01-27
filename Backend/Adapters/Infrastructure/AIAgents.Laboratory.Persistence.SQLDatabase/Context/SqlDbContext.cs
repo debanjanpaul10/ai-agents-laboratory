@@ -7,7 +7,7 @@ namespace AIAgents.Laboratory.Persistence.SQLDatabase.Context;
 /// The SQL database context class.
 /// </summary>
 /// <seealso cref="DbContext"/>
-public partial class SqlDbContext : DbContext
+public class SqlDbContext : DbContext
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="SqlDbContext"/> class.
@@ -43,6 +43,22 @@ public partial class SqlDbContext : DbContext
     /// The new feature requests.
     /// </value>
     public virtual DbSet<NewFeatureRequestData> NewFeatureRequests { get; set; }
+
+    /// <summary>
+    /// Gets or sets the bug item status mapping.
+    /// </summary>
+    /// <value>
+    /// The bug item status mapping.
+    /// </value>
+    public virtual DbSet<BugItemStatusMapping> BugItemStatusMapping { get; set; }
+
+    /// <summary>
+    /// Gets or sets the bug severity mapping.
+    /// </summary>
+    /// <value>
+    /// The bug severity mapping.
+    /// </value>
+    public virtual DbSet<BugSeverityMapping> BugSeverityMapping { get; set; }
 
     /// <summary>
     /// Override this method to further configure the model that was discovered by convention from the entity types

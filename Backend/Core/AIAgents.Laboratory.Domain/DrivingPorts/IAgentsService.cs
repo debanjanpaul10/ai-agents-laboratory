@@ -45,4 +45,12 @@ public interface IAgentsService
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>The boolean for success/failure.</returns>
     Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail);
+
+    /// <summary>
+    /// Downloads the knowledgebase file asynchronous.
+    /// </summary>
+    /// <param name="agentGuid">The agent guid id.</param>
+    /// <param name="fileName">The file name.</param>
+    /// <returns>The downloaded file url</returns>
+    Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName);
 }

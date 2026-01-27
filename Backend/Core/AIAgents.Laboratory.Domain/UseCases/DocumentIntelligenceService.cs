@@ -7,6 +7,7 @@ using AIAgents.Laboratory.Processor.Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
@@ -125,7 +126,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             var hasChanges = false;
 
             // 1. Remove any existing documents whose names are in RemovedKnowledgeBaseDocuments
-            if (updateDataDomain.RemovedKnowledgeBaseDocuments is not null && updateDataDomain.RemovedKnowledgeBaseDocuments.Any())
+            if (updateDataDomain.RemovedKnowledgeBaseDocuments?.Count > 0)
             {
                 var removedSet = new HashSet<string>(updateDataDomain.RemovedKnowledgeBaseDocuments, StringComparer.OrdinalIgnoreCase);
                 updatedStoredKnowledgeBase = [.. updatedStoredKnowledgeBase.Where(doc => !removedSet.Contains(doc.FileName))];
@@ -133,7 +134,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             }
 
             // 2. Process any newly uploaded knowledge base documents
-            if (updateDataDomain.KnowledgeBaseDocument is not null && updateDataDomain.KnowledgeBaseDocument.Any() && !string.IsNullOrEmpty(this.AllowedKnowledgebaseFileFormats))
+            if (updateDataDomain.KnowledgeBaseDocument?.Count > 0 && !string.IsNullOrEmpty(this.AllowedKnowledgebaseFileFormats))
             {
                 DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.KnowledgeBaseDocument, this.AllowedKnowledgebaseFileFormats);
                 foreach (var uploadedFile in updateDataDomain.KnowledgeBaseDocument)
@@ -168,6 +169,30 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         finally
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId);
+        }
+    }
+
+    /// <summary>
+    /// Downloads the knowledgebase file asynchronous.
+    /// </summary>
+    /// <param name="agentGuid">The agent guid id.</param>
+    /// <param name="fileName">The file name.</param>
+    /// <returns>The downloaded file url</returns>
+    public async Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName)
+    {
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+            return await blobStorageManager.DownloadFileFromBlobStorageAsync(agentGuid, fileName).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message);
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
         }
     }
 

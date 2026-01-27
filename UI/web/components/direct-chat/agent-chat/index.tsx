@@ -14,7 +14,6 @@ import { DashboardConstants, ManageAgentConstants } from "@helpers/constants";
 import { ChatMessage } from "@shared/types";
 import { GenerateMessageId } from "@shared/utils";
 import { DirectChatRequestDTO } from "@models/request/direct-chat-request-dto";
-import { useAuth } from "@auth/AuthProvider";
 import { useAppDispatch, useAppSelector } from "@store/index";
 import {
 	ClearConversationHistoryAsync,
@@ -33,7 +32,6 @@ export default function AgentChatComponent({
 	onClose: any;
 	isAgentInfoDrawerOpen: boolean;
 }) {
-	const { getAccessToken } = useAuth();
 	const dispatch = useAppDispatch();
 
 	const [messages, setMessages] = useState<Array<ChatMessage>>([]);
@@ -43,20 +41,20 @@ export default function AgentChatComponent({
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	const ConversationHistoryStoreData = useAppSelector(
-		(state) => state.ChatReducer.conversationHistory
+		(state) => state.ChatReducer.conversationHistory,
 	);
 	const IsDirectChatLoadingStoreData = useAppSelector(
-		(state) => state.CommonReducer.isDirectChatLoading
+		(state) => state.CommonReducer.isDirectChatLoading,
 	);
 	const ConversationAgentIdStoreData = useAppSelector(
-		(state) => state.CommonReducer.configurationValue
+		(state) => state.CommonReducer.configurationValue,
 	);
 	const IsEditAgentDataLoading = useAppSelector(
-		(state) => state.AgentsReducer.isEditAgentDataLoading
+		(state) => state.AgentsReducer.isEditAgentDataLoading,
 	);
 
 	const mapChatHistoryToMessages = (
-		chatHistory: Array<{ role: string; content: string }>
+		chatHistory: Array<{ role: string; content: string }>,
 	) => {
 		return chatHistory.map((msg) => ({
 			id: GenerateMessageId(),
@@ -81,29 +79,25 @@ export default function AgentChatComponent({
 			ConversationHistoryStoreData.chatHistory.length > 0
 		) {
 			const mappedMessages = mapChatHistoryToMessages(
-				ConversationHistoryStoreData.chatHistory
+				ConversationHistoryStoreData.chatHistory,
 			);
 			setMessages(mappedMessages);
 		}
 	}, [ConversationHistoryStoreData]);
 
-	async function getAgentInformation() {
-		const token = await getAccessToken();
-		token &&
-			dispatch(
-				GetAgentDataByIdAsync(
-					ConversationAgentIdStoreData.AIChatbotAgentId,
-					token
-				)
-			);
+	function getAgentInformation() {
+		dispatch(
+			GetAgentDataByIdAsync(
+				ConversationAgentIdStoreData.AIChatbotAgentId,
+			),
+		);
 	}
 
-	async function clearConversation() {
+	function clearConversation() {
 		setMessages([]);
 		setUserInput("");
 
-		const accessToken = await getAccessToken();
-		accessToken && dispatch(ClearConversationHistoryAsync(accessToken));
+		dispatch(ClearConversationHistoryAsync());
 	}
 
 	async function sendChatbotRequest() {
@@ -130,23 +124,18 @@ export default function AgentChatComponent({
 			const chatRequest: DirectChatRequestDTO = {
 				userMessage: userMessage.content.trim(),
 			};
-			const accessToken = await getAccessToken();
-			if (accessToken) {
-				const aiResponse = (await (
-					dispatch as ThunkDispatch<any, any, Action>
-				)(GetDirectChatResponseAsync(chatRequest, accessToken))) as
-					| string
-					| null;
+			const aiResponse = (await (
+				dispatch as ThunkDispatch<any, any, Action>
+			)(GetDirectChatResponseAsync(chatRequest))) as string | null;
 
-				if (aiResponse) {
-					const botMessage = {
-						id: GenerateMessageId(),
-						type: "bot" as const,
-						content: aiResponse,
-					};
+			if (aiResponse) {
+				const botMessage = {
+					id: GenerateMessageId(),
+					type: "bot" as const,
+					content: aiResponse,
+				};
 
-					setMessages((prev) => [...prev, botMessage]);
-				}
+				setMessages((prev) => [...prev, botMessage]);
 			}
 		} catch (error) {
 			console.error(error);
@@ -294,7 +283,7 @@ export default function AgentChatComponent({
 			textareaRef.current.style.height = "auto";
 			textareaRef.current.style.height = `${Math.min(
 				textareaRef.current.scrollHeight,
-				800
+				800,
 			)}px`;
 
 			// Show scrollbar only when content exceeds 200px

@@ -13,5 +13,5 @@ internal static class CacheKeys
     /// <summary>
     /// The cachek key expiration timeoutvalue.
     /// </summary>
-    internal static TimeSpan CacheExpirationTimeout = TimeSpan.FromMinutes(15);
+    internal static readonly TimeSpan CacheExpirationTimeout = TimeSpan.FromMinutes(15);
 }

@@ -135,6 +135,10 @@ export const RunWorkspaceConstants = {
 		SelectAgentSubheader:
 			"Choose an agent from the list on the left to start a conversation",
 		SubTitle: "AI Agent",
+		GroupChatAgent: {
+			Guid: "group-chat-guid",
+			Name: "Group Chat",
+		},
 	},
 };
 
@@ -237,6 +241,9 @@ export const NewFeatureRequestConstants = {
 
 export const ApplicationConstants = {
 	ChatbotAgentConfigKeyName: "AIChatbotAgentId",
+	StorageKeys: {
+		AccessToken: "accessToken",
+	},
 };
 
 export const KnowledgeBaseFlyoutPropsConstants = {

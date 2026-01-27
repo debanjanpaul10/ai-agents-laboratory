@@ -21,7 +21,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 								{parseInline(item)}
 							</li>
 						))}
-					</ul>
+					</ul>,
 				);
 				listItems = [];
 			}
@@ -37,7 +37,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 						<code className="text-cyan-300 text-sm font-mono">
 							{codeBlockContent.join("\n")}
 						</code>
-					</pre>
+					</pre>,
 				);
 				codeBlockContent = [];
 			}
@@ -58,7 +58,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 							className="font-bold text-white"
 						>
 							{boldMatch[1]}
-						</strong>
+						</strong>,
 					);
 					remaining = remaining.slice(boldMatch[0].length);
 					continue;
@@ -70,7 +70,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 					parts.push(
 						<em key={`italic-${partKey++}`} className="italic">
 							{italicMatch[1]}
-						</em>
+						</em>,
 					);
 					remaining = remaining.slice(italicMatch[0].length);
 					continue;
@@ -85,9 +85,24 @@ export function MarkdownRenderer({ content }: { content: string }) {
 							className="bg-black/30 text-cyan-300 px-1.5 py-0.5 rounded text-sm font-mono"
 						>
 							{codeMatch[1]}
-						</code>
+						</code>,
 					);
 					remaining = remaining.slice(codeMatch[0].length);
+					continue;
+				}
+
+				// Small text (<small>text</small>)
+				const smallMatch = remaining.match(/^<small>(.+?)<\/small>/);
+				if (smallMatch) {
+					parts.push(
+						<small
+							key={`small-${partKey++}`}
+							className="text-xs text-white/60"
+						>
+							{smallMatch[1]}
+						</small>,
+					);
+					remaining = remaining.slice(smallMatch[0].length);
 					continue;
 				}
 
@@ -145,7 +160,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 							className={`${sizes[0]} font-bold text-white mt-4 mb-2`}
 						>
 							{parseInline(text)}
-						</h1>
+						</h1>,
 					);
 				} else if (level === 2) {
 					elements.push(
@@ -154,7 +169,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 							className={`${sizes[1]} font-bold text-white mt-4 mb-2`}
 						>
 							{parseInline(text)}
-						</h2>
+						</h2>,
 					);
 				} else if (level === 3) {
 					elements.push(
@@ -163,7 +178,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 							className={`${sizes[2]} font-bold text-white mt-4 mb-2`}
 						>
 							{parseInline(text)}
-						</h3>
+						</h3>,
 					);
 				} else if (level === 4) {
 					elements.push(
@@ -172,7 +187,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 							className={`${sizes[3]} font-bold text-white mt-4 mb-2`}
 						>
 							{parseInline(text)}
-						</h4>
+						</h4>,
 					);
 				} else if (level === 5) {
 					elements.push(
@@ -181,7 +196,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 							className={`${sizes[4]} font-bold text-white mt-4 mb-2`}
 						>
 							{parseInline(text)}
-						</h5>
+						</h5>,
 					);
 				} else {
 					elements.push(
@@ -190,7 +205,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 							className={`${sizes[5]} font-bold text-white mt-4 mb-2`}
 						>
 							{parseInline(text)}
-						</h6>
+						</h6>,
 					);
 				}
 				return;
@@ -218,7 +233,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 				flushList();
 				if (elements.length > 0 && index < lines.length - 1) {
 					elements.push(
-						<div key={`space-${key++}`} className="h-2" />
+						<div key={`space-${key++}`} className="h-2" />,
 					);
 				}
 				return;
@@ -229,7 +244,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 			elements.push(
 				<p key={`p-${key++}`} className="text-white/90 my-1">
 					{parseInline(line)}
-				</p>
+				</p>,
 			);
 		});
 

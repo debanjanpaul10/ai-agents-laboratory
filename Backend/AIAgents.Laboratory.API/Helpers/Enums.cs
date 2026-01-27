@@ -1,5 +1,8 @@
 namespace AIAgents.Laboratory.API.Helpers;
 
+/// <summary>
+/// The authorization types.
+/// </summary>
 public enum AuthorizationTypes
 {
     /// <summary>

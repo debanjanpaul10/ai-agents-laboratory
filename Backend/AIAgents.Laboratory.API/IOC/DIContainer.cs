@@ -60,12 +60,11 @@ public static class DIContainer
     {
         services.ConfigureAuthenticationServices(configuration);
 
-        services.AddAPIAdapterDependencies().AddMessagingDependencies();
-        services.AddAgentsFrameworkDependencies(configuration).AddMongoDbAdapterDependencies(configuration).AddRelationalSqlDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
+        services.AddAPIAdapterDependencies().AddMessagingDependencies().AddMemoryCache().AddCacheDependencies();
+        services.AddAgentsFrameworkDependencies(configuration).AddMongoDbAdapterDependencies(configuration)
+            .AddRelationalSqlDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
 
         services.AddDomainDependencies().AddProcessorDependencies(configuration);
-        services.AddMemoryCache().AddCacheDependencies();
-
         services.AddSignalR().AddAzureSignalR(configuration[AzureAppConfigurationConstants.AzureSignalRConnection]);
     }
 
@@ -78,7 +77,7 @@ public static class DIContainer
         services.AddApiVersioning(configuration =>
         {
             configuration.AssumeDefaultVersionWhenUnspecified = true;
-            configuration.DefaultApiVersion = new ApiVersion(1, 0);
+            configuration.DefaultApiVersion = new ApiVersion(2, 0);
             configuration.ReportApiVersions = true;
         });
     }
@@ -128,6 +127,8 @@ public static class DIContainer
         if (claimsPrincipal?.Identity is not ClaimsIdentity claimsIdentity || !claimsIdentity.IsAuthenticated)
         {
             context.Fail(ExceptionConstants.InvalidTokenExceptionConstant);
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();
+            logger.LogError(ExceptionConstants.InvalidTokenExceptionConstant);
             return;
         }
 

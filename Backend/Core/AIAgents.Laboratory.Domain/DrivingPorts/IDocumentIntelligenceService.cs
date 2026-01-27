@@ -61,4 +61,12 @@ public interface IDocumentIntelligenceService
     /// <param name="agentId">The unique identifier of the agent whose data is to be deleted. Cannot be null or empty.</param>
     /// <returns>A task that represents the asynchronous delete operation.</returns>
     Task DeleteKnowledgebaseAndImagesDataAsync(string agentId);
+
+    /// <summary>
+    /// Downloads the knowledgebase file asynchronous.
+    /// </summary>
+    /// <param name="agentGuid">The agent guid id.</param>
+    /// <param name="fileName">The file name.</param>
+    /// <returns>The downloaded file url</returns>
+    Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName);
 }

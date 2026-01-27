@@ -4,6 +4,7 @@ using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using static AIAgents.Laboratory.Storage.Blobs.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Storage.Blobs.DataManager;
@@ -95,6 +96,46 @@ public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logge
     }
 
     /// <summary>
+    /// Downloads a file from blob storage.
+    /// </summary>
+    /// <param name="agentGuid">The agent guid id.</param>
+    /// <param name="fileName">The file name.</param>
+    /// <returns>The download file link.</returns>
+    public async Task<string> DownloadFileFromBlobStorageAsync(string agentGuid, string fileName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(agentGuid);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+
+            var safeFileName = Path.GetFileName(fileName);
+            string objectName = string.Format(GCPCloudStorageConstants.AgentFolderStructureFormat, this.GCPKnowledgeBaseFolderName, agentGuid) + "/" + safeFileName;
+
+            var stream = new MemoryStream();
+            var file = await storageClient.DownloadObjectAsync(
+                bucket: this.GCPStorageBucketName,
+                objectName: objectName,
+                destination: stream).ConfigureAwait(false);
+
+            if (file is not null)
+                return string.Format(GCPCloudStorageConstants.PublicUrlConstant, this.GCPStorageBucketName, file.Name);
+            else
+                throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+        }
+    }
+
+    /// <summary>
     /// Uploads documents to BLOB storage.
     /// </summary>
     /// <param name="documentFile">The user uploaded document file.</param>
@@ -108,7 +149,6 @@ public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logge
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, documentFile.FileName);
 
-            string GCPCloudBucketName = configuration[AzureAppConfigurationConstants.GCPBucketNameConstant] ?? throw new InvalidOperationException(ExceptionConstants.GCPBucketNotConfiguredExceptionMessage);
             var folderName = fileType switch
             {
                 UploadedFileType.AiVisionImageDocument => this.GCPVisionImagesFolderName,
@@ -121,13 +161,13 @@ public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logge
 
             using var stream = documentFile.OpenReadStream();
             var uploadedObject = await storageClient.UploadObjectAsync(
-                bucket: GCPCloudBucketName,
+                bucket: this.GCPStorageBucketName,
                 objectName: objectName,
                 contentType: documentFile.ContentType,
                 source: stream).ConfigureAwait(false);
 
             // Construct the public URL for the uploaded object
-            return string.Format(GCPCloudStorageConstants.PublicUrlConstant, GCPCloudBucketName, objectName);
+            return string.Format(GCPCloudStorageConstants.PublicUrlConstant, this.GCPStorageBucketName, objectName);
         }
         catch (Exception ex)
         {

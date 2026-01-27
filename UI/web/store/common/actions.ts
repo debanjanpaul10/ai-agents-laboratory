@@ -71,10 +71,10 @@ export function ToggleFeedbackLoader(
 	};
 }
 
-export function GetAllConfigurations(accessToken: string) {
+export function GetAllConfigurations() {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
-			const response = await GetConfigurationsDataApiAsync(accessToken);
+			const response = await GetConfigurationsDataApiAsync();
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: GET_ALL_CONFIGURATIONS,
@@ -92,13 +92,11 @@ export function GetAllConfigurations(accessToken: string) {
 
 export function GetConfigurationByKeyName(
 	keyName: string,
-	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			const response = await GetConfigurationByKeyNameApiAsync(
 				keyName,
-				accessToken
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -117,14 +115,12 @@ export function GetConfigurationByKeyName(
 
 export function AddBugReportDataAsync(
 	bugReportData: AddBugReportDTO,
-	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleFeedbackLoader(true, FEEDBACK_TYPES.BUGREPORT));
 			const response = await AddBugReportDataApiAsync(
 				bugReportData,
-				accessToken
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -147,14 +143,12 @@ export function AddBugReportDataAsync(
 
 export function SubmitFeatureRequestDataAsync(
 	newFeatureRequest: NewFeatureRequestDTO,
-	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleFeedbackLoader(true, FEEDBACK_TYPES.NEWFEATURE));
 			const response = await SubmitFeatureRequestDataApiAsync(
 				newFeatureRequest,
-				accessToken
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -179,11 +173,11 @@ export function SubmitFeatureRequestDataAsync(
 	};
 }
 
-export function GetTopActiveAgentsDataAsync(accessToken: string) {
+export function GetTopActiveAgentsDataAsync() {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleMainLoader(true));
-			const response = await GetTopActiveAgentsDataApiAsync(accessToken);
+			const response = await GetTopActiveAgentsDataApiAsync();
 			if (response?.isSuccess && response?.responseData)
 				dispatch({
 					type: GET_TOP_ACTIVE_AGENTS,

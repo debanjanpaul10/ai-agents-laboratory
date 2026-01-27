@@ -5,7 +5,7 @@ import { AgentsReducer } from "@store/agents/reducers";
 import { CommonReducer } from "@store/common/reducers";
 import { ChatReducer } from "@store/chat/reducers";
 import { ToolSkillsReducer } from "@store/tools-skills/reducers";
-import { WorkspacesReducer } from "./workspaces/reducers";
+import { WorkspacesReducer } from "@store/workspaces/reducers";
 
 export const store = configureStore({
 	reducer: {

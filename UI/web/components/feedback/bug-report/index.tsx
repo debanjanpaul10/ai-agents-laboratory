@@ -54,8 +54,7 @@ export default function BugReportComponent({
 			agentDetails: formData.agentDetails || window.location.href,
 		};
 
-		const accessToken = await authContext.getAccessToken();
-		accessToken && dispatch(AddBugReportDataAsync(bugReport, accessToken));
+		dispatch(AddBugReportDataAsync(bugReport));
 
 		setIsSubmitting(false);
 	}

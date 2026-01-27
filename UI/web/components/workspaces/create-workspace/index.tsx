@@ -9,7 +9,6 @@ import {
 	Sparkles,
 	RotateCcw,
 	Type,
-	GlobeLock,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button, Input, Chip } from "@heroui/react";
@@ -111,7 +110,7 @@ export default function CreateWorkspaceComponent({
 		}));
 	};
 
-	async function handleCreateWorkspace() {
+	function handleCreateWorkspace() {
 		const agentsToSubmit: WorkspaceAgentsDataDTO[] = Array.from(
 			selectedAgentGuids,
 		).map((guid) => {
@@ -129,16 +128,12 @@ export default function CreateWorkspaceComponent({
 			activeAgentsListInWorkspace: agentsToSubmit,
 		};
 
-		const token = await authContext.getAccessToken();
-		if (token) {
-			dispatch(CreateNewWorkspaceAsync(workspaceToSubmit, token) as any);
-			onCloseFlyout();
-		}
+		dispatch(CreateNewWorkspaceAsync(workspaceToSubmit) as any);
+		onCloseFlyout();
 	}
 
-	async function GetAllAvailableAgents() {
-		const accessToken = await authContext.getAccessToken();
-		accessToken && dispatch(GetAllAgentsDataAsync(accessToken, true));
+	function GetAllAvailableAgents() {
+		dispatch(GetAllAgentsDataAsync(true));
 	}
 
 	const handleClearData = () => {

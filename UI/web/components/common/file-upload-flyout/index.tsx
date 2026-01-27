@@ -1,9 +1,12 @@
 import { ChangeEvent, useState } from "react";
 import { Button } from "@heroui/react";
-import { ArrowRight, Download, Trash2, Upload } from "lucide-react";
+import { ArrowRight, Trash2, Upload } from "lucide-react";
 
 import { FileUploadFlyoutProps } from "@shared/types";
-import { DownloadExistingDocument } from "@shared/utils";
+import { useAppDispatch } from "@store/index";
+import { useAuth } from "@auth/AuthProvider";
+import { DownloadKnowledgebaseFileAsync } from "@store/agents/actions";
+import { DownloadFile } from "@shared/utils";
 
 export default function FileUploadFlyoutComponent({
 	isOpen,
@@ -13,9 +16,12 @@ export default function FileUploadFlyoutComponent({
 	existingFiles = [],
 	onExistingFilesChange,
 	removedExistingFiles = [],
+	agentGuid,
 	config,
 }: FileUploadFlyoutProps) {
 	const [dragActive, setDragActive] = useState(false);
+	const dispatch = useAppDispatch();
+	const authContext = useAuth();
 
 	const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
 		const fileInput = e.target as HTMLInputElement;
@@ -25,7 +31,7 @@ export default function FileUploadFlyoutComponent({
 		const validFiles = newFiles.filter((file) => {
 			if (file.size > 10 * 1024 * 1024) {
 				alert(
-					`File "${file.name}" exceeds 10MB limit and will be skipped.`
+					`File "${file.name}" exceeds 10MB limit and will be skipped.`,
 				);
 				return false;
 			}
@@ -39,7 +45,7 @@ export default function FileUploadFlyoutComponent({
 				!updatedFiles.some(
 					(existing) =>
 						existing.name === file.name &&
-						existing.size === file.size
+						existing.size === file.size,
 				)
 			) {
 				updatedFiles.push(file);
@@ -49,6 +55,24 @@ export default function FileUploadFlyoutComponent({
 		onFilesChange(updatedFiles);
 		fileInput.value = "";
 	};
+
+	async function HandleFileDownload(fileName: string, doc: any) {
+		if (agentGuid) {
+			// Knowledge base flyout
+			const response = await dispatch(
+				DownloadKnowledgebaseFileAsync({ agentGuid, fileName }),
+			);
+			if (response) {
+				DownloadFile(response, fileName);
+			}
+		} else {
+			// Existing image download
+			if (doc.imageUrl || doc.documentUrl || doc.url) {
+				const downloadUrl = doc.imageUrl || doc.documentUrl || doc.url;
+				await DownloadFile(downloadUrl, doc.name || "download");
+			}
+		}
+	}
 
 	const handleDragEvent = (e: React.DragEvent) => {
 		e.preventDefault();
@@ -69,7 +93,7 @@ export default function FileUploadFlyoutComponent({
 		const validfiles = droppedfiles.filter((file) => {
 			if (file.size > 10 * 1024 * 1024) {
 				alert(
-					`File "${file.name}" exceeds 10MB limit and will be skipped.`
+					`File "${file.name}" exceeds 10MB limit and will be skipped.`,
 				);
 				return false;
 			}
@@ -82,7 +106,7 @@ export default function FileUploadFlyoutComponent({
 				!updatedfiles.some(
 					(existing) =>
 						existing.name === file.name &&
-						existing.size === file.size
+						existing.size === file.size,
 				)
 			)
 				updatedfiles.push(file);
@@ -105,14 +129,6 @@ export default function FileUploadFlyoutComponent({
 		onFilesChange([]);
 		const allRemovedfiles = existingFiles.map((file) => file.name);
 		onExistingFilesChange?.(allRemovedfiles);
-	};
-
-	const formatFileSize = (bytes: number) => {
-		if (bytes === 0) return "0 Bytes";
-		const k = 1024;
-		const sizes = ["Bytes", "KB", "MB", "GB"];
-		const i = Math.floor(Math.log(bytes) / Math.log(k));
-		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 	};
 
 	if (!isOpen) return null;
@@ -165,7 +181,7 @@ export default function FileUploadFlyoutComponent({
 								</div>
 								<div>
 									<h3 className="text-white font-medium mb-2">
-										{config.headerConstants.Hints.Dropfiles}
+										{config.headerConstants.Hints.DropItems}
 									</h3>
 									<p className="text-white/60 text-sm">
 										{
@@ -196,20 +212,20 @@ export default function FileUploadFlyoutComponent({
 										existingFiles.filter(
 											(doc) =>
 												!removedExistingFiles.includes(
-													doc.name
-												)
+													doc.name,
+												),
 										).length
 									}
 									)
 								</span>
 							</h3>
-							<div className="space-y-2 max-h-32 overflow-y-auto">
+							<div className="space-y-2 max-h-full overflow-y-auto">
 								{existingFiles
 									.filter(
 										(doc) =>
 											!removedExistingFiles.includes(
-												doc.name
-											)
+												doc.name,
+											),
 									)
 									.map((doc, index) => (
 										<div
@@ -223,29 +239,29 @@ export default function FileUploadFlyoutComponent({
 														{doc.name}
 													</p>
 													<p className="text-white/60 text-xs">
-														{formatFileSize(
-															doc.size
-														)}{" "}
-														• Existing
+														Existing
 													</p>
 												</div>
 											</div>
 											<div className="flex items-center space-x-2 flex-shrink-0">
-												<Button
-													onPress={() =>
-														DownloadExistingDocument(
-															doc
-														)
-													}
-													title="Check existing document"
-													className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 hover:border-blue-500/30 transition-all duration-200 text-blue-400 hover:text-blue-300 flex-shrink-0"
-												>
-													<config.icons.download className="w-4 h-4" />
-												</Button>
+												{agentGuid && (
+													<Button
+														onPress={() =>
+															HandleFileDownload(
+																doc.name,
+																doc,
+															)
+														}
+														title="Check existing document"
+														className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 hover:border-blue-500/30 transition-all duration-200 text-blue-400 hover:text-blue-300 flex-shrink-0"
+													>
+														<config.icons.download className="w-4 h-4" />
+													</Button>
+												)}
 												<Button
 													onPress={() =>
 														removeExistingFile(
-															doc.name
+															doc.name,
 														)
 													}
 													title="Remove existing document"
@@ -280,8 +296,7 @@ export default function FileUploadFlyoutComponent({
 													{file.name}
 												</p>
 												<p className="text-white/60 text-xs">
-													{formatFileSize(file.size)}{" "}
-													• New
+													New
 												</p>
 											</div>
 										</div>
@@ -314,13 +329,17 @@ export default function FileUploadFlyoutComponent({
 							{selectedFiles.length +
 								existingFiles.filter(
 									(doc) =>
-										!removedExistingFiles.includes(doc.name)
+										!removedExistingFiles.includes(
+											doc.name,
+										),
 								).length}{" "}
 							file
 							{selectedFiles.length +
 								existingFiles.filter(
 									(doc) =>
-										!removedExistingFiles.includes(doc.name)
+										!removedExistingFiles.includes(
+											doc.name,
+										),
 								).length !==
 							1
 								? "s"
@@ -338,8 +357,8 @@ export default function FileUploadFlyoutComponent({
 									existingFiles.filter(
 										(doc) =>
 											!removedExistingFiles.includes(
-												doc.name
-											)
+												doc.name,
+											),
 									).length === 0
 								}
 							>

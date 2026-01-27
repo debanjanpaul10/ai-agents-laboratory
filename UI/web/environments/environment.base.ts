@@ -1,5 +1,5 @@
-import { environment as devEnvironment } from "./environment.development";
-import { environment as prodEnvironment } from "./environment.prod";
+import { environment as devEnvironment } from "@environments/environment.development";
+import { environment as prodEnvironment } from "@environments/environment.prod";
 
 export const getEnvironment = () => {
 	// Check if we're in development mode

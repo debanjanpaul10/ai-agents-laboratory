@@ -23,7 +23,6 @@ import {
 	ManageAgentConstants,
 } from "@helpers/constants";
 import { CreateNewAgentAsync } from "@store/agents/actions";
-import { useAuth } from "@auth/AuthProvider";
 import { FullScreenLoading } from "@components/common/spinner";
 import ExpandMetapromptEditorComponent from "@components/common/expand-metaprompt-editor";
 import { CreateAgentFlyoutProps } from "@shared/types";
@@ -42,7 +41,6 @@ export default function CreateAgentFlyoutComponent({
 	onClearSkillGuids,
 }: CreateAgentFlyoutProps) {
 	const dispatch = useAppDispatch();
-	const authContext = useAuth();
 
 	const [expandedPromptModal, setExpandedPromptModal] =
 		useState<boolean>(false);
@@ -101,7 +99,7 @@ export default function CreateAgentFlyoutComponent({
 		onClearSkillGuids();
 	};
 
-	async function handleSubmit() {
+	function handleSubmit() {
 		const form = new FormData();
 		form.append("agentMetaPrompt", formData.agentMetaPrompt);
 		form.append("agentName", formData.agentName);
@@ -127,8 +125,7 @@ export default function CreateAgentFlyoutComponent({
 			});
 		}
 
-		const token = await authContext.getAccessToken();
-		token && dispatch(CreateNewAgentAsync(form, token));
+		dispatch(CreateNewAgentAsync(form));
 		handleClearData();
 	}
 

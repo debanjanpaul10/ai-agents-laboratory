@@ -176,7 +176,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     /// <returns>The response from the group chat.</returns>
     [HttpPost(WorkspacesRoutes.GetWorkspaceGroupChatResponse_Route)]
     [Consumes(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GroupChatResponseDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -187,7 +187,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
         if (base.IsAuthorized(ApplicationBased))
         {
             var result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(chatRequestDTO).ConfigureAwait(false);
-            if (!string.IsNullOrWhiteSpace(result)) return HandleSuccessRequestResponse(result);
+            if (result is not null && !string.IsNullOrEmpty(result.AgentResponse)) return HandleSuccessRequestResponse(result);
             else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
 

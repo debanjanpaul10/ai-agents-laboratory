@@ -2,11 +2,13 @@ import { Action, Dispatch } from "redux";
 import {
 	CREATE_NEW_AGENT,
 	DELETE_AGENT_DATA,
+	DOWNLOAD_KNOWLEDGEBASE_FILE,
 	GET_AGENT_BY_ID,
 	GET_ALL_AGENTS_DATA,
 	TOGGLE_AGENT_CREATE_SPINNER,
 	TOGGLE_AGENTS_LIST_LOADING as TOGGLE_AGENTS_LIST_LOADER,
 	TOGGLE_CHAT_RESPONSE_SPINNER,
+	TOGGLE_DOWNLOAD_FILE_SPINNER,
 	TOGGLE_EDIT_AGENT_SPINNER,
 	TOGGLE_NEW_AGENT_DRAWER,
 	UPDATE_AGENT_DATA,
@@ -14,6 +16,7 @@ import {
 import {
 	CreateNewAgentApiAsync,
 	DeleteExistingAgentApiAsync,
+	DownloadKnowledgebaseFileApiAsync,
 	GetAgentByIdApiAsync,
 	GetAgentsApiAsync,
 	UpdateExistingAgentApiAsync,
@@ -24,6 +27,7 @@ import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 import { ToggleMainLoader } from "@store/common/actions";
 import { AgentsToasterConstants } from "@helpers/toaster-constants";
 import { ToggleAssociateAgentsDrawer } from "@store/workspaces/actions";
+import { DownloadFileDTO } from "@models/request/download-file.dto";
 
 export function ToggleNewAgentDrawer(isOpen: boolean) {
 	return {
@@ -60,8 +64,14 @@ export function ToggleAgentsListLoader(isLoading: boolean) {
 	};
 }
 
+export function ToggleDownloadFileSpinner(isLoading: boolean) {
+	return {
+		type: TOGGLE_DOWNLOAD_FILE_SPINNER,
+		payload: isLoading,
+	};
+}
+
 export function GetAllAgentsDataAsync(
-	accessToken: string,
 	isFromManageAgents: boolean = false,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
@@ -72,7 +82,7 @@ export function GetAllAgentsDataAsync(
 			}
 			dispatch(ToggleMainLoader(true));
 
-			const response = await GetAgentsApiAsync(accessToken);
+			const response = await GetAgentsApiAsync();
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: GET_ALL_AGENTS_DATA,
@@ -89,10 +99,10 @@ export function GetAllAgentsDataAsync(
 	};
 }
 
-export function GetAgentDataByIdAsync(agentId: string, accessToken: string) {
+export function GetAgentDataByIdAsync(agentId: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
-			const response = await GetAgentByIdApiAsync(agentId, accessToken);
+			const response = await GetAgentByIdApiAsync(agentId);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: GET_AGENT_BY_ID,
@@ -108,14 +118,12 @@ export function GetAgentDataByIdAsync(agentId: string, accessToken: string) {
 
 export function CreateNewAgentAsync(
 	newAgentData: CreateAgentDTO | FormData,
-	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleCreateAgentSpinner(true));
 			const response = await CreateNewAgentApiAsync(
 				newAgentData,
-				accessToken,
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -124,7 +132,7 @@ export function CreateNewAgentAsync(
 				});
 
 				dispatch(ToggleNewAgentDrawer(false));
-				dispatch(GetAllAgentsDataAsync(accessToken) as any);
+				dispatch(GetAllAgentsDataAsync() as any);
 				ShowSuccessToaster(AgentsToasterConstants.CREATE_AGENT);
 			}
 		} catch (error: any) {
@@ -138,21 +146,19 @@ export function CreateNewAgentAsync(
 
 export function UpdateExistingAgentDataAsync(
 	existingAgentData: AgentDataDTO | FormData,
-	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleEditAgentSpinner(true));
 			const response = await UpdateExistingAgentApiAsync(
 				existingAgentData,
-				accessToken,
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: UPDATE_AGENT_DATA,
 					payload: response.responseData,
 				});
-				dispatch(GetAllAgentsDataAsync(accessToken) as any);
+				dispatch(GetAllAgentsDataAsync() as any);
 				ShowSuccessToaster(AgentsToasterConstants.UPDATE_AGENT);
 			}
 		} catch (error: any) {
@@ -166,14 +172,12 @@ export function UpdateExistingAgentDataAsync(
 
 export function DeleteExistingAgentDataAsync(
 	agentId: string,
-	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
-			dispatch(ToggleMainLoader(true));
+			dispatch(ToggleEditAgentSpinner(true));
 			const response = await DeleteExistingAgentApiAsync(
 				agentId,
-				accessToken,
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -181,14 +185,40 @@ export function DeleteExistingAgentDataAsync(
 					payload: response.responseData,
 				});
 
-				dispatch(GetAllAgentsDataAsync(accessToken) as any);
+				dispatch(GetAllAgentsDataAsync() as any);
 				ShowSuccessToaster(AgentsToasterConstants.DELETE_AGENT);
 			}
 		} catch (error: any) {
 			console.error(error);
 			if (error.message) ShowErrorToaster(error.message);
 		} finally {
-			dispatch(ToggleMainLoader(false));
+			dispatch(ToggleEditAgentSpinner(false));
+		}
+	};
+}
+
+export function DownloadKnowledgebaseFileAsync(
+	downloadFileData: DownloadFileDTO,
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleDownloadFileSpinner(true));
+			const response = await DownloadKnowledgebaseFileApiAsync(
+				downloadFileData,
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: DOWNLOAD_KNOWLEDGEBASE_FILE,
+					payload: response.responseData,
+				});
+
+				return response.responseData;
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleDownloadFileSpinner(false));
 		}
 	};
 }

@@ -1,4 +1,5 @@
 ﻿using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 
 namespace AIAgents.Laboratory.Domain.Helpers;
@@ -78,4 +79,11 @@ public static class DomainUtilities
 
         return response.Trim();
     }
+
+    /// <summary>
+    /// Checks if the agent data has any knowledge base content.
+    /// </summary>
+    /// <param name="agentData">The agent data domain model.</param>
+    /// <returns>The boolean to indicate the KB content.</returns>
+    internal static bool HasKnowledgeBaseContent(this AgentDataDomain agentData) => agentData?.KnowledgeBaseDocument?.Count > 0 || agentData?.StoredKnowledgeBase?.Count > 0;
 }

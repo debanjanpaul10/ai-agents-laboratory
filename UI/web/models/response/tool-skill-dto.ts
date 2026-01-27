@@ -1,4 +1,4 @@
-import { AssociatedAgentsSkillDataDTO } from "./associated-agents-skill-data.dto";
+import { AssociatedAgentsSkillDataDTO } from "@models/response/associated-agents-skill-data.dto";
 
 export class ToolSkillDTO {
 	toolSkillGuid: string = "";

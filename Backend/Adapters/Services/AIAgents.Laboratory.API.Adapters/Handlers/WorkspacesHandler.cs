@@ -54,10 +54,11 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     /// </summary>
     /// <param name="chatRequest">The workspace agent chat request dto model.</param>
     /// <returns>The group chat response.</returns>
-    public async Task<string> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDTO chatRequest)
+    public async Task<GroupChatResponseDTO> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDTO chatRequest)
     {
         var domainInput = mapper.Map<WorkspaceAgentChatRequestDomain>(chatRequest);
-        return await workspacesService.GetWorkspaceGroupChatResponseAsync(domainInput).ConfigureAwait(false);
+        var domainResult = await workspacesService.GetWorkspaceGroupChatResponseAsync(domainInput).ConfigureAwait(false);
+        return mapper.Map<GroupChatResponseDTO>(domainResult);
     }
 
     /// <summary>

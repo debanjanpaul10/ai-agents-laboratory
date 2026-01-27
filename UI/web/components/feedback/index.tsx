@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 import { FEEDBACK_TYPES } from "@shared/types";
 import { useAppDispatch, useAppSelector } from "@store/index";
-import BugReportComponent from "./bug-report";
-import FeatureRequestComponent from "./feature-request";
+import BugReportComponent from "@components/feedback/bug-report";
+import FeatureRequestComponent from "@components/feedback/feature-request";
 import { ToggleFeedbackDrawer } from "@store/common/actions";
 
 export default function FeedbackComponent() {
@@ -15,7 +15,7 @@ export default function FeedbackComponent() {
 	});
 
 	const IsFeedbackDrawerOpenStoreData = useAppSelector(
-		(state) => state.CommonReducer.isFeedbackDrawerOpen
+		(state) => state.CommonReducer.isFeedbackDrawerOpen,
 	);
 
 	useEffect(() => {
