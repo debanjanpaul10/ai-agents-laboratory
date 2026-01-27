@@ -80,14 +80,13 @@ export default function CreateSkillComponent() {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
 
-	async function handleCreateSkill() {
+	function handleCreateSkill() {
 		const form = new FormData();
 		form.append("toolSkillDisplayName", formData.toolSkillDisplayName);
 		form.append("toolSkillTechnicalName", formData.toolSkillTechnicalName);
 		form.append("toolSkillMcpServerUrl", formData.toolSkillMcpServerUrl);
 
-		const token = await authContext.getAccessToken();
-		token && dispatch(AddNewToolSkillAsync(form, token));
+		dispatch(AddNewToolSkillAsync(form));
 		handleClearData();
 	}
 
@@ -105,13 +104,11 @@ export default function CreateSkillComponent() {
 		});
 	};
 
-	async function GetAllMcpToolsAvailable(mcpServerUrl: string) {
-		const token = await authContext.getAccessToken();
+	function GetAllMcpToolsAvailable(mcpServerUrl: string) {
 		var mcpServerRequest: McpServerToolRequestDTO = {
 			serverUrl: mcpServerUrl,
 		};
-		token &&
-			dispatch(GetAllMcpToolsAvailableAsync(mcpServerRequest, token));
+		dispatch(GetAllMcpToolsAvailableAsync(mcpServerRequest));
 	}
 
 	const isFormValid =

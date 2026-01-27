@@ -88,10 +88,10 @@ public static class ApplicationPluginsHelpers
                 
             # Instructions:
                 1. If a tool is needed, respond with EXACTLY this JSON format:
-                {{toolName: exact_tool_name, toolArguments: {{list_of_tool_arguments}}
+                {{toolName: exact_tool_name, toolArguments: list_of_tool_arguments}}
                 
                 2. If NO tool is needed, respond with:
-                {{toolName: """", toolArguments: {{}} }}
+                {{toolName: """", toolArguments: {{}}}}
                 
                 3. For toolArguments, provide a valid JSON object with the parameters the tool needs. If the tool requires no parameters, use {{}}.
 

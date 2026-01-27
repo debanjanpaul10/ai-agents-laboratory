@@ -223,6 +223,16 @@ internal static class SwaggerConstants
             internal const string Description = "Deletes an existing agent data from database.";
             internal const string OperationId = nameof(DeleteExistingAgentDataAction);
         }
+
+        /// <summary>
+        /// Swagger documentation for DownloadKnowledgebaseFileAsync.
+        /// </summary>
+        internal static class DownloadKnowledgebaseFileAction
+        {
+            internal const string Summary = "Downloads a knowledge base file.";
+            internal const string Description = "Downloads a knowledge base file from an agent.";
+            internal const string OperationId = nameof(DownloadKnowledgebaseFileAction);
+        }
     }
 
     /// <summary>

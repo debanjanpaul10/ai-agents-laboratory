@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { useAuth } from "@auth/AuthProvider";
 import DeletePopupComponent from "@components/common/delete-popup";
 import { FullScreenLoading } from "@components/common/spinner";
 import { WorkspacesConstants } from "@helpers/constants";
@@ -41,7 +40,6 @@ export default function EditWorkspaceFlyoutComponent({
 	onOpenAssociateAgents,
 }: EditWorkspaceFlyoutComponentProps) {
 	const dispatch = useAppDispatch();
-	const authContext = useAuth();
 	const { accounts } = useMsal();
 
 	const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
@@ -77,26 +75,20 @@ export default function EditWorkspaceFlyoutComponent({
 		onEditClose();
 	};
 
-	async function HandleWorkspaceDelete() {
-		const token = await authContext.getAccessToken();
+	function HandleWorkspaceDelete() {
 		var workspaceGuidId = editFormData.agentWorkspaceGuid;
-
-		token && dispatch(DeleteExistingWorkspaceAsync(workspaceGuidId, token));
+		dispatch(DeleteExistingWorkspaceAsync(workspaceGuidId));
 		setIsDeletePopupOpen(false);
 		handleEditClose();
 	}
 
-	async function handleEditSave() {
-		const token = await authContext.getAccessToken();
-		if (token) {
-			dispatch(UpdateExistingWorkspaceDataAsync(editFormData, token));
-			handleEditClose();
-		}
+	function handleEditSave() {
+		dispatch(UpdateExistingWorkspaceDataAsync(editFormData));
+		handleEditClose();
 	}
 
-	async function GetAllAvailableAgents() {
-		const accessToken = await authContext.getAccessToken();
-		accessToken && dispatch(GetAllAgentsDataAsync(accessToken, true));
+	function GetAllAvailableAgents() {
+		dispatch(GetAllAgentsDataAsync(true));
 	}
 
 	const handleAddUser = () => {

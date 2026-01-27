@@ -150,6 +150,11 @@ public static class RouteConstants
         /// The delete agent data route.
         /// </summary>
         internal const string DeleteExistingAgent_Route = "deleteagent/{agentId}";
+
+        /// <summary>
+        /// The download associated documents route.
+        /// </summary>
+        internal const string DownloadAssociatedDocuments_Route = "downloadassociateddocuments";
     }
 
     /// <summary>

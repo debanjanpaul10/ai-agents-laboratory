@@ -5,6 +5,7 @@ using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using static AIAgents.Laboratory.Storage.Blobs.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Storage.Blobs.DataManager;
@@ -88,6 +89,60 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
         finally
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, agentId);
+        }
+    }
+
+    /// <summary>
+    /// Downloads a file from blob storage.
+    /// </summary>
+    /// <param name="agentGuid">The agent guid id.</param>
+    /// <param name="fileName">The file name.</param>
+    /// <returns>The download file link.</returns>
+    public async Task<string> DownloadFileFromBlobStorageAsync(string agentGuid, string fileName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(agentGuid);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+
+            var safeFileName = Path.GetFileName(fileName);
+            // Try to get resource as Raw first (most documents are Raw)
+            string folderPath = string.Format(CloudinaryConstants.AgentImagesFolderStructureFormat, this.CloudinaryKnowledgeBaseFolderName, agentGuid);
+            string publicId = folderPath + "/" + safeFileName;
+
+            var getResourceParams = new GetResourceParams(publicId)
+            {
+                ResourceType = ResourceType.Raw
+            };
+
+            var resource = await cloudinary.GetResourceAsync(getResourceParams).ConfigureAwait(false);
+            if (resource.Error is not null)
+            {
+                // Try as Image if Raw fails (Cloudinary sometimes treats files as images or publicId might not have extension)
+                getResourceParams.ResourceType = ResourceType.Image;
+                getResourceParams.PublicId = folderPath + "/" + Path.GetFileNameWithoutExtension(safeFileName);
+                resource = await cloudinary.GetResourceAsync(getResourceParams).ConfigureAwait(false);
+            }
+
+            if (resource.Error is not null)
+            {
+                var ex = new FileNotFoundException(string.Format(ExceptionConstants.FileNotFoundExceptionMessage, fileName, agentGuid));
+                logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
+                throw ex;
+            }
+
+            return resource.Url;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
         }
     }
 

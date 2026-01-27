@@ -1,3 +1,4 @@
+using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 
 namespace AIAgents.Laboratory.Domain.DrivingPorts;
@@ -58,5 +59,5 @@ public interface IWorkspacesService
     /// </summary>
     /// <param name="chatRequest">The workspace agent chat request dto model.</param>
     /// <returns>The group chat response.</returns>
-    Task<string> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDomain chatRequest);
+    Task<GroupChatResponseDomain> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDomain chatRequest);
 }

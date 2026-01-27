@@ -56,7 +56,7 @@ export default function AgentsListComponent({
 				),
 			),
 		];
-		return apps.sort();
+		return apps.sort((a, b) => a.localeCompare(b));
 	}, [agentsDataList]);
 
 	// Filter and sort agents

@@ -32,31 +32,31 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
     /// Detects the file type of the specified knowledge base document and reads its content accordingly.
     /// </summary>
     /// <remarks>Supported file types include plain text, PDF, Excel, and Word documents. If the file type is not supported, an exception is thrown.</remarks>
-    /// <param name="knowledgeBaseDocument">The knowledge base document to read. Must not be null and must have a valid file name with a supported extension.</param>
+    /// <param name="knowledgeBaseDocumentDomain">The knowledge base document to read. Must not be null and must have a valid file name with a supported extension.</param>
     /// <returns>A string containing the content of the file. The format of the content depends on the file type.</returns>
-    public string DetectAndReadFileContent(KnowledgeBaseDocumentDomain knowledgeBaseDocument)
+    public string DetectAndReadFileContent(KnowledgeBaseDocumentDomain knowledgeBaseDocumentDomain)
     {
-        ArgumentNullException.ThrowIfNull(knowledgeBaseDocument);
+        ArgumentNullException.ThrowIfNull(knowledgeBaseDocumentDomain);
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, knowledgeBaseDocument.FileName);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, knowledgeBaseDocumentDomain.FileName);
 
-            var fileType = Path.GetExtension(knowledgeBaseDocument.FileName);
+            var fileType = Path.GetExtension(knowledgeBaseDocumentDomain.FileName);
             if (string.Equals(KnowledgeBaseConstants.FileContentTypes.PlainTextFiles, fileType, StringComparison.OrdinalIgnoreCase))
-                return this.ReadTextFileData(knowledgeBaseDocument);
+                return this.ReadTextFileData(knowledgeBaseDocumentDomain);
 
             else if (string.Equals(KnowledgeBaseConstants.FileContentTypes.PdfFiles, fileType, StringComparison.OrdinalIgnoreCase))
-                return this.ReadPdfFileData(knowledgeBaseDocument);
+                return this.ReadPdfFileData(knowledgeBaseDocumentDomain);
 
             else if (KnowledgeBaseConstants.FileContentTypes.ExcelFiles.Split(KnowledgeBaseConstants.CommaSeparator).Contains(fileType))
-                return this.ReadSpreadsheetData(knowledgeBaseDocument);
+                return this.ReadSpreadsheetData(knowledgeBaseDocumentDomain);
 
             else if (KnowledgeBaseConstants.FileContentTypes.WordFiles.Split(KnowledgeBaseConstants.CommaSeparator).Contains(fileType))
-                return this.ReadWordFileData(knowledgeBaseDocument);
+                return this.ReadWordFileData(knowledgeBaseDocumentDomain);
 
             else if (string.Equals(KnowledgeBaseConstants.FileContentTypes.JsonFiles, fileType, StringComparison.OrdinalIgnoreCase))
-                return this.ReadTextFileData(knowledgeBaseDocument);
+                return this.ReadTextFileData(knowledgeBaseDocumentDomain);
 
             else
                 throw new Exception(ExceptionConstants.UnsupportedFileTypeMessage);
@@ -68,7 +68,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, knowledgeBaseDocument.FileName);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, knowledgeBaseDocumentDomain.FileName);
         }
     }
 
@@ -179,18 +179,19 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
     private string ReadSpreadsheetData(KnowledgeBaseDocumentDomain knowledgeBaseFile)
     {
         ArgumentNullException.ThrowIfNull(knowledgeBaseFile);
+        ArgumentNullException.ThrowIfNull(knowledgeBaseFile.FileContent);
 
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadSpreadsheetData), DateTime.UtcNow, knowledgeBaseFile.FileName);
 
-            if (knowledgeBaseFile.FileContent is null || knowledgeBaseFile.FileContent.Length == 0) return string.Empty;
+            if (knowledgeBaseFile.FileContent.Length == 0) return string.Empty;
 
             using var memoryStream = new MemoryStream(knowledgeBaseFile.FileContent);
             using var spreadsheetDocument = SpreadsheetDocument.Open(memoryStream, false);
 
             var workbookPart = spreadsheetDocument.WorkbookPart;
-            if (workbookPart is null || workbookPart.Workbook.Sheets is null) return string.Empty;
+            if (workbookPart?.Workbook.Sheets is null) return string.Empty;
 
             var sharedStringTable = workbookPart.SharedStringTablePart?.SharedStringTable;
             var stringBuilder = new System.Text.StringBuilder();

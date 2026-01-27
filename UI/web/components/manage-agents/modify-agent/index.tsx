@@ -10,7 +10,6 @@ import {
 	Trash,
 	ScrollText,
 	Files,
-	Link,
 	GlobeLock,
 	Images,
 	ScanEye,
@@ -22,7 +21,6 @@ import { useMsal } from "@azure/msal-react";
 
 import { ModifyAgentComponentProps } from "@shared/types";
 import { useAppDispatch, useAppSelector } from "@store/index";
-import { useAuth } from "@auth/AuthProvider";
 import {
 	DeleteExistingAgentDataAsync,
 	UpdateExistingAgentDataAsync,
@@ -51,7 +49,6 @@ export default function ModifyAgentComponent({
 	onOpenAssociateSkills,
 }: ModifyAgentComponentProps) {
 	const dispatch = useAppDispatch();
-	const authContext = useAuth();
 	const { accounts } = useMsal();
 
 	const [expandedPromptModal, setExpandedPromptModal] =
@@ -75,7 +72,7 @@ export default function ModifyAgentComponent({
 		setEditFormData((prev: any) => ({ ...prev, [field]: value }));
 	};
 
-	async function handleEditSave() {
+	function handleEditSave() {
 		const form = new FormData();
 		form.append("agentId", editFormData.agentId);
 		form.append("agentMetaPrompt", editFormData.agentMetaPrompt);
@@ -116,9 +113,7 @@ export default function ModifyAgentComponent({
 			});
 		}
 
-		const accessToken = await authContext.getAccessToken();
-		accessToken &&
-			dispatch(UpdateExistingAgentDataAsync(form, accessToken));
+		dispatch(UpdateExistingAgentDataAsync(form));
 	}
 
 	const handleEditClose = () => {
@@ -127,14 +122,9 @@ export default function ModifyAgentComponent({
 	};
 
 	async function handleAgentDelete() {
-		const token = await authContext.getAccessToken();
-		if (token) {
-			await dispatch(
-				DeleteExistingAgentDataAsync(editFormData.agentId, token),
-			);
-			setIsDeletePopupOpen(false);
-			handleEditClose();
-		}
+		await dispatch(DeleteExistingAgentDataAsync(editFormData.agentId));
+		setIsDeletePopupOpen(false);
+		handleEditClose();
 	}
 
 	const handleExpandPrompt = () => {

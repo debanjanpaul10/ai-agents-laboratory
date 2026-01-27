@@ -1,4 +1,5 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
+﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 
 namespace AIAgents.Laboratory.Domain.DrivenPorts;
 
@@ -12,5 +13,5 @@ public interface IOrchestratorService
     /// </summary>
     /// <param name="chatRequest">The chat request domain model.</param>
     /// <returns>The orchestrator agent response.</returns>
-    Task<string> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails);
+    Task<GroupChatResponseDomain> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails);
 }

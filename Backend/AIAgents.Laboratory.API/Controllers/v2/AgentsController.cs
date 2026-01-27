@@ -1,4 +1,4 @@
-﻿using System.Net.Mime;
+using System.Net.Mime;
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Base;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
@@ -139,6 +139,30 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
         {
             var result = await agentsHandler.DeleteExistingAgentDataAsync(agentId, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+        }
+
+        return HandleUnAuthorizedRequestResponse();
+    }
+
+    /// <summary>
+    /// Downloads the knowledgebase file asynchronous.
+    /// </summary>
+    /// <param name="downloadFile">The download file dto model.</param>
+    /// <returns>The downloaded file data.</returns>
+    [HttpPost(AgentsRoutes.DownloadAssociatedDocuments_Route)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = DownloadKnowledgebaseFileAction.Summary, Description = DownloadKnowledgebaseFileAction.Description, OperationId = DownloadKnowledgebaseFileAction.OperationId)]
+    public async Task<ResponseDTO> DownloadKnowledgebaseFileAsync([FromBody] DownloadFileDTO downloadFile)
+    {
+        ArgumentNullException.ThrowIfNull(downloadFile);
+        if (IsAuthorized(UserBased))
+        {
+            var result = await agentsHandler.DownloadKnowledgebaseFileAsync(downloadFile.AgentGuid, downloadFile.FileName).ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(result)) return HandleSuccessRequestResponse(result);
             else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
 

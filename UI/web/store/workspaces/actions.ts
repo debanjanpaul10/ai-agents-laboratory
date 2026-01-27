@@ -59,11 +59,11 @@ export function ToggleAssociateAgentsDrawer(isOpen: boolean) {
 	};
 }
 
-export function GetAllWorkspacesDataAsync(accessToken: string) {
+export function GetAllWorkspacesDataAsync() {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleWorkspacesLoader(true));
-			const response = await GetAllWorkspacesDataApiAsync(accessToken);
+			const response = await GetAllWorkspacesDataApiAsync();
 			if (response?.isSuccess && response?.responseData)
 				dispatch({
 					type: GET_ALL_WORKSPACES,
@@ -80,14 +80,12 @@ export function GetAllWorkspacesDataAsync(accessToken: string) {
 
 export function GetWorkspaceByWorkspaceIdAsync(
 	workspaceId: string,
-	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleWorkspacesLoader(true));
 			const response = await GetWorkspaceByWorkspaceIdApiAsync(
 				workspaceId,
-				accessToken,
 			);
 
 			if (response?.isSuccess && response?.responseData)
@@ -106,14 +104,12 @@ export function GetWorkspaceByWorkspaceIdAsync(
 
 export function CreateNewWorkspaceAsync(
 	agentsWorkspaceData: AgentsWorkspaceDTO | FormData,
-	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleCreateWorkspaceLoader(true));
 			const response = await CreateNewWorkspaceApiAsync(
 				agentsWorkspaceData,
-				accessToken,
 			);
 
 			if (response?.isSuccess && response?.responseData) {
@@ -122,7 +118,7 @@ export function CreateNewWorkspaceAsync(
 					payload: response.responseData,
 				});
 
-				dispatch(GetAllWorkspacesDataAsync(accessToken) as any);
+				dispatch(GetAllWorkspacesDataAsync() as any);
 				ShowSuccessToaster(WorkspaceToasterConstants.CREATE_WORKSPACE);
 			}
 		} catch (error: any) {
@@ -136,18 +132,16 @@ export function CreateNewWorkspaceAsync(
 
 export function DeleteExistingWorkspaceAsync(
 	workspaceGuidId: string,
-	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleWorkspacesLoader(true));
 			const response = await DeleteExistingWorkspaceApiAsync(
 				workspaceGuidId,
-				accessToken,
 			);
 
 			if (response?.isSuccess && response?.responseData) {
-				dispatch(GetAllWorkspacesDataAsync(accessToken) as any);
+				dispatch(GetAllWorkspacesDataAsync() as any);
 				ShowSuccessToaster(WorkspaceToasterConstants.DELETE_WORKSPACE);
 			}
 		} catch (error: any) {
@@ -161,18 +155,16 @@ export function DeleteExistingWorkspaceAsync(
 
 export function UpdateExistingWorkspaceDataAsync(
 	agentsWorkspaceData: AgentsWorkspaceDTO,
-	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleEditWorkspacesLoader(true));
 			const response = await UpdateExistingWorkspaceDataApiAsync(
 				agentsWorkspaceData,
-				accessToken,
 			);
 
 			if (response?.isSuccess && response?.responseData) {
-				dispatch(GetAllWorkspacesDataAsync(accessToken) as any);
+				dispatch(GetAllWorkspacesDataAsync() as any);
 				ShowSuccessToaster(WorkspaceToasterConstants.UPDATE_WORKSPACE);
 			}
 		} catch (error: any) {
@@ -186,14 +178,12 @@ export function UpdateExistingWorkspaceDataAsync(
 
 export function GetWorkspaceGroupChatResponseAsync(
 	chatRequestDto: WorkspaceAgentChatRequestDTO,
-	accessToken: string,
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleChatResponseSpinner(true));
 			const response = await GetWorkspaceGroupChatResponseApiAsync(
 				chatRequestDto,
-				accessToken,
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({

@@ -47,11 +47,9 @@ export default function FeatureRequestComponent({
 				"Anonymous",
 		};
 
-		const accessToken = await authContext.getAccessToken();
-		accessToken &&
-			dispatch(
-				SubmitFeatureRequestDataAsync(featureRequest, accessToken)
-			);
+		dispatch(
+			SubmitFeatureRequestDataAsync(featureRequest)
+		);
 
 		setIsSubmitting(false);
 	}

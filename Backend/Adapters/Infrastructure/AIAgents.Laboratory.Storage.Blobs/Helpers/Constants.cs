@@ -144,5 +144,9 @@ internal static class Constants
         /// </summary>
         internal const string ConfigurationKeyNotFoundExceptionMessage = "The configuration key does not exists!";
 
+        /// <summary>
+        /// The file not found exception message.
+        /// </summary>
+        internal const string FileNotFoundExceptionMessage = "The requested file '{0}' is not found in '{1}'!";
     }
 }

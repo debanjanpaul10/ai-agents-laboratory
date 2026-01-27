@@ -98,23 +98,12 @@ export default function ManageAgentsPage() {
 		}
 	}, [authContext.isAuthenticated, authContext.isLoading]);
 
-	async function GetAllAgentsData() {
-		const token = await fetchToken();
-		token && dispatch(GetAllAgentsDataAsync(token));
+	function GetAllAgentsData() {
+		dispatch(GetAllAgentsDataAsync());
 	}
 
-	async function GetAllConfigurationsData() {
-		const token = await fetchToken();
-		token && dispatch(GetAllConfigurations(token));
-	}
-
-	async function fetchToken() {
-		try {
-			if (authContext.isAuthenticated && !authContext.isLoading)
-				return await authContext.getAccessToken();
-		} catch (error) {
-			console.error(error);
-		}
+	function GetAllConfigurationsData() {
+		dispatch(GetAllConfigurations());
 	}
 
 	useEffect(() => {
@@ -361,6 +350,7 @@ export default function ManageAgentsPage() {
 								handleExistingDocumentsChange
 							}
 							removedExistingFiles={removedExistingDocuments}
+							agentGuid={selectedAgent?.agentId}
 							config={{
 								headerConstants:
 									KnowledgeBaseFlyoutPropsConstants,

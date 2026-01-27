@@ -19,6 +19,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="mongoDatabaseService">The mongo db service.</param>
 /// <param name="agentChatService">The agent chat service.</param>
+/// <param name="orchestratorService">The orchestrator service.</param>
 /// <seealso cref="IWorkspacesService"/>
 public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService,
     IAgentChatService agentChatService, IOrchestratorService orchestratorService) : IWorkspacesService
@@ -108,13 +109,13 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// <summary>
     /// Gets the collection of all available workspaces.
     /// </summary>
-    /// <param name="userName">The current logged in user name.</param>
+    /// <param name="currentUserEmail">The current logged in user name.</param>
     /// <returns>The list of <see cref="AgentsWorkspaceDomain"/></returns>
-    public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(string userName)
+    public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(string currentUserEmail)
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, userName);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, currentUserEmail);
 
             var filter = Builders<AgentsWorkspaceDomain>.Filter.And(Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true));
             return await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.WorkspacesCollectionName, filter).ConfigureAwait(false);
@@ -126,7 +127,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, userName);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, currentUserEmail);
         }
     }
 
@@ -166,8 +167,10 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// </summary>
     /// <param name="chatRequest">The workspace agent chat request dto model.</param>
     /// <returns>The group chat response.</returns>
-    public async Task<string> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDomain chatRequest)
+    public async Task<GroupChatResponseDomain> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDomain chatRequest)
     {
+        ArgumentNullException.ThrowIfNull(chatRequest);
+
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));

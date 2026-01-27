@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Check, Search, Terminal, X, Info, Loader2 } from "lucide-react";
-import { Button, Input, Checkbox } from "@heroui/react";
+import { Button, Input } from "@heroui/react";
 
-import { useAuth } from "@auth/AuthProvider";
 import { GetAllToolSkillsApiAsync } from "@shared/api-service";
 import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 import { AssociateSkillsFlyoutProps } from "@shared/types";
@@ -14,7 +13,6 @@ export default function AssociateSkillsFlyoutComponent({
 	onSkillsChange,
 	selectedSkillGuids,
 }: AssociateSkillsFlyoutProps) {
-	const authContext = useAuth();
 	const [skills, setSkills] = useState<ToolSkillDTO[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [searchQuery, setSearchQuery] = useState<string>("");
@@ -30,12 +28,9 @@ export default function AssociateSkillsFlyoutComponent({
 	const fetchSkills = async () => {
 		setIsLoading(true);
 		try {
-			const token = await authContext.getAccessToken();
-			if (token) {
-				const response = await GetAllToolSkillsApiAsync(token);
-				if (response.isSuccess) {
-					setSkills(response.responseData as ToolSkillDTO[]);
-				}
+			const response = await GetAllToolSkillsApiAsync();
+			if (response.isSuccess) {
+				setSkills(response.responseData as ToolSkillDTO[]);
 			}
 		} catch (error) {
 			console.error("Failed to fetch skills:", error);
@@ -48,7 +43,7 @@ export default function AssociateSkillsFlyoutComponent({
 		setLocalSelectedGuids((prev) =>
 			prev.includes(guid)
 				? prev.filter((id) => id !== guid)
-				: [...prev, guid]
+				: [...prev, guid],
 		);
 	};
 
@@ -64,7 +59,7 @@ export default function AssociateSkillsFlyoutComponent({
 				.includes(searchQuery.toLowerCase()) ||
 			skill.toolSkillTechnicalName
 				.toLowerCase()
-				.includes(searchQuery.toLowerCase())
+				.includes(searchQuery.toLowerCase()),
 	);
 
 	if (!isOpen) return null;
@@ -153,7 +148,7 @@ export default function AssociateSkillsFlyoutComponent({
 									<div
 										className={`p-2 rounded-lg transition-colors duration-300 ${
 											localSelectedGuids.includes(
-												skill.toolSkillGuid
+												skill.toolSkillGuid,
 											)
 												? "bg-cyan-500/20"
 												: "bg-white/10"
@@ -162,7 +157,7 @@ export default function AssociateSkillsFlyoutComponent({
 										<Terminal
 											className={`w-5 h-5 ${
 												localSelectedGuids.includes(
-													skill.toolSkillGuid
+													skill.toolSkillGuid,
 												)
 													? "text-cyan-400"
 													: "text-white/60"
@@ -181,14 +176,14 @@ export default function AssociateSkillsFlyoutComponent({
 								<div
 									className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
 										localSelectedGuids.includes(
-											skill.toolSkillGuid
+											skill.toolSkillGuid,
 										)
 											? "bg-cyan-500 border-cyan-500 scale-110 shadow-lg shadow-cyan-500/20"
 											: "bg-white/5 border-white/10"
 									}`}
 								>
 									{localSelectedGuids.includes(
-										skill.toolSkillGuid
+										skill.toolSkillGuid,
 									) && (
 										<Check className="w-4 h-4 text-white" />
 									)}

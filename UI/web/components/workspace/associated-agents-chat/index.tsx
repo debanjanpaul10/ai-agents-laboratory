@@ -12,13 +12,13 @@ import { MarkdownRenderer } from "@components/common/markdown-renderer";
 import { GenerateMessageId } from "@shared/utils";
 import { ChatRequestDTO } from "@models/request/chat-request-dto";
 import { useAppDispatch } from "@store/index";
-import { useAuth } from "@auth/AuthProvider";
 import { ShowErrorToaster } from "@shared/toaster";
 import { InvokeChatAgentAsync } from "@store/chat/actions";
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
 import { GetWorkspaceGroupChatResponseAsync } from "@store/workspaces/actions";
 import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
+import { GroupChatResponseDTO } from "@models/response/group-chat-response.dto";
 
 export default function AssociatedAgentsChatPaneComponent({
 	selectedAgent,
@@ -28,12 +28,12 @@ export default function AssociatedAgentsChatPaneComponent({
 	workspaceDetailsData: AgentsWorkspaceDTO;
 }) {
 	const dispatch = useAppDispatch();
-	const authContext = useAuth();
 
 	const [showScrollbar, setShowScrollbar] = useState<boolean>(false);
 	const [userInput, setUserInput] = useState<string>("");
 	const [messages, setMessages] = useState<Array<ChatMessage>>([]);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isGroupChatAgent, setIsGroupChatAgent] = useState<boolean>(false);
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -42,15 +42,12 @@ export default function AssociatedAgentsChatPaneComponent({
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [messages]);
 
-	async function fetchToken() {
-		try {
-			if (authContext.isAuthenticated && !authContext.isLoading)
-				return await authContext.getAccessToken();
-		} catch (error: any) {
-			console.error(error);
-			if (error.message) ShowErrorToaster(error.message);
-		}
-	}
+	useEffect(() => {
+		setIsGroupChatAgent(
+			selectedAgent?.agentGuid ===
+				RunWorkspaceConstants.ChatPane.GroupChatAgent.Guid,
+		);
+	}, [selectedAgent]);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setUserInput(e.target.value);
@@ -82,9 +79,7 @@ export default function AssociatedAgentsChatPaneComponent({
 
 	const handleSendChatRequest = () => {
 		if (!selectedAgent) return;
-
-		if (selectedAgent.agentGuid === "group-chat-guid")
-			SendGroupChatRequest();
+		if (isGroupChatAgent) SendGroupChatRequest();
 		else SendChatbotRequest();
 	};
 
@@ -114,26 +109,28 @@ export default function AssociatedAgentsChatPaneComponent({
 				workspaceId: workspaceDetailsData.agentWorkspaceGuid,
 			};
 
-			const accessToken = await fetchToken();
-			if (accessToken) {
-				const aiResponse = (await (
-					dispatch as ThunkDispatch<any, any, Action>
-				)(
-					GetWorkspaceGroupChatResponseAsync(
-						chatRequest,
-						accessToken,
-					),
-				)) as string | null;
+			const aiResponse = (await (
+				dispatch as ThunkDispatch<any, any, Action>
+			)(
+				GetWorkspaceGroupChatResponseAsync(chatRequest),
+			)) as GroupChatResponseDTO | null;
 
-				if (aiResponse) {
-					const botMessage = {
-						id: GenerateMessageId(),
-						type: "bot" as const,
-						content: aiResponse,
-					};
-
-					setMessages((prev) => [...prev, botMessage]);
+			if (aiResponse?.agentResponse) {
+				let content = aiResponse.agentResponse;
+				if (
+					aiResponse.agentsInvoked &&
+					aiResponse.agentsInvoked.length > 0
+				) {
+					content = `${aiResponse.agentResponse}\n\n<small>Agents invoked: ${aiResponse.agentsInvoked.join(", ")}</small>`;
 				}
+
+				const botMessage = {
+					id: GenerateMessageId(),
+					type: "bot" as const,
+					content: content,
+				};
+
+				setMessages((prev) => [...prev, botMessage]);
 			}
 		} catch (error: any) {
 			console.error(error);
@@ -168,23 +165,18 @@ export default function AssociatedAgentsChatPaneComponent({
 				agentId: selectedAgent.agentGuid,
 				agentName: selectedAgent.agentName,
 			};
-			const accessToken = await fetchToken();
-			if (accessToken) {
-				const aiResponse = (await (
-					dispatch as ThunkDispatch<any, any, Action>
-				)(InvokeChatAgentAsync(chatRequest, accessToken))) as
-					| string
-					| null;
+			const aiResponse = (await (
+				dispatch as ThunkDispatch<any, any, Action>
+			)(InvokeChatAgentAsync(chatRequest))) as string | null;
 
-				if (aiResponse) {
-					const botMessage = {
-						id: GenerateMessageId(),
-						type: "bot" as const,
-						content: aiResponse,
-					};
+			if (aiResponse) {
+				const botMessage = {
+					id: GenerateMessageId(),
+					type: "bot" as const,
+					content: aiResponse,
+				};
 
-					setMessages((prev) => [...prev, botMessage]);
-				}
+				setMessages((prev) => [...prev, botMessage]);
 			}
 		} catch (error: any) {
 			console.error(error);
@@ -213,12 +205,12 @@ export default function AssociatedAgentsChatPaneComponent({
 				<div className="flex items-center space-x-3">
 					<div
 						className={`p-2 rounded-xl ${
-							selectedAgent.agentGuid === "group-chat-guid"
+							isGroupChatAgent
 								? "bg-gradient-to-r from-purple-500 to-pink-600"
 								: "bg-gradient-to-r from-cyan-500 to-blue-600"
 						}`}
 					>
-						{selectedAgent.agentGuid === "group-chat-guid" ? (
+						{isGroupChatAgent ? (
 							<Users className="w-5 h-5 text-white" />
 						) : (
 							<Bot className="w-5 h-5 text-white" />
@@ -229,7 +221,7 @@ export default function AssociatedAgentsChatPaneComponent({
 							{selectedAgent.agentName}
 						</h2>
 						<p className="text-white/60 text-sm">
-							{selectedAgent.agentGuid === "group-chat-guid"
+							{isGroupChatAgent
 								? "Active conversation with all agents"
 								: RunWorkspaceConstants.ChatPane.SubTitle}
 						</p>
@@ -255,12 +247,12 @@ export default function AssociatedAgentsChatPaneComponent({
 							<MessageSquare className="w-12 h-12 text-white/40" />
 						</div>
 						<h3 className="text-white/80 text-lg font-medium mb-2">
-							{selectedAgent.agentGuid === "group-chat-guid"
+							{isGroupChatAgent
 								? "Group Chat"
 								: RunWorkspaceConstants.Headers.Header}
 						</h3>
 						<p className="text-white/60 text-sm max-w-sm">
-							{selectedAgent.agentGuid === "group-chat-guid"
+							{isGroupChatAgent
 								? "Collaborate with all your agents in one place."
 								: RunWorkspaceConstants.Headers.SubHeader}
 						</p>
@@ -346,7 +338,7 @@ export default function AssociatedAgentsChatPaneComponent({
 						radius="full"
 						title="Send message"
 						className={`mb-3 text-white font-semibold transition-all duration-300 px-3 py-3 disabled:opacity-50 ${
-							selectedAgent.agentGuid === "group-chat-guid"
+							isGroupChatAgent
 								? "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700"
 								: "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
 						}`}

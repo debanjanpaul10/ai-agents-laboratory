@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { FullScreenLoading } from "@components/common/spinner";
 import { AuthContextType, AuthProviderProps, User } from "@shared/types";
 import { DashboardConstants, RouteConstants } from "@helpers/constants";
+import { tokenService } from "@helpers/token-service";
 
 const defaultAuthContext: AuthContextType = {
 	user: null,
@@ -30,20 +31,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	const { instance, inProgress, accounts } = useMsal();
 	const router = useRouter();
 
-	const isAuthenticated = accounts.length > 0;
+	const isAuthenticated = accounts.length > 0 && !!tokenService.getToken();
 
 	useEffect(() => {
-		if (inProgress === InteractionStatus.None) {
-			if (accounts.length > 0) {
-				const account = accounts[0];
-				setUser({
-					id: account.localAccountId,
-					name: account.name || "",
-					email: account.username,
-				});
+		const initAuth = async () => {
+			if (inProgress === InteractionStatus.None) {
+				if (accounts.length > 0) {
+					const account = accounts[0];
+					setUser({
+						id: account.localAccountId,
+						name: account.name || "",
+						email: account.username,
+					});
+
+					// Sync token before ending loading state
+					try {
+						const token = await getAccessToken();
+						if (token) {
+							tokenService.setToken(token);
+						} else {
+							tokenService.clearToken();
+						}
+					} catch (error) {
+						console.error("Failed to sync token during init:", error);
+						tokenService.clearToken();
+					}
+				} else {
+					tokenService.clearToken();
+					setUser(null);
+				}
+				setIsLoading(false);
 			}
-			setIsLoading(false);
-		}
+		};
+		initAuth();
 	}, [accounts, inProgress]);
 
 	useEffect(() => {
@@ -70,6 +90,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		try {
 			await instance.logoutPopup();
 			setUser(null);
+			tokenService.clearToken();
 		} catch (error) {
 			console.error(error);
 			throw error;

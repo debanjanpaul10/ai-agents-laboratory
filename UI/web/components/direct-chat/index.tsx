@@ -7,20 +7,18 @@ import {
 } from "@store/common/actions";
 import AgentChatComponent from "@components/direct-chat/agent-chat";
 import ChatbotInformationComponent from "@components/direct-chat/chatbot-information";
-import { useAuth } from "@auth/AuthProvider";
 import { GetConversationHistoryDataForUserAsync } from "@store/chat/actions";
 import { ApplicationConstants } from "@helpers/constants";
 
 export default function DirectChatComponent() {
 	const dispatch = useAppDispatch();
-	const authContext = useAuth();
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 	const [isAgentInfoDrawerOpen, setIsAgentInfoDrawerOpen] =
 		useState<boolean>(false);
 
 	const IsDrawerOpenStoreData = useAppSelector(
-		(state) => state.CommonReducer.isDirectChatOpen
+		(state) => state.CommonReducer.isDirectChatOpen,
 	);
 
 	useEffect(() => {
@@ -30,29 +28,19 @@ export default function DirectChatComponent() {
 	}, [IsDrawerOpenStoreData]);
 
 	useEffect(() => {
-		let isMounted = true;
-		const loadData = async () => {
-			if (isDrawerOpen) {
-				document.body.style.overflow = "hidden";
-				const token = await fetchToken();
-				if (token && isMounted) {
-					dispatch(GetConversationHistoryDataForUserAsync(token));
-					dispatch(
-						GetConfigurationByKeyName(
-							ApplicationConstants.ChatbotAgentConfigKeyName,
-							token
-						)
-					);
-				}
-			} else {
-				document.body.style.overflow = "unset";
-			}
-		};
-
-		loadData();
+		if (isDrawerOpen) {
+			document.body.style.overflow = "hidden";
+			dispatch(GetConversationHistoryDataForUserAsync());
+			dispatch(
+				GetConfigurationByKeyName(
+					ApplicationConstants.ChatbotAgentConfigKeyName,
+				),
+			);
+		} else {
+			document.body.style.overflow = "unset";
+		}
 
 		return () => {
-			isMounted = false;
 			document.body.style.overflow = "unset";
 		};
 	}, [isDrawerOpen]);
@@ -67,15 +55,6 @@ export default function DirectChatComponent() {
 
 	const onAgentInfoDrawerClose = () => {
 		setIsAgentInfoDrawerOpen(false);
-	};
-
-	const fetchToken = async () => {
-		try {
-			if (authContext.isAuthenticated && !authContext.isLoading)
-				return await authContext.getAccessToken();
-		} catch (error) {
-			console.error(error);
-		}
 	};
 
 	return (

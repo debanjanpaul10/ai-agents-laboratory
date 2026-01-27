@@ -3,7 +3,6 @@ import { Plus } from "lucide-react";
 import { Button } from "@heroui/react";
 
 import { useAuth } from "@auth/AuthProvider";
-import { ShowErrorToaster } from "@shared/toaster";
 import { useAppDispatch, useAppSelector } from "@store/index";
 import {
 	GetAllToolSkillsAsync,
@@ -40,23 +39,19 @@ export default function MarketplaceComponent() {
 	});
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState<boolean>(false);
 
-	const IsSkillsMarketPlaceLoading = useAppSelector(
+	const IsSkillsMarketPlaceLoading = useAppSelector<boolean>(
 		(state) => state.ToolSkillsReducer.isToolSkillsLoading,
 	);
-
 	const ConfigurationsStoreData = useAppSelector(
 		(state) => state.CommonReducer.configurations,
 	);
-
 	const ToolSkillsListStoreData = useAppSelector<ToolSkillDTO[]>(
 		(state) => state.ToolSkillsReducer.allToolSkills,
 	);
-
-	const IsAddSkillDrawerOpenStoreData = useAppSelector(
+	const IsAddSkillDrawerOpenStoreData = useAppSelector<boolean>(
 		(state) => state.ToolSkillsReducer.isAddSkillDrawerOpen,
 	);
-
-	const IsMcpToolsFlyoutOpen = useAppSelector(
+	const IsMcpToolsFlyoutOpen = useAppSelector<boolean>(
 		(state) => state.ToolSkillsReducer.isMcpToolsDrawerOpen,
 	);
 
@@ -89,24 +84,12 @@ export default function MarketplaceComponent() {
 		setIsEditDrawerOpen(true);
 	};
 
-	async function fetchToken() {
-		try {
-			if (authContext.isAuthenticated && !authContext.isLoading)
-				return await authContext.getAccessToken();
-		} catch (error: any) {
-			console.error(error);
-			if (error.message) ShowErrorToaster(error.message);
-		}
+	function GetAllToolSkillsData() {
+		dispatch(GetAllToolSkillsAsync());
 	}
 
-	async function GetAllToolSkillsData() {
-		const token = await fetchToken();
-		token && dispatch(GetAllToolSkillsAsync(token));
-	}
-
-	async function GetAllConfigurationsData() {
-		const token = await fetchToken();
-		token && dispatch(GetAllConfigurations(token));
+	function GetAllConfigurationsData() {
+		dispatch(GetAllConfigurations());
 	}
 
 	const handleCreateNewSkill = () => {

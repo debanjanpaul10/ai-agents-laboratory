@@ -274,6 +274,30 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
     }
 
+    /// <summary>
+    /// Downloads the knowledgebase file asynchronous.
+    /// </summary>
+    /// <param name="agentGuid">The agent guid id.</param>
+    /// <param name="fileName">The file name.</param>
+    /// <returns>The downloaded file url</returns>
+    public async Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName)
+    {
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+            return await documentIntelligenceService.DownloadKnowledgebaseFileAsync(agentGuid, fileName).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message));
+            throw;
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+        }
+    }
+
     #region PRIVATE METHODS
 
     /// <summary>
@@ -294,6 +318,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         };
         await toolSkillsService.AssociateSkillAndAgentAsync(associatedAgentsData, agentData.AssociatedSkillGuids.First(), currentUserEmail);
     }
+
 
     #endregion
 }
