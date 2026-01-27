@@ -5,7 +5,7 @@ import MainLayout from "@components/common/main-layout";
 import { WorkspacesConstants } from "@helpers/constants";
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { useAuth } from "@auth/AuthProvider";
-import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
+import { ShowSuccessToaster } from "@shared/toaster";
 import { GetWorkspaceByWorkspaceIdAsync } from "@store/workspaces/actions";
 import { FullScreenLoading } from "@components/common/spinner";
 import { GetAllConfigurations } from "@store/common/actions";
@@ -46,24 +46,12 @@ export default function WorkspaceComponent() {
 		}
 	}, [router.query.id]);
 
-	async function fetchToken() {
-		try {
-			if (authContext.isAuthenticated && !authContext.isLoading)
-				return await authContext.getAccessToken();
-		} catch (error: any) {
-			console.error(error);
-			if (error.message) ShowErrorToaster(error.message);
-		}
+	function GetWorkspaceByWorkspaceId(workspaceId: string) {
+		dispatch(GetWorkspaceByWorkspaceIdAsync(workspaceId));
 	}
 
-	async function GetWorkspaceByWorkspaceId(workspaceId: string) {
-		const token = await fetchToken();
-		token && dispatch(GetWorkspaceByWorkspaceIdAsync(workspaceId, token));
-	}
-
-	async function GetAllConfigurationsData() {
-		const token = await fetchToken();
-		token && dispatch(GetAllConfigurations(token));
+	function GetAllConfigurationsData() {
+		dispatch(GetAllConfigurations());
 	}
 
 	const handleAgentSelection = (agent: WorkspaceAgentsDataDTO) => {

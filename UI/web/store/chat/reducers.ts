@@ -3,7 +3,7 @@ import {
 	DIRECT_CHAT_REQUEST,
 	GET_CHAT_RESPONSE,
 	GET_CONVERSATION_HISTORY,
-} from "./actionTypes";
+} from "@store/chat/actionTypes";
 
 const initialState = {
 	chatResponse: {},

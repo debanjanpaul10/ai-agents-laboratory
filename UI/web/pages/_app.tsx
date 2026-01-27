@@ -56,7 +56,9 @@ export default function App({ Component, pageProps }: AppProps) {
 							<AuthProvider>
 								<ToastProvider
 									placement="top-center"
-									toastProps={{ classNames: { base: "z-[100]" } }}
+									toastProps={{
+										classNames: { base: "z-[100]" },
+									}}
 								/>
 								<Component {...pageProps} />
 							</AuthProvider>

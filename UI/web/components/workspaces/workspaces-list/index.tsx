@@ -10,7 +10,6 @@ import {
 	Pencil,
 	Search,
 	SortAsc,
-	Trash2,
 	User,
 	X,
 } from "lucide-react";

@@ -1,4 +1,4 @@
-import { WorkspaceAgentsDataDTO } from "./workspace-agents-data.dto";
+import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
 
 export class AgentsWorkspaceDTO {
 	agentWorkspaceGuid: string = "";

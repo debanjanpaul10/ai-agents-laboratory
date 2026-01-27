@@ -100,12 +100,17 @@ export default function AssociatedAgentsListPaneComponent({
 					<button
 						onClick={() =>
 							handleAgentClick({
-								agentGuid: "group-chat-guid",
-								agentName: "Group Chat",
+								agentGuid:
+									RunWorkspaceConstants.ChatPane
+										.GroupChatAgent.Guid,
+								agentName:
+									RunWorkspaceConstants.ChatPane
+										.GroupChatAgent.Name,
 							} as WorkspaceAgentsDataDTO)
 						}
 						className={`w-full text-left p-4 rounded-lg border transition-all duration-200 cursor-pointer ${
-							selectedAgent?.agentGuid === "group-chat-guid"
+							selectedAgent?.agentGuid ===
+							RunWorkspaceConstants.ChatPane.GroupChatAgent.Guid
 								? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 shadow-lg shadow-purple-500/20"
 								: "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
 						}`}
@@ -114,7 +119,8 @@ export default function AssociatedAgentsListPaneComponent({
 							<div
 								className={`p-2 rounded-lg ${
 									selectedAgent?.agentGuid ===
-									"group-chat-guid"
+									RunWorkspaceConstants.ChatPane
+										.GroupChatAgent.Guid
 										? "bg-gradient-to-r from-purple-500 to-pink-600"
 										: "bg-white/10"
 								}`}

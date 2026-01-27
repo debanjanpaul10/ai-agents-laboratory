@@ -12,11 +12,9 @@ import {
 	Wrench,
 	X,
 	Bot,
-	ChevronRight,
 	Users,
 } from "lucide-react";
 
-import { useAuth } from "@auth/AuthProvider";
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { EditSkillFlyoutComponentProps } from "@shared/types";
 import { ToolSkillDTO } from "@models/response/tool-skill-dto";
@@ -41,7 +39,6 @@ export default function EditSkillFlyoutComponent({
 	isDisabled,
 }: EditSkillFlyoutComponentProps) {
 	const dispatch = useAppDispatch();
-	const authContext = useAuth();
 	const { accounts } = useMsal();
 
 	const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
@@ -65,7 +62,7 @@ export default function EditSkillFlyoutComponent({
 		onEditClose();
 	};
 
-	async function handleEditSave() {
+	function handleEditSave() {
 		const form = new FormData();
 		form.append("toolSkillGuid", editFormData.toolSkillGuid);
 		form.append("toolSkillDisplayName", editFormData.toolSkillDisplayName);
@@ -78,25 +75,21 @@ export default function EditSkillFlyoutComponent({
 			editFormData.toolSkillMcpServerUrl,
 		);
 
-		const token = await authContext.getAccessToken();
-		token && dispatch(UpdateExistingToolSkillAsync(form, token));
+		dispatch(UpdateExistingToolSkillAsync(form));
 	}
 
-	async function HandleSkillDelete() {
-		const token = await authContext.getAccessToken();
+	function HandleSkillDelete() {
 		var skillId = editFormData.toolSkillGuid;
-		token && dispatch(DeleteExistingToolSkillAsync(skillId, token));
+		dispatch(DeleteExistingToolSkillAsync(skillId));
 		setIsDeletePopupOpen(false);
 		handleEditClose();
 	}
 
-	async function GetAllMcpToolsAvailable(mcpServerUrl: string) {
-		const token = await authContext.getAccessToken();
+	function GetAllMcpToolsAvailable(mcpServerUrl: string) {
 		const mcpServerRequest: McpServerToolRequestDTO = {
 			serverUrl: mcpServerUrl,
 		};
-		token &&
-			dispatch(GetAllMcpToolsAvailableAsync(mcpServerRequest, token));
+		dispatch(GetAllMcpToolsAvailableAsync(mcpServerRequest));
 	}
 
 	const renderSkillInformationTile = (selectedSkill: ToolSkillDTO) => {

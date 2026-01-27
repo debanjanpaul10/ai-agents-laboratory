@@ -20,19 +20,17 @@ export default function CreateAgentComponent() {
 	const [selectedKnowledgeFiles, setSelectedKnowledgeFiles] = useState<
 		File[]
 	>([]);
-
 	const [aiVisionImagesFlyoutOpen, setAiVisionImagesFlyoutOpen] =
 		useState<boolean>(false);
 	const [selectedAiVisionImages, setSelectedAiVisionImages] = useState<
 		File[]
 	>([]);
-
 	const [associateSkillsFlyoutOpen, setAssociateSkillsFlyoutOpen] =
 		useState<boolean>(false);
 	const [selectedSkillGuids, setSelectedSkillGuids] = useState<string[]>([]);
 
 	const IsDrawerOpenStoreData = useAppSelector(
-		(state) => state.AgentsReducer.isNewAgentDrawerOpen
+		(state) => state.AgentsReducer.isNewAgentDrawerOpen,
 	);
 
 	useEffect(() => {

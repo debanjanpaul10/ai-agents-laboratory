@@ -82,11 +82,11 @@ export function GetAllMcpToolsAvailableFailedAsync() {
 	};
 }
 
-export function GetAllToolSkillsAsync(accessToken: string) {
+export function GetAllToolSkillsAsync() {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleToolSkillsLoader(true));
-			const response = await GetAllToolSkillsApiAsync(accessToken);
+			const response = await GetAllToolSkillsApiAsync();
 			if (response?.isSuccess && response?.responseData)
 				dispatch({
 					type: GET_ALL_TOOLS_SKILLS,
@@ -103,7 +103,6 @@ export function GetAllToolSkillsAsync(accessToken: string) {
 
 export function GetToolSkillBySkillIdAsync(
 	skillId: string,
-	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
@@ -111,7 +110,6 @@ export function GetToolSkillBySkillIdAsync(
 
 			const response = await GetToolSkillBySkillIdApiAsync(
 				skillId,
-				accessToken
 			);
 			if (response?.isSuccess && response?.responseData)
 				dispatch({
@@ -129,14 +127,12 @@ export function GetToolSkillBySkillIdAsync(
 
 export function AddNewToolSkillAsync(
 	newToolSkill: ToolSkillDTO | FormData,
-	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleCreateSkillLoader(true));
 			const response = await AddNewToolSkillApiAsync(
 				newToolSkill,
-				accessToken
 			);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -145,7 +141,7 @@ export function AddNewToolSkillAsync(
 				});
 
 				dispatch(ToggleAddSkillDrawer(false));
-				dispatch(GetAllToolSkillsAsync(accessToken) as any);
+				dispatch(GetAllToolSkillsAsync() as any);
 				ShowSuccessToaster(ToolSkillsToasterConstants.CREATE_SKILL);
 			}
 		} catch (error: any) {
@@ -160,7 +156,6 @@ export function AddNewToolSkillAsync(
 
 export function GetAllMcpToolsAvailableAsync(
 	mcpServerTool: McpServerToolRequestDTO,
-	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
@@ -169,7 +164,6 @@ export function GetAllMcpToolsAvailableAsync(
 
 			const response = await GetAllMcpToolsAvailableApiAsync(
 				mcpServerTool,
-				accessToken
 			);
 			if (response?.isSuccess && response?.responseData)
 				dispatch(
@@ -187,17 +181,15 @@ export function GetAllMcpToolsAvailableAsync(
 }
 export function UpdateExistingToolSkillAsync(
 	updateToolSkill: ToolSkillDTO | FormData,
-	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleEditSkillLoader(true));
 			const response = await UpdateExistingToolSkillDataApiAsync(
 				updateToolSkill,
-				accessToken
 			);
 			if (response?.isSuccess && response?.responseData) {
-				dispatch(GetAllToolSkillsAsync(accessToken) as any);
+				dispatch(GetAllToolSkillsAsync() as any);
 				ShowSuccessToaster(ToolSkillsToasterConstants.UPDATE_SKILL);
 			}
 		} catch (error: any) {
@@ -211,17 +203,15 @@ export function UpdateExistingToolSkillAsync(
 
 export function DeleteExistingToolSkillAsync(
 	skillId: string,
-	accessToken: string
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleToolSkillsLoader(true));
 			const response = await DeleteExistingToolSkillBySkillIdApiAsync(
 				skillId,
-				accessToken
 			);
 			if (response?.isSuccess) {
-				dispatch(GetAllToolSkillsAsync(accessToken) as any);
+				dispatch(GetAllToolSkillsAsync() as any);
 				ShowSuccessToaster(ToolSkillsToasterConstants.DELETE_SKILL);
 			}
 		} catch (error: any) {

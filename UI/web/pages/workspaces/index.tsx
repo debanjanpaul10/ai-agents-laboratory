@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 
 import { useAuth } from "@auth/AuthProvider";
 import { useAppDispatch, useAppSelector } from "@store/index";
-import { ShowErrorToaster } from "@shared/toaster";
 import { GetAllConfigurations } from "@store/common/actions";
 import { FullScreenLoading } from "@components/common/spinner";
 import { WorkspacesConstants } from "@helpers/constants";
@@ -77,35 +76,12 @@ export default function WorkspacesComponent() {
 		}
 	}, [authContext.isAuthenticated, authContext.isLoading]);
 
-	async function fetchToken() {
-		try {
-			if (authContext.isAuthenticated && !authContext.isLoading)
-				return await authContext.getAccessToken();
-		} catch (error: any) {
-			console.error(error);
-			if (error.message) ShowErrorToaster(error.message);
-		}
-	}
+	const GetAllConfigurationsData = () => {
+		dispatch(GetAllConfigurations());
+	};
 
-	async function GetAllConfigurationsData() {
-		const token = await fetchToken();
-		token && dispatch(GetAllConfigurations(token));
-	}
-
-	async function GetAllWorkspacesData() {
-		const token = await fetchToken();
-		token && dispatch(GetAllWorkspacesDataAsync(token));
-	}
-
-	const handleUnAuthorizedUser = () => {
-		return (
-			<FullScreenLoading
-				isLoading={true}
-				message={
-					WorkspacesConstants.LoadingConstants.LoginRedirectLoader
-				}
-			/>
-		);
+	const GetAllWorkspacesData = () => {
+		dispatch(GetAllWorkspacesDataAsync());
 	};
 
 	const handleCreateNewWorkspaceClick = () => {
@@ -143,24 +119,23 @@ export default function WorkspacesComponent() {
 
 	const confirmDeleteWorkspace = async () => {
 		if (!selectedWorkspace?.agentWorkspaceGuid) return;
-		const token = await fetchToken();
-		if (token) {
-			await dispatch(
-				DeleteExistingWorkspaceAsync(
-					selectedWorkspace.agentWorkspaceGuid,
-					token,
-				) as any,
-			);
-			setIsDeletePopupOpen(false);
-			setSelectedWorkspace(null);
-		}
+		await dispatch(
+			DeleteExistingWorkspaceAsync(
+				selectedWorkspace.agentWorkspaceGuid,
+			) as any,
+		);
+		setIsDeletePopupOpen(false);
+		setSelectedWorkspace(null);
 	};
 
 	const isAnyDrawerOpen =
 		isEditDrawerOpen || IsAddWorkspaceDrawerOpenStoreData;
 
 	return !authContext.isAuthenticated ? (
-		handleUnAuthorizedUser()
+		<FullScreenLoading
+			isLoading={true}
+			message={WorkspacesConstants.LoadingConstants.LoginRedirectLoader}
+		/>
 	) : IsWorkspacesLoading ? (
 		<FullScreenLoading
 			isLoading={IsWorkspacesLoading}

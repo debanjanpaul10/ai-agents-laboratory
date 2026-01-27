@@ -2,11 +2,13 @@ import { useIsAuthenticated } from "@azure/msal-react";
 
 import LoginPage from "@pages/login";
 import { AuthenticatedAppProps } from "@shared/types";
+import { tokenService } from "@helpers/token-service";
 
 export default function AuthenticatedApp({ children }: AuthenticatedAppProps) {
 	const isAuthenticated = useIsAuthenticated();
+	const token = tokenService.getToken();
 
-	if (!isAuthenticated) {
+	if (!isAuthenticated || !token) {
 		return <LoginPage />;
 	}
 

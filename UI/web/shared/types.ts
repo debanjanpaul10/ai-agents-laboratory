@@ -153,6 +153,7 @@ export interface FileUploadFlyoutProps {
 	existingFiles?: File[] | any[];
 	onExistingFilesChange?: (removedFileNames: string[]) => void;
 	removedExistingFiles?: string[];
+	agentGuid?: string;
 	config: {
 		headerConstants: any;
 		icons: any;

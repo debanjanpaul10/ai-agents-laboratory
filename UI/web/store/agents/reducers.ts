@@ -9,6 +9,8 @@ import {
 	TOGGLE_EDIT_AGENT_SPINNER,
 	TOGGLE_NEW_AGENT_DRAWER,
 	TOGGLE_AGENTS_LIST_LOADING,
+	DOWNLOAD_KNOWLEDGEBASE_FILE,
+	TOGGLE_DOWNLOAD_FILE_SPINNER,
 } from "@store/agents/actionTypes";
 
 const initialState: any = {
@@ -22,6 +24,8 @@ const initialState: any = {
 	isEditAgentDataLoading: false,
 	isNewAgentDrawerOpen: false,
 	isAgentsListLoading: false,
+	downloadedFiles: {},
+	isDownloadFileSpinnerLoading: false,
 };
 
 export function AgentsReducer(state = initialState, action: any) {
@@ -56,13 +60,24 @@ export function AgentsReducer(state = initialState, action: any) {
 				deleteAgentResponse: action.payload,
 			};
 		}
+		case DOWNLOAD_KNOWLEDGEBASE_FILE: {
+			return {
+				...state,
+				downloadedFiles: action.payload,
+			};
+		}
 		case TOGGLE_AGENT_CREATE_SPINNER: {
 			return {
 				...state,
 				isAgentCreateSpinnerLoading: action.payload,
 			};
 		}
-
+		case TOGGLE_DOWNLOAD_FILE_SPINNER: {
+			return {
+				...state,
+				isDownloadFileSpinnerLoading: action.payload,
+			};
+		}
 		case TOGGLE_CHAT_RESPONSE_SPINNER: {
 			return {
 				...state,

@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useMsal } from "@azure/msal-react";
-import { useAuth } from "@auth/AuthProvider";
 import { Button } from "@heroui/react";
 
 import ExpandMetapromptEditorComponent from "@components/common/expand-metaprompt-editor";
@@ -26,16 +25,15 @@ export default function ChatbotInformationComponent({
 	onAgentInfoDrawerClose: any;
 }) {
 	const dispatch = useAppDispatch();
-	const authContext = useAuth();
 	const { accounts } = useMsal();
 
 	const ConversationAgentDetailsStoreData = useAppSelector(
-		(state) => state.AgentsReducer.agentData
+		(state) => state.AgentsReducer.agentData,
 	);
 
 	const [expandedPromptModal, setExpandedPromptModal] = useState(false);
 	const [editedMetaPrompt, setEditedMetaPrompt] = useState(
-		ConversationAgentDetailsStoreData?.agentMetaPrompt || ""
+		ConversationAgentDetailsStoreData?.agentMetaPrompt || "",
 	);
 
 	const handleAgentInfoDrawerClose = () => {
@@ -65,12 +63,10 @@ export default function ChatbotInformationComponent({
 		form.append("agentName", ConversationAgentDetailsStoreData.agentName);
 		form.append(
 			"applicationName",
-			ConversationAgentDetailsStoreData.applicationName
+			ConversationAgentDetailsStoreData.applicationName,
 		);
 
-		const accessToken = await authContext.getAccessToken();
-		accessToken &&
-			dispatch(UpdateExistingAgentDataAsync(form, accessToken));
+		dispatch(UpdateExistingAgentDataAsync(form));
 	};
 
 	const isOwner =
@@ -82,7 +78,7 @@ export default function ChatbotInformationComponent({
 	useEffect(() => {
 		if (ConversationAgentDetailsStoreData?.agentMetaPrompt) {
 			setEditedMetaPrompt(
-				ConversationAgentDetailsStoreData.agentMetaPrompt
+				ConversationAgentDetailsStoreData.agentMetaPrompt,
 			);
 		}
 	}, [ConversationAgentDetailsStoreData?.agentMetaPrompt]);
@@ -229,8 +225,8 @@ export default function ChatbotInformationComponent({
 									<p className="text-white/60">
 										{ConversationAgentDetailsStoreData?.dateCreated
 											? formatDate(
-													ConversationAgentDetailsStoreData.dateCreated
-											  )
+													ConversationAgentDetailsStoreData.dateCreated,
+												)
 											: "N/A"}
 									</p>
 								</div>

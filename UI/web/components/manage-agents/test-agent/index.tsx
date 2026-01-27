@@ -4,7 +4,6 @@ import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { Send, MessageSquare, Bot, Zap, ArrowRight } from "lucide-react";
 
 import { ChatRequestDTO } from "@models/request/chat-request-dto";
-import { useAuth } from "@auth/AuthProvider";
 import { InvokeChatAgentAsync } from "@store/chat/actions";
 import { useAppDispatch } from "@store/index";
 import { ChatMessage, TestAgentComponentProps } from "@shared/types";
@@ -16,7 +15,6 @@ export default function TestAgentComponent({
 	editFormData,
 	onClose,
 }: TestAgentComponentProps) {
-	const { getAccessToken } = useAuth();
 	const dispatch = useAppDispatch();
 
 	const [messages, setMessages] = useState<Array<ChatMessage>>([]);
@@ -55,24 +53,19 @@ export default function TestAgentComponent({
 				agentId: editFormData.agentId,
 				agentName: editFormData.agentName,
 			};
-			const accessToken = await getAccessToken();
-			if (accessToken) {
-				const aiResponse = (await (
-					dispatch as ThunkDispatch<any, any, Action>
-				)(InvokeChatAgentAsync(chatRequest, accessToken))) as
-					| string
-					| null;
+			const aiResponse = (await (
+				dispatch as ThunkDispatch<any, any, Action>
+			)(InvokeChatAgentAsync(chatRequest))) as string | null;
 
-				if (aiResponse) {
-					const botMessage = {
-						id: GenerateMessageId(),
-						type: "bot" as const,
-						content: aiResponse,
-						timestamp: new Date(),
-					};
+			if (aiResponse) {
+				const botMessage = {
+					id: GenerateMessageId(),
+					type: "bot" as const,
+					content: aiResponse,
+					timestamp: new Date(),
+				};
 
-					setMessages((prev) => [...prev, botMessage]);
-				}
+				setMessages((prev) => [...prev, botMessage]);
 			}
 		} catch (error) {
 			console.error(error);
@@ -94,7 +87,7 @@ export default function TestAgentComponent({
 			textareaRef.current.style.height = "auto";
 			textareaRef.current.style.height = `${Math.min(
 				textareaRef.current.scrollHeight,
-				800
+				800,
 			)}px`;
 
 			// Show scrollbar only when content exceeds 200px

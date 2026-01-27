@@ -41,23 +41,12 @@ export default function DashboardComponent() {
 		}
 	}, [authContext.isAuthenticated, authContext.isLoading]);
 
-	async function GetTopActiveAgentsData() {
-		const token = await fetchToken();
-		token && dispatch(GetTopActiveAgentsDataAsync(token));
+	function GetTopActiveAgentsData() {
+		dispatch(GetTopActiveAgentsDataAsync());
 	}
 
-	async function GetAllConfigurationsData() {
-		const token = await fetchToken();
-		token && dispatch(GetAllConfigurations(token));
-	}
-
-	async function fetchToken() {
-		try {
-			if (authContext.isAuthenticated && !authContext.isLoading)
-				return await authContext.getAccessToken();
-		} catch (error) {
-			console.error(error);
-		}
+	function GetAllConfigurationsData() {
+		dispatch(GetAllConfigurations());
 	}
 
 	return !authContext.isAuthenticated ? (

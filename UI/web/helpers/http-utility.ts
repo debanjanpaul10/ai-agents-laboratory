@@ -2,20 +2,45 @@ import axios from "axios";
 
 import { ResponseDTO } from "@shared/types";
 import { environment } from "@environments/environment.base";
+import { tokenService } from "@helpers/token-service";
 
 const BASE_API_URL: string = environment.apiBaseUrl;
 
-export async function GetAsync(
-	apiUrl: string,
-	accessToken: string,
-): Promise<ResponseDTO> {
+const apiClient = axios.create({
+	baseURL: BASE_API_URL,
+});
+
+apiClient.interceptors.request.use(
+	(config) => {
+		const token = tokenService.getToken();
+		if (token) {
+			config.headers.Authorization = `Bearer ${token}`;
+		}
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	},
+);
+
+apiClient.interceptors.response.use(
+	(response) => {
+		return response;
+	},
+	(error) => {
+		if (error.response && error.response.status === 401) {
+			tokenService.clearToken();
+			if (typeof window !== "undefined") {
+				window.location.href = "/";
+			}
+		}
+		return Promise.reject(error);
+	},
+);
+
+export async function GetAsync(apiUrl: string): Promise<ResponseDTO> {
 	try {
-		const url = BASE_API_URL + apiUrl;
-		const response = await axios.get(url, {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
+		const response = await apiClient.get(apiUrl);
 
 		if (response?.data) return response?.data;
 		else
@@ -34,15 +59,9 @@ export async function GetAsync(
 export async function PostAsync(
 	apiUrl: string,
 	data: any,
-	accessToken: string,
 ): Promise<ResponseDTO> {
 	try {
-		const url: string = BASE_API_URL + apiUrl;
-		const response = await axios.post(url, data, {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
+		const response = await apiClient.post(apiUrl, data);
 
 		if (response?.data) return response.data;
 		else
@@ -58,17 +77,9 @@ export async function PostAsync(
 	}
 }
 
-export async function DeleteAsync(
-	apiUrl: string,
-	accessToken: string,
-): Promise<ResponseDTO> {
+export async function DeleteAsync(apiUrl: string): Promise<ResponseDTO> {
 	try {
-		const url: string = BASE_API_URL + apiUrl;
-		const response = await axios.delete(url, {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
+		const response = await apiClient.delete(apiUrl);
 
 		if (response?.data) return response?.data;
 		else
@@ -87,15 +98,9 @@ export async function DeleteAsync(
 export async function PutAsync(
 	apiUrl: string,
 	data: any,
-	accessToken: string,
 ): Promise<ResponseDTO> {
 	try {
-		const url: string = BASE_API_URL + apiUrl;
-		const response = await axios.put(url, data, {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
+		const response = await apiClient.put(apiUrl, data);
 
 		if (response?.data) return response?.data;
 		else
