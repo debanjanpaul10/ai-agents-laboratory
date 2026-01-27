@@ -65,9 +65,9 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
     /// <param name="toolSkillId">The tool skill guid id.</param>
     /// <param name="currentUserEmail">The current user email.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> AssociateSkillAndAgentAsync(IList<AssociatedAgentsSkillDataDomain> agentDetailsList, string toolSkillId, string currentUserEmail)
+    public async Task<bool> AssociateSkillAndAgentAsync(IList<AssociatedAgentsSkillDataDomain> agentData, string toolSkillId, string currentUserEmail)
     {
-        ArgumentNullException.ThrowIfNull(agentDetailsList);
+        ArgumentNullException.ThrowIfNull(agentData);
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
@@ -78,7 +78,7 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
             var toolData = await this.GetToolSkillBySkillIdAsync(toolSkillId, currentUserEmail).ConfigureAwait(false);
             if (toolData is null) return false;
 
-            toolData.AssociatedAgents = agentDetailsList;
+            toolData.AssociatedAgents = agentData;
             await this.UpdateExistingToolSkillDataAsync(toolData, currentUserEmail).ConfigureAwait(false);
             return true;
 

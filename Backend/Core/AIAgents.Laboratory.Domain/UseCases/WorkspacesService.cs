@@ -109,13 +109,13 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// <summary>
     /// Gets the collection of all available workspaces.
     /// </summary>
-    /// <param name="userName">The current logged in user name.</param>
+    /// <param name="currentUserEmail">The current logged in user name.</param>
     /// <returns>The list of <see cref="AgentsWorkspaceDomain"/></returns>
-    public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(string userName)
+    public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(string currentUserEmail)
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, userName);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, currentUserEmail);
 
             var filter = Builders<AgentsWorkspaceDomain>.Filter.And(Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true));
             return await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.WorkspacesCollectionName, filter).ConfigureAwait(false);
@@ -127,7 +127,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, userName);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, currentUserEmail);
         }
     }
 
