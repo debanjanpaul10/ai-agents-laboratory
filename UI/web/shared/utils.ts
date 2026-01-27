@@ -11,7 +11,6 @@ export function GenerateMessageId(): string {
 }
 
 export function DownloadFile(downloadUrl: string, fileName: string) {
-	// Fallback for CORS or other issues
 	var link = document.createElement("a");
 	link.href = downloadUrl;
 	link.download = fileName;
