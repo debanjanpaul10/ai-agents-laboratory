@@ -131,14 +131,6 @@ export default function FileUploadFlyoutComponent({
 		onExistingFilesChange?.(allRemovedfiles);
 	};
 
-	const formatFileSize = (bytes: number) => {
-		if (bytes === 0) return "0 Bytes";
-		const k = 1024;
-		const sizes = ["Bytes", "KB", "MB", "GB"];
-		const i = Math.floor(Math.log(bytes) / Math.log(k));
-		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-	};
-
 	if (!isOpen) return null;
 
 	return (
@@ -247,10 +239,7 @@ export default function FileUploadFlyoutComponent({
 														{doc.name}
 													</p>
 													<p className="text-white/60 text-xs">
-														{formatFileSize(
-															doc.size,
-														)}{" "}
-														• Existing
+														Existing
 													</p>
 												</div>
 											</div>
@@ -307,8 +296,7 @@ export default function FileUploadFlyoutComponent({
 													{file.name}
 												</p>
 												<p className="text-white/60 text-xs">
-													{formatFileSize(file.size)}{" "}
-													• New
+													New
 												</p>
 											</div>
 										</div>
