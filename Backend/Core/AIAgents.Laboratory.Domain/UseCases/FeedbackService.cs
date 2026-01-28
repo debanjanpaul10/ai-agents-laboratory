@@ -1,11 +1,10 @@
-using System.Globalization;
-using System.Text.Json;
 using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
@@ -16,9 +15,20 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="logger">The logger service.</param>
 /// <param name="configuration">The configuration.</param>
 /// <param name="feedbackDataManager">The feedback data manager.</param>
+/// <param name="emailNotificationService">The email notification service.</param>
 /// <seealso cref="IFeedbackService"/>
-public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, IFeedbackDataManager feedbackDataManager) : IFeedbackService
+public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, IFeedbackDataManager feedbackDataManager, IEmailNotificationService emailNotificationService) : IFeedbackService
 {
+    /// <summary>
+    /// The boolean flag to check if feedback feature is enabled.
+    /// </summary>
+    private readonly bool IS_FEEDBACK_FEATURE_ENABLED = bool.TryParse(configuration[AzureAppConfigurationConstants.IsFeedbackFeatureEnabled], out var isEnabled) && isEnabled;
+
+    /// <summary>
+    /// The admin email address from configuration.
+    /// </summary>
+    private readonly string ADMIN_EMAIL_ADDRESS = configuration[AzureAppConfigurationConstants.AdminEmailAddressConstant] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+
     /// <summary>
     /// Adds the new bug report data asynchronous.
     /// </summary>
@@ -30,25 +40,28 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
 
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonSerializer.Serialize(bugReportData)));
-
-            var isFeedbackFeatureEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsFeedbackFeatureEnabled], out var isEnabled) && isEnabled;
-            if (isFeedbackFeatureEnabled)
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(bugReportData));
+            if (IS_FEEDBACK_FEATURE_ENABLED)
             {
                 bugReportData.PrepareBugReportDataDomain();
-                return await feedbackDataManager.AddNewBugReportDataAsync(bugReportData).ConfigureAwait(false);
+                await feedbackDataManager.AddNewBugReportDataAsync(bugReportData).ConfigureAwait(false);
+                await emailNotificationService.SendEmailNotificationAsync(
+                    subject: bugReportData.Title,
+                    content: string.Format(FeedbackTemplateConstants.EmailTemplateHtml, bugReportData.Title, bugReportData.Description, bugReportData.CreatedBy),
+                    recipient: ADMIN_EMAIL_ADDRESS).ConfigureAwait(false);
+                return true;
             }
 
             return false;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, ex.Message);
             throw;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonSerializer.Serialize(bugReportData)));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(bugReportData));
         }
     }
 
@@ -63,26 +76,28 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
 
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonSerializer.Serialize(featureRequestData)));
-            var isFeedbackFeatureEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsFeedbackFeatureEnabled], out var isEnabled) && isEnabled;
-            if (!isFeedbackFeatureEnabled)
-            {
-                return false;
-            }
-            else
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(featureRequestData));
+            if (IS_FEEDBACK_FEATURE_ENABLED)
             {
                 featureRequestData.PrepareNewFeatureRequestDataDomain();
-                return await feedbackDataManager.AddNewFeatureRequestDataAsync(featureRequestData).ConfigureAwait(false);
+                await feedbackDataManager.AddNewFeatureRequestDataAsync(featureRequestData).ConfigureAwait(false);
+                await emailNotificationService.SendEmailNotificationAsync(
+                    subject: featureRequestData.Title,
+                    content: string.Format(FeedbackTemplateConstants.EmailTemplateHtml, featureRequestData.Title, featureRequestData.Description, featureRequestData.CreatedBy),
+                    recipient: ADMIN_EMAIL_ADDRESS).ConfigureAwait(false);
+
+                return true;
             }
+            return false;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, ex.Message);
             throw;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonSerializer.Serialize(featureRequestData)));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(featureRequestData));
         }
     }
 }

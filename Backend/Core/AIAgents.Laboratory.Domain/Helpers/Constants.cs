@@ -1,11 +1,4 @@
-﻿// *********************************************************************************
-//	<copyright file="Constants.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The Constants Class.</summary>
-// *********************************************************************************
-
-namespace AIAgents.Laboratory.Domain.Helpers;
+﻿namespace AIAgents.Laboratory.Domain.Helpers;
 
 /// <summary>
 /// The Constants Class.
@@ -183,6 +176,11 @@ internal static class Constants
         /// The allowed vision images file formats constant.
         /// </summary>
         internal const string AllowedVisionImageFileFormatsConstant = "AllowedVisionImageFileFormats";
+
+        /// <summary>
+        /// The admin user email address constant.
+        /// </summary>
+        internal const string AdminEmailAddressConstant = "AdminEmailAddress";
     }
 
     /// <summary>
@@ -230,5 +228,16 @@ internal static class Constants
         /// The assistant role constant.
         /// </summary>
         internal const string AssistantRoleConstant = "assistant";
+    }
+
+    /// <summary>
+    /// The feedback template constants class.
+    /// </summary>
+    internal static class FeedbackTemplateConstants
+    {
+        /// <summary>
+        /// The email template html.
+        /// </summary>
+        internal const string EmailTemplateHtml = "<html><body><h1>{0}</h1><br/><h4>{1}</h4><p>{2}</p></body></html>";
     }
 }

@@ -47,7 +47,7 @@ export function ToggleDirectChatLoader(isLoading: boolean) {
 
 export function ToggleFeedbackDrawer(
 	isDrawerOpen: boolean,
-	drawerType: FEEDBACK_TYPES
+	drawerType: FEEDBACK_TYPES,
 ) {
 	return {
 		type: TOGGLE_FEEDBACK_DRAWER,
@@ -58,16 +58,10 @@ export function ToggleFeedbackDrawer(
 	};
 }
 
-export function ToggleFeedbackLoader(
-	isDrawerLoading: boolean,
-	drawerType: FEEDBACK_TYPES
-) {
+export function ToggleFeedbackLoader(isDrawerLoading: boolean) {
 	return {
 		type: TOGGLE_FEEDBACK_LOADER,
-		payload: {
-			isDrawerLoading,
-			drawerType,
-		},
+		payload: isDrawerLoading,
 	};
 }
 
@@ -90,14 +84,10 @@ export function GetAllConfigurations() {
 	};
 }
 
-export function GetConfigurationByKeyName(
-	keyName: string,
-) {
+export function GetConfigurationByKeyName(keyName: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
-			const response = await GetConfigurationByKeyNameApiAsync(
-				keyName,
-			);
+			const response = await GetConfigurationByKeyNameApiAsync(keyName);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: GET_CONFIGURATION_BY_KEY_NAME,
@@ -113,15 +103,11 @@ export function GetConfigurationByKeyName(
 	};
 }
 
-export function AddBugReportDataAsync(
-	bugReportData: AddBugReportDTO,
-) {
+export function AddBugReportDataAsync(bugReportData: AddBugReportDTO) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
-			dispatch(ToggleFeedbackLoader(true, FEEDBACK_TYPES.BUGREPORT));
-			const response = await AddBugReportDataApiAsync(
-				bugReportData,
-			);
+			dispatch(ToggleFeedbackLoader(true));
+			const response = await AddBugReportDataApiAsync(bugReportData);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: ADD_NEW_BUG_REPORT,
@@ -129,14 +115,12 @@ export function AddBugReportDataAsync(
 				});
 				ShowSuccessToaster(CommonToasterConstants.BUG_REPORT_ADDED);
 				dispatch(ToggleFeedbackDrawer(false, FEEDBACK_TYPES.BUGREPORT));
-
-				return response.responseData as {};
 			}
 		} catch (error: any) {
 			console.error(error);
 			if (error.message) ShowErrorToaster(error.message);
 		} finally {
-			dispatch(ToggleFeedbackLoader(false, FEEDBACK_TYPES.BUGREPORT));
+			dispatch(ToggleFeedbackLoader(false));
 		}
 	};
 }
@@ -146,29 +130,26 @@ export function SubmitFeatureRequestDataAsync(
 ) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
-			dispatch(ToggleFeedbackLoader(true, FEEDBACK_TYPES.NEWFEATURE));
-			const response = await SubmitFeatureRequestDataApiAsync(
-				newFeatureRequest,
-			);
+			dispatch(ToggleFeedbackLoader(true));
+			const response =
+				await SubmitFeatureRequestDataApiAsync(newFeatureRequest);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: ADD_NEW_FEATURE_REQUEST,
 					payload: response.responseData,
 				});
 				ShowSuccessToaster(
-					CommonToasterConstants.FEATURE_REQUEST_ADDED
+					CommonToasterConstants.FEATURE_REQUEST_ADDED,
 				);
 				dispatch(
-					ToggleFeedbackDrawer(false, FEEDBACK_TYPES.NEWFEATURE)
+					ToggleFeedbackDrawer(false, FEEDBACK_TYPES.NEWFEATURE),
 				);
-
-				return response.responseData as {};
 			}
 		} catch (error: any) {
 			console.error(error);
 			if (error.message) ShowErrorToaster(error.message);
 		} finally {
-			dispatch(ToggleFeedbackLoader(false, FEEDBACK_TYPES.NEWFEATURE));
+			dispatch(ToggleFeedbackLoader(false));
 		}
 	};
 }
