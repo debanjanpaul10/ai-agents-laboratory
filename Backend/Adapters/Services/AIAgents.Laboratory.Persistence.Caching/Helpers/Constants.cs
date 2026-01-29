@@ -3,7 +3,7 @@
 /// <summary>
 /// The Caching Constants class.
 /// </summary>
-internal class Constants
+internal static class Constants
 {
     /// <summary>
     /// The logging constants class.

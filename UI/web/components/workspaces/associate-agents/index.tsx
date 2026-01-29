@@ -17,10 +17,10 @@ export default function AssociateAgentsFlyoutComponent({
 	selectedAgentGuids,
 	onSelectionComplete,
 }: {
-	isOpen: boolean;
-	onClose: () => void;
-	selectedAgentGuids: Set<string>;
-	onSelectionComplete: (selectedGuids: Set<string>) => void;
+	readonly isOpen: boolean;
+	readonly onClose: () => void;
+	readonly selectedAgentGuids: Set<string>;
+	readonly onSelectionComplete: (selectedGuids: Set<string>) => void;
 }) {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [localSelectedGuids, setLocalSelectedGuids] = useState<Set<string>>(
@@ -67,6 +67,79 @@ export default function AssociateAgentsFlyoutComponent({
 		onClose();
 	};
 
+	const renderFilteredAgentsList = () =>
+		filteredAgents && filteredAgents.length > 0 ? (
+			<div className="grid grid-cols-1 gap-4">
+				{filteredAgents.map((agent: any, index: number) => {
+					const agentGuid = agent.agentGuid || agent.agentId || "";
+					const isSelected = localSelectedGuids.has(agentGuid);
+
+					return (
+						<div
+							key={agentGuid || index}
+							onClick={() => toggleLocalSelection(agentGuid)}
+							className={cn(
+								"group relative bg-white/[0.03] border rounded-2xl p-5 cursor-pointer transition-all duration-300",
+								isSelected
+									? "bg-indigo-500/10 border-indigo-500/50 shadow-[0_0_20px_rgba(99,102,241,0.15)] ring-1 ring-indigo-500/50"
+									: "bg-white/[0.03] border-white/5 hover:bg-white/[0.07] hover:border-indigo-500/30",
+							)}
+						>
+							<div className="flex items-start space-x-4">
+								<div
+									className={cn(
+										"p-3 rounded-xl transition-all duration-300",
+										isSelected
+											? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30"
+											: "bg-white/5 text-indigo-400 group-hover:bg-indigo-500/10",
+									)}
+								>
+									<BotMessageSquare className="w-5 h-5" />
+								</div>
+								<div className="flex-1 min-w-0">
+									<div className="flex items-center justify-between">
+										<h4 className="text-white font-bold text-base truncate mb-1">
+											{agent.agentName}
+										</h4>
+										<div
+											className={cn(
+												"w-5 h-5 rounded-full border transition-all flex items-center justify-center",
+												isSelected
+													? "bg-indigo-500 border-indigo-500 shadow-sm"
+													: "bg-white/5 border-white/10",
+											)}
+										>
+											{isSelected && (
+												<Check className="w-3.5 h-3.5 text-white" />
+											)}
+										</div>
+									</div>
+									<p className="text-white/50 text-xs leading-relaxed line-clamp-2">
+										{agent.agentDescription ||
+											"This agent is specialized and ready to assist with your workspace tasks."}
+									</p>
+								</div>
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		) : (
+			<div className="flex flex-col items-center justify-center h-full space-y-6 opacity-50 py-20">
+				<div className="p-6 bg-white/5 rounded-3xl ring-1 ring-white/10">
+					<Info className="w-12 h-12 text-white/20" />
+				</div>
+				<div className="text-center">
+					<p className="text-white font-semibold text-lg">
+						No Agents Available
+					</p>
+					<p className="text-white/40 text-sm mt-1">
+						Try refreshing or creating a new agent.
+					</p>
+				</div>
+			</div>
+		);
+
 	if (!isOpen) return null;
 
 	return (
@@ -85,8 +158,7 @@ export default function AssociateAgentsFlyoutComponent({
 							</h3>
 							<p className="text-white/40 text-sm font-medium">
 								{localSelectedGuids.size} selection
-								{localSelectedGuids.size !== 1 ? "s" : ""}{" "}
-								active
+								{localSelectedGuids.size > 1 ? "s" : ""} active
 							</p>
 						</div>
 					</div>
@@ -141,80 +213,8 @@ export default function AssociateAgentsFlyoutComponent({
 								</div>
 							))}
 						</div>
-					) : filteredAgents && filteredAgents.length > 0 ? (
-						<div className="grid grid-cols-1 gap-4">
-							{filteredAgents.map((agent: any, index: number) => {
-								const agentGuid =
-									agent.agentGuid || agent.agentId || "";
-								const isSelected =
-									localSelectedGuids.has(agentGuid);
-
-								return (
-									<div
-										key={agentGuid || index}
-										onClick={() =>
-											toggleLocalSelection(agentGuid)
-										}
-										className={cn(
-											"group relative bg-white/[0.03] border rounded-2xl p-5 cursor-pointer transition-all duration-300",
-											isSelected
-												? "bg-indigo-500/10 border-indigo-500/50 shadow-[0_0_20px_rgba(99,102,241,0.15)] ring-1 ring-indigo-500/50"
-												: "bg-white/[0.03] border-white/5 hover:bg-white/[0.07] hover:border-indigo-500/30",
-										)}
-									>
-										<div className="flex items-start space-x-4">
-											<div
-												className={cn(
-													"p-3 rounded-xl transition-all duration-300",
-													isSelected
-														? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30"
-														: "bg-white/5 text-indigo-400 group-hover:bg-indigo-500/10",
-												)}
-											>
-												<BotMessageSquare className="w-5 h-5" />
-											</div>
-											<div className="flex-1 min-w-0">
-												<div className="flex items-center justify-between">
-													<h4 className="text-white font-bold text-base truncate mb-1">
-														{agent.agentName}
-													</h4>
-													<div
-														className={cn(
-															"w-5 h-5 rounded-full border transition-all flex items-center justify-center",
-															isSelected
-																? "bg-indigo-500 border-indigo-500 shadow-sm"
-																: "bg-white/5 border-white/10",
-														)}
-													>
-														{isSelected && (
-															<Check className="w-3.5 h-3.5 text-white" />
-														)}
-													</div>
-												</div>
-												<p className="text-white/50 text-xs leading-relaxed line-clamp-2">
-													{agent.agentDescription ||
-														"This agent is specialized and ready to assist with your workspace tasks."}
-												</p>
-											</div>
-										</div>
-									</div>
-								);
-							})}
-						</div>
 					) : (
-						<div className="flex flex-col items-center justify-center h-full space-y-6 opacity-50 py-20">
-							<div className="p-6 bg-white/5 rounded-3xl ring-1 ring-white/10">
-								<Info className="w-12 h-12 text-white/20" />
-							</div>
-							<div className="text-center">
-								<p className="text-white font-semibold text-lg">
-									No Agents Available
-								</p>
-								<p className="text-white/40 text-sm mt-1">
-									Try refreshing or creating a new agent.
-								</p>
-							</div>
-						</div>
+						<>{renderFilteredAgentsList()}</>
 					)}
 				</div>
 

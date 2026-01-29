@@ -14,7 +14,7 @@ import { MarkdownRenderer } from "@components/common/markdown-renderer";
 export default function TestAgentComponent({
 	editFormData,
 	onClose,
-}: TestAgentComponentProps) {
+}: Readonly<TestAgentComponentProps>) {
 	const dispatch = useAppDispatch();
 
 	const [messages, setMessages] = useState<Array<ChatMessage>>([]);
@@ -217,9 +217,9 @@ export default function TestAgentComponent({
 					</div>
 				) : (
 					<div className="space-y-4">
-						{messages.map((message, index) => (
+						{messages.map((message, _) => (
 							<div
-								key={index}
+								key={message.id}
 								className={`flex ${
 									message.type === "user"
 										? "justify-end"

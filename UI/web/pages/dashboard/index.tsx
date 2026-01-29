@@ -49,31 +49,36 @@ export default function DashboardComponent() {
 		dispatch(GetAllConfigurations());
 	}
 
-	return !authContext.isAuthenticated ? (
+	const renderAuthorizedDashboard = () =>
+		IsLoadingStoreData ? (
+			<FullScreenLoading
+				isLoading={IsLoadingStoreData}
+				message={DashboardConstants.LoadingConstants.MainLoader}
+			/>
+		) : (
+			<MainLayout isFullWidth={true} contentClassName="p-6">
+				<div className="space-y-6">
+					<WelcomeCardComponent />
+
+					{/* Main Grid */}
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+						<ActiveAgentsTileComponent />
+						<QuickActionsTileComponent />
+						<SystemHealthTileComponent />
+					</div>
+				</div>
+				<DirectChatComponent />
+				<FeedbackComponent />
+				<FooterComponent />
+			</MainLayout>
+		);
+
+	return authContext.isAuthenticated ? (
+		renderAuthorizedDashboard()
+	) : (
 		<FullScreenLoading
 			isLoading={true}
 			message={DashboardConstants.LoadingConstants.LoginRedirectLoader}
 		/>
-	) : IsLoadingStoreData ? (
-		<FullScreenLoading
-			isLoading={IsLoadingStoreData}
-			message={DashboardConstants.LoadingConstants.MainLoader}
-		/>
-	) : (
-		<MainLayout isFullWidth={true} contentClassName="p-6">
-			<div className="space-y-6">
-				<WelcomeCardComponent />
-
-				{/* Main Grid */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-					<ActiveAgentsTileComponent />
-					<QuickActionsTileComponent />
-					<SystemHealthTileComponent />
-				</div>
-			</div>
-			<DirectChatComponent />
-			<FeedbackComponent />
-			<FooterComponent />
-		</MainLayout>
 	);
 }

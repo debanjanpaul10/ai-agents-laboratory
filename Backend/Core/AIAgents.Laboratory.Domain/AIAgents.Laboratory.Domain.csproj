@@ -16,4 +16,10 @@
     <ProjectReference Include="..\AIAgents.Laboratory.Processor\AIAgents.Laboratory.Processor.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Templates\FeedbackEmail.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

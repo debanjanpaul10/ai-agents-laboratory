@@ -11,7 +11,7 @@ export default function ActiveAgentsTileComponent() {
 	const [activeAgentsCount, setActiveAgentsCount] = useState<number>(0);
 
 	const TopActiveAgentsStoreData = useAppSelector<TopActiveAgentsDTO>(
-		(state) => state.CommonReducer.topActiveAgents
+		(state) => state.CommonReducer.topActiveAgents,
 	);
 
 	useEffect(() => {
@@ -67,7 +67,7 @@ export default function ActiveAgentsTileComponent() {
 												<Clock className="w-4 h-4 flex-shrink-0" />
 												<span>
 													{new Date(
-														agent.dateModified
+														agent.dateModified,
 													).toDateString()}
 												</span>
 											</span>
@@ -102,18 +102,18 @@ export default function ActiveAgentsTileComponent() {
 
 							<div className="space-y-2 mt-3">
 								{DashboardConstants.ActiveAgentsTile.Steps.map(
-									(item: string, index: number) => {
+									(item, _) => {
 										return (
 											<div
 												className="flex items-center text-gray-400 text-xs"
-												key={index}
+												key={item}
 											>
 												<ChevronsRight className="text-blue-400" />
 												&nbsp;
 												{item}
 											</div>
 										);
-									}
+									},
 								)}
 							</div>
 						</div>

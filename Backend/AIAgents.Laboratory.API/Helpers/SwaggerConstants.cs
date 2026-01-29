@@ -13,11 +13,11 @@ internal static class SwaggerConstants
         /// <summary>
         /// Swagger documentation for GetSQLQueryMarkdownResponseAsync
         /// </summary>
-        internal static class GetSQLQueryMarkdownResponseAction
+        internal static class GetSqlQueryMarkdownResponseAction
         {
             internal const string Summary = "Gets the markdown response for sql query json.";
             internal const string Description = "Gets a properly formatted markdown table and response format from a json sql request.";
-            internal const string OperationId = nameof(GetSQLQueryMarkdownResponseAction);
+            internal const string OperationId = nameof(GetSqlQueryMarkdownResponseAction);
         }
 
         /// <summary>
@@ -53,21 +53,21 @@ internal static class SwaggerConstants
         /// <summary>
         /// Swagger documentation for GetRAGTextResponseAsync.
         /// </summary>
-        internal static class GetRAGTextResponseAction
+        internal static class GetRagTextResponseAction
         {
             internal const string Summary = "Gives the RAG text response based on user query.";
             internal const string Description = "Gives the RAG text response based on user query and knowledge base passed on.";
-            internal const string OperationId = nameof(GetRAGTextResponseAction);
+            internal const string OperationId = nameof(GetRagTextResponseAction);
         }
 
         /// <summary>
         /// Swagger documentation for GetNLToSQLResponseAsync.
         /// </summary>
-        internal static class GetNLToSQLResponseAction
+        internal static class GetNlToSqlResponseAction
         {
             internal const string Summary = "Gives the Nl to sql response based on user query.";
             internal const string Description = "Creates a SQL query based on user's query, knowledge base and database schema.";
-            internal const string OperationId = nameof(GetNLToSQLResponseAction);
+            internal const string OperationId = nameof(GetNlToSqlResponseAction);
         }
     }
 

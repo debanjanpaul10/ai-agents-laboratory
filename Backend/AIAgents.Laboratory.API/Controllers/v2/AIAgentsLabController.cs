@@ -59,7 +59,7 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     [SwaggerOperation(Summary = GetConfigurationsDataAction.Summary, Description = GetConfigurationsDataAction.Description, OperationId = GetConfigurationsDataAction.OperationId)]
     public ResponseDTO GetConfigurationByKeyName([FromRoute] string configKey)
     {
-        ArgumentException.ThrowIfNullOrEmpty(configKey, ExceptionConstants.MissingConfigurationMessage);
+        ArgumentException.ThrowIfNullOrEmpty(configKey);
         if (base.IsAuthorized(UserBased))
         {
             var result = commonAiHandler.GetConfigurationByKeyName(configKey);
@@ -83,7 +83,7 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     [SwaggerOperation(Summary = AddBugReportDataAction.Summary, Description = AddBugReportDataAction.Description, OperationId = AddBugReportDataAction.OperationId)]
     public async Task<ResponseDTO> AddBugReportDataAsync([FromBody] AddBugReportDTO addBugReport)
     {
-        ArgumentNullException.ThrowIfNull(addBugReport, ExceptionConstants.InvalidBugReportDataMessage);
+        ArgumentNullException.ThrowIfNull(addBugReport);
         if (base.IsAuthorized(UserBased))
         {
             addBugReport.CreatedBy = base.UserEmail;
@@ -108,7 +108,7 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     [SwaggerOperation(Summary = SubmitFeatureRequestDataAction.Summary, Description = SubmitFeatureRequestDataAction.Description, OperationId = SubmitFeatureRequestDataAction.OperationId)]
     public async Task<ResponseDTO> SubmitFeatureRequestDataAsync([FromBody] NewFeatureRequestDTO newFeatureRequest)
     {
-        ArgumentNullException.ThrowIfNull(newFeatureRequest, ExceptionConstants.InvalidFeatureRequestDataMessage);
+        ArgumentNullException.ThrowIfNull(newFeatureRequest);
         if (base.IsAuthorized(UserBased))
         {
             newFeatureRequest.CreatedBy = base.UserEmail;

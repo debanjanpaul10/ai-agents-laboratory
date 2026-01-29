@@ -28,10 +28,10 @@ apiClient.interceptors.response.use(
 		return response;
 	},
 	(error) => {
-		if (error.response && error.response.status === 401) {
+		if (error.response?.status === 401) {
 			tokenService.clearToken();
-			if (typeof window !== "undefined") {
-				window.location.href = "/";
+			if (globalThis.window !== undefined) {
+				globalThis.location.href = "/";
 			}
 		}
 		return Promise.reject(error);
@@ -50,9 +50,7 @@ export async function GetAsync(apiUrl: string): Promise<ResponseDTO> {
 			};
 	} catch (error: any) {
 		console.error(error);
-		return Promise.reject(
-			error.response ? error.response.data : error.message,
-		);
+		throw error(error.response ? error.response.data : error.message);
 	}
 }
 
@@ -71,9 +69,7 @@ export async function PostAsync(
 			};
 	} catch (error: any) {
 		console.error(error);
-		return Promise.reject(
-			error.response ? error.response.data : error.message,
-		);
+		throw error(error.response ? error.response.data : error.message);
 	}
 }
 
@@ -89,9 +85,7 @@ export async function DeleteAsync(apiUrl: string): Promise<ResponseDTO> {
 			};
 	} catch (error: any) {
 		console.error(error);
-		return Promise.reject(
-			error.response ? error.response.data : error.message,
-		);
+		throw error(error.response ? error.response.data : error.message);
 	}
 }
 
@@ -110,8 +104,6 @@ export async function PutAsync(
 			};
 	} catch (error: any) {
 		console.error(error);
-		return Promise.reject(
-			error.response ? error.response.data : error.message,
-		);
+		throw error(error.response ? error.response.data : error.message);
 	}
 }

@@ -25,7 +25,7 @@ public static class DIContainer
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddRelationalSqlDependencies(this IServiceCollection services, IConfiguration configuration, bool isDevelopmentMode)
     {
-        var currentSqlServiceProvider = configuration[ConfigurationConstants.CurrentSQLProviderConstant] ?? throw new Exception(ErrorMessages.DatabaseConnectionNotFound);
+        var currentSqlServiceProvider = configuration[ConfigurationConstants.CurrentSQLProviderConstant] ?? throw new KeyNotFoundException(ErrorMessages.DatabaseConnectionNotFound);
         switch (currentSqlServiceProvider)
         {
             case DatabaseConstants.AzureSQLConstant:

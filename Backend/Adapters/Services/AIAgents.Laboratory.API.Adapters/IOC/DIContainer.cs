@@ -19,7 +19,6 @@ public static class DIContainer
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddAPIAdapterDependencies(this IServiceCollection services) =>
         services.AddScoped<ICommonAiHandler, CommonAiHandler>()
-            .AddScoped<IChatbotSkillsHandler, ChatbotSkillsHandler>()
             .AddScoped<IAgentsHandler, AgentsHandler>()
             .AddScoped<IChatHandler, ChatHandler>()
             .AddScoped<IFeedbackHandler, FeedbackHandler>()

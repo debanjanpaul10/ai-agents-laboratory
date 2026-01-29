@@ -117,6 +117,7 @@ export const WorkspacesConstants = {
 	CreateWorkspaceConstants: {
 		Header: "Add New Workspace",
 		SubHeader: "Create a new workspace as playground for your agents",
+		Protip: "Workspaces help you organize agents and collaborate with teammates in an isolated environment.",
 	},
 };
 

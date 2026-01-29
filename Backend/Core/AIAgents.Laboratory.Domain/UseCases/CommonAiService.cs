@@ -1,4 +1,3 @@
-using System.Globalization;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
@@ -41,17 +40,17 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAgentCurrentStatus), DateTime.UtcNow, string.Empty));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentCurrentStatus), DateTime.UtcNow, string.Empty);
             return agentStatusStore.Current;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentCurrentStatus), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentCurrentStatus), DateTime.UtcNow, ex.Message);
+            return new() { IsAvailable = false };
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetAgentCurrentStatus), DateTime.UtcNow, string.Empty));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentCurrentStatus), DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -91,7 +90,7 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationsData), DateTime.UtcNow, ex.Message);
-            throw;
+            return [];
         }
         finally
         {
@@ -108,7 +107,7 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationByKeyName), DateTime.UtcNow, key));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationByKeyName), DateTime.UtcNow, key);
 
             var cachedkeyValue = cacheService.GetCachedData<Dictionary<string, string>>(key);
             if (cachedkeyValue is not null && cachedkeyValue.Count > 0)
@@ -123,12 +122,12 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationByKeyName), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationByKeyName), DateTime.UtcNow, ex.Message);
+            return [];
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationByKeyName), DateTime.UtcNow, key));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationByKeyName), DateTime.UtcNow, key);
         }
     }
 
@@ -149,7 +148,7 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            return (0, []);
         }
         finally
         {

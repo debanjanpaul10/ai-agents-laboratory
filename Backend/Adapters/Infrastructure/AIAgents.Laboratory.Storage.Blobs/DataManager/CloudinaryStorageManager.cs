@@ -22,12 +22,14 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
     /// <summary>
     /// The Cloudinary knowledge base folder name.
     /// </summary>
-    private readonly string CloudinaryKnowledgeBaseFolderName = configuration[AzureAppConfigurationConstants.CloudinaryKnowledgebaseFolderNameConstant] ?? throw new InvalidOperationException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string CloudinaryKnowledgeBaseFolderName = configuration[AzureAppConfigurationConstants.CloudinaryKnowledgebaseFolderNameConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The Cloudinary vision images folder name.
     /// </summary>
-    private readonly string CloudinaryVisionImagesFolderName = configuration[AzureAppConfigurationConstants.CloudinaryImageFolderNameConstant] ?? throw new InvalidOperationException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string CloudinaryVisionImagesFolderName = configuration[AzureAppConfigurationConstants.CloudinaryImageFolderNameConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// Deletes the documents data and folder from blob storage.
@@ -84,7 +86,7 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            return false;
         }
         finally
         {
@@ -138,7 +140,7 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            return string.Empty;
         }
         finally
         {
@@ -151,7 +153,7 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
     /// </summary>
     /// <param name="documentFile">The user uploaded document file.</param>
     /// <param name="agentGuid">The agent guid id.</param>
-    /// <param name="folderName">The storage folder name.</param>
+    /// <param name="fileType">The uploaded file type.</param>
     /// <returns>The public URL for the document.</returns>
     public async Task<string> UploadDocumentsToStorageAsync(IFormFile documentFile, string agentGuid, UploadedFileType fileType)
     {
@@ -185,7 +187,7 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            return string.Empty;
         }
         finally
         {

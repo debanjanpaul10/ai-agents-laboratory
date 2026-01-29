@@ -25,7 +25,7 @@ export default function WorkspacesListComponent({
 	showCloseButton = true,
 	actionButton,
 	onEditWorkspace,
-}: WorkspacesListComponentProps) {
+}: Readonly<WorkspacesListComponentProps>) {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [selectedCreator, setSelectedCreator] = useState<string>("all");
 	const [sortBy, setSortBy] = useState<"name" | "date">("date");
@@ -40,7 +40,7 @@ export default function WorkspacesListComponent({
 			),
 		];
 
-		return creators.sort();
+		return creators.sort((a, b) => a.localeCompare(b));
 	}, [workspacesList]);
 
 	const filteredAndSortedWorkspaces = useMemo(() => {

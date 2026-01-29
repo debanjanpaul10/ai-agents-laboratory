@@ -4,10 +4,8 @@ import {
 	X,
 	Bot,
 	Sparkles,
-	ScrollText,
 	Expand,
 	Files,
-	Link,
 	GlobeLock,
 	Images,
 	ScanEye,
@@ -155,6 +153,8 @@ export default function CreateAgentFlyoutComponent({
 		selectedAiVisionImages.length > 0;
 
 	const renderAgentKnowledgeBaseData = () => {
+		const pluralWord = selectedKnowledgeFiles.length > 1 ? "s" : "";
+
 		return (
 			<div className="space-y-2">
 				<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
@@ -174,12 +174,7 @@ export default function CreateAgentFlyoutComponent({
 									{selectedKnowledgeFiles.length > 0
 										? `${
 												selectedKnowledgeFiles.length
-											} file${
-												selectedKnowledgeFiles.length !==
-												1
-													? "s"
-													: ""
-											} selected`
+											} file${pluralWord} selected`
 										: "Choose files"}
 								</span>
 								{selectedKnowledgeFiles.length > 0 && (
@@ -214,6 +209,8 @@ export default function CreateAgentFlyoutComponent({
 	};
 
 	const renderAiVisionUploadData = () => {
+		const pluralWord = selectedAiVisionImages.length > 1 ? "s" : "";
+
 		return (
 			<div className="space-y-2">
 				<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
@@ -233,12 +230,7 @@ export default function CreateAgentFlyoutComponent({
 									{selectedAiVisionImages.length > 0
 										? `${
 												selectedAiVisionImages.length
-											} file${
-												selectedAiVisionImages.length !==
-												1
-													? "s"
-													: ""
-											} selected`
+											} file${pluralWord} selected`
 										: "Choose images"}
 								</span>
 								{selectedAiVisionImages.length > 0 && (
@@ -273,6 +265,8 @@ export default function CreateAgentFlyoutComponent({
 	};
 
 	const renderAssociateToolSkillsData = () => {
+		const pluralWord = selectedSkillGuids.length > 1 ? "s" : "";
+
 		return (
 			<div className="space-y-2">
 				<label className="text-white/80 text-sm font-medium flex items-center space-x-2">
@@ -291,9 +285,7 @@ export default function CreateAgentFlyoutComponent({
 								<span className="text-white font-medium">
 									{selectedSkillGuids.length > 0
 										? `${selectedSkillGuids.length} skill${
-												selectedSkillGuids.length !== 1
-													? "s"
-													: ""
+												pluralWord
 											} associated`
 										: "Associate skills"}
 								</span>
@@ -374,7 +366,10 @@ export default function CreateAgentFlyoutComponent({
 
 						{/* Agent Name Field */}
 						<div className="space-y-2">
-							<label className="text-white/80 font-semibold text-sm ml-1">
+							<label
+								className="text-white/80 font-semibold text-sm ml-1"
+								htmlFor="agentName"
+							>
 								Agent Name
 							</label>
 							<Input
@@ -404,7 +399,10 @@ export default function CreateAgentFlyoutComponent({
 
 						{/* Application Name Field */}
 						<div className="space-y-2">
-							<label className="text-white/80 font-semibold text-sm ml-1">
+							<label
+								className="text-white/80 font-semibold text-sm ml-1"
+								htmlFor="applicationName"
+							>
 								Application Name
 							</label>
 							<Input
@@ -443,7 +441,10 @@ export default function CreateAgentFlyoutComponent({
 
 						{/* Agent Description Field */}
 						<div className="space-y-2">
-							<label className="text-white/80 font-semibold text-sm ml-1">
+							<label
+								className="text-white/80 font-semibold text-sm ml-1"
+								htmlFor="agentDescription"
+							>
 								Agent Description
 							</label>
 							<div className="relative group">
@@ -467,7 +468,10 @@ export default function CreateAgentFlyoutComponent({
 
 						{/* Meta Prompt Field */}
 						<div className="space-y-2">
-							<label className="text-white/80 font-semibold text-sm ml-1 flex items-center justify-between">
+							<label
+								className="text-white/80 font-semibold text-sm ml-1 flex items-center justify-between"
+								htmlFor="agentMetaPrompt"
+							>
 								<span>Agent Meta Prompt</span>
 								<span className="text-[10px] text-white/30 uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded-full">
 									System Instructions
@@ -530,7 +534,11 @@ export default function CreateAgentFlyoutComponent({
 										</p>
 									</div>
 								</div>
-								<label className="relative inline-flex items-center cursor-pointer">
+								<label
+									className="relative inline-flex items-center cursor-pointer"
+									htmlFor="isPrivate"
+									aria-label="Is Private"
+								>
 									<input
 										type="checkbox"
 										checked={formData.isPrivate}

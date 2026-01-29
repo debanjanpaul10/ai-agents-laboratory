@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "@store/index";
 import {
 	GetAllToolSkillsAsync,
 	ToggleAddSkillDrawer,
+	ToggleMcpToolsDrawer,
 } from "@store/tools-skills/actions";
 import { GetAllConfigurations } from "@store/common/actions";
 import { FullScreenLoading } from "@components/common/spinner";
@@ -17,7 +18,6 @@ import CreateSkillComponent from "@components/marketplace/create-skill";
 import EditSkillFlyoutComponent from "@components/marketplace/edit-skill";
 import McpToolsListFlyoutComponent from "@components/marketplace/mcp-tools-list";
 import { ToolSkillDTO } from "@models/response/tool-skill-dto";
-import { ToggleMcpToolsDrawer } from "@store/tools-skills/actions";
 
 export default function MarketplaceComponent() {
 	const dispatch = useAppDispatch();
@@ -54,6 +54,8 @@ export default function MarketplaceComponent() {
 	const IsMcpToolsFlyoutOpen = useAppSelector<boolean>(
 		(state) => state.ToolSkillsReducer.isMcpToolsDrawerOpen,
 	);
+
+	const isAnyDrawerOpen = isEditDrawerOpen || IsAddSkillDrawerOpenStoreData;
 
 	useEffect(() => {
 		if (authContext.isAuthenticated && !authContext.isLoading) {
@@ -92,73 +94,73 @@ export default function MarketplaceComponent() {
 		dispatch(GetAllConfigurations());
 	}
 
-	const handleCreateNewSkill = () => {
+	function HandleCreateNewSkill() {
 		dispatch(ToggleAddSkillDrawer(true));
-	};
+	}
 
-	const isAnyDrawerOpen = isEditDrawerOpen || IsAddSkillDrawerOpenStoreData;
+	const renderMarketPlace = () =>
+		IsSkillsMarketPlaceLoading ? (
+			<FullScreenLoading
+				isLoading={IsSkillsMarketPlaceLoading}
+				message={DashboardConstants.LoadingConstants.MainLoader}
+			/>
+		) : (
+			<MainLayout contentClassName="p-0" isFullWidth={true}>
+				<div className="w-full h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-black">
+					<SkillsListComponent
+						toolSkillsList={ToolSkillsListStoreData}
+						handleSkillClick={handleSkillClick}
+						onClose={() => {}}
+						isDisabled={isAnyDrawerOpen}
+						showCloseButton={false}
+						actionButton={
+							<Button
+								onPress={HandleCreateNewSkill}
+								className="bg-white/5 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-white font-medium px-6 rounded-xl transition-all duration-300 group shadow-lg"
+							>
+								<Plus className="w-4 h-4 mr-2 text-blue-400 group-hover:text-blue-300 group-hover:scale-110 transition-all" />
+								<span>Add New Skill</span>
+							</Button>
+						}
+					/>
+					<CreateSkillComponent />
+					<McpToolsListFlyoutComponent
+						isOpen={IsMcpToolsFlyoutOpen}
+						onClose={() => dispatch(ToggleMcpToolsDrawer(false))}
+					/>
+				</div>
 
-	return !authContext.isAuthenticated ? (
+				{/* Backdrop Overlay */}
+				{isAnyDrawerOpen && (
+					<div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300" />
+				)}
+
+				{/* Edit Skill Drawer */}
+				{isEditDrawerOpen && (
+					<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/2 w-full">
+						<div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
+							<EditSkillFlyoutComponent
+								editFormData={editFormData}
+								selectedSkill={selectedSkill}
+								setEditFormData={setEditFormData}
+								setSelectedSkill={setSelectedSkill}
+								isEditDrawerOpen={isEditDrawerOpen}
+								onEditClose={() => setIsEditDrawerOpen(false)}
+								isDisabled={false}
+							/>
+						</div>
+					</div>
+				)}
+			</MainLayout>
+		);
+
+	return authContext.isAuthenticated ? (
+		renderMarketPlace()
+	) : (
 		<FullScreenLoading
 			isLoading={true}
 			message={MarketplaceConstants.LoadingConstants.LoginRedirectLoader}
 		/>
-	) : IsSkillsMarketPlaceLoading ? (
-		<FullScreenLoading
-			isLoading={IsSkillsMarketPlaceLoading}
-			message={DashboardConstants.LoadingConstants.MainLoader}
-		/>
-	) : (
-		<MainLayout contentClassName="p-0" isFullWidth={true}>
-			<div className="w-full h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-black">
-				<SkillsListComponent
-					toolSkillsList={ToolSkillsListStoreData}
-					handleSkillClick={handleSkillClick}
-					onClose={() => {}}
-					isDisabled={isAnyDrawerOpen}
-					showCloseButton={false}
-					actionButton={
-						<Button
-							onPress={handleCreateNewSkill}
-							className="bg-white/5 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-white font-medium px-6 rounded-xl transition-all duration-300 group shadow-lg"
-						>
-							<Plus className="w-4 h-4 mr-2 text-blue-400 group-hover:text-blue-300 group-hover:scale-110 transition-all" />
-							<span>Add New Skill</span>
-						</Button>
-					}
-				/>
-				<CreateSkillComponent />
-				<McpToolsListFlyoutComponent
-					isOpen={IsMcpToolsFlyoutOpen}
-					onClose={() => dispatch(ToggleMcpToolsDrawer(false))}
-				/>
-			</div>
-
-			{/* Backdrop Overlay */}
-			{isAnyDrawerOpen && (
-				<div
-					className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300"
-					onClick={() => {}}
-				/>
-			)}
-
-			{/* Edit Skill Drawer */}
-			{isEditDrawerOpen && (
-				<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/2 w-full">
-					<div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
-					<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
-						<EditSkillFlyoutComponent
-							editFormData={editFormData}
-							selectedSkill={selectedSkill}
-							setEditFormData={setEditFormData}
-							setSelectedSkill={setSelectedSkill}
-							isEditDrawerOpen={isEditDrawerOpen}
-							onEditClose={() => setIsEditDrawerOpen(false)}
-							isDisabled={false}
-						/>
-					</div>
-				</div>
-			)}
-		</MainLayout>
 	);
 }

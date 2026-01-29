@@ -1,9 +1,7 @@
-﻿using System.Globalization;
-using AIAgents.Laboratory.Processor.Contracts;
+﻿using AIAgents.Laboratory.Processor.Contracts;
 using AIAgents.Laboratory.Processor.Helpers;
 using AIAgents.Laboratory.Processor.Models;
 using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
@@ -59,12 +57,12 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
                 return this.ReadTextFileData(knowledgeBaseDocumentDomain);
 
             else
-                throw new Exception(ExceptionConstants.UnsupportedFileTypeMessage);
+                throw new FileFormatException(ExceptionConstants.UnsupportedFileTypeMessage);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            return string.Empty;
         }
         finally
         {
@@ -102,8 +100,8 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, ex.Message);
+            return string.Empty;
         }
         finally
         {
@@ -158,7 +156,6 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message);
-            throw;
         }
         finally
         {
@@ -193,47 +190,12 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
             var workbookPart = spreadsheetDocument.WorkbookPart;
             if (workbookPart?.Workbook.Sheets is null) return string.Empty;
 
-            var sharedStringTable = workbookPart.SharedStringTablePart?.SharedStringTable;
-            var stringBuilder = new System.Text.StringBuilder();
-
-            foreach (Sheet sheet in workbookPart.Workbook.Sheets.OfType<Sheet>())
-            {
-                // Add sheet name as a simple header separator
-                var sheetName = sheet.Name?.Value;
-                if (!string.IsNullOrWhiteSpace(sheetName))
-                {
-                    stringBuilder.AppendLine(sheetName);
-                    stringBuilder.AppendLine(new string('-', sheetName.Length));
-                }
-
-                var worksheetPart = workbookPart.GetPartById(sheet.Id!) as WorksheetPart;
-                var rows = worksheetPart?.Worksheet?.GetFirstChild<SheetData>()?.Elements<Row>();
-                if (rows is null)
-                {
-                    stringBuilder.AppendLine();
-                    continue;
-                }
-
-                foreach (var row in rows)
-                {
-                    var cellValues = new List<string>();
-                    foreach (var cell in row.Elements<Cell>())
-                        cellValues.Add(Utility.GetCellText(cell, sharedStringTable));
-
-                    // Join cell values with tabs to preserve some structure
-                    if (cellValues.Count > 0)
-                        stringBuilder.AppendLine(string.Join('\t', cellValues));
-                }
-
-                stringBuilder.AppendLine();
-            }
-
-            return stringBuilder.ToString();
+            return Utility.PrepareExcelData(workbookPart);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadSpreadsheetData), DateTime.UtcNow, ex.Message);
-            throw;
+            return string.Empty;
         }
         finally
         {
@@ -266,19 +228,15 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
             if (body is null) return string.Empty;
 
             var stringBuilder = new System.Text.StringBuilder();
-            foreach (var paragraph in body.Elements<Paragraph>())
-            {
-                var text = paragraph.InnerText;
-                if (!string.IsNullOrWhiteSpace(text))
-                    stringBuilder.AppendLine(text.Trim());
-            }
+            foreach (var paragraph in body.Elements<Paragraph>().Select(p => p.InnerText).Where(item => !string.IsNullOrWhiteSpace(item.Trim())))
+                stringBuilder.AppendLine(paragraph);
 
             return stringBuilder.ToString();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadWordFileData), DateTime.UtcNow, ex.Message);
-            throw;
+            return string.Empty;
         }
         finally
         {
@@ -325,7 +283,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadPdfFileData), DateTime.UtcNow, ex.Message);
-            throw;
+            return string.Empty;
         }
         finally
         {
@@ -352,7 +310,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadTextFileData), DateTime.UtcNow, ex.Message);
-            throw;
+            return string.Empty;
         }
         finally
         {

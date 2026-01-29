@@ -4,7 +4,7 @@ import { ThemeProvider } from "@components/common/providers/theme-provider";
 export function ClientThemeProvider({
 	children,
 	...props
-}: React.ComponentProps<typeof ThemeProvider>) {
+}: Readonly<React.ComponentProps<typeof ThemeProvider>>) {
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {

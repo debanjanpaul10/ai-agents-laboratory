@@ -2,16 +2,12 @@ import React from "react";
 import Image from "next/image";
 
 import AppLogo from "@public/images/icon.png";
-
-interface LoadingSpinnerProps {
-	size?: "sm" | "md" | "lg" | "xl";
-	className?: string;
-}
+import { FullScreenLoadingProps, LoadingSpinnerProps } from "@shared/types";
 
 export function LoadingSpinner({
 	size = "md",
 	className = "",
-}: LoadingSpinnerProps) {
+}: Readonly<LoadingSpinnerProps>) {
 	const sizeClasses = {
 		sm: "w-4 h-4",
 		md: "w-6 h-6",
@@ -33,15 +29,10 @@ export function LoadingSpinner({
 	);
 }
 
-interface FullScreenLoadingProps {
-	isLoading: boolean;
-	message?: string;
-}
-
 export function FullScreenLoading({
 	isLoading,
 	message = "Loading AI Agents Laboratory...",
-}: FullScreenLoadingProps) {
+}: Readonly<FullScreenLoadingProps>) {
 	if (!isLoading) return null;
 
 	return (

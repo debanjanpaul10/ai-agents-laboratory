@@ -9,16 +9,13 @@ export default function GroupChatPopupComponent({
 	title,
 	description,
 	isLoading = false,
-}: PopupComponentProps) {
+}: Readonly<PopupComponentProps>) {
 	if (!isOpen) return null;
 
 	return (
 		<div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
 			{/* Backdrop */}
-			<div
-				className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300"
-				onClick={!isLoading ? onClose : undefined}
-			/>
+			<div className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300" />
 
 			{/* Modal Container */}
 			<div className="relative w-full max-w-md transform transition-all duration-300 ease-out animate-in zoom-in-95 fade-in duration-300">

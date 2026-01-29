@@ -31,9 +31,8 @@ public abstract class BaseController(IHttpContextAccessor httpContextAccessor, I
         if (httpContextAccessor.HttpContext is not null && httpContextAccessor.HttpContext?.User is not null)
         {
             // User Authentication
-            if (authorizationType == AuthorizationTypes.UserBased)
-                if (!string.IsNullOrEmpty(this.UserEmail) && !this.UserEmail.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
-                    return true && this.CheckApplicationLevelAuthorization();
+            if (authorizationType == AuthorizationTypes.UserBased && !string.IsNullOrEmpty(this.UserEmail) && !this.UserEmail.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
+                return this.CheckApplicationLevelAuthorization();
 
             // Application Authentication
             if (authorizationType == AuthorizationTypes.ApplicationBased)
@@ -90,7 +89,8 @@ public abstract class BaseController(IHttpContextAccessor httpContextAccessor, I
     private bool CheckApplicationLevelAuthorization()
     {
         var currentClientId = this.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.ClientIdClaimConstant))?.Value;
-        var aiAgentsClientIdFromConfig = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant] ?? throw new Exception(ExceptionConstants.MissingConfigurationMessage);
+        var aiAgentsClientIdFromConfig = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant]
+            ?? throw new KeyNotFoundException(configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant]);
         if (!string.IsNullOrEmpty(currentClientId) && !currentClientId.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
             return currentClientId.Equals(aiAgentsClientIdFromConfig, StringComparison.OrdinalIgnoreCase);
 

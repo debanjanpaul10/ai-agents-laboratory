@@ -1,8 +1,17 @@
+import { useEffect, useState } from "react";
 import { useMsal } from "@azure/msal-react";
 import { Spotlight } from "lucide-react";
 
 export default function WelcomeCardComponent() {
 	const { accounts } = useMsal();
+
+	const [userName, setUserName] = useState<string>("");
+	const [userEmail, setUserEmail] = useState<string>("");
+
+	useEffect(() => {
+		setUserName(accounts[0].name || accounts[0].username);
+		setUserEmail(accounts[0].username);
+	}, [accounts]);
 
 	return (
 		accounts[0] && (
@@ -13,19 +22,16 @@ export default function WelcomeCardComponent() {
 						<div className="flex items-center space-x-4">
 							<div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
 								<span className="text-white font-bold text-base md:text-lg">
-									{(accounts[0].name || accounts[0].username)
-										.charAt(0)
-										.toUpperCase()}
+									{userName.charAt(0).toUpperCase()}
 								</span>
 							</div>
 							<div>
 								<h2 className="text-base md:text-xl font-semibold text-white mb-1">
-									Welcome,{" "}
-									{accounts[0].name || accounts[0].username}!
+									Welcome, {userName}!
 								</h2>
 								<p className="text-white/70 flex items-center space-x-2 text-xs md:text-base">
 									<Spotlight />
-									<span>{accounts[0].username}</span>
+									<span>{userEmail}</span>
 								</p>
 							</div>
 						</div>

@@ -1,6 +1,9 @@
 ﻿using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Messaging.Adapters.Services;
+using Azure.Communication.Email;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using static AIAgents.Laboratory.Messaging.Adapters.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Messaging.Adapters.IOC;
 
@@ -14,6 +17,13 @@ public static class DIContainer
     /// </summary>
     /// <param name="services">The services.</param>
     /// <returns>The services collection.</returns>
-    public static IServiceCollection AddMessagingDependencies(this IServiceCollection services) =>
-        services.AddHostedService<AgentStatusWatcher>().AddSingleton<IAgentStatusStore, AgentStatusStore>();
+    public static IServiceCollection AddMessagingDependencies(this IServiceCollection services, IConfiguration configuration)
+    {
+        var emailNotificationConnectionString = configuration[AzureAppConfigurationConstants.EmailNotificationServiceConnectionString];
+        ArgumentException.ThrowIfNullOrWhiteSpace(emailNotificationConnectionString);
+
+        return services.AddHostedService<AgentStatusWatcher>().AddSingleton<IAgentStatusStore, AgentStatusStore>()
+              .AddSingleton(new EmailClient(emailNotificationConnectionString)).AddScoped<IEmailNotificationService, EmailNotificationService>();
+    }
+
 }

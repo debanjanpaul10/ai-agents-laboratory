@@ -237,6 +237,7 @@ export default function ModifyAgentComponent({
 		const existingCount = visibleExistingDocs.length;
 		const totalCount = selectedKnowledgeFiles.length + existingCount;
 		const hasAnyFiles = totalCount > 0;
+		const pluralWord = totalCount > 1 ? "s" : "";
 
 		return (
 			<div className="space-y-2">
@@ -256,7 +257,7 @@ export default function ModifyAgentComponent({
 								<span className="text-white font-medium">
 									{totalCount > 0
 										? `${totalCount} file${
-												totalCount !== 1 ? "s" : ""
+												pluralWord
 											} selected`
 										: "Choose files"}
 								</span>
@@ -300,6 +301,7 @@ export default function ModifyAgentComponent({
 		const existingCount = visibleExistingImages.length;
 		const totalCount = selectedVisionImages.length + existingCount;
 		const hasAnyFiles = totalCount > 0;
+		const pluralWord = totalCount > 1 ? "s" : "";
 
 		return (
 			<div className="space-y-2">
@@ -319,7 +321,7 @@ export default function ModifyAgentComponent({
 								<span className="text-white font-medium">
 									{totalCount > 0
 										? `${totalCount} file${
-												totalCount !== 1 ? "s" : ""
+												pluralWord
 											} selected`
 										: "Choose images"}
 								</span>
@@ -356,6 +358,7 @@ export default function ModifyAgentComponent({
 
 	const renderAssociateToolSkillsData = () => {
 		const totalCount = editFormData.associatedSkillGuids?.length || 0;
+		const pluralWord = totalCount > 1 ? "s" : "";
 
 		return (
 			<div className="space-y-2">
@@ -375,7 +378,7 @@ export default function ModifyAgentComponent({
 								<span className="text-white font-medium">
 									{totalCount > 0
 										? `${totalCount} skill${
-												totalCount !== 1 ? "s" : ""
+												pluralWord
 											} associated`
 										: "Associate skills"}
 								</span>
@@ -567,7 +570,10 @@ export default function ModifyAgentComponent({
 									Private Agent
 								</span>
 							</div>
-							<label className="relative inline-flex items-center cursor-pointer">
+							<label
+								className="relative inline-flex items-center cursor-pointer"
+								aria-label="Private Agent"
+							>
 								<input
 									type="checkbox"
 									checked={editFormData.isPrivate}

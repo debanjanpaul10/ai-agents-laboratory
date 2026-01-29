@@ -19,7 +19,6 @@ public static class DIContainer
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddDomainDependencies(this IServiceCollection services) =>
         services.AddScoped<ICommonAiService, CommonAiService>()
-            .AddScoped<IChatbotSkillsService, ChatbotSkillsService>()
             .AddScoped<IAgentsService, AgentsService>()
             .AddScoped<IAgentChatService, AgentChatService>()
             .AddScoped<IDirectChatService, DirectChatService>()

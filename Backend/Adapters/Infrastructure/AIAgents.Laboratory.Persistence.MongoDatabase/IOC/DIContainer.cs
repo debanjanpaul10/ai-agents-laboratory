@@ -29,11 +29,11 @@ public static class DIContainer
     /// <returns>The service collection.</returns>
     private static IServiceCollection ConfigureMongoDbServer(this IServiceCollection services, IConfiguration configuration)
     {
-        var mongoDbConnectionString = configuration[ConfigurationConstants.AiAgentsLabMongoConnectionString];
-        ArgumentException.ThrowIfNullOrWhiteSpace(mongoDbConnectionString, nameof(mongoDbConnectionString));
-
         try
         {
+            var mongoDbConnectionString = configuration[ConfigurationConstants.AiAgentsLabMongoConnectionString];
+            ArgumentException.ThrowIfNullOrWhiteSpace(mongoDbConnectionString);
+
             var settings = MongoClientSettings.FromConnectionString(mongoDbConnectionString);
             settings.UseTls = true;
             settings.SslSettings = new SslSettings()
@@ -46,7 +46,7 @@ public static class DIContainer
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Failed to configure MongoDB client. Connection string format may be incorrect. Error: {ex.Message}", ex);
+            throw new InvalidOperationException(string.Format(ExceptionConstants.FailedToConfigureMongoDbClientExceptionMessage, ex.Message));
         }
 
         return services;

@@ -8,15 +8,14 @@ export default function McpToolsListFlyoutComponent({
 	isOpen,
 	onClose,
 }: {
-	isOpen: boolean;
-	onClose: () => void;
+	readonly isOpen: boolean;
+	readonly onClose: () => void;
 }) {
 	const [mcpServerTools, setMcpServerTools] = useState<McpServerToolsDTO[]>();
 
 	const McpServerToolsStoreData = useAppSelector<McpServerToolsDTO[]>(
 		(state) => state.ToolSkillsReducer.mcpServerTools || [],
 	);
-
 	const IsLoading = useAppSelector<boolean>(
 		(state) => state.ToolSkillsReducer.isMcpToolsLoading,
 	);
@@ -24,6 +23,40 @@ export default function McpToolsListFlyoutComponent({
 	useEffect(() => {
 		setMcpServerTools(McpServerToolsStoreData);
 	}, [McpServerToolsStoreData]);
+
+	const renderMcpToolsList = () =>
+		mcpServerTools && mcpServerTools.length > 0 ? (
+			mcpServerTools.map((tool, _) => (
+				<div
+					key={tool.toolName}
+					className="group relative bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 hover:border-cyan-500/30 transition-all duration-300"
+				>
+					<div className="flex items-start space-x-3">
+						<div className="bg-cyan-500/10 p-2 rounded-lg group-hover:bg-cyan-500/20 transition-colors">
+							<Zap className="w-4 h-4 text-cyan-400" />
+						</div>
+						<div className="flex-1 min-w-0">
+							<h4 className="text-white font-semibold text-sm truncate">
+								{tool.toolName}
+							</h4>
+							<p className="text-white/50 text-xs mt-1 leading-relaxed line-clamp-3">
+								{tool.toolDescription ||
+									"No description provided."}
+							</p>
+						</div>
+					</div>
+				</div>
+			))
+		) : (
+			<div className="flex flex-col items-center justify-center h-full space-y-4 opacity-50">
+				<div className="p-4 bg-white/5 rounded-full">
+					<Info className="w-8 h-8 text-white/20" />
+				</div>
+				<p className="text-white/40 text-sm font-medium">
+					No tools found
+				</p>
+			</div>
+		);
 
 	if (!isOpen) return null;
 
@@ -73,37 +106,8 @@ export default function McpToolsListFlyoutComponent({
 								</div>
 							))}
 						</div>
-					) : mcpServerTools && mcpServerTools.length > 0 ? (
-						mcpServerTools.map((tool, index) => (
-							<div
-								key={index}
-								className="group relative bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 hover:border-cyan-500/30 transition-all duration-300"
-							>
-								<div className="flex items-start space-x-3">
-									<div className="bg-cyan-500/10 p-2 rounded-lg group-hover:bg-cyan-500/20 transition-colors">
-										<Zap className="w-4 h-4 text-cyan-400" />
-									</div>
-									<div className="flex-1 min-w-0">
-										<h4 className="text-white font-semibold text-sm truncate">
-											{tool.toolName}
-										</h4>
-										<p className="text-white/50 text-xs mt-1 leading-relaxed line-clamp-3">
-											{tool.toolDescription ||
-												"No description provided."}
-										</p>
-									</div>
-								</div>
-							</div>
-						))
 					) : (
-						<div className="flex flex-col items-center justify-center h-full space-y-4 opacity-50">
-							<div className="p-4 bg-white/5 rounded-full">
-								<Info className="w-8 h-8 text-white/20" />
-							</div>
-							<p className="text-white/40 text-sm font-medium">
-								No tools found
-							</p>
-						</div>
+						<>{renderMcpToolsList()}</>
 					)}
 				</div>
 

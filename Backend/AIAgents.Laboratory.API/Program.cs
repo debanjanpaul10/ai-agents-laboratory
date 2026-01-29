@@ -67,4 +67,4 @@ app.UseCors();
 app.MapControllers();
 app.MapHub<AgentStatusHub>(RouteConstants.AgentStatusHub_Route);
 
-app.Run();
+await app.RunAsync();

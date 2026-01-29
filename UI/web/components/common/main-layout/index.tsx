@@ -18,7 +18,7 @@ export default function MainLayout({
 			<div className={`ml-85 ${contentClassName || "p-8"}`}>
 				<main
 					className={`${
-						!isFullWidth ? "max-w-7xl mx-auto" : "w-full"
+						isFullWidth ? "w-full" : "max-w-7xl mx-auto"
 					} h-full`}
 				>
 					{children}

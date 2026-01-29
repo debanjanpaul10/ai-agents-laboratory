@@ -67,15 +67,4 @@ internal static class AgentServiceHelpers
         if (string.IsNullOrWhiteSpace(functionName))
             throw new ArgumentNullException(nameof(functionName), ExceptionConstants.SomethingWentWrongMessage);
     }
-
-    /// <summary>
-    /// Validates the MCP server URL parameter.
-    /// </summary>
-    /// <param name="mcpServerUrl">The MCP server URL to validate.</param>
-    /// <exception cref="ArgumentNullException">Thrown when the MCP server URL is null or empty.</exception>
-    internal static void ValidateMcpServerUrl(string mcpServerUrl)
-    {
-        if (string.IsNullOrWhiteSpace(mcpServerUrl))
-            throw new ArgumentNullException(nameof(mcpServerUrl), ExceptionConstants.SomethingWentWrongMessage);
-    }
 }
