@@ -13,7 +13,7 @@ import { CommonToasterConstants } from "@helpers/toaster-constants";
 export default function BugReportComponent({
 	onClose,
 }: {
-	onClose: () => void;
+	readonly onClose: () => void;
 }) {
 	const authContext = useAuth();
 	const dispatch = useAppDispatch();
@@ -51,7 +51,7 @@ export default function BugReportComponent({
 				authContext.user?.email ||
 				authContext.user?.name ||
 				"Anonymous",
-			agentDetails: formData.agentDetails || window.location.href,
+			agentDetails: formData.agentDetails || globalThis.location.href,
 		};
 
 		dispatch(AddBugReportDataAsync(bugReport));

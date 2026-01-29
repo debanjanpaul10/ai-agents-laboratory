@@ -65,6 +65,9 @@ export default function WorkspacesComponent() {
 		(state) => state.WorkspacesReducer.isAddWorkspaceDrawerOpen,
 	);
 
+	const isAnyDrawerOpen =
+		isEditDrawerOpen || IsAddWorkspaceDrawerOpenStoreData;
+
 	useEffect(() => {
 		if (authContext.isAuthenticated && !authContext.isLoading) {
 			GetAllWorkspacesData();
@@ -128,88 +131,91 @@ export default function WorkspacesComponent() {
 		setSelectedWorkspace(null);
 	};
 
-	const isAnyDrawerOpen =
-		isEditDrawerOpen || IsAddWorkspaceDrawerOpenStoreData;
+	const renderWorkspaces = () =>
+		IsWorkspacesLoading ? (
+			<FullScreenLoading
+				isLoading={IsWorkspacesLoading}
+				message={WorkspacesConstants.LoadingConstants.MainLoader}
+			/>
+		) : (
+			<MainLayout contentClassName="p-0" isFullWidth={true}>
+				<div className="w-full h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-black">
+					<WorkspacesListComponent
+						workspacesList={WorkspacesListStoreData}
+						handleWorkspaceClick={(workspaceId: string) =>
+							router.push(`/workspace/${workspaceId}`)
+						}
+						onEditWorkspace={handleEditWorkspace}
+						onClose={() => {}}
+						isDisabled={isAnyDrawerOpen}
+						showCloseButton={false}
+						actionButton={
+							<Button
+								onPress={handleCreateNewWorkspaceClick}
+								className="bg-white/5 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-white font-medium px-6 rounded-xl transition-all duration-300 group shadow-lg"
+							>
+								<Plus className="w-4 h-4 mr-2 text-blue-400 group-hover:text-blue-300 group-hover:scale-110 transition-all" />
+								<span>Add New Workspace</span>
+							</Button>
+						}
+					/>
+					<CreateWorkspaceComponent
+						onOpenAssociateAgents={handleOpenAssociateAgents}
+					/>
+					<AssociateAgentsFlyoutComponent
+						isOpen={associateAgentsState.isOpen}
+						onClose={handleAssociateAgentsClose}
+						selectedAgentGuids={associateAgentsState.selectedGuids}
+						onSelectionComplete={
+							handleAssociateAgentsSelectionComplete
+						}
+					/>
 
-	return !authContext.isAuthenticated ? (
+					{/* Delete Popup */}
+					<DeletePopupComponent
+						isOpen={isDeletePopupOpen}
+						onClose={() => setIsDeletePopupOpen(false)}
+						onAction={confirmDeleteWorkspace}
+						title="Delete Workspace"
+						description="Are you sure you want to delete this workspace? This action cannot be undone and will remove all associated data."
+						isLoading={IsWorkspacesLoading}
+					/>
+				</div>
+
+				{/* Backdrop Overlay */}
+				{isAnyDrawerOpen && (
+					<div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300" />
+				)}
+
+				{/* Edit Workspace Drawer */}
+				{isEditDrawerOpen && (
+					<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/2 w-full">
+						<div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
+						<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
+							<EditWorkspaceFlyoutComponent
+								editFormData={editFormData}
+								selectedWorkspace={selectedWorkspace}
+								setEditFormData={setEditFormData}
+								setSelectedWorkspace={setSelectedWorkspace}
+								isEditDrawerOpen={isEditDrawerOpen}
+								onEditClose={() => setIsEditDrawerOpen(false)}
+								isDisabled={false}
+								onOpenAssociateAgents={
+									handleOpenAssociateAgents
+								}
+							/>
+						</div>
+					</div>
+				)}
+			</MainLayout>
+		);
+
+	return authContext.isAuthenticated ? (
+		renderWorkspaces
+	) : (
 		<FullScreenLoading
 			isLoading={true}
 			message={WorkspacesConstants.LoadingConstants.LoginRedirectLoader}
 		/>
-	) : IsWorkspacesLoading ? (
-		<FullScreenLoading
-			isLoading={IsWorkspacesLoading}
-			message={WorkspacesConstants.LoadingConstants.MainLoader}
-		/>
-	) : (
-		<MainLayout contentClassName="p-0" isFullWidth={true}>
-			<div className="w-full h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-black">
-				<WorkspacesListComponent
-					workspacesList={WorkspacesListStoreData}
-					handleWorkspaceClick={(workspaceId: string) =>
-						router.push(`/workspace/${workspaceId}`)
-					}
-					onEditWorkspace={handleEditWorkspace}
-					onClose={() => {}}
-					isDisabled={isAnyDrawerOpen}
-					showCloseButton={false}
-					actionButton={
-						<Button
-							onPress={handleCreateNewWorkspaceClick}
-							className="bg-white/5 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-white font-medium px-6 rounded-xl transition-all duration-300 group shadow-lg"
-						>
-							<Plus className="w-4 h-4 mr-2 text-blue-400 group-hover:text-blue-300 group-hover:scale-110 transition-all" />
-							<span>Add New Workspace</span>
-						</Button>
-					}
-				/>
-				<CreateWorkspaceComponent
-					onOpenAssociateAgents={handleOpenAssociateAgents}
-				/>
-				<AssociateAgentsFlyoutComponent
-					isOpen={associateAgentsState.isOpen}
-					onClose={handleAssociateAgentsClose}
-					selectedAgentGuids={associateAgentsState.selectedGuids}
-					onSelectionComplete={handleAssociateAgentsSelectionComplete}
-				/>
-
-				{/* Delete Popup */}
-				<DeletePopupComponent
-					isOpen={isDeletePopupOpen}
-					onClose={() => setIsDeletePopupOpen(false)}
-					onAction={confirmDeleteWorkspace}
-					title="Delete Workspace"
-					description="Are you sure you want to delete this workspace? This action cannot be undone and will remove all associated data."
-					isLoading={IsWorkspacesLoading}
-				/>
-			</div>
-
-			{/* Backdrop Overlay */}
-			{isAnyDrawerOpen && (
-				<div
-					className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300"
-					onClick={() => {}}
-				/>
-			)}
-
-			{/* Edit Workspace Drawer */}
-			{isEditDrawerOpen && (
-				<div className="fixed top-0 right-0 h-screen z-50 transition-all duration-500 ease-in-out md:w-1/2 w-full">
-					<div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 via-teal-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
-					<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl">
-						<EditWorkspaceFlyoutComponent
-							editFormData={editFormData}
-							selectedWorkspace={selectedWorkspace}
-							setEditFormData={setEditFormData}
-							setSelectedWorkspace={setSelectedWorkspace}
-							isEditDrawerOpen={isEditDrawerOpen}
-							onEditClose={() => setIsEditDrawerOpen(false)}
-							isDisabled={false}
-							onOpenAssociateAgents={handleOpenAssociateAgents}
-						/>
-					</div>
-				</div>
-			)}
-		</MainLayout>
 	);
 }

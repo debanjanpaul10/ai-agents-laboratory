@@ -13,7 +13,7 @@ import { CommonToasterConstants } from "@helpers/toaster-constants";
 export default function FeatureRequestComponent({
 	onClose,
 }: {
-	onClose: () => void;
+	readonly onClose: () => void;
 }) {
 	const authContext = useAuth();
 	const dispatch = useAppDispatch();
