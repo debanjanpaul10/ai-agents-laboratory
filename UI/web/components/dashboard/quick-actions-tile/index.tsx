@@ -5,7 +5,6 @@ import {
 	Bug,
 	PackagePlus,
 } from "lucide-react";
-import { useRouter } from "next/router";
 
 import { useAppDispatch } from "@store/index";
 import {
@@ -17,7 +16,6 @@ import { DashboardConstants } from "@helpers/constants";
 
 export default function QuickActionsTileComponent() {
 	const dispatch = useAppDispatch();
-	const router = useRouter();
 
 	const toggleDirectChatDrawer = () => {
 		dispatch(ToggleDirectChatDrawer(true));
@@ -82,10 +80,10 @@ export default function QuickActionsTileComponent() {
 
 				{/* Actions Grid */}
 				<div className="flex flex-col space-y-3 flex-1">
-					{actions.map((action, index) => {
+					{actions.map((action, _) => {
 						return (
 							<button
-								key={index}
+								key={action.label}
 								onClick={action.onClick}
 								className="w-full bg-gray-700/30 hover:bg-gray-700/50 backdrop-blur-sm rounded-xl p-3 border border-gray-600/30 hover:border-white/20 transition-all duration-300 group cursor-pointer"
 							>

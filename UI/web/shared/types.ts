@@ -223,3 +223,13 @@ export interface AssociateSkillsFlyoutProps {
 	onSkillsChange: (skillGuids: string[]) => void;
 	selectedSkillGuids: string[];
 }
+
+export interface FullScreenLoadingProps {
+	isLoading: boolean;
+	message?: string;
+}
+
+export interface LoadingSpinnerProps {
+	size?: "sm" | "md" | "lg" | "xl";
+	className?: string;
+}

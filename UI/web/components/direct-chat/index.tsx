@@ -60,10 +60,7 @@ export default function DirectChatComponent() {
 	return (
 		isDrawerOpen && (
 			<>
-				<div
-					className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 max-w-full"
-					onClick={onClose}
-				/>
+				<div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 max-w-full" />
 
 				{isAgentInfoDrawerOpen && (
 					<div className="fixed top-0 md:w-1/2 h-screen z-50 transition-all duration-500 ease-in-out right-1/2">

@@ -76,7 +76,7 @@ export default function EditWorkspaceFlyoutComponent({
 	};
 
 	function HandleWorkspaceDelete() {
-		var workspaceGuidId = editFormData.agentWorkspaceGuid;
+		const workspaceGuidId = editFormData.agentWorkspaceGuid;
 		dispatch(DeleteExistingWorkspaceAsync(workspaceGuidId));
 		setIsDeletePopupOpen(false);
 		handleEditClose();
@@ -192,7 +192,10 @@ export default function EditWorkspaceFlyoutComponent({
 
 							<div className="space-y-4">
 								<div className="space-y-2">
-									<label className="text-white/80 font-semibold text-sm ml-1">
+									<label
+										className="text-white/80 font-semibold text-sm ml-1"
+										htmlFor="agentWorkspaceName"
+									>
 										Workspace Name
 									</label>
 									<Input
@@ -227,7 +230,11 @@ export default function EditWorkspaceFlyoutComponent({
 											(Preview)
 										</span>
 									</label>
-									<label className="relative inline-flex items-end cursor-pointer">
+									<label
+										className="relative inline-flex items-end cursor-pointer"
+										htmlFor="isGroupChatEnabled"
+										aria-label="Is Groupchat Enabled"
+									>
 										<input
 											type="checkbox"
 											checked={
@@ -252,7 +259,10 @@ export default function EditWorkspaceFlyoutComponent({
 							</div>
 
 							<div className="space-y-4">
-								<label className="text-white/80 font-semibold text-sm ml-1">
+								<label
+									className="text-white/80 font-semibold text-sm ml-1"
+									htmlFor="selectedAgent"
+								>
 									Workspace Agents
 								</label>
 								<div className="flex gap-3">
@@ -303,8 +313,8 @@ export default function EditWorkspaceFlyoutComponent({
 									<Button
 										isIconOnly
 										className="h-[56px] w-[56px] min-w-[56px] bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-400/10 text-cyan-400 transition-all duration-300 rounded-2xl group/btn disabled:opacity-50"
-										onPress={async () => {
-											await GetAllAvailableAgents();
+										onPress={() => {
+											GetAllAvailableAgents();
 											onOpenAssociateAgents(
 												selectedAgentGuids,
 												handleAgentSelectionComplete,
@@ -333,7 +343,10 @@ export default function EditWorkspaceFlyoutComponent({
 
 							<div className="space-y-4">
 								<div className="space-y-2">
-									<label className="text-white/80 font-semibold text-sm ml-1">
+									<label
+										className="text-white/80 font-semibold text-sm ml-1"
+										htmlFor="newUserEmail"
+									>
 										Add Member Email
 									</label>
 									<div className="flex space-x-3">

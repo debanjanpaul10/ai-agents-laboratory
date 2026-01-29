@@ -211,7 +211,7 @@ export default function WorkspacesComponent() {
 		);
 
 	return authContext.isAuthenticated ? (
-		renderWorkspaces
+		renderWorkspaces()
 	) : (
 		<FullScreenLoading
 			isLoading={true}

@@ -19,7 +19,7 @@ export default function AssociatedAgentsListPaneComponent({
 	selectedAgent,
 	setSelectedAgent,
 	isGroupChatEnabled,
-}: AssociatedAgentsListPaneProps) {
+}: Readonly<AssociatedAgentsListPaneProps>) {
 	const router = useRouter();
 
 	const [activeAssociatedAgents, setActiveAssociatedAgents] = useState<
@@ -50,9 +50,7 @@ export default function AssociatedAgentsListPaneComponent({
 						</h2>
 						<p className="text-white/60 text-sm">
 							{activeAssociatedAgents.length} agent
-							{activeAssociatedAgents.length !== 1
-								? "s"
-								: ""}{" "}
+							{activeAssociatedAgents.length > 1 ? "s" : ""}{" "}
 							available
 						</p>
 					</div>

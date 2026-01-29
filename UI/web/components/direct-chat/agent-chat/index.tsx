@@ -223,9 +223,9 @@ export default function AgentChatComponent({
 					</div>
 				) : (
 					<div className="space-y-4">
-						{messages.map((message, index) => (
+						{messages.map((message, _) => (
 							<div
-								key={index}
+								key={message.id}
 								className={`flex ${
 									message.type === "user"
 										? "justify-end"
