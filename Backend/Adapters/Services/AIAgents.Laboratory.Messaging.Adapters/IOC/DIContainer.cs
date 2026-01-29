@@ -17,23 +17,13 @@ public static class DIContainer
     /// </summary>
     /// <param name="services">The services.</param>
     /// <returns>The services collection.</returns>
-    public static IServiceCollection AddMessagingDependencies(this IServiceCollection services, IConfiguration configuration) =>
-        services.AddHostedService<AgentStatusWatcher>().AddSingleton<IAgentStatusStore, AgentStatusStore>()
-            .AddEmailNotificationService(configuration);
-
-    /// <summary>
-    /// Adds the email notification service.
-    /// </summary>
-    /// <param name="services">The service collection.</param>
-    /// <param name="configuration">The configuration service.</param>
-    /// <returns>The service collection.</returns>
-    /// <exception cref="Exception"></exception>
-    internal static IServiceCollection AddEmailNotificationService(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddMessagingDependencies(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration[AzureAppConfigurationConstants.EmailNotificationServiceConnectionString]
-            ?? throw new Exception(ExceptionMessagesConstants.ConfigurationMissingExceptionMessage);
+        var emailNotificationConnectionString = configuration[AzureAppConfigurationConstants.EmailNotificationServiceConnectionString];
+        ArgumentException.ThrowIfNullOrWhiteSpace(emailNotificationConnectionString);
 
-        return services.AddSingleton(new EmailClient(connectionString))
-            .AddScoped<IEmailNotificationService, EmailNotificationService>();
+        return services.AddHostedService<AgentStatusWatcher>().AddSingleton<IAgentStatusStore, AgentStatusStore>()
+              .AddSingleton(new EmailClient(emailNotificationConnectionString)).AddScoped<IEmailNotificationService, EmailNotificationService>();
     }
+
 }

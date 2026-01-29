@@ -22,7 +22,7 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
     /// <summary>
     /// The admin email address from configuration.
     /// </summary>
-    private readonly string ADMIN_EMAIL_ADDRESS = configuration[AzureAppConfigurationConstants.AdminEmailAddressConstant] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string ADMIN_EMAIL_ADDRESS = configuration[AzureAppConfigurationConstants.AdminEmailAddressConstant] ?? throw new ArgumentNullException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// Adds the new bug report data asynchronous.
@@ -78,7 +78,7 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
             var template = await File.ReadAllTextAsync(FeedbackTemplateConstants.FileName).ConfigureAwait(false);
             var emailSendResult = await emailNotificationService.SendEmailNotificationAsync(
                 subject: featureRequestData.Title,
-                content: string.Format(FeedbackTemplateConstants.EmailTemplateHtml, featureRequestData.Title, featureRequestData.Description, featureRequestData.CreatedBy),
+                content: string.Format(template, featureRequestData.Title, featureRequestData.Description, featureRequestData.CreatedBy),
                 recipient: ADMIN_EMAIL_ADDRESS).ConfigureAwait(false);
 
             return feedbackSaveResult && emailSendResult;

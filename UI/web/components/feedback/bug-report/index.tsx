@@ -139,7 +139,9 @@ export default function BugReportComponent({
 								const value = Array.from(keys)[0];
 								handleInputChange(
 									"bugSeverity",
-									value ? parseInt(value as string) : 0,
+									value
+										? Number.parseInt(value as string)
+										: 0,
 								);
 							}}
 							placeholder={

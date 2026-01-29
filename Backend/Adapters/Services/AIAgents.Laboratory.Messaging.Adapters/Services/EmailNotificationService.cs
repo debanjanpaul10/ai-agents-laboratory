@@ -20,7 +20,7 @@ public sealed class EmailNotificationService(ILogger<EmailNotificationService> l
     /// The email communication service sender address.
     /// </summary>
     private readonly string EMAIL_COMMUNICATION_SENDER = configuration[AzureAppConfigurationConstants.EmailNotificationServiceSenderAddress]
-        ?? throw new Exception(ExceptionMessagesConstants.ConfigurationMissingExceptionMessage);
+        ?? throw new ArgumentNullException(ExceptionMessagesConstants.ConfigurationMissingExceptionMessage);
 
     /// <summary>
     /// Sends an email notification asynchronously.
