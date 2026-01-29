@@ -239,5 +239,10 @@ internal static class Constants
         /// The email template html.
         /// </summary>
         internal const string EmailTemplateHtml = "<html><body><h1>{0}</h1><br/><h4>{1}</h4><p>{2}</p></body></html>";
+
+        /// <summary>
+        /// The file name for email template.
+        /// </summary>
+        internal const string FileName = "Templates/FeedbackEmail.html";
     }
 }

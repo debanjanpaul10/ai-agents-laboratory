@@ -20,11 +20,6 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, IFeedbackDataManager feedbackDataManager, IEmailNotificationService emailNotificationService) : IFeedbackService
 {
     /// <summary>
-    /// The boolean flag to check if feedback feature is enabled.
-    /// </summary>
-    private readonly bool IS_FEEDBACK_FEATURE_ENABLED = bool.TryParse(configuration[AzureAppConfigurationConstants.IsFeedbackFeatureEnabled], out var isEnabled) && isEnabled;
-
-    /// <summary>
     /// The admin email address from configuration.
     /// </summary>
     private readonly string ADMIN_EMAIL_ADDRESS = configuration[AzureAppConfigurationConstants.AdminEmailAddressConstant] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
@@ -41,18 +36,17 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(bugReportData));
-            if (IS_FEEDBACK_FEATURE_ENABLED)
-            {
-                bugReportData.PrepareBugReportDataDomain();
-                await feedbackDataManager.AddNewBugReportDataAsync(bugReportData).ConfigureAwait(false);
-                await emailNotificationService.SendEmailNotificationAsync(
-                    subject: bugReportData.Title,
-                    content: string.Format(FeedbackTemplateConstants.EmailTemplateHtml, bugReportData.Title, bugReportData.Description, bugReportData.CreatedBy),
-                    recipient: ADMIN_EMAIL_ADDRESS).ConfigureAwait(false);
-                return true;
-            }
 
-            return false;
+            bugReportData.PrepareAuditEntityData(bugReportData.CreatedBy);
+            var feedbackSaveResult = await feedbackDataManager.AddNewBugReportDataAsync(bugReportData).ConfigureAwait(false);
+
+            var template = await File.ReadAllTextAsync(FeedbackTemplateConstants.FileName).ConfigureAwait(false);
+            var emailSendResult = await emailNotificationService.SendEmailNotificationAsync(
+                subject: bugReportData.Title,
+                content: string.Format(template, bugReportData.Title, bugReportData.Description, bugReportData.CreatedBy),
+                recipient: ADMIN_EMAIL_ADDRESS).ConfigureAwait(false);
+
+            return feedbackSaveResult && emailSendResult;
         }
         catch (Exception ex)
         {
@@ -77,18 +71,17 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(featureRequestData));
-            if (IS_FEEDBACK_FEATURE_ENABLED)
-            {
-                featureRequestData.PrepareNewFeatureRequestDataDomain();
-                await feedbackDataManager.AddNewFeatureRequestDataAsync(featureRequestData).ConfigureAwait(false);
-                await emailNotificationService.SendEmailNotificationAsync(
-                    subject: featureRequestData.Title,
-                    content: string.Format(FeedbackTemplateConstants.EmailTemplateHtml, featureRequestData.Title, featureRequestData.Description, featureRequestData.CreatedBy),
-                    recipient: ADMIN_EMAIL_ADDRESS).ConfigureAwait(false);
 
-                return true;
-            }
-            return false;
+            featureRequestData.PrepareAuditEntityData(featureRequestData.CreatedBy);
+            var feedbackSaveResult = await feedbackDataManager.AddNewFeatureRequestDataAsync(featureRequestData).ConfigureAwait(false);
+
+            var template = await File.ReadAllTextAsync(FeedbackTemplateConstants.FileName).ConfigureAwait(false);
+            var emailSendResult = await emailNotificationService.SendEmailNotificationAsync(
+                subject: featureRequestData.Title,
+                content: string.Format(FeedbackTemplateConstants.EmailTemplateHtml, featureRequestData.Title, featureRequestData.Description, featureRequestData.CreatedBy),
+                recipient: ADMIN_EMAIL_ADDRESS).ConfigureAwait(false);
+
+            return feedbackSaveResult && emailSendResult;
         }
         catch (Exception ex)
         {

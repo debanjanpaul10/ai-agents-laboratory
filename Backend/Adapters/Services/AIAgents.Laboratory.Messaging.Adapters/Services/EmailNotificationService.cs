@@ -35,14 +35,15 @@ public sealed class EmailNotificationService(ILogger<EmailNotificationService> l
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(SendEmailNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { subject, content, recipient }));
 
-            var emailSendingOperation = await emailClient.SendAsync(
-                wait: Azure.WaitUntil.Started,
+            EmailSendOperation emailSendingOperation = await emailClient.SendAsync(
+                wait: Azure.WaitUntil.Completed,
                 senderAddress: EMAIL_COMMUNICATION_SENDER,
                 recipientAddress: recipient,
                 subject: subject,
                 htmlContent: content).ConfigureAwait(false);
 
-            return true;
+            EmailSendResult status = emailSendingOperation.Value;
+            return status.Status == EmailSendStatus.Succeeded;
         }
         catch (Exception ex)
         {
