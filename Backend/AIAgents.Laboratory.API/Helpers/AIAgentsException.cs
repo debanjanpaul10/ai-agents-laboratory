@@ -1,11 +1,4 @@
-﻿// *********************************************************************************
-//	<copyright file="AIAgentsException.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The AI Agents Exception Class.</summary>
-// *********************************************************************************
-
-namespace AIAgents.Laboratory.API.Helpers;
+﻿namespace AIAgents.Laboratory.API.Helpers;
 
 /// <summary>
 /// The AI Agents Exception Class.

@@ -52,7 +52,7 @@ public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService>
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetCachedData), DateTime.UtcNow, ex.Message);
-            throw;
+            return default!;
         }
         finally
         {
@@ -93,7 +93,7 @@ public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService>
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(RemoveCachedData), DateTime.UtcNow, ex.Message);
-            throw;
+            return false;
         }
         finally
         {
@@ -129,7 +129,7 @@ public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService>
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(SetCacheData), DateTime.UtcNow, ex.Message);
-            throw;
+            return false;
         }
         finally
         {

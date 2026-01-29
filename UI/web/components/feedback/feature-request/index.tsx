@@ -13,7 +13,7 @@ import { CommonToasterConstants } from "@helpers/toaster-constants";
 export default function FeatureRequestComponent({
 	onClose,
 }: {
-	onClose: () => void;
+	readonly onClose: () => void;
 }) {
 	const authContext = useAuth();
 	const dispatch = useAppDispatch();
@@ -27,7 +27,7 @@ export default function FeatureRequestComponent({
 
 	const handleInputChange = (
 		field: keyof NewFeatureRequestDTO,
-		value: string
+		value: string,
 	) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
@@ -47,10 +47,7 @@ export default function FeatureRequestComponent({
 				"Anonymous",
 		};
 
-		dispatch(
-			SubmitFeatureRequestDataAsync(featureRequest)
-		);
-
+		dispatch(SubmitFeatureRequestDataAsync(featureRequest));
 		setIsSubmitting(false);
 	}
 

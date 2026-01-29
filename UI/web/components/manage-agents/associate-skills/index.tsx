@@ -12,7 +12,7 @@ export default function AssociateSkillsFlyoutComponent({
 	onClose,
 	onSkillsChange,
 	selectedSkillGuids,
-}: AssociateSkillsFlyoutProps) {
+}: Readonly<AssociateSkillsFlyoutProps>) {
 	const [skills, setSkills] = useState<ToolSkillDTO[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [searchQuery, setSearchQuery] = useState<string>("");
@@ -61,6 +61,71 @@ export default function AssociateSkillsFlyoutComponent({
 				.toLowerCase()
 				.includes(searchQuery.toLowerCase()),
 	);
+
+	const renderAssociatedSkillsList = () => {
+		return filteredSkills.length > 0 ? (
+			filteredSkills.map((skill) => (
+				<div
+					key={skill.toolSkillGuid}
+					onClick={() => toggleSkill(skill.toolSkillGuid)}
+					className={`relative group cursor-pointer transition-all duration-300 p-4 rounded-xl border ${
+						localSelectedGuids.includes(skill.toolSkillGuid)
+							? "bg-cyan-500/10 border-cyan-500/40"
+							: "bg-white/5 border-white/10 hover:border-white/20"
+					}`}
+					onKeyDown={() => toggleSkill(skill.toolSkillGuid)}
+				>
+					<div className="flex items-center justify-between">
+						<div className="flex items-center space-x-4">
+							<div
+								className={`p-2 rounded-lg transition-colors duration-300 ${
+									localSelectedGuids.includes(
+										skill.toolSkillGuid,
+									)
+										? "bg-cyan-500/20"
+										: "bg-white/10"
+								}`}
+							>
+								<Terminal
+									className={`w-5 h-5 ${
+										localSelectedGuids.includes(
+											skill.toolSkillGuid,
+										)
+											? "text-cyan-400"
+											: "text-white/60"
+									}`}
+								/>
+							</div>
+							<div>
+								<h4 className="text-white font-semibold">
+									{skill.toolSkillDisplayName}
+								</h4>
+								<p className="text-white/40 text-xs font-mono">
+									{skill.toolSkillTechnicalName}
+								</p>
+							</div>
+						</div>
+						<div
+							className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+								localSelectedGuids.includes(skill.toolSkillGuid)
+									? "bg-cyan-500 border-cyan-500 scale-110 shadow-lg shadow-cyan-500/20"
+									: "bg-white/5 border-white/10"
+							}`}
+						>
+							{localSelectedGuids.includes(
+								skill.toolSkillGuid,
+							) && <Check className="w-4 h-4 text-white" />}
+						</div>
+					</div>
+				</div>
+			))
+		) : (
+			<div className="h-full flex flex-col items-center justify-center space-y-3 opacity-40 py-12">
+				<Search className="w-12 h-12" />
+				<p>{AssociateSkillsFlyoutPropsConstants.Hints.NoSkills}</p>
+			</div>
+		);
+	};
 
 	if (!isOpen) return null;
 
@@ -132,72 +197,8 @@ export default function AssociateSkillsFlyoutComponent({
 							Loading skills...
 						</span>
 					</div>
-				) : filteredSkills.length > 0 ? (
-					filteredSkills.map((skill) => (
-						<div
-							key={skill.toolSkillGuid}
-							onClick={() => toggleSkill(skill.toolSkillGuid)}
-							className={`relative group cursor-pointer transition-all duration-300 p-4 rounded-xl border ${
-								localSelectedGuids.includes(skill.toolSkillGuid)
-									? "bg-cyan-500/10 border-cyan-500/40"
-									: "bg-white/5 border-white/10 hover:border-white/20"
-							}`}
-						>
-							<div className="flex items-center justify-between">
-								<div className="flex items-center space-x-4">
-									<div
-										className={`p-2 rounded-lg transition-colors duration-300 ${
-											localSelectedGuids.includes(
-												skill.toolSkillGuid,
-											)
-												? "bg-cyan-500/20"
-												: "bg-white/10"
-										}`}
-									>
-										<Terminal
-											className={`w-5 h-5 ${
-												localSelectedGuids.includes(
-													skill.toolSkillGuid,
-												)
-													? "text-cyan-400"
-													: "text-white/60"
-											}`}
-										/>
-									</div>
-									<div>
-										<h4 className="text-white font-semibold">
-											{skill.toolSkillDisplayName}
-										</h4>
-										<p className="text-white/40 text-xs font-mono">
-											{skill.toolSkillTechnicalName}
-										</p>
-									</div>
-								</div>
-								<div
-									className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
-										localSelectedGuids.includes(
-											skill.toolSkillGuid,
-										)
-											? "bg-cyan-500 border-cyan-500 scale-110 shadow-lg shadow-cyan-500/20"
-											: "bg-white/5 border-white/10"
-									}`}
-								>
-									{localSelectedGuids.includes(
-										skill.toolSkillGuid,
-									) && (
-										<Check className="w-4 h-4 text-white" />
-									)}
-								</div>
-							</div>
-						</div>
-					))
 				) : (
-					<div className="h-full flex flex-col items-center justify-center space-y-3 opacity-40 py-12">
-						<Search className="w-12 h-12" />
-						<p>
-							{AssociateSkillsFlyoutPropsConstants.Hints.NoSkills}
-						</p>
-					</div>
+					<>{renderAssociatedSkillsList()}</>
 				)}
 			</div>
 

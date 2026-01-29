@@ -81,8 +81,8 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
         }
         catch (Exception ex)
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow, ex.Message);
+            return new();
         }
         finally
         {
@@ -143,7 +143,6 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DelegateToAgentAsync), DateTime.UtcNow, ex.Message);
-            throw;
         }
         finally
         {

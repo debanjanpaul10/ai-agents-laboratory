@@ -40,8 +40,8 @@ internal static class TokenHelper
         }
         catch (Exception ex)
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(GetAiAgentsLabTokenAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiAgentsLabTokenAsync), DateTime.UtcNow, ex.Message);
+            return string.Empty;
         }
         finally
         {

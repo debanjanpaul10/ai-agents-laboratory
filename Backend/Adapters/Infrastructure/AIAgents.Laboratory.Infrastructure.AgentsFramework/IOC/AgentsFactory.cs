@@ -25,7 +25,7 @@ internal static class AgentsFactory
         ArgumentNullException.ThrowIfNull(appConfiguration);
 
         var currentAiServiceProvider = appConfiguration[AzureAppConfigurationConstants.CurrentAiServiceProvider]
-            ?? throw new InvalidOperationException(ExceptionConstants.CurrentAiServiceProviderMissingMessage);
+            ?? throw new KeyNotFoundException(ExceptionConstants.CurrentAiServiceProviderMissingMessage);
 
         var agentConfiguration = BuildAgentConfigurationFromAppConfig(appConfiguration, currentAiServiceProvider);
         return CreateAgentConfiguration(agentConfiguration, serviceProvider);
@@ -168,7 +168,6 @@ internal static class AgentsFactory
             case GoogleGeminiAiConstants.ServiceProviderName:
                 var isProModelEnabled = bool.TryParse(appConfiguration[GoogleGeminiAiConstants.IsProModelEnabledFlag], out bool parsedValue) && parsedValue;
                 var geminiAiModel = isProModelEnabled ? GoogleGeminiAiConstants.GeminiProModel : GoogleGeminiAiConstants.GeminiFlashModel;
-
                 agentConfig.ModelId = appConfiguration[geminiAiModel];
                 agentConfig.ApiKey = appConfiguration[GoogleGeminiAiConstants.GeminiAPIKeyConstant];
                 agentConfig.ServiceProvider = GoogleGeminiAiConstants.ServiceProviderName;

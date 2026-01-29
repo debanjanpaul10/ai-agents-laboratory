@@ -60,7 +60,7 @@ public static class DIContainer
     {
         services.ConfigureAuthenticationServices(configuration);
 
-        services.AddAPIAdapterDependencies().AddMessagingDependencies().AddMemoryCache().AddCacheDependencies();
+        services.AddAPIAdapterDependencies().AddMessagingDependencies(configuration).AddMemoryCache().AddCacheDependencies();
         services.AddAgentsFrameworkDependencies(configuration).AddMongoDbAdapterDependencies(configuration)
             .AddRelationalSqlDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
 

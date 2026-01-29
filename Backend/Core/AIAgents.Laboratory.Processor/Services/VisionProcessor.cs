@@ -62,7 +62,7 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            return [];
         }
         finally
         {

@@ -24,12 +24,12 @@ internal static class Constants
         /// <summary>
         /// The method started message constant
         /// </summary>
-        internal static readonly string MethodStartedMessageConstant = "Method {0} started at {1}";
+        internal const string MethodStartedMessageConstant = "Method {0} started at {1} for {2}";
 
         /// <summary>
         /// The method ended message constant
         /// </summary>
-        internal static readonly string MethodEndedMessageConstant = "Method {0} ended at {1}";
+        internal const string MethodEndedMessageConstant = "Method {0} ended at {1} for {2}";
 
         /// <summary>
         /// The method failed with message constant.
@@ -52,6 +52,16 @@ internal static class Constants
         /// The collection does not exists message
         /// </summary>
         internal const string CollectionDoesNotExistsMessage = "Oops! It seems the collection does not exists";
+
+        /// <summary>
+        /// No document was updated message constant.
+        /// </summary>
+        internal const string NoDocumentWasUpdatedMessageConstant = "No document was updated. Document may not exist or no changes were needed.";
+
+        /// <summary>
+        /// The exception message for failure to configure MongoDB client.
+        /// </summary>
+        internal const string FailedToConfigureMongoDbClientExceptionMessage = "Failed to configure MongoDB client. Connection string format may be incorrect. Error: {0}";
     }
 
 }

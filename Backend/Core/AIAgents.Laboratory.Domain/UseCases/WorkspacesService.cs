@@ -27,12 +27,12 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// <summary>
     /// The mongo database name configuration value.
     /// </summary>
-    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The workspaces collection name configuration value.
     /// </summary>
-    private readonly string WorkspacesCollectionName = configuration[MongoDbCollectionConstants.WorkspaceCollectionName] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string WorkspacesCollectionName = configuration[MongoDbCollectionConstants.WorkspaceCollectionName] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// Creates a new workspace.
@@ -55,8 +55,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, ex.Message);
+            return false;
         }
         finally
         {
@@ -81,7 +81,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
 
             var filter = Builders<AgentsWorkspaceDomain>.Filter.Where(ws => ws.IsActive && ws.AgentWorkspaceGuid == workspaceGuidId);
             var allWorkspaces = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, WorkspacesCollectionName, filter);
-            var updateWorkspace = allWorkspaces.FirstOrDefault() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+            var updateWorkspace = allWorkspaces.FirstOrDefault() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
             if (updateWorkspace.CreatedBy != currentUserEmail)
                 throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
@@ -97,8 +97,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, ex.Message);
+            return false;
         }
         finally
         {
@@ -122,8 +122,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, ex.Message);
+            return [];
         }
         finally
         {
@@ -149,12 +149,12 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
                 Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.AgentWorkspaceGuid, workspaceId));
 
             var allData = await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.WorkspacesCollectionName, filter).ConfigureAwait(false);
-            return allData?.First() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+            return allData?.First() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
         }
         catch (Exception ex)
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, ex.Message);
+            return new();
         }
         finally
         {
@@ -178,17 +178,17 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
                 chatRequest.ConversationId = Guid.NewGuid().ToString();
 
             var workspaceDetails = await this.GetWorkspaceByWorkspaceIdAsync(chatRequest.WorkspaceId, chatRequest.ApplicationName).ConfigureAwait(false)
-                ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+                ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
             if (!workspaceDetails.IsGroupChatEnabled)
-                throw new Exception(ExceptionConstants.GroupchatNotEnabledExceptionMessage);
+                throw new MethodAccessException(ExceptionConstants.GroupchatNotEnabledExceptionMessage);
 
             return await orchestratorService.GetOrchestratorAgentResponseAsync(chatRequest, workspaceDetails).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, ex.Message);
+            return new();
         }
         finally
         {
@@ -215,9 +215,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
                 chatRequest.ConversationId = Guid.NewGuid().ToString();
 
             var workspaceDetails = await this.GetWorkspaceByWorkspaceIdAsync(chatRequest.WorkspaceId, chatRequest.ApplicationName).ConfigureAwait(false)
-                ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+                ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
             var agentDetails = workspaceDetails.ActiveAgentsListInWorkspace.FirstOrDefault(agent => agent.AgentGuid == chatRequest.AgentId)
-                ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+                ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
             var agentChatRequestModel = new ChatRequestDomain()
             {
@@ -230,8 +230,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, ex.Message);
+            return string.Empty;
         }
         finally
         {
@@ -257,7 +257,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
             var filter = Builders<AgentsWorkspaceDomain>.Filter.And(
                    Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.AgentWorkspaceGuid, agentsWorkspaceData.AgentWorkspaceGuid));
             var allWorkspacesData = await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.WorkspacesCollectionName, filter).ConfigureAwait(false);
-            var existingWorkspaceData = allWorkspacesData.FirstOrDefault() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+            var existingWorkspaceData = allWorkspacesData.FirstOrDefault() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
             if (!existingWorkspaceData.WorkspaceUsers.Contains(currentUserEmail))
                 throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
@@ -276,8 +276,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, ex.Message);
+            return false;
         }
         finally
         {

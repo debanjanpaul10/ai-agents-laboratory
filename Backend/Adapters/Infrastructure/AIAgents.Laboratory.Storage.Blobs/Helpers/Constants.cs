@@ -101,7 +101,7 @@ internal static class Constants
     /// <summary>
     /// The GCP cloud storage constants class.
     /// </summary>
-    internal static class GCPCloudStorageConstants
+    internal static class GcpCloudStorageConstants
     {
         /// <summary>
         /// The agent images folder structure format constant.

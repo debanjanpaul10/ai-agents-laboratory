@@ -63,46 +63,43 @@ export default function WorkspaceComponent() {
 		setSelectedAgent(agent);
 	};
 
-	const handleUnAuthorizedUser = () => {
-		return (
+	const renderWorkspace = () =>
+		IsWorkspaceLoadingStoreData ? (
 			<FullScreenLoading
-				isLoading={true}
-				message={
-					WorkspacesConstants.LoadingConstants.LoginRedirectLoader
-				}
+				isLoading={IsWorkspaceLoadingStoreData}
+				message={WorkspacesConstants.LoadingConstants.MainLoader}
 			/>
+		) : (
+			<MainLayout isFullWidth={true} contentClassName="p-0">
+				<div className="h-[calc(100vh)] flex flex-col md:flex-row gap-0 rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+					<div className="w-1/2 h-full flex-shrink-0">
+						<AssociatedAgentsListPaneComponent
+							selectedAgent={selectedAgent}
+							setSelectedAgent={handleAgentSelection}
+							workspaceDetailsData={WorkspaceDetailsData}
+							isGroupChatEnabled={
+								WorkspaceDetailsData.isGroupChatEnabled
+							}
+						/>
+					</div>
+
+					<div className="w-1/2 h-full">
+						<AssociatedAgentsChatPaneComponent
+							key={selectedAgent?.agentGuid}
+							selectedAgent={selectedAgent}
+							workspaceDetailsData={WorkspaceDetailsData}
+						/>
+					</div>
+				</div>
+			</MainLayout>
 		);
-	};
 
-	return !authContext.isAuthenticated ? (
-		handleUnAuthorizedUser()
-	) : IsWorkspaceLoadingStoreData ? (
-		<FullScreenLoading
-			isLoading={IsWorkspaceLoadingStoreData}
-			message={WorkspacesConstants.LoadingConstants.MainLoader}
-		/>
+	return authContext.isAuthenticated ? (
+		renderWorkspace()
 	) : (
-		<MainLayout isFullWidth={true} contentClassName="p-0">
-			<div className="h-[calc(100vh)] flex flex-col md:flex-row gap-0 rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
-				<div className="w-1/2 h-full flex-shrink-0">
-					<AssociatedAgentsListPaneComponent
-						selectedAgent={selectedAgent}
-						setSelectedAgent={handleAgentSelection}
-						workspaceDetailsData={WorkspaceDetailsData}
-						isGroupChatEnabled={
-							WorkspaceDetailsData.isGroupChatEnabled
-						}
-					/>
-				</div>
-
-				<div className="w-1/2 h-full">
-					<AssociatedAgentsChatPaneComponent
-						key={selectedAgent?.agentGuid}
-						selectedAgent={selectedAgent}
-						workspaceDetailsData={WorkspaceDetailsData}
-					/>
-				</div>
-			</div>
-		</MainLayout>
+		<FullScreenLoading
+			isLoading={true}
+			message={WorkspacesConstants.LoadingConstants.LoginRedirectLoader}
+		/>
 	);
 }

@@ -24,7 +24,7 @@ export default function AgentsListComponent({
 	isDisabled,
 	showCloseButton = true,
 	actionButton,
-}: AgentsListComponentProps) {
+}: Readonly<AgentsListComponentProps>) {
 	const [currentAgentsData, setCurrentAgentsData] = useState<AgentDataDTO[]>(
 		[],
 	);
@@ -421,17 +421,17 @@ export default function AgentsListComponent({
 			<div className="p-6 flex-shrink-0">
 				<div className="flex items-center justify-between">
 					<div className="text-white/60 text-sm">
-						{filteredAndSortedAgents.length !==
+						{filteredAndSortedAgents.length ===
 						agentsDataList.length ? (
 							<>
-								Showing {filteredAndSortedAgents.length} of{" "}
 								{agentsDataList.length} agent
-								{agentsDataList.length !== 1 ? "s" : ""}
+								{agentsDataList.length > 1 ? "s" : ""} total
 							</>
 						) : (
 							<>
+								Showing {filteredAndSortedAgents.length} of{" "}
 								{agentsDataList.length} agent
-								{agentsDataList.length !== 1 ? "s" : ""} total
+								{agentsDataList.length > 1 ? "s" : ""}
 							</>
 						)}
 					</div>

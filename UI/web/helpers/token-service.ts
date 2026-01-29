@@ -2,7 +2,7 @@ import { ApplicationConstants } from "@helpers/constants";
 
 export const tokenService = {
 	getToken: (): string | null => {
-		if (typeof window !== "undefined") {
+		if (globalThis.window !== undefined) {
 			return localStorage.getItem(
 				ApplicationConstants.StorageKeys.AccessToken,
 			);
@@ -11,7 +11,7 @@ export const tokenService = {
 	},
 
 	setToken: (token: string): void => {
-		if (typeof window !== "undefined") {
+		if (globalThis.window !== undefined) {
 			localStorage.setItem(
 				ApplicationConstants.StorageKeys.AccessToken,
 				token,
@@ -20,7 +20,7 @@ export const tokenService = {
 	},
 
 	clearToken: (): void => {
-		if (typeof window !== "undefined") {
+		if (globalThis.window !== undefined) {
 			localStorage.removeItem(
 				ApplicationConstants.StorageKeys.AccessToken,
 			);

@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
@@ -47,13 +46,13 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, chatRequest.AgentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, chatRequest.AgentId);
 
             var agentData = await agentsService.GetAgentDataByIdAsync(chatRequest.AgentId, string.Empty).ConfigureAwait(false);
             if (agentData is null || string.IsNullOrEmpty(agentData.AgentMetaPrompt))
             {
                 var ex = new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
-                logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message));
+                logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message);
                 throw ex;
             }
 
@@ -86,12 +85,12 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message);
+            return string.Empty;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, chatRequest.AgentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, chatRequest.AgentId);
         }
     }
 
@@ -107,7 +106,7 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, chatMessage.AgentName);
 
-            var associatedSkill = await toolSkillsService.GetToolSkillBySkillIdAsync(associatedSkillGuids.First(), string.Empty).ConfigureAwait(false);
+            var associatedSkill = await toolSkillsService.GetToolSkillBySkillIdAsync(associatedSkillGuids[0], string.Empty).ConfigureAwait(false);
             ArgumentNullException.ThrowIfNull(associatedSkill);
             ArgumentException.ThrowIfNullOrWhiteSpace(associatedSkill.ToolSkillMcpServerUrl);
 
@@ -121,7 +120,7 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            return string.Empty;
         }
         finally
         {
