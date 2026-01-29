@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using AIAgents.Laboratory.Domain.DomainEntities;
+﻿using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using Microsoft.Extensions.Configuration;
@@ -33,9 +32,9 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
 
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery);
 
-            var chatbotAgentGuid = configuration[AzureAppConfigurationConstants.AIChatbotAgentId] ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
+            var chatbotAgentGuid = configuration[AzureAppConfigurationConstants.AIChatbotAgentId] ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
             var agentDataTask = agentsService.GetAgentDataByIdAsync(chatbotAgentGuid, userEmail);
             var conversationHistoryTask = conversationHistoryService.GetConversationHistoryAsync(userEmail);
             await Task.WhenAll(agentDataTask, conversationHistoryTask).ConfigureAwait(false);
@@ -56,12 +55,12 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message);
+            return string.Empty;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, userQuery);
         }
     }
 
@@ -72,19 +71,21 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
     /// <returns>The boolean for success/failure.</returns>
     public async Task<bool> ClearConversationHistoryForUserAsync(string userName)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(userName);
+
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName);
             return await conversationHistoryService.ClearConversationHistoryForUserAsync(userName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
+            return false;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName);
         }
     }
 
@@ -95,20 +96,21 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
     /// <returns>The conversation history data domain model.</returns>
     public async Task<ConversationHistoryDomain> GetConversationHistoryDataAsync(string userName)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(userName);
 
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, userName));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, userName);
             return await conversationHistoryService.GetConversationHistoryAsync(userName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, ex.Message);
+            return new();
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, userName));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, userName);
         }
     }
 }

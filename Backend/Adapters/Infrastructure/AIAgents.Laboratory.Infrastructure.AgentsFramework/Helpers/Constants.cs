@@ -106,6 +106,11 @@ internal static class Constants
         /// The invalid agent configuration exception message.
         /// </summary>
         internal const string InvalidAgentConfigurationExceptionMessage = "Invalid agent configuration: {0}";
+
+        /// <summary>
+        /// The invalid json format exception message.
+        /// </summary>
+        internal const string InvalidJsonDeserializeExceptionMessage = "Failed to deserialize the JSON";
     }
 
     /// <summary>

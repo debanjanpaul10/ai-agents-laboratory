@@ -20,7 +20,7 @@ public sealed class EmailNotificationService(ILogger<EmailNotificationService> l
     /// The email communication service sender address.
     /// </summary>
     private readonly string EMAIL_COMMUNICATION_SENDER = configuration[AzureAppConfigurationConstants.EmailNotificationServiceSenderAddress]
-        ?? throw new ArgumentNullException(ExceptionMessagesConstants.ConfigurationMissingExceptionMessage);
+        ?? throw new KeyNotFoundException(ExceptionMessagesConstants.ConfigurationMissingExceptionMessage);
 
     /// <summary>
     /// Sends an email notification asynchronously.
@@ -48,7 +48,7 @@ public sealed class EmailNotificationService(ILogger<EmailNotificationService> l
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(SendEmailNotificationAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            return false;
         }
         finally
         {

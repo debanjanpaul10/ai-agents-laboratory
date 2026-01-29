@@ -22,7 +22,7 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
     /// <summary>
     /// The admin email address from configuration.
     /// </summary>
-    private readonly string ADMIN_EMAIL_ADDRESS = configuration[AzureAppConfigurationConstants.AdminEmailAddressConstant] ?? throw new ArgumentNullException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string ADMIN_EMAIL_ADDRESS = configuration[AzureAppConfigurationConstants.AdminEmailAddressConstant] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// Adds the new bug report data asynchronous.
@@ -51,7 +51,7 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            return false;
         }
         finally
         {
@@ -86,7 +86,7 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            return false;
         }
         finally
         {

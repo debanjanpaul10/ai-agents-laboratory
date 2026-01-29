@@ -1,8 +1,8 @@
-using System.Globalization;
 using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using static AIAgents.Laboratory.Persistence.SQLDatabase.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Persistence.SQLDatabase.DataManagers;
@@ -24,7 +24,7 @@ public sealed class FeedbackDataManager(IUnitOfWork unitOfWork, ILogger<Feedback
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodStartedMessageConstant, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, bugReportData.CreatedBy));
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(bugReportData));
 
             var bugStatusEntity = await unitOfWork.Repository<BugItemStatusMapping>().FirstOrDefaultAsync(status => status.StatusName == DatabaseConstants.NotStartedConstant && status.IsActive);
             bugReportData.BugStatusId = bugStatusEntity?.Id ?? 0;
@@ -36,12 +36,12 @@ public sealed class FeedbackDataManager(IUnitOfWork unitOfWork, ILogger<Feedback
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodFailedWithMessageConstant, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, ex.Message);
+            return false;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodEndedMessageConstant, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, bugReportData.CreatedBy));
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(bugReportData));
         }
     }
 
@@ -54,7 +54,7 @@ public sealed class FeedbackDataManager(IUnitOfWork unitOfWork, ILogger<Feedback
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodStartedMessageConstant, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, featureRequestData.CreatedBy));
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, featureRequestData.CreatedBy);
 
             await unitOfWork.Repository<NewFeatureRequestData>().AddAsync(featureRequestData).ConfigureAwait(false);
             await unitOfWork.SaveChangesAsync().ConfigureAwait(false);
@@ -63,12 +63,12 @@ public sealed class FeedbackDataManager(IUnitOfWork unitOfWork, ILogger<Feedback
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodFailedWithMessageConstant, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, ex.Message);
+            return false;
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodEndedMessageConstant, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, featureRequestData.CreatedBy));
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, featureRequestData.CreatedBy);
         }
     }
 }
