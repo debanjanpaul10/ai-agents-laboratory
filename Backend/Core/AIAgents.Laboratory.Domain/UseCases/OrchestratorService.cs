@@ -22,30 +22,21 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAgentsService agentsService, IAgentChatService agentChatService, IAiServices aiServices) : IOrchestratorService
 {
     /// <summary>
-    /// Get the orchestrator agent response asynchronously.
+    /// Get the orchestrator agent response for each agent asynchronously.
     /// </summary>
     /// <param name="chatRequest">The chat request domain model.</param>
-    /// <param name="workspaceDetails">The workspace details.</param>
-    /// <returns>The orchestrator agent response.</returns>
-    public async Task<GroupChatResponseDomain> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails)
+    /// <returns>The final consolidated orchestrator response domain model.</returns>
+    public async Task<OrchestratorFinalResponseDomain> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails)
     {
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));
 
-            IList<AgentDataDomain> agentsData = [];
-            await Parallel.ForEachAsync(workspaceDetails.ActiveAgentsListInWorkspace, async (agent, cancellationToken) =>
-            {
-                var agentData = await agentsService.GetAgentDataByIdAsync(agent.AgentGuid, string.Empty).ConfigureAwait(false);
-                if (agentData is not null)
-                    lock (agentsData)
-                        agentsData.Add(agentData);
-            }).ConfigureAwait(false);
-
-            var agentsList = agentsData.Select(agent => $"{agent.AgentName}: {agent.AgentDescription}");
-            var orchestratorSystemPrompt = SystemOrchestratorFunction.GetFunctionInstructions(string.Join("\n", agentsList));
+            var agentsData = await this.GetActiveAgentsDataAsync(workspaceDetails).ConfigureAwait(false);
+            var orchestratorSystemPrompt = OrchestratorHelpers.GetOrchestratorSystemPrompt(agentsData);
             ConversationHistoryDomain conversationHistory = new();
             IList<string> agentsInvoked = [];
+            List<GroupChatAgentsResponseDomain> groupChatAgentsResponses = [];
 
             var loopCount = 0;
             while (loopCount < SystemOrchestratorFunction.MAX_ORCHESTRATOR_LOOPS)
@@ -53,31 +44,38 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
                 loopCount++;
 
                 // Call Orchestrator
-                var orchestratorResponse = await aiServices.GetChatbotResponseAsync(
-                    conversationDataDomain: conversationHistory,
-                    userMessage: chatRequest.UserMessage,
-                    agentMetaPrompt: orchestratorSystemPrompt).ConfigureAwait(false);
-
-                // Add Orchestrator's own response to history to maintain context
-                conversationHistory.ChatHistory.Add(new ChatHistoryDomain
-                {
-                    Role = ChatbotHelperConstants.AssistantRoleConstant,
-                    Content = orchestratorResponse
-                });
+                var orchestratorResponse = await this.InvokeOrchestratorIterationAsync(conversationHistory, chatRequest.UserMessage, orchestratorSystemPrompt).ConfigureAwait(false);
 
                 // Parse Orchestrator Response
-                var parsedResponse = JsonConvert.DeserializeObject<OrchestratorResponseDomain>(orchestratorResponse);
+                var parsedResponse = OrchestratorHelpers.ParseOrchestratorResponse(orchestratorResponse);
                 if (parsedResponse?.Type == SystemOrchestratorFunction.OrchestratorResponseTypeFinalResponse)
-                    return OrchestratorHelpers.PrepareGroupChatResponseDomain(parsedResponse.Content, agentsInvoked);
-
+                {
+                    return OrchestratorHelpers.PrepareOrchestratorFinalResponse(
+                        finalResponse: parsedResponse.Content,
+                        groupChatResponses: groupChatAgentsResponses
+                    );
+                }
                 else if (parsedResponse?.Type == SystemOrchestratorFunction.OrchestratorResponseTypeDelegate)
-                    await this.DelegateToAgentAsync(agentsData, chatRequest, conversationHistory, parsedResponse, agentsInvoked).ConfigureAwait(false);
-
+                {
+                    var agentResponse = await this.DelegateToAgentAsync(agentsData, chatRequest, conversationHistory, parsedResponse, agentsInvoked).ConfigureAwait(false);
+                    groupChatAgentsResponses.Add(new GroupChatAgentsResponseDomain
+                    {
+                        AgentName = parsedResponse.AgentName,
+                        AgentResponse = agentResponse
+                    });
+                }
                 else
-                    return OrchestratorHelpers.PrepareGroupChatResponseDomain(ExceptionConstants.OrchestratorResponseFormatInvalidExceptionMessage, agentsInvoked);
+                {
+                    return OrchestratorHelpers.PrepareOrchestratorFinalResponse(
+                        finalResponse: ExceptionConstants.OrchestratorResponseFormatInvalidExceptionMessage,
+                        groupChatResponses: groupChatAgentsResponses);
+                }
             }
 
-            return OrchestratorHelpers.PrepareGroupChatResponseDomain(ExceptionConstants.OrchestratorLoopLimitReachedExceptionMessage, agentsInvoked);
+            return OrchestratorHelpers.PrepareOrchestratorFinalResponse(
+                finalResponse: ExceptionConstants.OrchestratorLoopLimitReachedExceptionMessage,
+                groupChatResponses: groupChatAgentsResponses
+            );
         }
         catch (Exception ex)
         {
@@ -93,6 +91,49 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
     #region PRIVATE METHODS
 
     /// <summary>
+    /// Invokes the orchestrator iteration.
+    /// </summary>
+    /// <param name="conversationHistory">The conversation history.</param>
+    /// <param name="userMessage">The user message.</param>
+    /// <param name="orchestratorSystemPrompt">The orchestrator system prompt.</param>
+    /// <returns>The orchestrator response content.</returns>
+    private async Task<string> InvokeOrchestratorIterationAsync(ConversationHistoryDomain conversationHistory, string userMessage, string orchestratorSystemPrompt)
+    {
+        var orchestratorResponse = await aiServices.GetChatbotResponseAsync(
+            conversationDataDomain: conversationHistory,
+            userMessage: userMessage,
+            agentMetaPrompt: orchestratorSystemPrompt).ConfigureAwait(false);
+
+        // Add Orchestrator's own response to history to maintain context
+        conversationHistory.ChatHistory.Add(new ChatHistoryDomain
+        {
+            Role = ChatbotHelperConstants.AssistantRoleConstant,
+            Content = orchestratorResponse
+        });
+
+        return orchestratorResponse;
+    }
+
+    /// <summary>
+    /// Gets the active agents data in the workspace.
+    /// </summary>
+    /// <param name="workspaceDetails">The workspace details.</param>
+    /// <returns>The list of <see cref="AgentDataDomain"/></returns>
+    private async Task<IList<AgentDataDomain>> GetActiveAgentsDataAsync(AgentsWorkspaceDomain workspaceDetails)
+    {
+        IList<AgentDataDomain> agentsData = [];
+        await Parallel.ForEachAsync(workspaceDetails.ActiveAgentsListInWorkspace, async (agent, cancellationToken) =>
+        {
+            var agentData = await agentsService.GetAgentDataByIdAsync(agent.AgentGuid, string.Empty).ConfigureAwait(false);
+            if (agentData is not null)
+                lock (agentsData)
+                    agentsData.Add(agentData);
+        }).ConfigureAwait(false);
+
+        return agentsData;
+    }
+
+    /// <summary>
     /// Delegates the task to an agent.
     /// </summary>
     /// <param name="agentsData">The agents data.</param>
@@ -100,8 +141,8 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
     /// <param name="conversationHistory">The conversation history.</param>
     /// <param name="parsedResponse">The parsed response.</param>
     /// <param name="agentsInvoked">The list of agents invoked.</param>
-    private async Task DelegateToAgentAsync(IList<AgentDataDomain> agentsData, WorkspaceAgentChatRequestDomain chatRequest, ConversationHistoryDomain conversationHistory,
-        OrchestratorResponseDomain parsedResponse, IList<string> agentsInvoked)
+    private async Task<string> DelegateToAgentAsync(IList<AgentDataDomain> agentsData, WorkspaceAgentChatRequestDomain chatRequest, ConversationHistoryDomain conversationHistory,
+        OrchestratorAgentResponseDomain parsedResponse, IList<string> agentsInvoked)
     {
         try
         {
@@ -112,12 +153,13 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
             if (targetAgent is null)
             {
                 // Agent not found, let orchestrator know
+                var errorMessage = string.Format(ExceptionConstants.OrchestratorAgentNotAvailableExceptionMessage, targetAgentName);
                 conversationHistory.ChatHistory.Add(new ChatHistoryDomain
                 {
                     Role = ChatbotHelperConstants.UserRoleConstant,
-                    Content = string.Format(ExceptionConstants.OrchestratorAgentNotAvailableExceptionMessage, targetAgentName)
+                    Content = errorMessage
                 });
-                return;
+                return errorMessage;
             }
 
             // Track the invoked agent
@@ -139,10 +181,13 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
                 Role = ChatbotHelperConstants.UserRoleConstant,
                 Content = $"[{targetAgentName}]: {agentResponse}"
             });
+
+            return agentResponse;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DelegateToAgentAsync), DateTime.UtcNow, ex.Message);
+            return string.Empty;
         }
         finally
         {

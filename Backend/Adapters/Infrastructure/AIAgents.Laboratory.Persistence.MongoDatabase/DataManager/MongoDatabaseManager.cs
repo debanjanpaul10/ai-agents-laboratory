@@ -1,7 +1,5 @@
 ﻿using System.Data.SqlTypes;
-using System.Globalization;
 using AIAgents.Laboratory.Domain.DrivenPorts;
-using iText.IO.Exceptions;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Newtonsoft.Json;

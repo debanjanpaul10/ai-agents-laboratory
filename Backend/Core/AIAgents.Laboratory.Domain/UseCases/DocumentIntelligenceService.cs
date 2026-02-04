@@ -154,9 +154,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             // 3. Only persist changes if something actually changed
             if (hasChanges)
                 // If all documents were removed, set StoredKnowledgeBase to null, otherwise save the updated list
-                updates.Add(Builders<AgentDataDomain>.Update.Set(
-                    x => x.StoredKnowledgeBase,
-                    updatedStoredKnowledgeBase.Count != 0 ? updatedStoredKnowledgeBase : null));
+                updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, updatedStoredKnowledgeBase.Count != 0 ? updatedStoredKnowledgeBase : null));
         }
         catch (Exception ex)
         {
@@ -230,7 +228,6 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
                     ImageUrl = imageUrl,
                 });
             }
-
         }
         catch (Exception ex)
         {

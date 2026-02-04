@@ -1,3 +1,4 @@
+using System.Globalization;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 using AIAgents.Laboratory.Domain.DrivenPorts;
@@ -170,6 +171,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     public async Task<GroupChatResponseDomain> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDomain chatRequest)
     {
         ArgumentNullException.ThrowIfNull(chatRequest);
+        ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.WorkspaceId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.UserMessage);
 
         try
         {
@@ -177,13 +180,19 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
             if (string.IsNullOrWhiteSpace(chatRequest.ConversationId))
                 chatRequest.ConversationId = Guid.NewGuid().ToString();
 
-            var workspaceDetails = await this.GetWorkspaceByWorkspaceIdAsync(chatRequest.WorkspaceId, chatRequest.ApplicationName).ConfigureAwait(false)
-                ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
+            var workspaceDetails = await this.GetWorkspaceByWorkspaceIdAsync(chatRequest.WorkspaceId, chatRequest.ApplicationName).ConfigureAwait(false);
+            if (workspaceDetails is null || string.IsNullOrWhiteSpace(workspaceDetails.Id))
+                throw new FileNotFoundException(string.Format(CultureInfo.InvariantCulture, ExceptionConstants.WorkspaceNotFoundExceptionMessage, chatRequest.WorkspaceId));
 
             if (!workspaceDetails.IsGroupChatEnabled)
                 throw new MethodAccessException(ExceptionConstants.GroupchatNotEnabledExceptionMessage);
 
-            return await orchestratorService.GetOrchestratorAgentResponseAsync(chatRequest, workspaceDetails).ConfigureAwait(false);
+            var groupResponse = await orchestratorService.GetOrchestratorAgentResponseAsync(chatRequest, workspaceDetails).ConfigureAwait(false);
+            return new GroupChatResponseDomain()
+            {
+                AgentResponse = groupResponse.FinalResponse,
+                AgentsInvoked = [.. groupResponse.GroupChatAgentsResponses.Select(x => x.AgentName)]
+            };
         }
         catch (Exception ex)
         {
@@ -203,6 +212,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// <returns>The string response from AI.</returns>
     public async Task<string> InvokeWorkspaceAgentAsync(WorkspaceAgentChatRequestDomain chatRequest)
     {
+        ArgumentNullException.ThrowIfNull(chatRequest);
         ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.WorkspaceId);
         ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.AgentId);
         ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.UserMessage);

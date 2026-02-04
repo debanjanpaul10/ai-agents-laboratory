@@ -26,14 +26,12 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     /// <summary>
     /// The mongo database name configuration value.
     /// </summary>
-    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase]
-        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The agents data collection name configuration value.
     /// </summary>
-    private readonly string AgentsDataCollectionName = configuration[MongoDbCollectionConstants.AgentsCollectionName]
-        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string AgentsDataCollectionName = configuration[MongoDbCollectionConstants.AgentsCollectionName] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The is knowledge base service allowed.
@@ -72,7 +70,10 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                 await this.UpdateSkillsWithAssociatedAgentsDataAsync(agentData, userEmail).ConfigureAwait(false);
 
             agentData.PrepareAuditEntityData(userEmail);
-            return await mongoDatabaseService.SaveDataAsync(agentData, this.MongoDatabaseName, this.AgentsDataCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.SaveDataAsync(
+                data: agentData,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -116,7 +117,10 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                     )
                 );
 
-            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.AgentsDataCollectionName, filter).ConfigureAwait(false);
+            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName,
+                filter: filter).ConfigureAwait(false);
 
             var agentData = allData.First() ?? throw new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
             if (agentData.StoredKnowledgeBase is not null && agentData.StoredKnowledgeBase.Any())
@@ -158,7 +162,10 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                 )
             );
 
-            var agents = await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.AgentsDataCollectionName, filter).ConfigureAwait(false);
+            var agents = await mongoDatabaseService.GetDataFromCollectionAsync(
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName,
+                filter: filter).ConfigureAwait(false);
             // Process stored knowledge base data if available
             foreach (var agent in from agent in agents where agent.StoredKnowledgeBase is not null && agent.StoredKnowledgeBase.Any() select agent)
                 agent.ConvertKnowledgebaseBinaryDataToFile();
@@ -218,7 +225,11 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                 await this.UpdateSkillsWithAssociatedAgentsDataAsync(updateDataDomain, userEmail).ConfigureAwait(false);
 
             var update = Builders<AgentDataDomain>.Update.Combine(updates);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, this.MongoDatabaseName, this.AgentsDataCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.UpdateDataInCollectionAsync(
+                filter: filter,
+                update: update,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -247,7 +258,10 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, agentId);
 
             var filter = Builders<AgentDataDomain>.Filter.Where(x => x.IsActive && x.AgentId == agentId);
-            var allAgents = await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.AgentsDataCollectionName, filter).ConfigureAwait(false);
+            var allAgents = await mongoDatabaseService.GetDataFromCollectionAsync(
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName,
+                filter: filter).ConfigureAwait(false);
             var updateAgent = allAgents.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
 
             if (updateAgent.CreatedBy != currentUserEmail)
@@ -260,7 +274,11 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             };
             var update = Builders<AgentDataDomain>.Update.Combine(updates);
             await documentIntelligenceService.DeleteKnowledgebaseAndImagesDataAsync(agentId).ConfigureAwait(false);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, this.MongoDatabaseName, this.AgentsDataCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.UpdateDataInCollectionAsync(
+                filter: filter,
+                update: update,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
