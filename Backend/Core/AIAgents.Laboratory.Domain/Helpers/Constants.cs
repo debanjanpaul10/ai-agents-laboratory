@@ -100,6 +100,11 @@ internal static class Constants
         /// The orchestrator agent not available exception message.
         /// </summary>
         internal const string OrchestratorAgentNotAvailableExceptionMessage = "The requested agent '{0}' is not available to process the user query!";
+
+        /// <summary>
+        /// The requested workspace not found exception message.
+        /// </summary>
+        internal const string WorkspaceNotFoundExceptionMessage = "The requested workspace with id '{0}' is not found!";
     }
 
     /// <summary>

@@ -50,7 +50,7 @@ export async function GetAsync(apiUrl: string): Promise<ResponseDTO> {
 			};
 	} catch (error: any) {
 		console.error(error);
-		throw error(error.response ? error.response.data : error.message);
+		throw new Error(error.response ? error.response.data : error.message);
 	}
 }
 
@@ -69,7 +69,7 @@ export async function PostAsync(
 			};
 	} catch (error: any) {
 		console.error(error);
-		throw error(error.response ? error.response.data : error.message);
+		throw new Error(error.response ? error.response.data : error.message);
 	}
 }
 
@@ -85,7 +85,7 @@ export async function DeleteAsync(apiUrl: string): Promise<ResponseDTO> {
 			};
 	} catch (error: any) {
 		console.error(error);
-		throw error(error.response ? error.response.data : error.message);
+		throw new Error(error.response ? error.response.data : error.message);
 	}
 }
 
@@ -104,6 +104,6 @@ export async function PutAsync(
 			};
 	} catch (error: any) {
 		console.error(error);
-		throw error(error.response ? error.response.data : error.message);
+		throw new Error(error.response ? error.response.data : error.message);
 	}
 }

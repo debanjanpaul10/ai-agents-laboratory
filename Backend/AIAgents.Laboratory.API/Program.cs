@@ -58,6 +58,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCorrelationIdMiddleware();
+app.UseRequestLogging();
 app.UseExceptionMiddleware();
 app.UseHttpsRedirection();
 app.UseAuthentication();

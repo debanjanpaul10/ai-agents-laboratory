@@ -74,7 +74,7 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
             // Handle integrated skills if configured
             if (agentData.AssociatedSkillGuids is not null && agentData.AssociatedSkillGuids.Count > 0)
                 return await this.GetResponseWithIntegratedSkillAsync(
-                    chatMessage,
+                    chatMessage: chatMessage,
                     associatedSkillGuids: agentData.AssociatedSkillGuids).ConfigureAwait(false);
             else
                 return await aiServices.GetAiFunctionResponseAsync(

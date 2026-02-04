@@ -45,6 +45,7 @@ public class DomainMapperProfile : Profile
         CreateMap<ChatHistoryDomain, ChatHistoryDTO>();
         CreateMap<ConversationHistoryDomain, ConversationHistoryDTO>();
         CreateMap<AssociatedAgentsSkillDataDomain, AssociatedAgentsSkillDataDTO>();
+        CreateMap<GroupChatAgentsResponseDomain, GroupChatAgentsResponseDto>();
 
         CreateMap<AgentDataDomain, AgentDataDTO>().ReverseMap()
             .ForMember(destination => destination.AgentId, opt => opt.MapFrom(source => source.AgentId));

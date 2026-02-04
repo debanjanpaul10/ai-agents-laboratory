@@ -27,7 +27,7 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
     {
         var isProModelEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsProModelEnabledFlag], out bool parsedValue) && parsedValue;
         var geminiAiModel = isProModelEnabled ? AzureAppConfigurationConstants.GeminiProModel : AzureAppConfigurationConstants.GeminiFlashModel;
-        return configuration[geminiAiModel] ?? ExceptionConstants.ModelNameNotFoundExceptionConstant;
+        return configuration[geminiAiModel] ?? throw new KeyNotFoundException(ExceptionConstants.ModelNameNotFoundExceptionConstant);
     }
 
     /// <summary>
