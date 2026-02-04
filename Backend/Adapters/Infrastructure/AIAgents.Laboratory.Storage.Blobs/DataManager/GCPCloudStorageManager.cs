@@ -90,7 +90,7 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -130,7 +130,7 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -175,7 +175,7 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

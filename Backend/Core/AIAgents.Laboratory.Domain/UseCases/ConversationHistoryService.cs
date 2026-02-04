@@ -1,6 +1,7 @@
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -68,7 +69,7 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryAsync), DateTime.UtcNow, ex.Message);
-            return new();
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -115,7 +116,7 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -149,7 +150,7 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

@@ -78,7 +78,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewAgentAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -120,7 +120,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.AgentsDataCollectionName,
-                filter: filter).ConfigureAwait(false);
+                filter).ConfigureAwait(false);
 
             var agentData = allData.First() ?? throw new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
             if (agentData.StoredKnowledgeBase is not null && agentData.StoredKnowledgeBase.Any())
@@ -131,7 +131,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, ex.Message);
-            return new();
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -165,7 +165,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             var agents = await mongoDatabaseService.GetDataFromCollectionAsync(
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.AgentsDataCollectionName,
-                filter: filter).ConfigureAwait(false);
+                filter).ConfigureAwait(false);
             // Process stored knowledge base data if available
             foreach (var agent in from agent in agents where agent.StoredKnowledgeBase is not null && agent.StoredKnowledgeBase.Any() select agent)
                 agent.ConvertKnowledgebaseBinaryDataToFile();
@@ -175,7 +175,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, ex.Message);
-            return [];
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -226,15 +226,15 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
 
             var update = Builders<AgentDataDomain>.Update.Combine(updates);
             return await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter: filter,
-                update: update,
+                filter,
+                update,
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.AgentsDataCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -275,15 +275,15 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             var update = Builders<AgentDataDomain>.Update.Combine(updates);
             await documentIntelligenceService.DeleteKnowledgebaseAndImagesDataAsync(agentId).ConfigureAwait(false);
             return await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter: filter,
-                update: update,
+                filter,
+                update,
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.AgentsDataCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -301,13 +301,13 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
             return await documentIntelligenceService.DownloadKnowledgebaseFileAsync(agentGuid, fileName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

@@ -1,5 +1,6 @@
 ﻿using System.Data.SqlTypes;
 using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -38,7 +39,7 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, ex.Message);
-            return [];
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -72,7 +73,7 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -108,7 +109,7 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -142,7 +143,7 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

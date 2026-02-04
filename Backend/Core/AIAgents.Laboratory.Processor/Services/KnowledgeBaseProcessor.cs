@@ -62,7 +62,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsException(ex);
         }
         finally
         {
@@ -156,6 +156,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsException(ex);
         }
         finally
         {
@@ -195,7 +196,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadSpreadsheetData), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsException(ex);
         }
         finally
         {
@@ -236,7 +237,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadWordFileData), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsException(ex);
         }
         finally
         {
@@ -283,7 +284,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadPdfFileData), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsException(ex);
         }
         finally
         {
@@ -310,7 +311,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadTextFileData), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsException(ex);
         }
         finally
         {

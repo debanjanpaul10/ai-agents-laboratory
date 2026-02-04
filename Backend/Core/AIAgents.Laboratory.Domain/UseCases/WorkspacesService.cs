@@ -57,7 +57,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -99,7 +99,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -124,7 +124,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, ex.Message);
-            return [];
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -155,7 +155,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, ex.Message);
-            return new();
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -197,7 +197,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, ex.Message);
-            return new();
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -241,7 +241,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -287,7 +287,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

@@ -1,6 +1,7 @@
 ﻿using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
@@ -56,7 +57,7 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -81,7 +82,7 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -106,7 +107,7 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, ex.Message);
-            return new();
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

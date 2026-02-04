@@ -1,4 +1,5 @@
 ﻿using AIAgents.Laboratory.API.Helpers;
+using AIAgents.Laboratory.Domain.Helpers;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.Constants.LoggingConstants;
 
@@ -23,11 +24,15 @@ public sealed class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, Req
         }
         catch (UnauthorizedAccessException ex)
         {
-            await HandleExceptionAsync(httpContext, ex, StatusCodes.Status401Unauthorized, ex.ToString(), ex.Message);
+            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status401Unauthorized, ex.Message.ToString(), ex.Message);
+        }
+        catch (BadHttpRequestException ex)
+        {
+            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status400BadRequest, ex.Message.ToString(), ex.Message);
         }
         catch (Exception ex)
         {
-            await HandleExceptionAsync(httpContext, ex, StatusCodes.Status500InternalServerError, ex.ToString(), ex.Message);
+            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status500InternalServerError, ex.Message.ToString(), ex.Message);
         }
     }
 
@@ -42,7 +47,7 @@ public sealed class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, Req
     private async Task HandleExceptionAsync(HttpContext httpContext, Exception ex, int statusCode, string error, string message)
     {
         // Get correlation ID from HttpContext
-        var correlationId = httpContext.Items[CorrelationIdHeader]?.ToString() ?? LogContext.CorrelationId ?? HeaderConstants.NotApplicableStringConstant;
+        var correlationId = httpContext.Items[CorrelationIdHeader]?.ToString() ?? LogContext.CorrelationId ?? Guid.NewGuid().ToString();
 
         // Enrich log context with request details using Microsoft's ILogger.BeginScope
         using (logger.BeginScope(new Dictionary<string, object>
@@ -59,7 +64,7 @@ public sealed class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, Req
 
         httpContext.Response.ContentType = EnvironmentConfigurationConstants.ApplicationJsonConstant;
         httpContext.Response.StatusCode = statusCode;
-        var errorResponse = new AIAgentsException(message, statusCode, error);
+        var errorResponse = new AIAgentsBusinessException(message, statusCode, error);
         await httpContext.Response.WriteAsJsonAsync(errorResponse);
     }
 }
