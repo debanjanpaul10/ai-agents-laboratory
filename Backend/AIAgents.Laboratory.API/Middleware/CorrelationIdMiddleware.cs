@@ -30,14 +30,22 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
         Helpers.LogContext.CorrelationId = correlationId;
 
         // Use Microsoft's ILogger.BeginScope to enrich ALL logs in this scope
-        using (logger.BeginScope(new Dictionary<string, object>
+        try
         {
-            [HeaderLoggingConstants.CorrelationId] = correlationId,
-            [HeaderLoggingConstants.RequestPath] = httpContext.Request.Path.ToString(),
-            [HeaderLoggingConstants.RequestMethod] = httpContext.Request.Method
-        }))
+            using (logger.BeginScope(new Dictionary<string, object>
+            {
+                [HeaderLoggingConstants.CorrelationId] = correlationId,
+                [HeaderLoggingConstants.RequestPath] = httpContext.Request.Path.ToString(),
+                [HeaderLoggingConstants.RequestMethod] = httpContext.Request.Method
+            }))
+            {
+                await next(httpContext);
+            }
+        }
+        finally
         {
-            await next(httpContext);
+            Helpers.LogContext.Clear();
+            httpContext.Items.Remove(CorrelationIdHeader);
         }
     }
 

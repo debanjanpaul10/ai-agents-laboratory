@@ -42,7 +42,7 @@ public sealed class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, Req
     private async Task HandleExceptionAsync(HttpContext httpContext, Exception ex, int statusCode, string error, string message)
     {
         // Get correlation ID from HttpContext
-        var correlationId = httpContext.Items[CorrelationIdHeader]?.ToString() ?? HeaderConstants.NotApplicableStringConstant;
+        var correlationId = httpContext.Items[CorrelationIdHeader]?.ToString() ?? LogContext.CorrelationId ?? HeaderConstants.NotApplicableStringConstant;
 
         // Enrich log context with request details using Microsoft's ILogger.BeginScope
         using (logger.BeginScope(new Dictionary<string, object>
