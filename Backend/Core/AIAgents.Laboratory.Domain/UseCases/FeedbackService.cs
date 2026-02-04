@@ -51,7 +51,7 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -86,7 +86,7 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

@@ -55,6 +55,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteKnowledgebaseAndImagesDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -96,6 +97,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -159,6 +161,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -182,7 +185,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -232,6 +235,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -301,6 +305,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

@@ -53,7 +53,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -110,7 +110,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -160,7 +160,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetChatbotResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

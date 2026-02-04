@@ -1,4 +1,5 @@
 using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -34,7 +35,7 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, ex.Message);
-            return [];
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -65,7 +66,7 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -102,7 +103,7 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateMcpClientAsync), DateTime.UtcNow, ex.Message);
-            return default!;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -121,7 +122,7 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
 
         var withoutLineEndings = value.Replace("\r", string.Empty).Replace("\n", string.Empty);
         var sanitizedChars = withoutLineEndings.Where(c => !char.IsControl(c) || c == '\t');
-        return new string(sanitizedChars.ToArray());
+        return new string([.. sanitizedChars]);
     }
 
     #endregion

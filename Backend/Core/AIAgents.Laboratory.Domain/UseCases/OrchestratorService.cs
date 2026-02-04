@@ -80,7 +80,7 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow, ex.Message);
-            return new();
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -101,7 +101,7 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
     {
         var orchestratorResponse = await aiServices.GetChatbotResponseAsync(
             conversationDataDomain: conversationHistory,
-            userMessage: userMessage,
+            userMessage,
             agentMetaPrompt: orchestratorSystemPrompt).ConfigureAwait(false);
 
         // Add Orchestrator's own response to history to maintain context
@@ -187,7 +187,7 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DelegateToAgentAsync), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

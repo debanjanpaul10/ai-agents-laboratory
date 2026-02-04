@@ -86,7 +86,7 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -120,7 +120,7 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, ex.Message);
-            return string.Empty;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

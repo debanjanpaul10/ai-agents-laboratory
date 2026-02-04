@@ -1,5 +1,6 @@
 using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -37,7 +38,7 @@ public sealed class FeedbackDataManager(IUnitOfWork unitOfWork, ILogger<Feedback
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -64,7 +65,7 @@ public sealed class FeedbackDataManager(IUnitOfWork unitOfWork, ILogger<Feedback
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

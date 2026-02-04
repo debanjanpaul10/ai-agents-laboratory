@@ -46,7 +46,7 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentCurrentStatus), DateTime.UtcNow, ex.Message);
-            return new() { IsAvailable = false };
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -90,7 +90,7 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationsData), DateTime.UtcNow, ex.Message);
-            return [];
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -123,7 +123,7 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationByKeyName), DateTime.UtcNow, ex.Message);
-            return [];
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -148,7 +148,7 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, ex.Message);
-            return (0, []);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

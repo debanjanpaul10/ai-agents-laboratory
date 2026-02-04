@@ -1,4 +1,5 @@
 ﻿using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Azure.Communication.Email;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -48,7 +49,7 @@ public sealed class EmailNotificationService(ILogger<EmailNotificationService> l
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(SendEmailNotificationAsync), DateTime.UtcNow, ex.Message);
-            return false;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
