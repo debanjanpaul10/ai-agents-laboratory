@@ -24,15 +24,15 @@ public sealed class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, Req
         }
         catch (UnauthorizedAccessException ex)
         {
-            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status401Unauthorized, ex.ToString(), ex.Message);
+            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status401Unauthorized, ex.Message.ToString(), ex.Message);
         }
         catch (BadHttpRequestException ex)
         {
-            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status400BadRequest, ex.ToString(), ex.Message);
+            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status400BadRequest, ex.Message.ToString(), ex.Message);
         }
         catch (Exception ex)
         {
-            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status500InternalServerError, ex.ToString(), ex.Message);
+            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status500InternalServerError, ex.Message.ToString(), ex.Message);
         }
     }
 

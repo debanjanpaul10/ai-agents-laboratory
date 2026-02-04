@@ -145,6 +145,8 @@ public static class DIContainer
         var authenticationFailedException = new UnauthorizedAccessException(ExceptionConstants.InvalidTokenExceptionConstant);
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();
         logger.LogError(authenticationFailedException, authenticationFailedException.Message);
+
+        context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
         await context.HttpContext.Response.WriteAsync(authenticationFailedException.Message);
     }
 
