@@ -11,12 +11,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
+    <PackageReference Include="Infisical.Sdk" Version="3.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.5.0-preview" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.1.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.1.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.2" />
   </ItemGroup>
 
   <ItemGroup>
