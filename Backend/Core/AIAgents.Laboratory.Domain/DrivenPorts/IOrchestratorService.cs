@@ -13,5 +13,5 @@ public interface IOrchestratorService
     /// </summary>
     /// <param name="chatRequest">The chat request domain model.</param>
     /// <returns>The orchestrator agent response.</returns>
-    Task<GroupChatResponseDomain> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails);
+    Task<OrchestratorFinalResponseDomain> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails);
 }

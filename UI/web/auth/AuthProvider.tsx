@@ -25,7 +25,7 @@ const defaultAuthContext: AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children }: Readonly<AuthProviderProps>) {
 	const [user, setUser] = useState<User | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const { instance, inProgress, accounts } = useMsal();
@@ -53,7 +53,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 							tokenService.clearToken();
 						}
 					} catch (error) {
-						console.error("Failed to sync token during init:", error);
+						console.error(
+							"Failed to sync token during init:",
+							error,
+						);
 						tokenService.clearToken();
 					}
 				} else {

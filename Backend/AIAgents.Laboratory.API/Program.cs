@@ -58,6 +58,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCorrelationIdMiddleware();
+app.UseRequestLogging();
 app.UseExceptionMiddleware();
 app.UseHttpsRedirection();
 app.UseAuthentication();
@@ -67,4 +69,4 @@ app.UseCors();
 app.MapControllers();
 app.MapHub<AgentStatusHub>(RouteConstants.AgentStatusHub_Route);
 
-app.Run();
+await app.RunAsync();

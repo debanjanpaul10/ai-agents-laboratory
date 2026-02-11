@@ -53,7 +53,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -77,7 +77,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
     public async Task<string> GetAiFunctionResponseAsync<TInput>(TInput input, string mcpServerUrl, string pluginName, string functionName)
     {
         AgentServiceHelpers.ValidateInputParameters(input, pluginName, functionName);
-        AgentServiceHelpers.ValidateMcpServerUrl(mcpServerUrl);
+        ArgumentException.ThrowIfNullOrWhiteSpace(mcpServerUrl);
 
         try
         {
@@ -94,7 +94,8 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
                 prompt: DetermineToolToCallFunction.GetFunctionInstructions(toolDescriptions, jsonInput),
                 input: jsonInput);
 
-            var toolSelectionResult = JsonConvert.DeserializeObject<ToolSelectionResultDomain>(DomainUtilities.ExtractJsonFromMarkdown(toolSelectionResultResponse)) ?? throw new Exception();
+            var toolSelectionResult = JsonConvert.DeserializeObject<ToolSelectionResultDomain>(DomainUtilities.ExtractJsonFromMarkdown(toolSelectionResultResponse))
+                ?? throw new JsonSerializationException(ExceptionConstants.InvalidJsonDeserializeExceptionMessage);
 
             // STEP 3: If a tool is selected, invoke the MCP tool and get the result
             var toolResult = string.Empty;
@@ -109,7 +110,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -159,7 +160,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetChatbotResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

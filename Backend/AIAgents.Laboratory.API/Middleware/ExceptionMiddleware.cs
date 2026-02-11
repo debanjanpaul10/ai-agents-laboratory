@@ -1,5 +1,7 @@
 ﻿using AIAgents.Laboratory.API.Helpers;
+using AIAgents.Laboratory.Domain.Helpers;
 using static AIAgents.Laboratory.API.Helpers.Constants;
+using static AIAgents.Laboratory.API.Helpers.Constants.LoggingConstants;
 
 namespace AIAgents.Laboratory.API.Middleware;
 
@@ -8,46 +10,63 @@ namespace AIAgents.Laboratory.API.Middleware;
 /// </summary>
 /// <param name="logger">The logger service.</param>
 /// <param name="next">The request delegate.</param>
-public class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, RequestDelegate next)
+public sealed class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, RequestDelegate next)
 {
-	/// <summary>
-	/// Invokes the specified HTTP context.
-	/// </summary>
-	/// <param name="httpContext">The HTTP context.</param>
-	public async Task Invoke(HttpContext httpContext)
-	{
-		try
-		{
-			await next(httpContext);
-		}
-		catch (UnauthorizedAccessException ex)
-		{
-			await HandleExceptionAsync(httpContext, ex, StatusCodes.Status401Unauthorized, ex.ToString(), ex.Message);
-		}
-		catch (Exception ex)
-		{
-			await HandleExceptionAsync(httpContext, ex, StatusCodes.Status500InternalServerError, ex.ToString(), ex.Message);
-		}
-	}
+    /// <summary>
+    /// Invokes the specified HTTP context.
+    /// </summary>
+    /// <param name="httpContext">The HTTP context.</param>
+    public async Task Invoke(HttpContext httpContext)
+    {
+        try
+        {
+            await next(httpContext);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status401Unauthorized, ex.Message.ToString(), ex.Message);
+        }
+        catch (BadHttpRequestException ex)
+        {
+            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status400BadRequest, ex.Message.ToString(), ex.Message);
+        }
+        catch (Exception ex)
+        {
+            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status500InternalServerError, ex.Message.ToString(), ex.Message);
+        }
+    }
 
-	/// <summary>
-	/// Handles the exception asynchronous.
-	/// </summary>
-	/// <param name="httpContext">The HTTP context.</param>
-	/// <param name="ex">The ex.</param>
-	/// <param name="statusCode">The status code.</param>
-	/// <param name="error">The error.</param>
-	/// <param name="message">The message.</param>
-	private async Task HandleExceptionAsync(HttpContext httpContext, Exception ex, int statusCode, string error, string message)
-	{
-		logger.LogError(ex, string.Format(LoggingConstants.LogHelperMethodFailed, httpContext.Request.Method, DateTime.UtcNow, ex.Message));
+    /// <summary>
+    /// Handles the exception asynchronous.
+    /// </summary>
+    /// <param name="httpContext">The HTTP context.</param>
+    /// <param name="ex">The ex.</param>
+    /// <param name="statusCode">The status code.</param>
+    /// <param name="error">The error.</param>
+    /// <param name="message">The message.</param>
+    private async Task HandleExceptionAsync(HttpContext httpContext, Exception ex, int statusCode, string error, string message)
+    {
+        // Get correlation ID from HttpContext
+        var correlationId = httpContext.Items[CorrelationIdHeader]?.ToString() ?? LogContext.CorrelationId ?? Guid.NewGuid().ToString();
 
-		httpContext.Response.ContentType = EnvironmentConfigurationConstants.ApplicationJsonConstant;
-		httpContext.Response.StatusCode = statusCode;
+        // Enrich log context with request details using Microsoft's ILogger.BeginScope
+        using (logger.BeginScope(new Dictionary<string, object>
+        {
+            [HeaderLoggingConstants.CorrelationId] = correlationId,
+            [HeaderLoggingConstants.RequestPath] = httpContext.Request.Path.ToString(),
+            [HeaderLoggingConstants.RequestMethod] = httpContext.Request.Method,
+            [HeaderLoggingConstants.StatusCode] = statusCode
+        }))
+        {
+            logger.LogError(ex, UnhandledExceptionMessage,
+                correlationId, httpContext.Request.Path, httpContext.Request.Method);
+        }
 
-		var errorResponse = new AIAgentsException(message, statusCode, error);
-		await httpContext.Response.WriteAsJsonAsync(errorResponse);
-	}
+        httpContext.Response.ContentType = EnvironmentConfigurationConstants.ApplicationJsonConstant;
+        httpContext.Response.StatusCode = statusCode;
+        var errorResponse = new AIAgentsBusinessException(message, statusCode, error);
+        await httpContext.Response.WriteAsJsonAsync(errorResponse);
+    }
 }
 
 /// <summary>
@@ -55,10 +74,10 @@ public class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, RequestDel
 /// </summary>
 public static class ExceptionMiddlewareExtensions
 {
-	/// <summary>
-	/// Uses the exception middleware.
-	/// </summary>
-	/// <param name="builder">The builder.</param>
-	/// <returns>The application builder.</returns>
-	public static IApplicationBuilder UseExceptionMiddleware(this IApplicationBuilder builder) => builder.UseMiddleware<ExceptionMiddleware>();
+    /// <summary>
+    /// Uses the exception middleware.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The application builder.</returns>
+    public static IApplicationBuilder UseExceptionMiddleware(this IApplicationBuilder builder) => builder.UseMiddleware<ExceptionMiddleware>();
 }

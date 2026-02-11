@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
@@ -29,12 +28,12 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
     /// <summary>
     /// The configuration value for allowed knowledge base file formats.
     /// </summary>
-    private readonly string AllowedKnowledgebaseFileFormats = configuration[AzureAppConfigurationConstants.AllowedKbFileFormatsConstant] ?? throw new InvalidOperationException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string AllowedKnowledgebaseFileFormats = configuration[AzureAppConfigurationConstants.AllowedKbFileFormatsConstant] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The configuration value for allowed ai vision images file formats.
     /// </summary>
-    private readonly string AllowedAiVisionImagesFileFormats = configuration[AzureAppConfigurationConstants.AllowedVisionImageFileFormatsConstant] ?? throw new InvalidOperationException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string AllowedAiVisionImagesFileFormats = configuration[AzureAppConfigurationConstants.AllowedVisionImageFileFormatsConstant] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// Deletes the knowledge base documents and AI Vision images data associated with a specific agent from the storage.
@@ -56,7 +55,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteKnowledgebaseAndImagesDataAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -98,7 +97,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -119,7 +118,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId);
 
             // Start from existing stored knowledge base
             var updatedStoredKnowledgeBase = existingAgent.StoredKnowledgeBase?.ToList() ?? [];
@@ -157,14 +156,12 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             // 3. Only persist changes if something actually changed
             if (hasChanges)
                 // If all documents were removed, set StoredKnowledgeBase to null, otherwise save the updated list
-                updates.Add(Builders<AgentDataDomain>.Update.Set(
-                    x => x.StoredKnowledgeBase,
-                    updatedStoredKnowledgeBase.Count != 0 ? updatedStoredKnowledgeBase : null));
+                updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, updatedStoredKnowledgeBase.Count != 0 ? updatedStoredKnowledgeBase : null));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -188,7 +185,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -234,12 +231,11 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
                     ImageUrl = imageUrl,
                 });
             }
-
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -260,7 +256,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, updateDataDomain.AgentId);
 
             // Start from existing stored image keywords
             var updatedStoredImagesKeywords = existingAgent.AiVisionImagesData?.ToList() ?? [];
@@ -309,7 +305,7 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

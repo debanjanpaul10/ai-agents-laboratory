@@ -1,7 +1,7 @@
-using System.Globalization;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -20,12 +20,12 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
     /// <summary>
     /// The mongo database name configuration value.
     /// </summary>
-    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The conversation history collection name configuration value.
     /// </summary>
-    private readonly string ConversationHistoryCollectionName = configuration[MongoDbCollectionConstants.ConversationHistoryCollectionName] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string ConversationHistoryCollectionName = configuration[MongoDbCollectionConstants.ConversationHistoryCollectionName] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// Gets the conversation history data for current chat.
@@ -34,9 +34,11 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
     /// <returns>The conversation history domain.</returns>
     public async Task<ConversationHistoryDomain> GetConversationHistoryAsync(string userName)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(userName);
+
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryAsync), DateTime.UtcNow, userName));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryAsync), DateTime.UtcNow, userName);
             var allConversationHistoryData = await mongoDatabaseService.GetDataFromCollectionAsync(
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.ConversationHistoryCollectionName,
@@ -57,18 +59,21 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
                     LastModifiedOn = DateTime.UtcNow
                 };
 
-                await mongoDatabaseService.SaveDataAsync(newConversationHistory, this.MongoDatabaseName, this.ConversationHistoryCollectionName).ConfigureAwait(false);
+                await mongoDatabaseService.SaveDataAsync(
+                    data: newConversationHistory,
+                    databaseName: this.MongoDatabaseName,
+                    collectionName: this.ConversationHistoryCollectionName).ConfigureAwait(false);
                 return newConversationHistory;
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryAsync), DateTime.UtcNow, userName));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryAsync), DateTime.UtcNow, userName);
         }
     }
 
@@ -83,7 +88,7 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
 
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, conversationHistory.ConversationId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, conversationHistory.ConversationId);
 
             var filter = Builders<ConversationHistoryDomain>.Filter.Where(x => x.ConversationId == conversationHistory.ConversationId && x.UserName == conversationHistory.UserName);
             var allConversationHistoryData = await mongoDatabaseService.GetDataFromCollectionAsync(
@@ -91,27 +96,31 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
                 collectionName: this.ConversationHistoryCollectionName,
                 filter: filter).ConfigureAwait(false);
 
-            var conversationHistoryData = allConversationHistoryData.FirstOrDefault() ?? throw new Exception(ExceptionConstants.DataNotFoundExceptionMessage);
+            var conversationHistoryData = allConversationHistoryData.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
             // Add the new message to the existing chat history
             var updatedChatHistory = conversationHistoryData.ChatHistory.ToList();
-            updatedChatHistory.Add(conversationHistory.ChatHistory.Last());
+            updatedChatHistory.Add(conversationHistory.ChatHistory[^1]);
 
             // Update the existing document with the new chat history
             var update = Builders<ConversationHistoryDomain>.Update
                 .Set(x => x.ChatHistory, updatedChatHistory)
                 .Set(x => x.LastModifiedOn, DateTime.UtcNow)
                 .Set(x => x.IsActive, true);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, this.MongoDatabaseName, this.ConversationHistoryCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.UpdateDataInCollectionAsync(
+                filter: filter,
+                update: update,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.ConversationHistoryCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, conversationHistory.ConversationId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, conversationHistory.ConversationId);
         }
     }
 
@@ -126,23 +135,26 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
 
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName);
 
             var filter = Builders<ConversationHistoryDomain>.Filter.Where(x => x.UserName == userName && x.IsActive);
             var allConversationHistoryData = await mongoDatabaseService.GetDataFromCollectionAsync(
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.ConversationHistoryCollectionName,
                 filter: filter).ConfigureAwait(false);
-            return allConversationHistoryData.Any() && await mongoDatabaseService.DeleteDataFromCollectionAsync(filter, this.MongoDatabaseName, this.ConversationHistoryCollectionName).ConfigureAwait(false);
+            return allConversationHistoryData.Any() && await mongoDatabaseService.DeleteDataFromCollectionAsync(
+                filter: filter,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.ConversationHistoryCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName);
         }
     }
 }

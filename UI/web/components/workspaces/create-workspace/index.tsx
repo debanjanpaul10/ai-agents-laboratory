@@ -11,8 +11,7 @@ import {
 	Type,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button, Input, Chip } from "@heroui/react";
-import { cn } from "@heroui/react";
+import { Button, Input, Chip, cn } from "@heroui/react";
 
 import { useAuth } from "@auth/AuthProvider";
 import { FullScreenLoading } from "@components/common/spinner";
@@ -181,10 +180,7 @@ export default function CreateWorkspaceComponent({
 	) : (
 		isDrawerOpen && (
 			<>
-				<div
-					className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 max-w-full"
-					onClick={onCloseFlyout}
-				/>
+				<div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 max-w-full" />
 				<div className="fixed right-0 top-0 md:w-1/2 w-full h-screen z-50 transition-all duration-500 ease-in-out">
 					<div className="absolute inset-0 bg-gradient-to-l from-purple-600/20 via-blue-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
 					<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl flex flex-col">
@@ -231,7 +227,10 @@ export default function CreateWorkspaceComponent({
 
 								<div className="space-y-4">
 									<div className="space-y-2">
-										<label className="text-white/80 font-semibold text-sm ml-1">
+										<label
+											className="text-white/80 font-semibold text-sm ml-1"
+											htmlFor="agentWorkspaceName"
+										>
 											Workspace Name
 										</label>
 										<Input
@@ -258,7 +257,10 @@ export default function CreateWorkspaceComponent({
 								</div>
 
 								<div className="space-y-4">
-									<label className="text-white/80 font-semibold text-sm ml-1">
+									<label
+										className="text-white/80 font-semibold text-sm ml-1"
+										htmlFor="selectedAgentGuids"
+									>
 										Select Workspace Agents
 									</label>
 									<div className="flex gap-3">
@@ -310,8 +312,8 @@ export default function CreateWorkspaceComponent({
 										<Button
 											isIconOnly
 											className="h-[56px] w-[56px] min-w-[56px] bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-400/10 text-cyan-400 transition-all duration-300 rounded-2xl group/btn"
-											onPress={async () => {
-												await GetAllAvailableAgents();
+											onPress={() => {
+												GetAllAvailableAgents();
 												onOpenAssociateAgents(
 													selectedAgentGuids,
 													handleAgentSelectionComplete,
@@ -335,7 +337,11 @@ export default function CreateWorkspaceComponent({
 												(Preview)
 											</span>
 										</label>
-										<label className="relative inline-flex items-end cursor-pointer">
+										<label
+											className="relative inline-flex items-end cursor-pointer"
+											htmlFor="isGroupChatEnabled"
+											aria-label="Is GroupChat Enabled"
+										>
 											<input
 												type="checkbox"
 												checked={
@@ -374,7 +380,10 @@ export default function CreateWorkspaceComponent({
 
 								<div className="space-y-4">
 									<div className="space-y-2">
-										<label className="text-white/80 font-semibold text-sm ml-1">
+										<label
+											className="text-white/80 font-semibold text-sm ml-1"
+											htmlFor="newUserEmail"
+										>
 											Add Member Email
 										</label>
 										<div className="flex space-x-3 mt-1">
@@ -455,9 +464,11 @@ export default function CreateWorkspaceComponent({
 											<span className="text-indigo-400 font-bold block mb-1">
 												Pro Tip:
 											</span>
-											Workspaces help you organize agents
-											and collaborate with teammates in an
-											isolated environment.
+											{
+												WorkspacesConstants
+													.CreateWorkspaceConstants
+													.Protip
+											}
 										</p>
 									</div>
 								</div>

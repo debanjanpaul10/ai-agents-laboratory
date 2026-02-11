@@ -4,7 +4,9 @@ import LoginPage from "@pages/login";
 import { AuthenticatedAppProps } from "@shared/types";
 import { tokenService } from "@helpers/token-service";
 
-export default function AuthenticatedApp({ children }: AuthenticatedAppProps) {
+export default function AuthenticatedApp({
+	children,
+}: Readonly<AuthenticatedAppProps>) {
 	const isAuthenticated = useIsAuthenticated();
 	const token = tokenService.getToken();
 

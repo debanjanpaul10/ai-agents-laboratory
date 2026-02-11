@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using AIAgents.Laboratory.Domain.DomainEntities;
+﻿using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
@@ -27,12 +26,12 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     /// <summary>
     /// The mongo database name configuration value.
     /// </summary>
-    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The agents data collection name configuration value.
     /// </summary>
-    private readonly string AgentsDataCollectionName = configuration[MongoDbCollectionConstants.AgentsCollectionName] ?? throw new Exception(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string AgentsDataCollectionName = configuration[MongoDbCollectionConstants.AgentsCollectionName] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The is knowledge base service allowed.
@@ -71,12 +70,15 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                 await this.UpdateSkillsWithAssociatedAgentsDataAsync(agentData, userEmail).ConfigureAwait(false);
 
             agentData.PrepareAuditEntityData(userEmail);
-            return await mongoDatabaseService.SaveDataAsync(agentData, this.MongoDatabaseName, this.AgentsDataCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.SaveDataAsync(
+                data: agentData,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewAgentAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -97,7 +99,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
 
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, agentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, agentId);
 
             var filter = Builders<AgentDataDomain>.Filter.And(
                 Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
@@ -115,9 +117,12 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                     )
                 );
 
-            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.AgentsDataCollectionName, filter).ConfigureAwait(false);
+            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName,
+                filter).ConfigureAwait(false);
 
-            var agentData = allData.First() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
+            var agentData = allData.First() ?? throw new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
             if (agentData.StoredKnowledgeBase is not null && agentData.StoredKnowledgeBase.Any())
                 agentData.ConvertKnowledgebaseBinaryDataToFile();
 
@@ -125,12 +130,12 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, agentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, agentId);
         }
     }
 
@@ -143,7 +148,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, userEmail));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, userEmail);
 
             var filter = Builders<AgentDataDomain>.Filter.And(
                 Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
@@ -157,23 +162,24 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                 )
             );
 
-            var agents = await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.AgentsDataCollectionName, filter).ConfigureAwait(false);
-
+            var agents = await mongoDatabaseService.GetDataFromCollectionAsync(
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName,
+                filter).ConfigureAwait(false);
             // Process stored knowledge base data if available
-            foreach (var agent in agents)
-                if (agent.StoredKnowledgeBase is not null && agent.StoredKnowledgeBase.Any())
-                    agent.ConvertKnowledgebaseBinaryDataToFile();
+            foreach (var agent in from agent in agents where agent.StoredKnowledgeBase is not null && agent.StoredKnowledgeBase.Any() select agent)
+                agent.ConvertKnowledgebaseBinaryDataToFile();
 
             return agents;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, userEmail));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, userEmail);
         }
     }
 
@@ -195,7 +201,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
 
             var filter = Builders<AgentDataDomain>.Filter.And(Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
             var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.AgentsDataCollectionName, filter).ConfigureAwait(false);
-            var existingAgent = agentsData.FirstOrDefault() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
+            var existingAgent = agentsData.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
 
             var updates = new List<UpdateDefinition<AgentDataDomain>>
             {
@@ -219,12 +225,16 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                 await this.UpdateSkillsWithAssociatedAgentsDataAsync(updateDataDomain, userEmail).ConfigureAwait(false);
 
             var update = Builders<AgentDataDomain>.Update.Combine(updates);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, this.MongoDatabaseName, this.AgentsDataCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.UpdateDataInCollectionAsync(
+                filter,
+                update,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -245,11 +255,14 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
 
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, agentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, agentId);
 
             var filter = Builders<AgentDataDomain>.Filter.Where(x => x.IsActive && x.AgentId == agentId);
-            var allAgents = await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.AgentsDataCollectionName, filter).ConfigureAwait(false);
-            var updateAgent = allAgents.FirstOrDefault() ?? throw new Exception(ExceptionConstants.AgentNotFoundExceptionMessage);
+            var allAgents = await mongoDatabaseService.GetDataFromCollectionAsync(
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName,
+                filter: filter).ConfigureAwait(false);
+            var updateAgent = allAgents.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
 
             if (updateAgent.CreatedBy != currentUserEmail)
                 throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
@@ -261,16 +274,20 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             };
             var update = Builders<AgentDataDomain>.Update.Combine(updates);
             await documentIntelligenceService.DeleteKnowledgebaseAndImagesDataAsync(agentId).ConfigureAwait(false);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, this.MongoDatabaseName, this.AgentsDataCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.UpdateDataInCollectionAsync(
+                filter,
+                update,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.AgentsDataCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, agentId));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, agentId);
         }
     }
 
@@ -284,13 +301,13 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
             return await documentIntelligenceService.DownloadKnowledgebaseFileAsync(agentGuid, fileName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.LogHelperMethodFailed, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -316,9 +333,8 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                 AgentName = agentData.AgentName
             }
         };
-        await toolSkillsService.AssociateSkillAndAgentAsync(associatedAgentsData, agentData.AssociatedSkillGuids.First(), currentUserEmail);
+        await toolSkillsService.AssociateSkillAndAgentAsync(associatedAgentsData, agentData.AssociatedSkillGuids[0], currentUserEmail);
     }
-
 
     #endregion
 }

@@ -3,7 +3,7 @@
 /// <summary>
 /// The Orchestrator Response Domain Model.
 /// </summary>
-public sealed record OrchestratorResponseDomain
+public sealed record OrchestratorAgentResponseDomain
 {
     /// <summary>
     /// The type of response from orchestrator.

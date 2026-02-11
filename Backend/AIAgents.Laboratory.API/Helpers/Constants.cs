@@ -65,9 +65,14 @@ internal static class Constants
     internal static class LoggingConstants
     {
         /// <summary>
+        /// The Correlation Id header constant.
+        /// </summary>
+        internal const string CorrelationIdHeader = "X-Correlation-ID";
+
+        /// <summary>
         /// The log helper method start.
         /// </summary>
-        internal const string LogHelperMethodStart = "{0} started at {1}";
+        internal const string LogHelperMethodStart = "{0} started at {1} for {2}";
 
         /// <summary>
         /// The log helper method failed.
@@ -77,7 +82,47 @@ internal static class Constants
         /// <summary>
         /// The log helper method end.
         /// </summary>
-        internal const string LogHelperMethodEnd = "{0} ended at {1}";
+        internal const string LogHelperMethodEnd = "{0} ended at {1} for {2}";
+
+        /// <summary>
+        /// The http logging message constant.
+        /// </summary>
+        internal const string HttpLoggingMessage = "HTTP {Method} {Path} started";
+
+        /// <summary>
+        /// The http logging message constant with time elapsed.
+        /// </summary>
+        internal const string HttpLoggingMessageWithTime = "HTTP {Method} {Path} responded {StatusCode} in {ElapsedMilliseconds}ms";
+
+        /// <summary>
+        /// The unhandled exception logging message constant.
+        /// </summary>
+        internal const string UnhandledExceptionMessage = "Unhandled exception occurred. CorrelationId: {CorrelationId}, Path: {Path}, Method: {Method}";
+        /// <summary>
+        /// The header logging constants class.
+        /// </summary>
+        internal static class HeaderLoggingConstants
+        {
+            /// <summary>
+            /// The correlation id constant.
+            /// </summary>
+            internal const string CorrelationId = "CorrelationId";
+
+            /// <summary>
+            /// The request path constant.
+            /// </summary>
+            internal const string RequestPath = "RequestPath";
+
+            /// <summary>
+            /// The request method constant.
+            /// </summary>
+            internal const string RequestMethod = "RequestMethod";
+
+            /// <summary>
+            /// The status code constant.
+            /// </summary>
+            internal const string StatusCode = "StatusCode";
+        }
     }
 
     /// <summary>

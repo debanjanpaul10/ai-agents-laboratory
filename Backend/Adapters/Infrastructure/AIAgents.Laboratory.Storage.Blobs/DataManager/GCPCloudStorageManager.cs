@@ -16,22 +16,25 @@ namespace AIAgents.Laboratory.Storage.Blobs.DataManager;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="storageClient">The Google Cloud Storage client instance.</param>
 /// <seealso cref="IBlobStorageManager"/>
-public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logger, IConfiguration configuration, StorageClient storageClient) : IBlobStorageManager
+public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logger, IConfiguration configuration, StorageClient storageClient) : IBlobStorageManager
 {
     /// <summary>
     /// The Google Cloud Platform storage bucket name.
     /// </summary>
-    private readonly string GCPStorageBucketName = configuration[AzureAppConfigurationConstants.GCPBucketNameConstant] ?? throw new InvalidOperationException(ExceptionConstants.GCPBucketNotConfiguredExceptionMessage);
+    private readonly string GCPStorageBucketName = configuration[AzureAppConfigurationConstants.GCPBucketNameConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.GCPBucketNotConfiguredExceptionMessage);
 
     /// <summary>
     /// The Google Cloud Platform knowledge base folder name.
     /// </summary>
-    private readonly string GCPKnowledgeBaseFolderName = configuration[AzureAppConfigurationConstants.GCPKBFolderNameConstant] ?? throw new InvalidOperationException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string GCPKnowledgeBaseFolderName = configuration[AzureAppConfigurationConstants.GCPKBFolderNameConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The Google Cloud Platform vision images folder name.
     /// </summary>
-    private readonly string GCPVisionImagesFolderName = configuration[AzureAppConfigurationConstants.GCPImageFolderNameConstant] ?? throw new InvalidOperationException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string GCPVisionImagesFolderName = configuration[AzureAppConfigurationConstants.GCPImageFolderNameConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// Deletes the documents data and folder from blob storage.
@@ -61,7 +64,7 @@ public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logge
                 try
                 {
                     // Construct the prefix for objects to delete: {folderName}/{agentId}/
-                    string prefix = string.Format(GCPCloudStorageConstants.AgentFolderStructureFormat, folderName, agentId) + "/";
+                    string prefix = string.Format(GcpCloudStorageConstants.AgentFolderStructureFormat, folderName, agentId) + "/";
 
                     // List all objects with the specified prefix
                     var objectsToDelete = storageClient.ListObjects(this.GCPStorageBucketName, prefix);
@@ -87,7 +90,7 @@ public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logge
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -111,7 +114,7 @@ public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logge
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
 
             var safeFileName = Path.GetFileName(fileName);
-            string objectName = string.Format(GCPCloudStorageConstants.AgentFolderStructureFormat, this.GCPKnowledgeBaseFolderName, agentGuid) + "/" + safeFileName;
+            string objectName = string.Format(GcpCloudStorageConstants.AgentFolderStructureFormat, this.GCPKnowledgeBaseFolderName, agentGuid) + "/" + safeFileName;
 
             var stream = new MemoryStream();
             var file = await storageClient.DownloadObjectAsync(
@@ -120,14 +123,14 @@ public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logge
                 destination: stream).ConfigureAwait(false);
 
             if (file is not null)
-                return string.Format(GCPCloudStorageConstants.PublicUrlConstant, this.GCPStorageBucketName, file.Name);
+                return string.Format(GcpCloudStorageConstants.PublicUrlConstant, this.GCPStorageBucketName, file.Name);
             else
                 throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -157,7 +160,7 @@ public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logge
             };
 
             var safeFileName = Path.GetFileName(documentFile.FileName);
-            var objectName = string.Format(GCPCloudStorageConstants.AgentFolderStructureFormat, folderName, agentGuid) + "/" + safeFileName;
+            var objectName = string.Format(GcpCloudStorageConstants.AgentFolderStructureFormat, folderName, agentGuid) + "/" + safeFileName;
 
             using var stream = documentFile.OpenReadStream();
             var uploadedObject = await storageClient.UploadObjectAsync(
@@ -167,12 +170,12 @@ public sealed class GCPCloudStorageManager(ILogger<GCPCloudStorageManager> logge
                 source: stream).ConfigureAwait(false);
 
             // Construct the public URL for the uploaded object
-            return string.Format(GCPCloudStorageConstants.PublicUrlConstant, this.GCPStorageBucketName, objectName);
+            return string.Format(GcpCloudStorageConstants.PublicUrlConstant, this.GCPStorageBucketName, uploadedObject.Name);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

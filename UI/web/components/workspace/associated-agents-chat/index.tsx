@@ -186,19 +186,7 @@ export default function AssociatedAgentsChatPaneComponent({
 		}
 	}
 
-	return !selectedAgent ? (
-		<div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl text-center p-8">
-			<div className="bg-white/5 backdrop-blur-sm rounded-full p-8 mb-6">
-				<MessageSquare className="w-16 h-16 text-white/40" />
-			</div>
-			<h2 className="text-2xl font-bold bg-gradient-to-r from-white via-cyan-100 to-blue-100 bg-clip-text text-transparent mb-4">
-				{RunWorkspaceConstants.ChatPane.SelectAgentHeader}
-			</h2>
-			<p className="text-white/60 max-w-md">
-				{RunWorkspaceConstants.ChatPane.SelectAgentSubheader}
-			</p>
-		</div>
-	) : (
+	return selectedAgent ? (
 		<div className="h-full flex flex-col bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl">
 			{/* Chat Header */}
 			<div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
@@ -259,9 +247,9 @@ export default function AssociatedAgentsChatPaneComponent({
 					</div>
 				) : (
 					<div className="space-y-4">
-						{messages.map((message, index) => (
+						{messages.map((message, _) => (
 							<div
-								key={index}
+								key={message.id}
 								className={`flex ${
 									message.type === "user"
 										? "justify-end"
@@ -347,6 +335,18 @@ export default function AssociatedAgentsChatPaneComponent({
 					</Button>
 				</div>
 			</div>
+		</div>
+	) : (
+		<div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl text-center p-8">
+			<div className="bg-white/5 backdrop-blur-sm rounded-full p-8 mb-6">
+				<MessageSquare className="w-16 h-16 text-white/40" />
+			</div>
+			<h2 className="text-2xl font-bold bg-gradient-to-r from-white via-cyan-100 to-blue-100 bg-clip-text text-transparent mb-4">
+				{RunWorkspaceConstants.ChatPane.SelectAgentHeader}
+			</h2>
+			<p className="text-white/60 max-w-md">
+				{RunWorkspaceConstants.ChatPane.SelectAgentSubheader}
+			</p>
 		</div>
 	);
 }

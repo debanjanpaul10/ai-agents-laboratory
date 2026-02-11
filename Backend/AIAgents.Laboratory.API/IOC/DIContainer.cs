@@ -60,7 +60,7 @@ public static class DIContainer
     {
         services.ConfigureAuthenticationServices(configuration);
 
-        services.AddAPIAdapterDependencies().AddMessagingDependencies().AddMemoryCache().AddCacheDependencies();
+        services.AddAPIAdapterDependencies().AddMessagingDependencies(configuration).AddMemoryCache().AddCacheDependencies();
         services.AddAgentsFrameworkDependencies(configuration).AddMongoDbAdapterDependencies(configuration)
             .AddRelationalSqlDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
 
@@ -145,7 +145,9 @@ public static class DIContainer
         var authenticationFailedException = new UnauthorizedAccessException(ExceptionConstants.InvalidTokenExceptionConstant);
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();
         logger.LogError(authenticationFailedException, authenticationFailedException.Message);
-        await Task.CompletedTask;
+
+        context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        await context.HttpContext.Response.WriteAsync(authenticationFailedException.Message);
     }
 
     #endregion

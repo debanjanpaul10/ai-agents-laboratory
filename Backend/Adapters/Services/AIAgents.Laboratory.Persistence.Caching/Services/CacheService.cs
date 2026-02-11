@@ -1,4 +1,5 @@
 ﻿using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -52,7 +53,7 @@ public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService>
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetCachedData), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -93,7 +94,7 @@ public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService>
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(RemoveCachedData), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -129,7 +130,7 @@ public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService>
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(SetCacheData), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {

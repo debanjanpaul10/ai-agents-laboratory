@@ -1,7 +1,9 @@
-﻿using System.Globalization;
+﻿using System.Data.SqlTypes;
 using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using static AIAgents.Laboratory.Persistence.MongoDatabase.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
@@ -26,22 +28,22 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodStartedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TResult>(collectionName);
             if (collectionData is not null)
                 return await collectionData.Find(filter).ToListAsync().ConfigureAwait(false);
 
-            throw new Exception(ExceptionConstants.SomethingWentWrongMessageConstant);
+            throw new SqlTypeException(ExceptionConstants.SomethingWentWrongMessageConstant);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodEndedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
         }
     }
 
@@ -57,7 +59,7 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodStartedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TInput>(collectionName);
             if (collectionData is not null)
@@ -66,16 +68,16 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
                 return true;
             }
 
-            throw new Exception(ExceptionConstants.SomethingWentWrongMessageConstant);
+            throw new SqlTypeException(ExceptionConstants.SomethingWentWrongMessageConstant);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodFailedWithMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodEndedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
         }
     }
 
@@ -93,25 +95,25 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodStartedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
-            var collectionData = mongoDatabase.GetCollection<TDocument>(collectionName) ?? throw new Exception(ExceptionConstants.CollectionDoesNotExistsMessage);
+            var collectionData = mongoDatabase.GetCollection<TDocument>(collectionName) ?? throw new FileNotFoundException(ExceptionConstants.CollectionDoesNotExistsMessage);
 
             var result = await collectionData.UpdateOneAsync(filter, update).ConfigureAwait(false);
             if (result.ModifiedCount == 0)
-                throw new Exception("No document was updated. Document may not exist or no changes were needed.");
+                throw new SqlTypeException(ExceptionConstants.NoDocumentWasUpdatedMessageConstant);
 
             return true;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodFailedWithMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodEndedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
         }
     }
 
@@ -127,26 +129,25 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     {
         try
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodStartedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
-            var collectionData = mongoDatabase.GetCollection<TDocument>(collectionName) ?? throw new Exception(ExceptionConstants.CollectionDoesNotExistsMessage);
+            var collectionData = mongoDatabase.GetCollection<TDocument>(collectionName) ?? throw new FileNotFoundException(ExceptionConstants.CollectionDoesNotExistsMessage);
 
             var result = await collectionData.DeleteOneAsync(filter).ConfigureAwait(false);
             if (result.DeletedCount == 0)
-                throw new Exception("No document was deleted. Document may not exist or no changes were needed.");
+                throw new SqlTypeException(ExceptionConstants.NoDocumentWasUpdatedMessageConstant);
 
             return true;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodFailedWithMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, ex.Message));
-            throw;
+            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            logger.LogInformation(string.Format(CultureInfo.CurrentCulture, LoggingConstants.MethodEndedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow));
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
         }
     }
-
 }

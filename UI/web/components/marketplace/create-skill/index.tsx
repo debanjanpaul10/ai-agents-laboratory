@@ -43,11 +43,9 @@ export default function CreateSkillComponent() {
 	const IsDrawerOpenStoreData = useAppSelector(
 		(state) => state.ToolSkillsReducer.isAddSkillDrawerOpen,
 	);
-
 	const IsCreateSkillLoading = useAppSelector(
 		(state) => state.ToolSkillsReducer.isCreateSkillLoading,
 	);
-
 	const IsMcpToolsLoading = useAppSelector(
 		(state) => state.ToolSkillsReducer.isMcpToolsLoading,
 	);
@@ -105,7 +103,7 @@ export default function CreateSkillComponent() {
 	};
 
 	function GetAllMcpToolsAvailable(mcpServerUrl: string) {
-		var mcpServerRequest: McpServerToolRequestDTO = {
+		const mcpServerRequest: McpServerToolRequestDTO = {
 			serverUrl: mcpServerUrl,
 		};
 		dispatch(GetAllMcpToolsAvailableAsync(mcpServerRequest));
@@ -128,11 +126,7 @@ export default function CreateSkillComponent() {
 	) : (
 		isDrawerOpen && (
 			<>
-				<div
-					className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 max-w-full"
-					onClick={onCloseFlyout}
-				/>
-
+				<div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 max-w-full" />
 				<div className="fixed right-0 top-0 md:w-1/2 h-screen z-50 transition-all duration-500 ease-in-out">
 					<div className="absolute inset-0 bg-gradient-to-l from-purple-600/20 via-blue-600/20 to-cyan-600/20 blur-sm opacity-50 -z-10"></div>
 					<div className="relative h-full bg-gradient-to-br from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl flex flex-col">
@@ -177,7 +171,10 @@ export default function CreateSkillComponent() {
 
 								<div className="space-y-6">
 									<div className="space-y-2">
-										<label className="text-white/80 font-semibold text-sm ml-1">
+										<label
+											className="text-white/80 font-semibold text-sm ml-1"
+											htmlFor="toolSkillDisplayName"
+										>
 											Display Name
 										</label>
 										<Input
@@ -209,7 +206,10 @@ export default function CreateSkillComponent() {
 									</div>
 
 									<div className="space-y-2">
-										<label className="text-white/80 font-semibold text-sm ml-1">
+										<label
+											className="text-white/80 font-semibold text-sm ml-1"
+											htmlFor="toolSkillTechnicalName"
+										>
 											Technical Name
 										</label>
 										<Input
@@ -241,7 +241,10 @@ export default function CreateSkillComponent() {
 									</div>
 
 									<div className="space-y-2">
-										<label className="text-white/80 font-semibold text-sm ml-1">
+										<label
+											className="text-white/80 font-semibold text-sm ml-1"
+											htmlFor="toolSkillMcpServerUrl"
+										>
 											MCP Server URL
 										</label>
 										<div className="flex gap-3 items-center">

@@ -57,6 +57,16 @@ internal static class Constants
         /// The is ai service enabled constant
         /// </summary>
         internal const string IsAIServiceEnabledConstant = "IsAIServiceEnabled";
+
+        /// <summary>
+        /// The email notification service connection string.
+        /// </summary>
+        internal const string EmailNotificationServiceConnectionString = "EmailNotification:ConnectionString";
+
+        /// <summary>
+        /// The email notification service sender address.
+        /// </summary>
+        internal const string EmailNotificationServiceSenderAddress = "EmailNotification:SenderAddress";
     }
 
     /// <summary>
@@ -78,5 +88,16 @@ internal static class Constants
         /// The receive agent status function
         /// </summary>
         internal const string ReceiveAgentStatusFunction = "ReceiveAgentStatus";
+    }
+
+    /// <summary>
+    /// The exception messages constant class.
+    /// </summary>
+    internal static class ExceptionMessagesConstants
+    {
+        /// <summary>
+        /// The configuration missing exception message constant.
+        /// </summary>
+        internal const string ConfigurationMissingExceptionMessage = "The requested configuration was not found!";
     }
 }

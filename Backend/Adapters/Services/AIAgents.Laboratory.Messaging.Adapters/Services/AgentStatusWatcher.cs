@@ -90,9 +90,9 @@ public sealed class AgentStatusWatcher(ILogger<AgentStatusWatcher> logger, IConf
         }
         catch (AzureSignalRNotConnectedException ex)
         {
-            logger.LogWarning(LoggingConstants.UnableToRelayMessage, ex.Message);
+            logger.LogError(ex, LoggingConstants.UnableToRelayMessage, ex.Message);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not AzureSignalRNotConnectedException)
         {
             logger.LogError(ex, LoggingConstants.ErrorBroadcastingStatusChange, ex.Message);
         }

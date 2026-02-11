@@ -1,4 +1,5 @@
 using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -33,8 +34,8 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         }
         catch (Exception ex)
         {
-            logger.LogError(LoggingConstants.LogHelperMethodFailed, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -64,8 +65,8 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         }
         catch (Exception ex)
         {
-            logger.LogError(LoggingConstants.LogHelperMethodFailed, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -101,8 +102,8 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         }
         catch (Exception ex)
         {
-            logger.LogError(LoggingConstants.LogHelperMethodFailed, nameof(CreateMcpClientAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateMcpClientAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
@@ -117,14 +118,11 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
     /// <returns>The sanitized value suitable for logging.</returns>
     private static string SanitizeForLogging(string value)
     {
-        if (string.IsNullOrEmpty(value))
-        {
-            return value;
-        }
+        if (string.IsNullOrEmpty(value)) return value;
 
         var withoutLineEndings = value.Replace("\r", string.Empty).Replace("\n", string.Empty);
         var sanitizedChars = withoutLineEndings.Where(c => !char.IsControl(c) || c == '\t');
-        return new string(sanitizedChars.ToArray());
+        return new string([.. sanitizedChars]);
     }
 
     #endregion

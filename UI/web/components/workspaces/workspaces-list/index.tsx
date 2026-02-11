@@ -25,7 +25,7 @@ export default function WorkspacesListComponent({
 	showCloseButton = true,
 	actionButton,
 	onEditWorkspace,
-}: WorkspacesListComponentProps) {
+}: Readonly<WorkspacesListComponentProps>) {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [selectedCreator, setSelectedCreator] = useState<string>("all");
 	const [sortBy, setSortBy] = useState<"name" | "date">("date");
@@ -40,7 +40,7 @@ export default function WorkspacesListComponent({
 			),
 		];
 
-		return creators.sort();
+		return creators.sort((a, b) => a.localeCompare(b));
 	}, [workspacesList]);
 
 	const filteredAndSortedWorkspaces = useMemo(() => {
@@ -260,8 +260,12 @@ export default function WorkspacesListComponent({
 										</div>
 										<div className="relative">
 											<div className="flex items-center space-x-1 bg-blue-500/10 px-2 py-1 rounded-full border border-blue-500/20 group-hover:opacity-0 transition-opacity duration-300">
-												<span className="text-blue-400 text-[10px] font-medium uppercase tracking-wider">
-													Workspace
+												<span
+													className={`${workspace.isGroupChatEnabled ? "text-violet-400" : "text-cyan-100"} text-[10px] font-medium uppercase tracking-wider`}
+												>
+													{workspace.isGroupChatEnabled
+														? "Premium Workspace"
+														: "Workspace"}
 												</span>
 											</div>
 											<div className="absolute top-0 right-0 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-[-2px]">

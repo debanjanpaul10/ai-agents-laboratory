@@ -13,7 +13,7 @@ import { CommonToasterConstants } from "@helpers/toaster-constants";
 export default function BugReportComponent({
 	onClose,
 }: {
-	onClose: () => void;
+	readonly onClose: () => void;
 }) {
 	const authContext = useAuth();
 	const dispatch = useAppDispatch();
@@ -29,7 +29,7 @@ export default function BugReportComponent({
 
 	const handleInputChange = (
 		field: keyof AddBugReportDTO,
-		value: string | number
+		value: string | number,
 	) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
@@ -51,11 +51,10 @@ export default function BugReportComponent({
 				authContext.user?.email ||
 				authContext.user?.name ||
 				"Anonymous",
-			agentDetails: formData.agentDetails || window.location.href,
+			agentDetails: formData.agentDetails || globalThis.location.href,
 		};
 
 		dispatch(AddBugReportDataAsync(bugReport));
-
 		setIsSubmitting(false);
 	}
 
@@ -140,7 +139,9 @@ export default function BugReportComponent({
 								const value = Array.from(keys)[0];
 								handleInputChange(
 									"bugSeverity",
-									value ? parseInt(value as string) : 0
+									value
+										? Number.parseInt(value as string)
+										: 0,
 								);
 							}}
 							placeholder={
@@ -187,7 +188,7 @@ export default function BugReportComponent({
 							onChange={(e) =>
 								handleInputChange(
 									"bugDescription",
-									e.target.value
+									e.target.value,
 								)
 							}
 							placeholder={
@@ -212,7 +213,7 @@ export default function BugReportComponent({
 							onChange={(e) =>
 								handleInputChange(
 									"agentDetails",
-									e.target.value
+									e.target.value,
 								)
 							}
 							placeholder={

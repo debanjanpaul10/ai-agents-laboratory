@@ -1,4 +1,5 @@
 using AIAgents.Laboratory.Processor.Contracts;
+using AIAgents.Laboratory.Processor.Helpers;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 using Microsoft.Extensions.Configuration;
@@ -62,7 +63,7 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
         catch (Exception ex)
         {
             logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, ex.Message);
-            throw;
+            throw new AIAgentsException(ex);
         }
         finally
         {

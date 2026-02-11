@@ -23,7 +23,7 @@ export default function SkillsListComponent({
 	isDisabled,
 	showCloseButton = true,
 	actionButton,
-}: SkillsListComponentProps) {
+}: Readonly<SkillsListComponentProps>) {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedAgent, setSelectedAgent] = useState<string>("all");
 	const [selectedCreator, setSelectedCreator] = useState<string>("all");
@@ -39,7 +39,7 @@ export default function SkillsListComponent({
 				),
 			),
 		];
-		return agents.sort();
+		return agents.sort((a, b) => a.localeCompare(b));
 	}, [toolSkillsList]);
 
 	const uniqueCreators = useMemo(() => {
@@ -48,7 +48,7 @@ export default function SkillsListComponent({
 				toolSkillsList.map((skill) => skill.createdBy || "Unknown"),
 			),
 		];
-		return creators.sort();
+		return creators.sort((a, b) => a.localeCompare(b));
 	}, [toolSkillsList]);
 
 	// Filter and sort skills
@@ -420,17 +420,17 @@ export default function SkillsListComponent({
 			<div className="p-6 flex-shrink-0 border-t border-white/5 bg-black/20 backdrop-blur-md">
 				<div className="flex items-center justify-between">
 					<div className="text-white/60 text-sm">
-						{filteredAndSortedSkills.length !==
+						{filteredAndSortedSkills.length ===
 						toolSkillsList.length ? (
 							<>
-								Showing {filteredAndSortedSkills.length} of{" "}
 								{toolSkillsList.length} skill
-								{toolSkillsList.length !== 1 ? "s" : ""}
+								{toolSkillsList.length > 1 ? "s" : ""} total
 							</>
 						) : (
 							<>
+								Showing {filteredAndSortedSkills.length} of{" "}
 								{toolSkillsList.length} skill
-								{toolSkillsList.length !== 1 ? "s" : ""} total
+								{toolSkillsList.length > 1 ? "s" : ""}
 							</>
 						)}
 					</div>

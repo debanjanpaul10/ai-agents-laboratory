@@ -7,15 +7,16 @@ export function cn(...inputs: ClassValue[]): string {
 
 // Generate a unique ID for messages
 export function GenerateMessageId(): string {
-	return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+	const cryptoRandomNumber = crypto.randomUUID();
+	return `msg_${Date.now()}_${cryptoRandomNumber}`;
 }
 
 export function DownloadFile(downloadUrl: string, fileName: string) {
-	var link = document.createElement("a");
+	const link = document.createElement("a");
 	link.href = downloadUrl;
 	link.download = fileName;
 	link.target = "_blank";
 	document.body.appendChild(link);
 	link.click();
-	document.body.removeChild(link);
+	link.remove();
 }
