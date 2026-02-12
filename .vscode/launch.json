@@ -1,0 +1,10 @@
+{
+	"configurations": [
+		{
+			"name": "API DEBUG",
+			"type": "dotnet",
+			"request": "launch",
+			"projectPath": "${workspaceFolder}/Backend/AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj"
+		}
+	]
+}

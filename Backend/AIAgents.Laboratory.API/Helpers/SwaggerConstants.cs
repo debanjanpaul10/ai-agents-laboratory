@@ -469,5 +469,40 @@ internal static class SwaggerConstants
             internal const string OperationId = nameof(GetWorkspaceGroupChatResponseAction);
         }
     }
+
+    /// <summary>
+    /// Swagger documentation for ApplicationAdminController.
+    /// </summary>
+    internal static class ApplicationAdminController
+    {
+        /// <summary>
+        /// Swagger documentation for GetAllSubmittedFeatureRequestsAsync.
+        /// </summary>
+        internal static class GetAllSubmittedFeatureRequestsAction
+        {
+            internal const string Summary = "Gets all the submitted feature requests.";
+            internal const string Description = "Gets the list of all the submitted feature requests by users to be reviewed by devs and implemented.";
+            internal const string OperationId = nameof(GetAllSubmittedFeatureRequestsAction);
+        }
+        /// <summary>
+        /// Swagger documentation for GetAllBugReportsDataAsync.
+        /// </summary>
+        internal static class GetAllBugReportsDataAction
+        {
+            internal const string Summary = "Gets all the bug reports data.";
+            internal const string Description = "Gets the list of all the bug reports data submitted by users to be reviewed by devs and fixed.";
+            internal const string OperationId = nameof(GetAllBugReportsDataAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for IsAdminAccessEnabledAsync.
+        /// </summary>
+        internal static class IsAdminAccessEnabledAction
+        {
+            internal const string Summary = "Checks if the admin access is enabled.";
+            internal const string Description = "Checks if the admin access is enabled for the current logged in user.";
+            internal const string OperationId = nameof(IsAdminAccessEnabledAction);
+        }
+    }
 }
 

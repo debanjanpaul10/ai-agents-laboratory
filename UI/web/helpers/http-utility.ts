@@ -41,7 +41,6 @@ apiClient.interceptors.response.use(
 export async function GetAsync(apiUrl: string): Promise<ResponseDTO> {
 	try {
 		const response = await apiClient.get(apiUrl);
-
 		if (response?.data) return response?.data;
 		else
 			return {
@@ -60,7 +59,6 @@ export async function PostAsync(
 ): Promise<ResponseDTO> {
 	try {
 		const response = await apiClient.post(apiUrl, data);
-
 		if (response?.data) return response.data;
 		else
 			return {
@@ -76,7 +74,6 @@ export async function PostAsync(
 export async function DeleteAsync(apiUrl: string): Promise<ResponseDTO> {
 	try {
 		const response = await apiClient.delete(apiUrl);
-
 		if (response?.data) return response?.data;
 		else
 			return {
@@ -95,7 +92,6 @@ export async function PutAsync(
 ): Promise<ResponseDTO> {
 	try {
 		const response = await apiClient.put(apiUrl, data);
-
 		if (response?.data) return response?.data;
 		else
 			return {

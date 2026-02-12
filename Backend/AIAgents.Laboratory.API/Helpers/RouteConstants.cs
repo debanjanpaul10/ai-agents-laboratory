@@ -290,4 +290,25 @@ public static class RouteConstants
         /// </summary>
         internal const string GetWorkspaceGroupChatResponse_Route = "workspacegroupchatresponse";
     }
+
+    /// <summary>
+    /// The route constants for Application Admin Controller.
+    /// </summary>
+    internal static class ApplicationAdminRoutes
+    {
+        /// <summary>
+        /// The get all reported bugs route.
+        /// </summary>
+        internal const string GetAllReportedBugs_Route = "getallreportedbugs";
+
+        /// <summary>
+        /// The get all submitted feature requests route.
+        /// </summary>
+        internal const string GetAllSubmittedFeatureRequests_Route = "getallsubmittedfeaturerequests";
+
+        /// <summary>
+        /// The route constant for checking if admin access is enabled.
+        /// </summary>
+        internal const string IsAdminAccessEnabled_Route = "isadminaccessenabled";
+    }
 }

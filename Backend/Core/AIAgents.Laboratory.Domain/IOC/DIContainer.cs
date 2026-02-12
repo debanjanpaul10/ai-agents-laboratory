@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,13 +19,14 @@ public static class DIContainer
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddDomainDependencies(this IServiceCollection services) =>
         services.AddScoped<ICommonAiService, CommonAiService>()
-            .AddScoped<IAgentsService, AgentsService>()
-            .AddScoped<IAgentChatService, AgentChatService>()
-            .AddScoped<IDirectChatService, DirectChatService>()
-            .AddScoped<IConversationHistoryService, ConversationHistoryService>()
-            .AddScoped<IFeedbackService, FeedbackService>()
-            .AddScoped<IDocumentIntelligenceService, DocumentIntelligenceService>()
-            .AddScoped<IToolSkillsService, ToolSkillsService>()
-            .AddScoped<IWorkspacesService, WorkspacesService>()
-            .AddScoped<IOrchestratorService, OrchestratorService>();
+        .AddScoped<IAgentsService, AgentsService>()
+        .AddScoped<IAgentChatService, AgentChatService>()
+        .AddScoped<IDirectChatService, DirectChatService>()
+        .AddScoped<IConversationHistoryService, ConversationHistoryService>()
+        .AddScoped<IFeedbackService, FeedbackService>()
+        .AddScoped<IDocumentIntelligenceService, DocumentIntelligenceService>()
+        .AddScoped<IToolSkillsService, ToolSkillsService>()
+        .AddScoped<IWorkspacesService, WorkspacesService>()
+        .AddScoped<IOrchestratorService, OrchestratorService>()
+        .AddScoped<IApplicationAdminService, ApplicationAdminService>();
 }

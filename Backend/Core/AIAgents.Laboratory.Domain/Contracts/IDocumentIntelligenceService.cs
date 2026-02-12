@@ -1,7 +1,7 @@
 ﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using MongoDB.Driver;
 
-namespace AIAgents.Laboratory.Domain.DrivingPorts;
+namespace AIAgents.Laboratory.Domain.Contracts;
 
 /// <summary>
 /// Defines methods for processing and updating an agent's knowledge base documents and AI Vision images, including handling uploads, removals, and preparing update definitions for persistence.

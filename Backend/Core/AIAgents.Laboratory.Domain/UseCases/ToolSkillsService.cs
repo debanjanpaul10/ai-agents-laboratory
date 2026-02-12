@@ -1,3 +1,4 @@
+using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;

@@ -94,7 +94,8 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
             await foreach (var chunk in memoryStore.GetNearestMatchesAsync(agentId, queryEmbedding, 5))
                 relevantChunks.Add(chunk);
 
-            if (relevantChunks.Count == 0) return string.Empty;
+            if (relevantChunks.Count == 0)
+                return string.Empty;
 
             return string.Join("\n\n", relevantChunks.Where(c => !string.IsNullOrEmpty(c.Record.Metadata.Text)).Select(c => c.Record.Metadata.Text));
         }
@@ -183,13 +184,15 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadSpreadsheetData), DateTime.UtcNow, knowledgeBaseFile.FileName);
 
-            if (knowledgeBaseFile.FileContent.Length == 0) return string.Empty;
+            if (knowledgeBaseFile.FileContent.Length == 0)
+                return string.Empty;
 
             using var memoryStream = new MemoryStream(knowledgeBaseFile.FileContent);
             using var spreadsheetDocument = SpreadsheetDocument.Open(memoryStream, false);
 
             var workbookPart = spreadsheetDocument.WorkbookPart;
-            if (workbookPart?.Workbook.Sheets is null) return string.Empty;
+            if (workbookPart?.Workbook?.Sheets is null)
+                return string.Empty;
 
             return Utility.PrepareExcelData(workbookPart);
         }
@@ -226,7 +229,8 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
             using var wordDocument = WordprocessingDocument.Open(memoryStream, false);
 
             var body = wordDocument.MainDocumentPart?.Document?.Body;
-            if (body is null) return string.Empty;
+            if (body is null)
+                return string.Empty;
 
             var stringBuilder = new System.Text.StringBuilder();
             foreach (var paragraph in body.Elements<Paragraph>().Select(p => p.InnerText).Where(item => !string.IsNullOrWhiteSpace(item.Trim())))
@@ -305,7 +309,9 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadTextFileData), DateTime.UtcNow, knowledgeBaseFile.FileName);
 
-            if (knowledgeBaseFile.FileContent is null || knowledgeBaseFile.FileContent.Length == 0) return string.Empty;
+            if (knowledgeBaseFile.FileContent is null || knowledgeBaseFile.FileContent.Length == 0)
+                return string.Empty;
+
             return System.Text.Encoding.UTF8.GetString(knowledgeBaseFile.FileContent);
         }
         catch (Exception ex)

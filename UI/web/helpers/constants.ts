@@ -297,3 +297,12 @@ export const AssociateSkillsFlyoutPropsConstants = {
 		Done: "Done",
 	},
 };
+
+export const AdminPageConstants = {
+	UnauthorizedAccess: {
+		Header: "Acces Denied",
+		SubHeader: "Unauthorized Access",
+		Subtitle:
+			"You do not have permission to access the admin panel. If you believe this is an error, please contact the system administrator.",
+	},
+};

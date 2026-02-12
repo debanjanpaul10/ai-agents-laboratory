@@ -43,9 +43,9 @@ public static class DIContainer
         services.AddScoped<ICloudinary>(provider =>
         {
             var account = new Account(
-                configuration[AzureAppConfigurationConstants.CloudinaryCloudNameConstant],
-                configuration[AzureAppConfigurationConstants.CloudinaryApiKeyConstant],
-                configuration[AzureAppConfigurationConstants.CloudinaryApiSecretConstant]);
+                cloud: configuration[AzureAppConfigurationConstants.CloudinaryCloudNameConstant],
+                apiKey: configuration[AzureAppConfigurationConstants.CloudinaryApiKeyConstant],
+                apiSecret: configuration[AzureAppConfigurationConstants.CloudinaryApiSecretConstant]);
             return new Cloudinary(account);
         }).AddScoped<IBlobStorageManager, CloudinaryStorageManager>();
 
@@ -55,6 +55,7 @@ public static class DIContainer
     /// <param name="services">The services collection.</param>
     /// <param name="configuration">The configuration service.</param>
     /// <returns>The updated services collection.</returns>
+#pragma warning disable CS0618
     private static IServiceCollection AddGoogleCloudStorageDependencies(this IServiceCollection services, IConfiguration configuration) =>
         services.AddSingleton(provider =>
         {

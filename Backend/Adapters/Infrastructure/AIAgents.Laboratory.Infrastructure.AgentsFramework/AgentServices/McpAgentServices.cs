@@ -1,4 +1,4 @@
-using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.Helpers;
 using Microsoft.Extensions.Configuration;

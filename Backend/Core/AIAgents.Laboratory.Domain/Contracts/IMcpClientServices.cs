@@ -1,6 +1,6 @@
 ﻿using ModelContextProtocol.Client;
 
-namespace AIAgents.Laboratory.Domain.DrivingPorts;
+namespace AIAgents.Laboratory.Domain.Contracts;
 
 /// <summary>
 /// Defines a service for retrieving MCP client tools and functions from a specified MCP server.

@@ -93,4 +93,58 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
             logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(featureRequestData));
         }
     }
+
+    /// <summary>
+    /// Gets all bug reports data asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <returns>A list of <see cref="BugReportData"/></returns>
+    public async Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(string currentLoggedinUser)
+    {
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, currentLoggedinUser);
+
+            if (currentLoggedinUser == ADMIN_EMAIL_ADDRESS)
+                return await feedbackDataManager.GetAllBugReportsDataAsync(currentLoggedinUser).ConfigureAwait(false);
+            else
+                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, currentLoggedinUser);
+        }
+    }
+
+    /// <summary>
+    /// Gets all submitted feature requests asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <returns>A list of <see cref="NewFeatureRequestData"/></returns>
+    public async Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser)
+    {
+        try
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, currentLoggedinUser);
+
+            if (currentLoggedinUser == ADMIN_EMAIL_ADDRESS)
+                return await feedbackDataManager.GetAllSubmittedFeatureRequestsAsync(currentLoggedinUser).ConfigureAwait(false);
+            else
+                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, currentLoggedinUser);
+        }
+    }
 }

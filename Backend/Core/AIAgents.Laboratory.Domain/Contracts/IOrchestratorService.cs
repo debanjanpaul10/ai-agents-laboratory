@@ -1,7 +1,7 @@
 ﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 
-namespace AIAgents.Laboratory.Domain.DrivenPorts;
+namespace AIAgents.Laboratory.Domain.Contracts;
 
 /// <summary>
 /// The orchestrator service interface.

@@ -1,26 +1,12 @@
-using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
+﻿using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 
 namespace AIAgents.Laboratory.Domain.DrivingPorts;
 
 /// <summary>
-/// The contract for feedback service.
+/// The contract for application admin service, which is responsible for handling application administration related operations, such as retrieving bug reports and feature requests.
 /// </summary>
-public interface IFeedbackService
+public interface IApplicationAdminService
 {
-    /// <summary>
-    /// Adds the new bug report data asynchronous.
-    /// </summary>
-    /// <param name="bugReportData">The bug report data.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    Task<bool> AddNewBugReportDataAsync(BugReportData bugReportData);
-
-    /// <summary>
-    /// Adds the new feature request data asynchronous.
-    /// </summary>
-    /// <param name="featureRequestData">The feature request data.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    Task<bool> AddNewFeatureRequestDataAsync(NewFeatureRequestData featureRequestData);
-
     /// <summary>
     /// Gets all bug reports data asynchronous.
     /// </summary>
@@ -35,4 +21,10 @@ public interface IFeedbackService
     /// <returns>A list of <see cref="NewFeatureRequestData"/></returns>
     Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser);
 
+    /// <summary>
+    /// Checks if the admin access is enabled for the current logged in user asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedInUser">The current logged in user.</param>
+    /// <returns>The boolean for success/failure.</returns>
+    bool IsAdminAccessEnabledAsync(string currentLoggedInUser);
 }

@@ -1,6 +1,6 @@
 using AIAgents.Laboratory.Domain.DomainEntities;
 
-namespace AIAgents.Laboratory.Domain.DrivingPorts;
+namespace AIAgents.Laboratory.Domain.Contracts;
 
 /// <summary>
 /// The conversation history service interface.

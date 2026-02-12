@@ -72,4 +72,50 @@ public sealed class FeedbackDataManager(IUnitOfWork unitOfWork, ILogger<Feedback
             logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, featureRequestData.CreatedBy);
         }
     }
+
+    /// <summary>
+    /// Gets all bug reports data asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <returns>A list of <see cref="BugReportData"/></returns>
+    public async Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(string currentLoggedinUser)
+    {
+        try
+        {
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, currentLoggedinUser);
+            return await unitOfWork.Repository<BugReportData>().GetAllAsync(x => x.IsActive).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, currentLoggedinUser);
+        }
+    }
+
+    /// <summary>
+    /// Gets all submitted feature requests asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <returns>A list of <see cref="NewFeatureRequestData"/></returns>
+    public async Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser)
+    {
+        try
+        {
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, currentLoggedinUser);
+            return await unitOfWork.Repository<NewFeatureRequestData>().GetAllAsync(x => x.IsActive).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, currentLoggedinUser);
+        }
+    }
 }

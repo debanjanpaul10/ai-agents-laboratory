@@ -92,7 +92,10 @@ export async function AddBugReportDataApiAsync(addBugReport: AddBugReportDTO) {
 export async function SubmitFeatureRequestDataApiAsync(
 	newFeatureRequest: NewFeatureRequestDTO,
 ) {
-	return await PostAsync("aiagentslab/submitfeaturerequest", newFeatureRequest);
+	return await PostAsync(
+		"aiagentslab/submitfeaturerequest",
+		newFeatureRequest,
+	);
 }
 
 export async function GetTopActiveAgentsDataApiAsync() {
@@ -132,10 +135,7 @@ export async function DeleteExistingToolSkillBySkillIdApiAsync(
 export async function GetAllMcpToolsAvailableApiAsync(
 	mcpServerTool: McpServerToolRequestDTO,
 ) {
-	return await PostAsync(
-		"toolskills/getallmcptoolsavailable",
-		mcpServerTool,
-	);
+	return await PostAsync("toolskills/getallmcptoolsavailable", mcpServerTool);
 }
 
 // #endregion
@@ -173,6 +173,22 @@ export async function GetWorkspaceGroupChatResponseApiAsync(
 		"workspaces/workspacegroupchatresponse",
 		chatRequestDto,
 	);
+}
+
+// #endregion
+
+// #region APPLICATION ADMIN
+
+export async function GetAllSubmittedFeatureRequestsApiAsync() {
+	return await GetAsync("applicationadmin/getallsubmittedfeaturerequests");
+}
+
+export async function GetAllBugReportsDataApiAsync() {
+	return await GetAsync("applicationadmin/getallreportedbugs");
+}
+
+export async function IsAdminAccessEnabledApiAsync() {
+	return await GetAsync("applicationadmin/isadminaccessenabled");
 }
 
 // #endregion

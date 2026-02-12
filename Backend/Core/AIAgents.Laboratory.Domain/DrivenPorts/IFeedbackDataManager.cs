@@ -20,4 +20,18 @@ public interface IFeedbackDataManager
     /// <param name="featureRequestData">The feature request data.</param>
     /// <returns>The boolean for success/failure.</returns>
     Task<bool> AddNewFeatureRequestDataAsync(NewFeatureRequestData featureRequestData);
+
+    /// <summary>
+    /// Gets all bug reports data asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <returns>A list of <see cref="BugReportData"/></returns>
+    Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(string currentLoggedinUser);
+
+    /// <summary>
+    /// Gets all submitted feature requests asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <returns>A list of <see cref="NewFeatureRequestData"/></returns>
+    Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser);
 }

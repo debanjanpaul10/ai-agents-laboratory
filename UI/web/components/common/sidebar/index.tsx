@@ -7,6 +7,7 @@ import {
 	LogOut,
 	Info,
 	Laptop,
+	UserCircle,
 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@heroui/react";
@@ -19,8 +20,9 @@ import { metadata } from "@helpers/constants";
 export default function SidebarComponent() {
 	const router = useRouter();
 	const { instance } = useMsal();
+
 	const ConfigurationsStoreData = useAppSelector(
-		(state) => state.CommonReducer.configurations
+		(state) => state.CommonReducer.configurations,
 	);
 
 	const isActive = (path: string) => router.pathname === path;
@@ -37,6 +39,10 @@ export default function SidebarComponent() {
 		if (ConfigurationsStoreData?.HowToFileLink) {
 			window.open(ConfigurationsStoreData.HowToFileLink, "_blank");
 		}
+	};
+
+	const handleAdminPage = () => {
+		router.push("/admin");
 	};
 
 	const navItems = [
@@ -63,7 +69,7 @@ export default function SidebarComponent() {
 	];
 
 	return (
-		<aside className="fixed left-0 top-0 z-40 h-screen w-auto border-r border-white/10 bg-black/60 backdrop-blur-xl">
+		<aside className="fixed left-0 top-0 z-40 h-screen w-90 border-r border-white/10 bg-black/60 backdrop-blur-xl">
 			<div className="flex h-full flex-col px-3 py-4">
 				<div className="mb-8 flex items-center px-2">
 					<div className="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-xl mr-3">
@@ -111,6 +117,15 @@ export default function SidebarComponent() {
 						<Info className="h-5 w-5 mr-3" />
 						How To
 					</Button>
+
+					<Button
+						onPress={handleAdminPage}
+						className="w-full justify-start bg-transparent hover:bg-blue-500/10 text-gray-400 hover:text-blue-400"
+					>
+						<UserCircle className="h-5 w-5 mr-3" />
+						Admin
+					</Button>
+
 					<Button
 						onPress={handleLogout}
 						className="w-full justify-start bg-transparent hover:bg-red-500/10 text-gray-400 hover:text-red-400"

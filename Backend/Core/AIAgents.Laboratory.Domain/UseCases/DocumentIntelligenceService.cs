@@ -1,6 +1,6 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+﻿using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Processor.Contracts;
 using Microsoft.Extensions.Configuration;
