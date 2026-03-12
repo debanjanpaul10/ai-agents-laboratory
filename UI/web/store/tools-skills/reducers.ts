@@ -10,6 +10,7 @@ import {
 	TOGGLE_MCP_TOOLS_DRAWER,
 	GET_ALL_REGISTERED_APPLICATIONS,
 	TOGGLE_REGISTERED_APPLICATIONS_LOADER,
+	GET_REGISTERED_APPLICATION_BY_ID,
 } from "@store/tools-skills/actionTypes";
 
 const initialState: any = {
@@ -25,6 +26,7 @@ const initialState: any = {
 
 	registeredApplications: [],
 	isRegisteredApplicationsLoading: false,
+	registeredApplication: {},
 };
 
 export function ToolSkillsReducer(state = initialState, action: any) {
@@ -94,6 +96,12 @@ export function ToolSkillsReducer(state = initialState, action: any) {
 			return {
 				...state,
 				registeredApplications: action.payload,
+			};
+		}
+		case GET_REGISTERED_APPLICATION_BY_ID: {
+			return {
+				...state,
+				registeredApplication: action.payload,
 			};
 		}
 

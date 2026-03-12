@@ -54,6 +54,7 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
     /// </returns>
     public async Task<string> GetMcpToolResponseAsync(string mcpServerUrl, string toolName, Dictionary<string, object?> toolArguments)
     {
+        string response = string.Empty;
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { mcpServerUrl, toolName, toolArguments }));
@@ -61,7 +62,8 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
             var arguments = toolArguments ?? [];
             var mcpClient = await this.CreateMcpClientAsync(mcpServerUrl).ConfigureAwait(false);
             var callToolResult = await mcpClient.CallToolAsync(toolName, arguments).ConfigureAwait(false);
-            return JsonConvert.SerializeObject(callToolResult);
+            response = JsonConvert.SerializeObject(callToolResult);
+            return response;
         }
         catch (Exception ex)
         {
@@ -70,7 +72,7 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { mcpServerUrl, toolName, toolArguments }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { mcpServerUrl, toolName, toolArguments, response }));
         }
     }
 

@@ -37,6 +37,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
     {
         AgentServiceHelpers.ValidateInputParameters(input, pluginName, functionName);
 
+        string aiResponse = string.Empty;
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { pluginName, functionName }));
@@ -48,7 +49,8 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
             };
 
             var response = await chatClient.GetResponseAsync(chatMessages).ConfigureAwait(false);
-            return response?.Text ?? ExceptionConstants.DefaultAIExceptionMessage;
+            aiResponse = response?.Text ?? ExceptionConstants.DefaultAIExceptionMessage;
+            return aiResponse;
         }
         catch (Exception ex)
         {
@@ -57,7 +59,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { pluginName, functionName }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { pluginName, functionName, aiResponse }));
         }
     }
 
@@ -70,15 +72,12 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
     /// <param name="pluginName">Name of the plugin.</param>
     /// <param name="functionName">Name of the function.</param>
     /// <returns>The AI aiResponse.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when input, mcpServerUrl, pluginName, or functionName is null or empty.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when agent configuration is invalid or MCP server communication fails.</exception>
-    /// <exception cref="TimeoutException">Thrown when the AI service call or MCP server call times out.</exception>
-    /// <exception cref="Exception">Thrown when an unexpected error occurs during AI function execution or MCP integration.</exception>
     public async Task<string> GetAiFunctionResponseAsync<TInput>(TInput input, string mcpServerUrl, string pluginName, string functionName)
     {
         AgentServiceHelpers.ValidateInputParameters(input, pluginName, functionName);
         ArgumentException.ThrowIfNullOrWhiteSpace(mcpServerUrl);
 
+        string aiResponse = string.Empty;
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { pluginName, functionName }));
@@ -104,9 +103,10 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
                     mcpServerUrl, toolName: toolSelectionResult.ToolName, toolArguments: toolSelectionResult.ToolArguments).ConfigureAwait(false);
 
             // STEP 4: Finally, call the AI function with the original input and the tool result (if any)
-            return await this.GetChatMessageAiResponseAsync(
+            aiResponse = await this.GetChatMessageAiResponseAsync(
                 prompt: GenerateFinalResponseWithToolResultFunction.GetFunctionInstructions(jsonInput, toolResult),
                 input: jsonInput).ConfigureAwait(false);
+            return aiResponse;
         }
         catch (Exception ex)
         {
@@ -115,7 +115,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { pluginName, functionName }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { pluginName, functionName, aiResponse }));
         }
     }
 
@@ -126,15 +126,12 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
     /// <param name="conversationDataDomain">The conversation history data domain.</param>
     /// <param name="agentMetaPrompt">The agent meta prompt.</param>
     /// <returns>The AI chatbot aiResponse.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when userMessage, conversationDataDomain, or agentMetaPrompt is null or empty.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when agent configuration is invalid or chat completion fails.</exception>
-    /// <exception cref="TimeoutException">Thrown when the chat completion call times out.</exception>
-    /// <exception cref="Exception">Thrown when an unexpected error occurs during chat completion.</exception>
     public async Task<string> GetChatbotResponseAsync(ConversationHistoryDomain conversationDataDomain, string userMessage, string agentMetaPrompt)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userMessage);
         ArgumentException.ThrowIfNullOrWhiteSpace(agentMetaPrompt);
 
+        string aiResponse = string.Empty;
         try
         {
             var chatMessages = new List<ChatMessage>
@@ -156,7 +153,8 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
 
             // Get aiResponse from AI
             var response = await chatClient.GetResponseAsync(chatMessages).ConfigureAwait(false);
-            return response?.Text ?? string.Empty;
+            aiResponse = response?.Text ?? string.Empty;
+            return aiResponse;
         }
         catch (Exception ex)
         {
@@ -165,7 +163,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userMessage, agentMetaPrompt }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userMessage, agentMetaPrompt, aiResponse }));
         }
     }
 

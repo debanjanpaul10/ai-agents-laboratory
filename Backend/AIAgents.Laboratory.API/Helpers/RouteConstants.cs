@@ -336,5 +336,10 @@ public static class RouteConstants
         /// The route constant for deleting a registered application by its identifier.
         /// </summary>
         internal const string DeleteRegisteredApplicationById_Route = "deleteregisteredapplication/{applicationId}";
+
+        /// <summary>
+        /// The route constant for updating an existing registered application.
+        /// </summary>
+        internal const string UpdateExistingRegisteredApplication_Route = "updateregisteredapplication";
     }
 }

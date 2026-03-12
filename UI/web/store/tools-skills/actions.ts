@@ -15,6 +15,9 @@ import {
 	TOGGLE_REGISTERED_APPLICATIONS_LOADER,
 	GET_ALL_REGISTERED_APPLICATIONS,
 	ADD_NEW_REGISTERED_APPLICATION,
+	GET_REGISTERED_APPLICATION_BY_ID,
+	UPDATE_REGISTERED_APPLICATION,
+	DELETE_REGISTERED_APPLICATION,
 } from "@store/tools-skills/actionTypes";
 import {
 	AddNewToolSkillApiAsync,
@@ -25,6 +28,9 @@ import {
 	DeleteExistingToolSkillBySkillIdApiAsync,
 	GetAllRegisteredApplicationsApiAsync,
 	RegisterNewApplicationApiAsync,
+	GetRegisteredApplicationByIdApiAsync,
+	UpdateExistingRegisteredApplicationApiAsync,
+	DeleteRegisteredApplicationByIdApiAsync,
 } from "@shared/api-service";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 import { ToolSkillDTO } from "@models/response/tool-skill-dto";
@@ -257,6 +263,79 @@ export function RegisterNewApplicationAsync(
 				});
 				ShowSuccessToaster(
 					ToolSkillsToasterConstants.CREATE_NEW_APPLICATION,
+				);
+				dispatch(GetAllRegisteredApplicationsAsync() as any);
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleRegisterApplicationsLoader(false));
+		}
+	};
+}
+
+export function GetRegisteredApplicationByIdAsync(applicationId: number) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleRegisterApplicationsLoader(true));
+			const response =
+				await GetRegisteredApplicationByIdApiAsync(applicationId);
+			if (response?.isSuccess)
+				dispatch({
+					type: GET_REGISTERED_APPLICATION_BY_ID,
+					payload: response.responseData,
+				});
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleRegisterApplicationsLoader(false));
+		}
+	};
+}
+
+export function UpdateExistingRegisteredApplicationAsync(
+	updateApplicationDtoModel: RegisteredApplicationDTO,
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleRegisterApplicationsLoader(true));
+			const response = await UpdateExistingRegisteredApplicationApiAsync(
+				updateApplicationDtoModel,
+			);
+			if (response?.isSuccess) {
+				dispatch({
+					type: UPDATE_REGISTERED_APPLICATION,
+					payload: response.responseData,
+				});
+				ShowSuccessToaster(
+					ToolSkillsToasterConstants.UPDATE_APPLICATION,
+				);
+				dispatch(GetAllRegisteredApplicationsAsync() as any);
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleRegisterApplicationsLoader(false));
+		}
+	};
+}
+
+export function DeleteRegisteredApplicationByIdAsync(applicationId: number) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleRegisterApplicationsLoader(true));
+			const response =
+				await DeleteRegisteredApplicationByIdApiAsync(applicationId);
+			if (response?.isSuccess) {
+				dispatch({
+					type: DELETE_REGISTERED_APPLICATION,
+					payload: response.responseData,
+				});
+				ShowSuccessToaster(
+					ToolSkillsToasterConstants.DELETE_APPLICATION,
 				);
 				dispatch(GetAllRegisteredApplicationsAsync() as any);
 			}

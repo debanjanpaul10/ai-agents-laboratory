@@ -50,7 +50,8 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// </returns>
     public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
     {
-        return await context.Set<TEntity>().Where(predicate).ToListAsync().ConfigureAwait(false);
+        return await context.Set<TEntity>().AsNoTracking()
+            .Where(predicate).ToListAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -62,7 +63,8 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// </returns>
     public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
     {
-        return await context.Set<TEntity>().FirstOrDefaultAsync(predicate).ConfigureAwait(false);
+        return await context.Set<TEntity>().AsNoTracking()
+            .FirstOrDefaultAsync(predicate).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -161,7 +163,7 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
             foreach (var includedProperty in includeProperties.Split([','], StringSplitOptions.RemoveEmptyEntries))
                 query = query.Include(includedProperty);
 
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false) ?? default!;
+        return await query.AsNoTracking().FirstOrDefaultAsync().ConfigureAwait(false) ?? default!;
     }
 
     /// <summary>

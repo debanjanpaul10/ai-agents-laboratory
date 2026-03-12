@@ -112,7 +112,8 @@ public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService>
     /// <returns>The boolean for success/failure.</returns>
     public bool SetCacheData<T>(string key, T value, TimeSpan expirationTime)
     {
-        if (!this.IsCacheServiceEnabled) return false;
+        if (!this.IsCacheServiceEnabled)
+            return false;
 
         if (string.IsNullOrEmpty(key))
         {

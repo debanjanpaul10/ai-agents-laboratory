@@ -209,4 +209,29 @@ export async function RegisterNewApplicationApiAsync(
 	);
 }
 
+export async function GetRegisteredApplicationByIdApiAsync(
+	applicationId: number,
+) {
+	return await GetAsync(
+		`registeredapplication/getregisteredapplication/${applicationId}`,
+	);
+}
+
+export async function UpdateExistingRegisteredApplicationApiAsync(
+	updateApplicationDtoModel: RegisteredApplicationDTO,
+) {
+	return await PutAsync(
+		"registeredapplication/updateregisteredapplication",
+		updateApplicationDtoModel,
+	);
+}
+
+export async function DeleteRegisteredApplicationByIdApiAsync(
+	applicationId: number,
+) {
+	return await DeleteAsync(
+		`registeredapplication/deleteregisteredapplication/${applicationId}`,
+	);
+}
+
 // #endregion
