@@ -14,7 +14,7 @@ namespace AIAgents.Laboratory.API.Adapters.Mapper;
 /// The Domain Mapper Profile Class.
 /// </summary>
 /// <seealso cref="Profile" />
-public class DomainMapperProfile : Profile
+public sealed class DomainMapperProfile : Profile
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="DomainMapperProfile"/> class.
@@ -59,5 +59,6 @@ public class DomainMapperProfile : Profile
         CreateMap<AgentsWorkspaceDomain, AgentsWorkspaceDTO>().ReverseMap();
         CreateMap<WorkspaceAgentsDataDomain, WorkspaceAgentsDataDTO>().ReverseMap();
         CreateMap<GroupChatResponseDomain, GroupChatResponseDTO>().ReverseMap();
+        CreateMap<RegisteredApplicationDto, RegisteredApplication>().ReverseMap();
     }
 }

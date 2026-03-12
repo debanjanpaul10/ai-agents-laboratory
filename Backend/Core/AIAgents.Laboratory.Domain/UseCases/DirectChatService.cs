@@ -45,14 +45,18 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
             var agentMetaprompt = agentDataTask.Result.AgentMetaPrompt;
             var chatHistoryList = conversationHistoryData.ChatHistory.ToList();
 
-            var aiResponse = await aiServices.GetChatbotResponseAsync(conversationHistoryData, userQuery, agentMetaprompt).ConfigureAwait(false);
+            var aiResponse = await aiServices.GetChatbotResponseAsync(
+                conversationDataDomain: conversationHistoryData,
+                userMessage: userQuery,
+                agentMetaPrompt: agentMetaprompt).ConfigureAwait(false);
+
             chatHistoryList.Add(new ChatHistoryDomain
             {
                 Role = ChatbotHelperConstants.AssistantRoleConstant,
                 Content = aiResponse
             });
             conversationHistoryData.ChatHistory = chatHistoryList;
-            await conversationHistoryService.SaveMessageToConversationHistoryAsync(conversationHistoryData).ConfigureAwait(false);
+            await conversationHistoryService.SaveMessageToConversationHistoryAsync(conversationHistory: conversationHistoryData).ConfigureAwait(false);
             return aiResponse;
         }
         catch (Exception ex)

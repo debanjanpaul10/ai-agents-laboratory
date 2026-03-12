@@ -22,8 +22,7 @@ public static class DIContainer
         var emailNotificationConnectionString = configuration[AzureAppConfigurationConstants.EmailNotificationServiceConnectionString];
         ArgumentException.ThrowIfNullOrWhiteSpace(emailNotificationConnectionString);
 
-        return services.AddHostedService<AgentStatusWatcher>().AddSingleton<IAgentStatusStore, AgentStatusStore>()
-              .AddSingleton(new EmailClient(emailNotificationConnectionString)).AddScoped<IEmailNotificationService, EmailNotificationService>();
+        return services.AddSingleton(new EmailClient(emailNotificationConnectionString)).AddScoped<IEmailNotificationService, EmailNotificationService>();
     }
 
 }

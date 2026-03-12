@@ -46,7 +46,10 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
 
             toolSkillData.ToolSkillGuid = Guid.NewGuid().ToString();
             toolSkillData.PrepareAuditEntityData(userEmail);
-            return await mongoDatabaseService.SaveDataAsync(toolSkillData, MongoDatabaseName, ToolSkillsCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.SaveDataAsync(
+                data: toolSkillData,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.ToolSkillsCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -80,7 +83,8 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
             if (toolData is null) return false;
 
             toolData.AssociatedAgents = agentData;
-            return await this.UpdateExistingToolSkillDataAsync(toolData, currentUserEmail).ConfigureAwait(false);
+            return await this.UpdateExistingToolSkillDataAsync(
+                updateToolSkillData: toolData, currentUserEmail).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -109,9 +113,10 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentUserEmail, toolSkillId }));
 
             var filter = Builders<ToolSkillDomain>.Filter.Where(tsd => tsd.IsActive && tsd.ToolSkillGuid == toolSkillId);
-            var allToolSkills = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, ToolSkillsCollectionName, filter);
-            var updateToolSkill = allToolSkills.FirstOrDefault() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
+            var allToolSkills = await mongoDatabaseService.GetDataFromCollectionAsync(
+                databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName, filter).ConfigureAwait(false);
 
+            var updateToolSkill = allToolSkills.FirstOrDefault() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
             if (updateToolSkill.CreatedBy != currentUserEmail)
                 throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
 
@@ -122,7 +127,8 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
                 Builders<ToolSkillDomain>.Update.Set(x => x.ModifiedBy, currentUserEmail)
             };
             var update = Builders<ToolSkillDomain>.Update.Combine(updates);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, MongoDatabaseName, ToolSkillsCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.UpdateDataInCollectionAsync(
+                filter, update, databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -149,7 +155,7 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
         try
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { serverUrl, currentUserEmail }));
-            return await mcpClientServices.GetAllMcpToolsAsync(serverUrl).ConfigureAwait(false);
+            return await mcpClientServices.GetAllMcpToolsAsync(mcpServerUrl: serverUrl).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -174,7 +180,8 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllToolSkillsAsync), DateTime.UtcNow, userEmail);
 
             var filter = Builders<ToolSkillDomain>.Filter.And(Builders<ToolSkillDomain>.Filter.Eq(x => x.IsActive, true));
-            return await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, ToolSkillsCollectionName, filter).ConfigureAwait(false);
+            return await mongoDatabaseService.GetDataFromCollectionAsync(
+                databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName, filter).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -203,7 +210,9 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
 
             var filter = Builders<ToolSkillDomain>.Filter.And(
                 Builders<ToolSkillDomain>.Filter.Eq(x => x.IsActive, true), Builders<ToolSkillDomain>.Filter.Eq(x => x.ToolSkillGuid, toolSkillId));
-            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, ToolSkillsCollectionName, filter).ConfigureAwait(false);
+            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
+                databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName, filter).ConfigureAwait(false);
+
             return allData?.First() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
         }
         catch (Exception ex)
@@ -235,7 +244,8 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
             var filter = Builders<ToolSkillDomain>.Filter.And(
                 Builders<ToolSkillDomain>.Filter.Eq(x => x.IsActive, true),
                 Builders<ToolSkillDomain>.Filter.Eq(x => x.ToolSkillGuid, updateToolSkillData.ToolSkillGuid));
-            var toolSkillsData = await mongoDatabaseService.GetDataFromCollectionAsync(MongoDatabaseName, ToolSkillsCollectionName, filter).ConfigureAwait(false);
+            var toolSkillsData = await mongoDatabaseService.GetDataFromCollectionAsync(
+                databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName, filter).ConfigureAwait(false);
             var existingToolSkill = toolSkillsData.FirstOrDefault() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
             if (existingToolSkill.CreatedBy != currentUserEmail)
@@ -252,7 +262,8 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
             };
 
             var update = Builders<ToolSkillDomain>.Update.Combine(updates);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(filter, update, MongoDatabaseName, ToolSkillsCollectionName).ConfigureAwait(false);
+            return await mongoDatabaseService.UpdateDataInCollectionAsync(
+                filter, update, databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

@@ -34,7 +34,8 @@ internal static class TokenHelper
             var scopes = new[] { string.Format(CultureInfo.CurrentCulture, ConfigurationConstants.TokenScopeFormat, clientId) };
 
             var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-            var accessToken = await credential.GetTokenAsync(new TokenRequestContext(scopes!), CancellationToken.None);
+            var accessToken = await credential.GetTokenAsync(
+                requestContext: new TokenRequestContext(scopes!), cancellationToken: CancellationToken.None).ConfigureAwait(false);
 
             ArgumentException.ThrowIfNullOrWhiteSpace(accessToken.Token);
             return accessToken.Token;

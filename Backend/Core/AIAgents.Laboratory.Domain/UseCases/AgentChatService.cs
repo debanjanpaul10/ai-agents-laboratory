@@ -48,7 +48,7 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, chatRequest.AgentId);
 
-            var agentData = await agentsService.GetAgentDataByIdAsync(chatRequest.AgentId, string.Empty).ConfigureAwait(false);
+            var agentData = await agentsService.GetAgentDataByIdAsync(chatRequest.AgentId, string.Empty);
             if (agentData is null || string.IsNullOrEmpty(agentData.AgentMetaPrompt))
             {
                 var ex = new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
@@ -65,7 +65,9 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
 
             // Get data from Knowledge Base if configured
             if (IsKnowledgeBaseServiceAllowed && agentData.HasKnowledgeBaseContent())
-                chatMessage.KnowledgeBase = await knowledgeBaseProcessor.GetRelevantKnowledgeAsync(chatRequest.UserMessage, agentData.AgentId).ConfigureAwait(false);
+                chatMessage.KnowledgeBase = await knowledgeBaseProcessor.GetRelevantKnowledgeAsync(
+                    query: chatRequest.UserMessage,
+                    agentId: agentData.AgentId).ConfigureAwait(false);
 
             // Use AI Vision services if configured
             if (IsAiVisionServiceAllowed && agentData.AiVisionImagesData is not null && agentData.AiVisionImagesData.Any())
@@ -106,7 +108,8 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, chatMessage.AgentName);
 
-            var associatedSkill = await toolSkillsService.GetToolSkillBySkillIdAsync(associatedSkillGuids[0], string.Empty).ConfigureAwait(false);
+            var associatedSkill = await toolSkillsService.GetToolSkillBySkillIdAsync(
+                toolSkillId: associatedSkillGuids[0], currentUserEmail: string.Empty).ConfigureAwait(false);
             ArgumentNullException.ThrowIfNull(associatedSkill);
             ArgumentException.ThrowIfNullOrWhiteSpace(associatedSkill.ToolSkillMcpServerUrl);
 

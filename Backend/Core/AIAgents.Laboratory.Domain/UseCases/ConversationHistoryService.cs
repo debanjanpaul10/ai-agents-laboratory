@@ -142,6 +142,7 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.ConversationHistoryCollectionName,
                 filter: filter).ConfigureAwait(false);
+
             return allConversationHistoryData.Any() && await mongoDatabaseService.DeleteDataFromCollectionAsync(
                 filter: filter,
                 databaseName: this.MongoDatabaseName,

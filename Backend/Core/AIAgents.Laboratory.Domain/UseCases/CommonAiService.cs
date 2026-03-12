@@ -1,4 +1,3 @@
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
@@ -17,7 +16,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="logger">The logger service.</param>
 /// <param name="cacheService">The cache service.</param>
 /// <seealso cref="ICommonAiService"/>
-public sealed class CommonAiService(IConfiguration configuration, ILogger<CommonAiService> logger, IAgentStatusStore agentStatusStore, ICacheService cacheService, IAgentsService agentsService) : ICommonAiService
+public sealed class CommonAiService(IConfiguration configuration, ILogger<CommonAiService> logger, ICacheService cacheService, IAgentsService agentsService) : ICommonAiService
 {
     /// <summary>
     /// Gets the current model identifier.
@@ -28,30 +27,6 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
         var isProModelEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsProModelEnabledFlag], out bool parsedValue) && parsedValue;
         var geminiAiModel = isProModelEnabled ? AzureAppConfigurationConstants.GeminiProModel : AzureAppConfigurationConstants.GeminiFlashModel;
         return configuration[geminiAiModel] ?? throw new KeyNotFoundException(ExceptionConstants.ModelNameNotFoundExceptionConstant);
-    }
-
-    /// <summary>
-    /// Gets the agent current status.
-    /// </summary> 
-    /// <returns>
-    /// The agent status data.
-    /// </returns>
-    public AgentStatus GetAgentCurrentStatus()
-    {
-        try
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentCurrentStatus), DateTime.UtcNow, string.Empty);
-            return agentStatusStore.Current;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentCurrentStatus), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
-        }
-        finally
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentCurrentStatus), DateTime.UtcNow, string.Empty);
-        }
     }
 
     /// <summary>
@@ -142,7 +117,7 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
         {
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, userName);
 
-            var activeAgentsList = await agentsService.GetAllAgentsDataAsync(userName).ConfigureAwait(false);
+            var activeAgentsList = await agentsService.GetAllAgentsDataAsync(userEmail: userName).ConfigureAwait(false);
             return (activeAgentsList.Count(), [.. activeAgentsList.OrderByDescending(x => x.DateModified).Take(3)]);
         }
         catch (Exception ex)

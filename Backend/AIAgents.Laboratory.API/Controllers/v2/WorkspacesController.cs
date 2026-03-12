@@ -186,7 +186,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
         ArgumentNullException.ThrowIfNull(chatRequestDTO);
         if (base.IsAuthorized(ApplicationBased))
         {
-            var result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(chatRequestDTO).ConfigureAwait(false);
+            var result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(chatRequest: chatRequestDTO).ConfigureAwait(false);
             if (result is not null && !string.IsNullOrEmpty(result.AgentResponse)) return HandleSuccessRequestResponse(result);
             else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }

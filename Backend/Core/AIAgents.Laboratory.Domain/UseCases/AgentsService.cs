@@ -68,7 +68,8 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             if (agentData.VisionImages is not null && agentData.VisionImages.Any() && this.IsAiVisionServiceAllowed)
                 await documentIntelligenceService.CreateAndProcessAiVisionImagesKeywordsAsync(agentData).ConfigureAwait(false);
             if (agentData.AssociatedSkillGuids.Any())
-                await this.UpdateSkillsWithAssociatedAgentsDataAsync(agentData, userEmail).ConfigureAwait(false);
+                await this.UpdateSkillsWithAssociatedAgentsDataAsync(
+                    agentData, currentUserEmail: userEmail).ConfigureAwait(false);
 
             agentData.PrepareAuditEntityData(userEmail);
             return await mongoDatabaseService.SaveDataAsync(
@@ -201,7 +202,8 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { updateDataDomain.AgentId, updateDataDomain.ModifiedBy }));
 
             var filter = Builders<AgentDataDomain>.Filter.And(Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
-            var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(this.MongoDatabaseName, this.AgentsDataCollectionName, filter).ConfigureAwait(false);
+            var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(
+                databaseName: this.MongoDatabaseName, collectionName: this.AgentsDataCollectionName, filter).ConfigureAwait(false);
             var existingAgent = agentsData.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
 
             var updates = new List<UpdateDefinition<AgentDataDomain>>
@@ -223,7 +225,8 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                 await documentIntelligenceService.HandleAiVisionImagesDataUpdateAsync(updateDataDomain, updates, existingAgent).ConfigureAwait(false);
 
             if (updateDataDomain.AssociatedSkillGuids.Any())
-                await this.UpdateSkillsWithAssociatedAgentsDataAsync(updateDataDomain, userEmail).ConfigureAwait(false);
+                await this.UpdateSkillsWithAssociatedAgentsDataAsync(
+                    agentData: updateDataDomain, currentUserEmail: userEmail).ConfigureAwait(false);
 
             var update = Builders<AgentDataDomain>.Update.Combine(updates);
             return await mongoDatabaseService.UpdateDataInCollectionAsync(
@@ -334,7 +337,8 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                 AgentName = agentData.AgentName
             }
         };
-        await toolSkillsService.AssociateSkillAndAgentAsync(associatedAgentsData, agentData.AssociatedSkillGuids[0], currentUserEmail);
+        await toolSkillsService.AssociateSkillAndAgentAsync(
+            agentData: associatedAgentsData, toolSkillId: agentData.AssociatedSkillGuids[0], currentUserEmail).ConfigureAwait(false);
     }
 
     #endregion

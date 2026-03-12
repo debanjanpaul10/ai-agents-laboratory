@@ -8,6 +8,8 @@ import {
 	TOGGLE_TOOLS_SKILLS_LOADER,
 	TOGGLE_MCP_TOOLS_LOADER,
 	TOGGLE_MCP_TOOLS_DRAWER,
+	GET_ALL_REGISTERED_APPLICATIONS,
+	TOGGLE_REGISTERED_APPLICATIONS_LOADER,
 } from "@store/tools-skills/actionTypes";
 
 const initialState: any = {
@@ -20,6 +22,9 @@ const initialState: any = {
 	mcpServerTools: [],
 	isMcpToolsLoading: false,
 	isMcpToolsDrawerOpen: false,
+
+	registeredApplications: [],
+	isRegisteredApplicationsLoading: false,
 };
 
 export function ToolSkillsReducer(state = initialState, action: any) {
@@ -60,6 +65,13 @@ export function ToolSkillsReducer(state = initialState, action: any) {
 				isMcpToolsDrawerOpen: action.payload,
 			};
 		}
+		case TOGGLE_REGISTERED_APPLICATIONS_LOADER: {
+			return {
+				...state,
+				isRegisteredApplicationsLoading: action.payload,
+			};
+		}
+
 		case GET_ALL_TOOLS_SKILLS: {
 			return {
 				...state,
@@ -72,11 +84,16 @@ export function ToolSkillsReducer(state = initialState, action: any) {
 				toolSkills: action.payload,
 			};
 		}
-
 		case GET_ALL_MCP_SERVER_TOOLS: {
 			return {
 				...state,
 				mcpServerTools: action.payload,
+			};
+		}
+		case GET_ALL_REGISTERED_APPLICATIONS: {
+			return {
+				...state,
+				registeredApplications: action.payload,
 			};
 		}
 

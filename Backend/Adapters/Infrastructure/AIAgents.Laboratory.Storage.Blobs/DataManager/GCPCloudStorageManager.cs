@@ -76,7 +76,7 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
 
                     // Wait for all deletions to complete
                     if (deleteTasks.Count > 0)
-                        await Task.WhenAll(deleteTasks).ConfigureAwait(false);
+                        await Task.WhenAll(deleteTasks);
                 }
                 catch (Exception folderEx)
                 {
@@ -120,7 +120,7 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
             var file = await storageClient.DownloadObjectAsync(
                 bucket: this.GCPStorageBucketName,
                 objectName: objectName,
-                destination: stream).ConfigureAwait(false);
+                destination: stream);
 
             if (file is not null)
                 return string.Format(GcpCloudStorageConstants.PublicUrlConstant, this.GCPStorageBucketName, file.Name);
@@ -167,7 +167,7 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
                 bucket: this.GCPStorageBucketName,
                 objectName: objectName,
                 contentType: documentFile.ContentType,
-                source: stream).ConfigureAwait(false);
+                source: stream);
 
             // Construct the public URL for the uploaded object
             return string.Format(GcpCloudStorageConstants.PublicUrlConstant, this.GCPStorageBucketName, uploadedObject.Name);

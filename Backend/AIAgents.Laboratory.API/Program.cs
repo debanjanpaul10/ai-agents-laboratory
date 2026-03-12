@@ -1,8 +1,9 @@
-using AIAgents.Laboratory.API.Helpers;
 using AIAgents.Laboratory.API.IOC;
 using AIAgents.Laboratory.API.Middleware;
-using AIAgents.Laboratory.Messaging.Adapters.Services;
 using Azure.Identity;
+using HealthChecks.UI.Client;
+using HealthChecks.UI.Configuration;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.OpenApi;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using SwaggerConstants = AIAgents.Laboratory.API.Helpers.Constants.SwaggerConstants;
@@ -44,6 +45,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddProblemDetails();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHealthChecks();
+builder.Services.ConfigureHealthChecks();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -67,6 +70,15 @@ app.UseAuthorization();
 
 app.UseCors();
 app.MapControllers();
-app.MapHub<AgentStatusHub>(RouteConstants.AgentStatusHub_Route);
+app.MapHealthChecks(HealthCheckConstants.AppHealthCheckEndpoint, new HealthCheckOptions()
+{
+    Predicate = _ => true,
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+app.UseHealthChecksUI(delegate (Options options)
+{
+    options.UIPath = HealthCheckConstants.AppHealthCheckEndpointUI;
+
+});
 
 await app.RunAsync();

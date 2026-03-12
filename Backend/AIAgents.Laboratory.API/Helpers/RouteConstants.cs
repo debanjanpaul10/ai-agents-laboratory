@@ -311,4 +311,30 @@ public static class RouteConstants
         /// </summary>
         internal const string IsAdminAccessEnabled_Route = "isadminaccessenabled";
     }
+
+    /// <summary>
+    /// The route constants for Registered Application Controller.
+    /// </summary>
+    internal static class RegisteredApplicationRoutes
+    {
+        /// <summary>
+        /// The route constant for registering an application.
+        /// </summary>
+        internal const string RegisterNewApplication_Route = "registernewapplication";
+
+        /// <summary>
+        /// The route constant for getting all registered applications.
+        /// </summary>
+        internal const string GetAllRegisteredApplications_Route = "getallregisteredapplications";
+
+        /// <summary>
+        /// The route constant for getting a registered application by its identifier.
+        /// </summary>
+        internal const string GetRegisteredApplicationById_Route = "getregisteredapplication/{applicationId}";
+
+        /// <summary>
+        /// The route constant for deleting a registered application by its identifier.
+        /// </summary>
+        internal const string DeleteRegisteredApplicationById_Route = "deleteregisteredapplication/{applicationId}";
+    }
 }

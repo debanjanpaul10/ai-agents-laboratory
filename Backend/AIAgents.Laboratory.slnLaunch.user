@@ -1,6 +1,6 @@
 [
   {
-    "Name": "New Profile",
+    "Name": "API Debug",
     "Projects": [
       {
         "Path": "AIAgents.Laboratory.API\\AIAgents.Laboratory.API.csproj",

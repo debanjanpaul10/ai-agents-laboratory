@@ -98,7 +98,7 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
             };
 
             var httpClientTransport = new HttpClientTransport(transportOptions);
-            return await McpClient.CreateAsync(httpClientTransport).ConfigureAwait(false);
+            return await McpClient.CreateAsync(httpClientTransport);
         }
         catch (Exception ex)
         {

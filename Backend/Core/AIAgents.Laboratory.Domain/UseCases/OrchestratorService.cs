@@ -45,7 +45,8 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
                 loopCount++;
 
                 // Call Orchestrator
-                var orchestratorResponse = await this.InvokeOrchestratorIterationAsync(conversationHistory, chatRequest.UserMessage, orchestratorSystemPrompt).ConfigureAwait(false);
+                var orchestratorResponse = await this.InvokeOrchestratorIterationAsync(
+                    conversationHistory, userMessage: chatRequest.UserMessage, orchestratorSystemPrompt).ConfigureAwait(false);
 
                 // Parse Orchestrator Response
                 var parsedResponse = OrchestratorHelpers.ParseOrchestratorResponse(orchestratorResponse);
@@ -125,11 +126,13 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
         IList<AgentDataDomain> agentsData = [];
         await Parallel.ForEachAsync(workspaceDetails.ActiveAgentsListInWorkspace, async (agent, cancellationToken) =>
         {
-            var agentData = await agentsService.GetAgentDataByIdAsync(agent.AgentGuid, string.Empty).ConfigureAwait(false);
+            var agentData = await agentsService.GetAgentDataByIdAsync(
+                agentId: agent.AgentGuid,
+                userEmail: string.Empty).ConfigureAwait(false);
             if (agentData is not null)
                 lock (agentsData)
                     agentsData.Add(agentData);
-        }).ConfigureAwait(false);
+        });
 
         return agentsData;
     }
@@ -142,8 +145,8 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
     /// <param name="conversationHistory">The conversation history.</param>
     /// <param name="parsedResponse">The parsed response.</param>
     /// <param name="agentsInvoked">The list of agents invoked.</param>
-    private async Task<string> DelegateToAgentAsync(IList<AgentDataDomain> agentsData, WorkspaceAgentChatRequestDomain chatRequest, ConversationHistoryDomain conversationHistory,
-        OrchestratorAgentResponseDomain parsedResponse, IList<string> agentsInvoked)
+    private async Task<string> DelegateToAgentAsync(
+        IList<AgentDataDomain> agentsData, WorkspaceAgentChatRequestDomain chatRequest, ConversationHistoryDomain conversationHistory, OrchestratorAgentResponseDomain parsedResponse, IList<string> agentsInvoked)
     {
         try
         {
@@ -174,7 +177,7 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, IAg
                 ConversationId = chatRequest.ConversationId,
                 UserMessage = parsedResponse.Instruction,
             };
-            var agentResponse = await agentChatService.GetAgentChatResponseAsync(agentChatRequestModel).ConfigureAwait(false);
+            var agentResponse = await agentChatService.GetAgentChatResponseAsync(chatRequest: agentChatRequestModel).ConfigureAwait(false);
 
             // Add Agent's response to history so Orchestrator can see it
             conversationHistory.ChatHistory.Add(new ChatHistoryDomain

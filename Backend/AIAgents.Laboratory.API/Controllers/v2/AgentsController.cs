@@ -42,7 +42,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
         ArgumentNullException.ThrowIfNull(agentData);
         if (base.IsAuthorized(UserBased))
         {
-            var result = await agentsHandler.CreateNewAgentAsync(agentData, UserEmail).ConfigureAwait(false);
+            var result = await agentsHandler.CreateNewAgentAsync(agentData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
             else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
@@ -161,9 +161,14 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
         ArgumentNullException.ThrowIfNull(downloadFile);
         if (IsAuthorized(UserBased))
         {
-            var result = await agentsHandler.DownloadKnowledgebaseFileAsync(downloadFile.AgentGuid, downloadFile.FileName).ConfigureAwait(false);
-            if (!string.IsNullOrWhiteSpace(result)) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            var result = await agentsHandler.DownloadKnowledgebaseFileAsync(
+                agentGuid: downloadFile.AgentGuid,
+                fileName: downloadFile.FileName).ConfigureAwait(false);
+
+            if (!string.IsNullOrWhiteSpace(result))
+                return HandleSuccessRequestResponse(result);
+            else
+                return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();

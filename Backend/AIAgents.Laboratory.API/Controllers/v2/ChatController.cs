@@ -66,9 +66,14 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
 
         if (base.IsAuthorized(UserBased))
         {
-            var result = await chatHandler.GetDirectChatResponseAsync(userChatMessage.UserMessage, UserEmail).ConfigureAwait(false);
-            if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            var result = await chatHandler.GetDirectChatResponseAsync(
+                userQuery: userChatMessage.UserMessage,
+                userEmail: base.UserEmail).ConfigureAwait(false);
+
+            if (!string.IsNullOrEmpty(result))
+                return HandleSuccessRequestResponse(result);
+            else
+                return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();

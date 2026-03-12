@@ -15,6 +15,7 @@ import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
 import { DownloadFileDTO } from "@models/request/download-file.dto";
+import { RegisteredApplicationDTO } from "@models/request/registered-application.dto";
 
 // #region AGENTS
 
@@ -189,6 +190,23 @@ export async function GetAllBugReportsDataApiAsync() {
 
 export async function IsAdminAccessEnabledApiAsync() {
 	return await GetAsync("applicationadmin/isadminaccessenabled");
+}
+
+// #endregion
+
+// #region REGISTERED APPLICATIONS
+
+export async function GetAllRegisteredApplicationsApiAsync() {
+	return await GetAsync("registeredapplication/getallregisteredapplications");
+}
+
+export async function RegisterNewApplicationApiAsync(
+	newApplicationDtoModel: RegisteredApplicationDTO,
+) {
+	return await PostAsync(
+		"registeredapplication/registernewapplication",
+		newApplicationDtoModel,
+	);
 }
 
 // #endregion

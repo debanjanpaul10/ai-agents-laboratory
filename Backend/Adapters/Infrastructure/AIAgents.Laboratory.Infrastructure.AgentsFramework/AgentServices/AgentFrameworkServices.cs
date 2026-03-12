@@ -92,7 +92,7 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
             var toolDescriptions = string.Join("\n", availableMcpTools.Select(t => $"- {t.Name}: {t.Description}"));
             var toolSelectionResultResponse = await this.GetChatMessageAiResponseAsync(
                 prompt: DetermineToolToCallFunction.GetFunctionInstructions(toolDescriptions, jsonInput),
-                input: jsonInput);
+                input: jsonInput).ConfigureAwait(false);
 
             var toolSelectionResult = JsonConvert.DeserializeObject<ToolSelectionResultDomain>(DomainUtilities.ExtractJsonFromMarkdown(toolSelectionResultResponse))
                 ?? throw new JsonSerializationException(ExceptionConstants.InvalidJsonDeserializeExceptionMessage);
@@ -100,7 +100,8 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
             // STEP 3: If a tool is selected, invoke the MCP tool and get the result
             var toolResult = string.Empty;
             if (!string.IsNullOrEmpty(toolSelectionResult.ToolName))
-                toolResult = await mcpClientServices.GetMcpToolResponseAsync(mcpServerUrl, toolSelectionResult.ToolName, toolSelectionResult.ToolArguments).ConfigureAwait(false);
+                toolResult = await mcpClientServices.GetMcpToolResponseAsync(
+                    mcpServerUrl, toolName: toolSelectionResult.ToolName, toolArguments: toolSelectionResult.ToolArguments).ConfigureAwait(false);
 
             // STEP 4: Finally, call the AI function with the original input and the tool result (if any)
             return await this.GetChatMessageAiResponseAsync(

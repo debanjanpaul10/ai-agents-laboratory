@@ -62,17 +62,17 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
                     {
                         Prefix = folderPath,
                         ResourceType = ResourceType.Image
-                    }).ConfigureAwait(false);
+                    });
 
                     // Delete resources of type 'raw' (for non-image docs)
                     await cloudinary.DeleteResourcesAsync(new DelResParams
                     {
                         Prefix = folderPath,
                         ResourceType = ResourceType.Raw
-                    }).ConfigureAwait(false);
+                    });
 
                     // Delete the folder itself
-                    await cloudinary.DeleteFolderAsync(folderPath).ConfigureAwait(false);
+                    await cloudinary.DeleteFolderAsync(folderPath);
                 }
                 catch (Exception folderEx)
                 {
@@ -119,13 +119,13 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
                 ResourceType = ResourceType.Raw
             };
 
-            var resource = await cloudinary.GetResourceAsync(getResourceParams).ConfigureAwait(false);
+            var resource = await cloudinary.GetResourceAsync(getResourceParams);
             if (resource.Error is not null)
             {
                 // Try as Image if Raw fails (Cloudinary sometimes treats files as images or publicId might not have extension)
                 getResourceParams.ResourceType = ResourceType.Image;
                 getResourceParams.PublicId = folderPath + "/" + Path.GetFileNameWithoutExtension(safeFileName);
-                resource = await cloudinary.GetResourceAsync(getResourceParams).ConfigureAwait(false);
+                resource = await cloudinary.GetResourceAsync(getResourceParams);
             }
 
             if (resource.Error is not null)
@@ -175,7 +175,7 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
                 File = new FileDescription(documentFile.FileName, stream),
                 Folder = string.Format(CloudinaryConstants.AgentImagesFolderStructureFormat, folderName, agentGuid)
             };
-            var uploadResult = await cloudinary.UploadAsync(uploadParams).ConfigureAwait(false);
+            var uploadResult = await cloudinary.UploadAsync(uploadParams);
             if (uploadResult.Error is not null)
             {
                 logger.LogError("Cloudinary error: {Error}", uploadResult.Error.Message);

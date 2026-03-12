@@ -48,7 +48,7 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
             ReadOperationResult results;
             do
             {
-                results = await computerVisionClient.GetReadResultAsync(Guid.Parse(operationId)).ConfigureAwait(false);
+                results = await computerVisionClient.GetReadResultAsync(operationId: Guid.Parse(operationId)).ConfigureAwait(false);
             }
             while (results.Status == OperationStatusCodes.Running || results.Status == OperationStatusCodes.NotStarted);
 

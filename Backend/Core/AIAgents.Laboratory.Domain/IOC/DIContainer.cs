@@ -28,5 +28,6 @@ public static class DIContainer
         .AddScoped<IToolSkillsService, ToolSkillsService>()
         .AddScoped<IWorkspacesService, WorkspacesService>()
         .AddScoped<IOrchestratorService, OrchestratorService>()
-        .AddScoped<IApplicationAdminService, ApplicationAdminService>();
+        .AddScoped<IApplicationAdminService, ApplicationAdminService>()
+        .AddScoped<IRegisteredApplicationService, RegisteredApplicationService>();
 }

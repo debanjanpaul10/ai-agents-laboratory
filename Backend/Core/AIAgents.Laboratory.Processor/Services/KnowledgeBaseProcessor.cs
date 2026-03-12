@@ -91,7 +91,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
             var queryEmbedding = queryEmbeddingResult.Vector;
             var relevantChunks = new List<(MemoryRecord Record, double Score)>();
 
-            await foreach (var chunk in memoryStore.GetNearestMatchesAsync(agentId, queryEmbedding, 5))
+            await foreach (var chunk in memoryStore.GetNearestMatchesAsync(collectionName: agentId, embedding: queryEmbedding, limit: 5).ConfigureAwait(false))
                 relevantChunks.Add(chunk);
 
             if (relevantChunks.Count == 0)
@@ -130,7 +130,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
 
             // Ensure the collection exists before upserting records
             var collections = new List<string>();
-            await foreach (var collection in memoryStore.GetCollectionsAsync())
+            await foreach (var collection in memoryStore.GetCollectionsAsync().ConfigureAwait(false))
                 collections.Add(collection);
 
             if (!collections.Contains(agentId))
@@ -140,7 +140,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
             if (chunks.Count == 0)
                 throw new InvalidOperationException(ExceptionConstants.NoValidChunksGenerated);
 
-            var embeddingResults = await embeddingGeneratorService.GenerateAsync(chunks).ConfigureAwait(false);
+            var embeddingResults = await embeddingGeneratorService.GenerateAsync(chunks);
             var embeddings = embeddingResults.Select(e => e.Vector).ToList();
             if (embeddings.Count != chunks.Count)
                 throw new InvalidOperationException(ExceptionConstants.NumberOfEmbeddingsMismatch);

@@ -82,15 +82,19 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             DocumentHandlerService.ValidateUploadedFiles(agentData.KnowledgeBaseDocument, this.AllowedKnowledgebaseFileFormats);
 
             foreach (var uploadedDocument in agentData.KnowledgeBaseDocument)
-                await blobStorageManager.UploadDocumentsToStorageAsync(uploadedDocument, agentData.AgentId, UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
+                await blobStorageManager.UploadDocumentsToStorageAsync(
+                    documentFile: uploadedDocument,
+                    agentGuid: agentData.AgentId,
+                    fileType: UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
 
-            await agentData.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
+            await agentData.ProcessKnowledgebaseDocumentDataAsync();
             if (agentData.StoredKnowledgeBase is not null && agentData.StoredKnowledgeBase.Any())
             {
                 foreach (var file in agentData.StoredKnowledgeBase)
                 {
                     var content = knowledgeBaseProcessor.DetectAndReadFileContent(file);
-                    await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, agentData.AgentId).ConfigureAwait(false);
+                    await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(
+                        content, agentId: agentData.AgentId).ConfigureAwait(false);
                 }
             }
         }
@@ -137,15 +141,19 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             {
                 DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.KnowledgeBaseDocument, this.AllowedKnowledgebaseFileFormats);
                 foreach (var uploadedFile in updateDataDomain.KnowledgeBaseDocument)
-                    await blobStorageManager.UploadDocumentsToStorageAsync(uploadedFile, updateDataDomain.AgentId, UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
+                    await blobStorageManager.UploadDocumentsToStorageAsync(
+                        documentFile: uploadedFile,
+                        agentGuid: updateDataDomain.AgentId,
+                        fileType: UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
 
-                await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync().ConfigureAwait(false);
+                await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync();
                 if (updateDataDomain.StoredKnowledgeBase is not null && updateDataDomain.StoredKnowledgeBase.Any())
                 {
                     foreach (var file in updateDataDomain.StoredKnowledgeBase)
                     {
-                        var content = knowledgeBaseProcessor.DetectAndReadFileContent(file);
-                        await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(content, updateDataDomain.AgentId).ConfigureAwait(false);
+                        var content = knowledgeBaseProcessor.DetectAndReadFileContent(knowledgeBaseDocumentDomain: file);
+                        await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(
+                            content, agentId: updateDataDomain.AgentId).ConfigureAwait(false);
                     }
 
                     updatedStoredKnowledgeBase.AddRange(updateDataDomain.StoredKnowledgeBase);
@@ -217,7 +225,11 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
                 if (image is null) continue;
 
                 // Upload to BLOB STORAGE
-                var imageUrl = await blobStorageManager.UploadDocumentsToStorageAsync(image, agentData.AgentId, UploadedFileType.AiVisionImageDocument).ConfigureAwait(false);
+                var imageUrl = await blobStorageManager.UploadDocumentsToStorageAsync(
+                    documentFile: image,
+                    agentGuid: agentData.AgentId,
+                    fileType: UploadedFileType.AiVisionImageDocument).ConfigureAwait(false);
+
                 if (string.IsNullOrEmpty(imageUrl)) continue;
 
                 // Process the image to generate keywords data
@@ -279,7 +291,10 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
                     if (image is null) continue;
 
                     // Upload to BLOB STORAGE
-                    var imageUrl = await blobStorageManager.UploadDocumentsToStorageAsync(image, updateDataDomain.AgentId, UploadedFileType.AiVisionImageDocument).ConfigureAwait(false);
+                    var imageUrl = await blobStorageManager.UploadDocumentsToStorageAsync(
+                        documentFile: image,
+                        agentGuid: updateDataDomain.AgentId,
+                        fileType: UploadedFileType.AiVisionImageDocument).ConfigureAwait(false);
 
                     // Process the image to generate keywords data
                     var processedImageKeywords = await visionProcessor.ReadDataFromImageWithComputerVisionAsync(imageUrl).ConfigureAwait(false);

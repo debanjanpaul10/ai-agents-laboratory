@@ -12,6 +12,9 @@ import {
 	TOGGLE_TOOLS_SKILLS_LOADER,
 	TOGGLE_MCP_TOOLS_LOADER,
 	TOGGLE_MCP_TOOLS_DRAWER,
+	TOGGLE_REGISTERED_APPLICATIONS_LOADER,
+	GET_ALL_REGISTERED_APPLICATIONS,
+	ADD_NEW_REGISTERED_APPLICATION,
 } from "@store/tools-skills/actionTypes";
 import {
 	AddNewToolSkillApiAsync,
@@ -20,11 +23,14 @@ import {
 	GetToolSkillBySkillIdApiAsync,
 	UpdateExistingToolSkillDataApiAsync,
 	DeleteExistingToolSkillBySkillIdApiAsync,
+	GetAllRegisteredApplicationsApiAsync,
+	RegisterNewApplicationApiAsync,
 } from "@shared/api-service";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 import { McpServerToolRequestDTO } from "@models/request/mcp-server-tool-request-dto";
 import { ToolSkillsToasterConstants } from "@helpers/toaster-constants";
+import { RegisteredApplicationDTO } from "@models/request/registered-application.dto";
 
 export function ToggleToolSkillsLoader(isLoading: boolean): ReduxStoreType {
 	return {
@@ -82,6 +88,13 @@ export function GetAllMcpToolsAvailableFailedAsync() {
 	};
 }
 
+export function ToggleRegisterApplicationsLoader(isLoading: boolean) {
+	return {
+		type: TOGGLE_REGISTERED_APPLICATIONS_LOADER,
+		payload: isLoading,
+	};
+}
+
 export function GetAllToolSkillsAsync() {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
@@ -101,16 +114,12 @@ export function GetAllToolSkillsAsync() {
 	};
 }
 
-export function GetToolSkillBySkillIdAsync(
-	skillId: string,
-) {
+export function GetToolSkillBySkillIdAsync(skillId: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleToolSkillsLoader(true));
 
-			const response = await GetToolSkillBySkillIdApiAsync(
-				skillId,
-			);
+			const response = await GetToolSkillBySkillIdApiAsync(skillId);
 			if (response?.isSuccess && response?.responseData)
 				dispatch({
 					type: GET_TOOL_SKILL_BY_ID,
@@ -125,15 +134,11 @@ export function GetToolSkillBySkillIdAsync(
 	};
 }
 
-export function AddNewToolSkillAsync(
-	newToolSkill: ToolSkillDTO | FormData,
-) {
+export function AddNewToolSkillAsync(newToolSkill: ToolSkillDTO | FormData) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleCreateSkillLoader(true));
-			const response = await AddNewToolSkillApiAsync(
-				newToolSkill,
-			);
+			const response = await AddNewToolSkillApiAsync(newToolSkill);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: ADD_NEW_TOOL_SKILL,
@@ -162,12 +167,11 @@ export function GetAllMcpToolsAvailableAsync(
 			dispatch(ToggleMcpToolsLoader(true));
 			dispatch(ToggleMcpToolsDrawer(true));
 
-			const response = await GetAllMcpToolsAvailableApiAsync(
-				mcpServerTool,
-			);
+			const response =
+				await GetAllMcpToolsAvailableApiAsync(mcpServerTool);
 			if (response?.isSuccess && response?.responseData)
 				dispatch(
-					GetAllMcpToolsAvailableSuccessAsync(response.responseData)
+					GetAllMcpToolsAvailableSuccessAsync(response.responseData),
 				);
 			else dispatch(ToggleMcpToolsLoader(false));
 		} catch (error: any) {
@@ -185,9 +189,8 @@ export function UpdateExistingToolSkillAsync(
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleEditSkillLoader(true));
-			const response = await UpdateExistingToolSkillDataApiAsync(
-				updateToolSkill,
-			);
+			const response =
+				await UpdateExistingToolSkillDataApiAsync(updateToolSkill);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch(GetAllToolSkillsAsync() as any);
 				ShowSuccessToaster(ToolSkillsToasterConstants.UPDATE_SKILL);
@@ -201,15 +204,12 @@ export function UpdateExistingToolSkillAsync(
 	};
 }
 
-export function DeleteExistingToolSkillAsync(
-	skillId: string,
-) {
+export function DeleteExistingToolSkillAsync(skillId: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleToolSkillsLoader(true));
-			const response = await DeleteExistingToolSkillBySkillIdApiAsync(
-				skillId,
-			);
+			const response =
+				await DeleteExistingToolSkillBySkillIdApiAsync(skillId);
 			if (response?.isSuccess) {
 				dispatch(GetAllToolSkillsAsync() as any);
 				ShowSuccessToaster(ToolSkillsToasterConstants.DELETE_SKILL);
@@ -219,6 +219,52 @@ export function DeleteExistingToolSkillAsync(
 			if (error.message) ShowErrorToaster(error.message);
 		} finally {
 			dispatch(ToggleToolSkillsLoader(false));
+		}
+	};
+}
+
+export function GetAllRegisteredApplicationsAsync() {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleRegisterApplicationsLoader(true));
+			const response = await GetAllRegisteredApplicationsApiAsync();
+			if (response?.isSuccess)
+				dispatch({
+					type: GET_ALL_REGISTERED_APPLICATIONS,
+					payload: response.responseData,
+				});
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleRegisterApplicationsLoader(false));
+		}
+	};
+}
+
+export function RegisterNewApplicationAsync(
+	newApplicationModel: RegisteredApplicationDTO,
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleRegisterApplicationsLoader(true));
+			const response =
+				await RegisterNewApplicationApiAsync(newApplicationModel);
+			if (response?.isSuccess) {
+				dispatch({
+					type: ADD_NEW_REGISTERED_APPLICATION,
+					payload: response.responseData,
+				});
+				ShowSuccessToaster(
+					ToolSkillsToasterConstants.CREATE_NEW_APPLICATION,
+				);
+				dispatch(GetAllRegisteredApplicationsAsync() as any);
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleRegisterApplicationsLoader(false));
 		}
 	};
 }

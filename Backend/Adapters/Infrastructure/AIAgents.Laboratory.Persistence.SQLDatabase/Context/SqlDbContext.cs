@@ -1,4 +1,5 @@
 ﻿using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
+using AIAgents.Laboratory.Persistence.SQLDatabase.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AIAgents.Laboratory.Persistence.SQLDatabase.Context;
@@ -59,6 +60,11 @@ public class SqlDbContext : DbContext
     /// The bug severity mapping.
     /// </value>
     public virtual DbSet<BugSeverityMapping> BugSeverityMapping { get; set; }
+
+    /// <summary>
+    /// Gets or sets the registered applications.
+    /// </summary>
+    public virtual DbSet<RegisteredApplicationEntity> RegisteredApplications { get; set; }
 
     /// <summary>
     /// Override this method to further configure the model that was discovered by convention from the entity types
