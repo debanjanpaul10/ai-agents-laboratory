@@ -22,24 +22,8 @@ namespace AIAgents.Laboratory.Infrastructure.AgentsFramework.AgentServices;
 /// <param name="this.mcpClientServices">The mcp client services.</param>
 /// <param name="chatClient">The chat client.</param>
 /// <seealso cref="IAiServices"/>
-public sealed class AgentFrameworkServices : IAiServices
+public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logger, ICorrelationContext correlationContext, IMcpClientServices mcpClientServices, IChatClient chatClient) : IAiServices
 {
-    private readonly ILogger<AgentFrameworkServices> _logger;
-
-    private readonly ICorrelationContext _correlationContext;
-
-    private readonly IMcpClientServices _mcpClientServices;
-
-    private readonly IChatClient _chatClient;
-
-    public AgentFrameworkServices(ILogger<AgentFrameworkServices> logger, ICorrelationContext correlationContext, IMcpClientServices mcpClientServices, IChatClient chatClient)
-    {
-        this._chatClient = chatClient;
-        this._logger = logger;
-        this._correlationContext = correlationContext;
-        this._mcpClientServices = mcpClientServices;
-    }
-
     /// <summary>
     /// Gets the ai function aiResponse asynchronous.
     /// </summary>
@@ -57,7 +41,7 @@ public sealed class AgentFrameworkServices : IAiServices
         string aiResponse = string.Empty;
         try
         {
-            this._logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { this._correlationContext.CorrelationId, pluginName, functionName }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, pluginName, functionName }));
 
             var chatMessages = new List<ChatMessage>
             {
@@ -65,18 +49,18 @@ public sealed class AgentFrameworkServices : IAiServices
                 new(ChatRole.System, GetChatMessageResponseFunction.FunctionInstructions)
             };
 
-            var response = await this._chatClient.GetResponseAsync(chatMessages).ConfigureAwait(false);
+            var response = await chatClient.GetResponseAsync(chatMessages).ConfigureAwait(false);
             aiResponse = response?.Text ?? ExceptionConstants.DefaultAIExceptionMessage;
             return aiResponse;
         }
         catch (Exception ex)
         {
-            this._logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
             throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            this._logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { this._correlationContext.CorrelationId, pluginName, functionName, aiResponse }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, pluginName, functionName, aiResponse }));
         }
     }
 
@@ -97,12 +81,12 @@ public sealed class AgentFrameworkServices : IAiServices
         string aiResponse = string.Empty;
         try
         {
-            this._logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { this._correlationContext.CorrelationId, pluginName, functionName }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, pluginName, functionName }));
 
             var jsonInput = JsonConvert.SerializeObject(input);
 
             // STEP 1: Get all available MCP Tools
-            var availableMcpTools = await this._mcpClientServices.GetAllMcpToolsAsync(mcpServerUrl).ConfigureAwait(false);
+            var availableMcpTools = await mcpClientServices.GetAllMcpToolsAsync(mcpServerUrl).ConfigureAwait(false);
 
             // STEP 2: Ask LLM to determine which tool to call (if any)
             var toolDescriptions = string.Join("\n", availableMcpTools.Select(t => $"- {t.Name}: {t.Description}"));
@@ -116,7 +100,7 @@ public sealed class AgentFrameworkServices : IAiServices
             // STEP 3: If a tool is selected, invoke the MCP tool and get the result
             var toolResult = string.Empty;
             if (!string.IsNullOrEmpty(toolSelectionResult.ToolName))
-                toolResult = await this._mcpClientServices.GetMcpToolResponseAsync(
+                toolResult = await mcpClientServices.GetMcpToolResponseAsync(
                     mcpServerUrl, toolName: toolSelectionResult.ToolName, toolArguments: toolSelectionResult.ToolArguments).ConfigureAwait(false);
 
             // STEP 4: Finally, call the AI function with the original input and the tool result (if any)
@@ -127,12 +111,12 @@ public sealed class AgentFrameworkServices : IAiServices
         }
         catch (Exception ex)
         {
-            this._logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
             throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            this._logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { this._correlationContext.CorrelationId, pluginName, functionName, aiResponse }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiFunctionResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, pluginName, functionName, aiResponse }));
         }
     }
 
@@ -151,7 +135,7 @@ public sealed class AgentFrameworkServices : IAiServices
         string aiResponse = string.Empty;
         try
         {
-            this._logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetChatbotResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { this._correlationContext.CorrelationId, userMessage }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetChatbotResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userMessage }));
 
             var chatMessages = new List<ChatMessage>
             {
@@ -171,18 +155,18 @@ public sealed class AgentFrameworkServices : IAiServices
             }
 
             // Get aiResponse from AI
-            var response = await this._chatClient.GetResponseAsync(chatMessages).ConfigureAwait(false);
+            var response = await chatClient.GetResponseAsync(chatMessages).ConfigureAwait(false);
             aiResponse = response?.Text ?? string.Empty;
             return aiResponse;
         }
         catch (Exception ex)
         {
-            this._logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetChatbotResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetChatbotResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
             throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            this._logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { this._correlationContext.CorrelationId, userMessage, aiResponse }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetChatbotResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userMessage, aiResponse }));
         }
     }
 
@@ -199,7 +183,7 @@ public sealed class AgentFrameworkServices : IAiServices
         string response = string.Empty;
         try
         {
-            this._logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetChatMessageAiResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { this._correlationContext.CorrelationId, input }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetChatMessageAiResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, input }));
 
             var chatMessages = new List<ChatMessage>
             {
@@ -207,18 +191,18 @@ public sealed class AgentFrameworkServices : IAiServices
                 new(ChatRole.User, input)
             };
 
-            var aiResponse = await this._chatClient.GetResponseAsync(chatMessages).ConfigureAwait(false);
+            var aiResponse = await chatClient.GetResponseAsync(chatMessages).ConfigureAwait(false);
             response = aiResponse?.Text ?? ExceptionConstants.DefaultAIExceptionMessage;
             return response;
         }
         catch (Exception ex)
         {
-            this._logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetChatMessageAiResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetChatMessageAiResponseAsync), DateTime.UtcNow, AgentServiceHelpers.SanitizeErrorMessage(ex.Message));
             throw new AIAgentsBusinessException(ex.Message);
         }
         finally
         {
-            this._logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetChatMessageAiResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { this._correlationContext.CorrelationId, input, response }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetChatMessageAiResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, input, response }));
         }
     }
 
