@@ -1,0 +1,26 @@
+{
+	"inputs": [
+		{
+			"id": "github_org",
+			"type": "promptString",
+			"description": "Github organization for debanjanpaul10"
+		},
+		{
+			"id": "github_project",
+			"type": "promptString",
+			"description": "Github project name 'ai-agents-laboratory'"
+		}
+	],
+	"servers": {
+		"Github debanjanpaul10": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-github",
+				"${input:github_org}",
+				"${input:github_project}"
+			]
+		}
+	}
+}

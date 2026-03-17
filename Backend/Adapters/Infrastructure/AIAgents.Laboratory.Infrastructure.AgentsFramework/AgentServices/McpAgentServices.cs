@@ -14,8 +14,9 @@ namespace AIAgents.Laboratory.Infrastructure.AgentsFramework.AgentServices;
 /// </summary>
 /// <param name="configuration">The configuration.</param>
 /// <param name="logger">The logger used to record diagnostic and operational information for the service.</param>
+/// <param name="correlationContext">The correlation context used to track and correlate logs and operations across different components and services during interactions with the MCP server.</param>
 /// <seealso cref="IMcpClientServices"/>
-public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAgentServices> logger) : IMcpClientServices
+public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAgentServices> logger, ICorrelationContext correlationContext) : IMcpClientServices
 {
     /// <summary>
     /// Asynchronously retrieves all available MCP client tools from the specified MCP server endpoint.
@@ -57,11 +58,12 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         string response = string.Empty;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { mcpServerUrl, toolName, toolArguments }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl, toolName, toolArguments }));
 
             var arguments = toolArguments ?? [];
             var mcpClient = await this.CreateMcpClientAsync(mcpServerUrl).ConfigureAwait(false);
             var callToolResult = await mcpClient.CallToolAsync(toolName, arguments).ConfigureAwait(false);
+
             response = JsonConvert.SerializeObject(callToolResult);
             return response;
         }
@@ -72,7 +74,7 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { mcpServerUrl, toolName, toolArguments, response }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl, toolName, toolArguments, response }));
         }
     }
 

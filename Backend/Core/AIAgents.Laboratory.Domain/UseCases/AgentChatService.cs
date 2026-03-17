@@ -1,10 +1,12 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+﻿using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Processor.Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
@@ -16,13 +18,14 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// generation to deliver contextual chat replies. This service is typically used in conversational applications where agent-specific logic and knowledge integration are required.</remarks>
 /// <param name="configuration">The configuration service.</param>
 /// <param name="logger">The logger used to record diagnostic and operational information for the service.</param>
+/// <param name="correlationContext">The correlation context used to track and correlate logs and operations across different components and services during a chat interaction.</param>
 /// <param name="agentsService">The service used to retrieve agent data and metadata required for chat interactions.</param>
 /// <param name="knowledgeBaseProcessor">The processor used to extract relevant knowledge base information to enhance agent responses.</param>
 /// <param name="aiServices">The AI services used to generate responses based on chat context and agent configuration.</param>
 /// <param name="toolSkillsService">The tool skills service used to manage and invoke external tools or skills associated with agents.</param>
 /// <seealso cref="IAgentChatService"/>
-public sealed class AgentChatService(IConfiguration configuration, ILogger<AgentChatService> logger, IAgentsService agentsService,
-    IKnowledgeBaseProcessor knowledgeBaseProcessor, IAiServices aiServices, IToolSkillsService toolSkillsService) : IAgentChatService
+public sealed class AgentChatService(IConfiguration configuration, ILogger<AgentChatService> logger, ICorrelationContext correlationContext,
+    IAgentsService agentsService, IKnowledgeBaseProcessor knowledgeBaseProcessor, IAiServices aiServices, IToolSkillsService toolSkillsService) : IAgentChatService
 {
     /// <summary>
     /// The feature flag for knowledge base service.
@@ -41,12 +44,12 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
     /// <returns>
     /// The AI response.
     /// </returns>
-    /// <exception cref="System.NotImplementedException"></exception>
     public async Task<string> GetAgentChatResponseAsync(ChatRequestDomain chatRequest)
     {
+        string response = string.Empty;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, chatRequest.AgentId);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
 
             var agentData = await agentsService.GetAgentDataByIdAsync(chatRequest.AgentId, string.Empty);
             if (agentData is null || string.IsNullOrEmpty(agentData.AgentMetaPrompt))
@@ -75,15 +78,16 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
 
             // Handle integrated skills if configured
             if (agentData.AssociatedSkillGuids is not null && agentData.AssociatedSkillGuids.Count > 0)
-                return await this.GetResponseWithIntegratedSkillAsync(
+                response = await this.GetResponseWithIntegratedSkillAsync(
                     chatMessage: chatMessage,
                     associatedSkillGuids: agentData.AssociatedSkillGuids).ConfigureAwait(false);
             else
-                return await aiServices.GetAiFunctionResponseAsync(
+                response = await aiServices.GetAiFunctionResponseAsync(
                     input: chatMessage,
                     pluginName: ApplicationPluginsHelpers.PluginName,
                     functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
 
+            return response;
         }
         catch (Exception ex)
         {
@@ -92,7 +96,7 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, chatRequest.AgentId);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response }));
         }
     }
 
@@ -104,20 +108,22 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
     /// <returns>The AI agent response string.</returns>
     private async Task<string> GetResponseWithIntegratedSkillAsync(ChatMessageDomain chatMessage, IList<string> associatedSkillGuids)
     {
+        string response = string.Empty;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, chatMessage.AgentName);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatMessage }));
 
             var associatedSkill = await toolSkillsService.GetToolSkillBySkillIdAsync(
                 toolSkillId: associatedSkillGuids[0], currentUserEmail: string.Empty).ConfigureAwait(false);
             ArgumentNullException.ThrowIfNull(associatedSkill);
             ArgumentException.ThrowIfNullOrWhiteSpace(associatedSkill.ToolSkillMcpServerUrl);
 
-            return await aiServices.GetAiFunctionResponseAsync(
+            response = await aiServices.GetAiFunctionResponseAsync(
                 input: chatMessage,
                 mcpServerUrl: associatedSkill.ToolSkillMcpServerUrl,
                 pluginName: ApplicationPluginsHelpers.PluginName,
                 functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+            return response;
 
         }
         catch (Exception ex)
@@ -127,7 +133,7 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, chatMessage.AgentName);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response }));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities;
+﻿using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
@@ -16,8 +17,9 @@ namespace AIAgents.Laboratory.Persistence.SQLDatabase.DataManagers;
 /// <param name="unitOfWork">The database unit of work service.</param>
 /// <param name="logger">The application logger service.</param>
 /// <param name="mapper">The auto mapper service.</param>
+/// <param name="correlationContext">The correlation context service.</param>
 /// <seealso cref="IRegisteredApplicationDataManager"/>
-public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILogger<RegisteredApplicationDataManager> logger, IMapper mapper) : IRegisteredApplicationDataManager
+public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILogger<RegisteredApplicationDataManager> logger, IMapper mapper, ICorrelationContext correlationContext) : IRegisteredApplicationDataManager
 {
     /// <summary>
     /// Creates a new registered application for the current logged in user with the provided application data.
@@ -29,7 +31,7 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
     {
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(CreateNewRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, newApplicationData }));
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(CreateNewRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, newApplicationData }));
 
             var dataEntityModel = mapper.Map<RegisteredApplicationEntity>(newApplicationData);
             await unitOfWork.Repository<RegisteredApplicationEntity>().AddAsync(dataEntityModel).ConfigureAwait(false);
@@ -43,7 +45,7 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(CreateNewRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, newApplicationData }));
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(CreateNewRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, newApplicationData }));
         }
     }
 
@@ -58,7 +60,7 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
     {
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, applicationId }));
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
             var result = await unitOfWork.Repository<RegisteredApplicationEntity>().FirstOrDefaultAsync(x => x.IsActive && x.Id == applicationId).ConfigureAwait(false);
             if (result is not null)
             {
@@ -80,7 +82,7 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, applicationId }));
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
         }
     }
 
@@ -94,7 +96,7 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
     {
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, applicationId }));
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
             var result = await unitOfWork.Repository<RegisteredApplicationEntity>().FirstOrDefaultAsync(x => x.IsActive && x.Id == applicationId).ConfigureAwait(false);
             return mapper.Map<RegisteredApplication>(result);
         }
@@ -105,7 +107,7 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, applicationId }));
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
         }
     }
 
@@ -118,7 +120,7 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
     {
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetRegisteredApplicationsAsync), DateTime.UtcNow, currentLoggedInUser);
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetRegisteredApplicationsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser }));
 
             var result = await unitOfWork.Repository<RegisteredApplicationEntity>().GetAllAsync(x => x.IsActive).ConfigureAwait(false);
             return mapper.Map<IEnumerable<RegisteredApplication>>(result);
@@ -130,7 +132,7 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetRegisteredApplicationsAsync), DateTime.UtcNow, currentLoggedInUser);
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetRegisteredApplicationsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser }));
         }
     }
 
@@ -145,7 +147,7 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
     {
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, updateApplicationData }));
+            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, updateApplicationData }));
 
             var result = await unitOfWork.Repository<RegisteredApplicationEntity>().GetAllAsync(x => x.IsActive && x.Id == updateApplicationData.Id).ConfigureAwait(false);
             if (result is not null)
@@ -165,7 +167,7 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, updateApplicationData }));
+            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, updateApplicationData }));
         }
     }
 }

@@ -21,6 +21,11 @@ public abstract class BaseController(IHttpContextAccessor httpContextAccessor, I
     protected string UserEmail => httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.UserEmailClaimConstant))?.Value ?? HeaderConstants.NotApplicableStringConstant;
 
     /// <summary>
+    /// The correlation ID for the current request, extracted from the HTTP context items set by the CorrelationIdMiddleware.
+    /// </summary>
+    protected string CorrelationId => httpContextAccessor.HttpContext?.Items[LoggingConstants.CorrelationIdHeader]?.ToString() ?? string.Empty;
+
+    /// <summary>
     /// Determines whether the request is authorized based on the authorization type.
     /// </summary>
     /// <param name="authorizationType">The authorization type.</param>

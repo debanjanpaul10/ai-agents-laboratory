@@ -3,6 +3,8 @@ using System.Globalization;
 using System.Security.Claims;
 using AIAgents.Laboratory.API.Adapters.IOC;
 using AIAgents.Laboratory.API.Controllers;
+using AIAgents.Laboratory.API.Helpers;
+using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.IOC;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.IOC;
 using AIAgents.Laboratory.Messaging.Adapters.IOC;
@@ -60,6 +62,9 @@ public static class DIContainer
     {
         services.ConfigureAuthenticationServices(configuration);
 
+        // Register correlation context service for cross-layer correlation ID access
+        services.AddScoped<ICorrelationContext, CorrelationContext>();
+
         services.AddAPIAdapterDependencies().AddMessagingDependencies(configuration).AddMemoryCache().AddCacheDependencies();
         services.AddAgentsFrameworkDependencies(configuration).AddMongoDbAdapterDependencies(configuration)
             .AddRelationalSqlDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
@@ -91,7 +96,7 @@ public static class DIContainer
     {
         services.AddHealthChecksUI(opt =>
         {
-            opt.SetEvaluationTimeInSeconds(30);
+            opt.SetEvaluationTimeInSeconds(60);
             opt.MaximumHistoryEntriesPerEndpoint(60);
             opt.SetApiMaxActiveRequests(1);
             opt.AddHealthCheckEndpoint(HealthCheckConstants.AppHealthCheckName, HealthCheckConstants.AppHealthCheckEndpoint);

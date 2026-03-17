@@ -1,4 +1,5 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities;
+﻿using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
@@ -15,7 +16,9 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <remarks>This service acts as a driving port in the application architecture, orchestrating the business logic and interactions with the underlying data management layer through the use of data managers.</remarks>
 /// <param name="logger">The logger service.</param>
 /// <param name="registeredApplicationDataManager">The registered application data manager service.</param>
-public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationService> logger, IRegisteredApplicationDataManager registeredApplicationDataManager) : IRegisteredApplicationService
+/// <param name="correlationContext">The correlation context service.</param>
+/// <seealso cref="IRegisteredApplicationService"/>
+public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationService> logger, IRegisteredApplicationDataManager registeredApplicationDataManager, ICorrelationContext correlationContext) : IRegisteredApplicationService
 {
     /// <summary>
     /// Creates a new registered application for the current logged in user with the provided application data.
@@ -27,7 +30,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, newApplicationData }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, newApplicationData }));
 
             newApplicationData.PrepareAuditEntityData(currentLoggedInUser);
             return await registeredApplicationDataManager.CreateNewRegisteredApplicationAsync(currentLoggedInUser, newApplicationData).ConfigureAwait(false);
@@ -39,7 +42,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, newApplicationData }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, newApplicationData }));
         }
     }
 
@@ -54,7 +57,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, applicationId }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
             return await registeredApplicationDataManager.DeleteRegisteredApplicationByIdAsync(currentLoggedInUser, applicationId).ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -64,7 +67,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, applicationId }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
         }
     }
 
@@ -78,7 +81,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, applicationId }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
             return await registeredApplicationDataManager.GetRegisteredApplicationByIdAsync(currentLoggedInUser, applicationId).ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -88,7 +91,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, applicationId }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
         }
     }
 
@@ -101,7 +104,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRegisteredApplicationsAsync), DateTime.UtcNow, currentLoggedInUser);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRegisteredApplicationsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser }));
             return await registeredApplicationDataManager.GetRegisteredApplicationsAsync(currentLoggedInUser).ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -111,7 +114,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRegisteredApplicationsAsync), DateTime.UtcNow, currentLoggedInUser);
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRegisteredApplicationsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser }));
         }
     }
 
@@ -126,7 +129,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, updateApplicationData }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, updateApplicationData }));
 
             updateApplicationData.ModifiedBy = currentLoggedInUser;
             updateApplicationData.DateModified = DateTime.UtcNow;
@@ -139,7 +142,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { currentLoggedInUser, updateApplicationData }));
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, updateApplicationData }));
         }
     }
 }

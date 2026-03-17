@@ -36,4 +36,8 @@
     <ProjectReference Include="..\Core\AIAgents.Laboratory.Processor\AIAgents.Laboratory.Processor.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

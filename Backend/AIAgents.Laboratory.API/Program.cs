@@ -9,7 +9,9 @@ using static AIAgents.Laboratory.API.Helpers.Constants;
 using SwaggerConstants = AIAgents.Laboratory.API.Helpers.Constants.SwaggerConstants;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(EnvironmentConfigurationConstants.LocalAppsetingsFileName, true).AddEnvironmentVariables();
+if (builder.Environment.IsDevelopment())
+    builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile(EnvironmentConfigurationConstants.LocalAppsetingsFileName, true).AddEnvironmentVariables();
 
 var miCredentials = builder.Configuration[EnvironmentConfigurationConstants.ManagedIdentityClientIdConstant];
 var credentials = builder.Environment.IsDevelopment()
@@ -20,7 +22,10 @@ var credentials = builder.Environment.IsDevelopment()
     });
 
 builder.ConfigureAzureAppConfiguration(credentials);
-builder.Services.ConfigureApplicationDependencies(builder.Configuration, builder.Environment.IsDevelopment());
+builder.Services.ConfigureApplicationDependencies(
+    configuration: builder.Configuration,
+    isDevelopmentMode: builder.Environment.IsDevelopment());
+
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddOpenApi();

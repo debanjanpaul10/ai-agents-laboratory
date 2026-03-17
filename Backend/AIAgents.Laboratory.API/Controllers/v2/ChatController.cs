@@ -2,7 +2,10 @@
 using AIAgents.Laboratory.API.Adapters.Models.Base;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
+using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.AuthorizationTypes;
 using static AIAgents.Laboratory.API.Helpers.Constants;
@@ -12,16 +15,21 @@ using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ChatController;
 namespace AIAgents.Laboratory.API.Controllers.v2;
 
 /// <summary>
-/// The Chat API Controller class.
+/// Provides API endpoints for interacting with AI chat agents, including invoking chat operations, retrieving direct responses, managing conversation history, and clearing user data.
 /// </summary>
-/// <param name="httpContextAccessor">The http context accessor.</param>
-/// <param name="configuration">The configuration.</param>
-/// <param name="chatHandler">The Chat API adapter handler.</param>
-/// <seealso cref="BaseController" />
+/// <remarks>This controller is versioned and secured, exposing endpoints for AI chat functionality. All actions require proper authorization and may return standard HTTP status codes for success, 
+/// unauthorized access, bad requests, or not found scenarios. Usage of these endpoints is intended for clients needing conversational AI features and conversation history management.</remarks>
+/// <param name="httpContextAccessor">The accessor used to obtain HTTP context information for the current request.</param>
+/// <param name="configuration">The application configuration instance used to access settings and options.</param>
+/// <param name="logger">The logger used for recording diagnostic and operational information for the controller.</param>
+/// <param name="correlationContext">The context object used to track correlation identifiers for request tracing and logging.</param>
+/// <param name="chatHandler">The handler responsible for processing chat-related operations and communication with AI agents.</param>
+/// <seealso cref="BaseController"/>
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public sealed class ChatController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IChatHandler chatHandler) : BaseController(httpContextAccessor, configuration)
+public sealed class ChatController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<ChatController> logger, ICorrelationContext correlationContext,
+    IChatHandler chatHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Invokes the chat agent asynchronous.
@@ -37,15 +45,32 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
     [SwaggerOperation(Summary = InvokeAgentAction.Summary, Description = InvokeAgentAction.Description, OperationId = InvokeAgentAction.OperationId)]
     public async Task<ResponseDTO> InvokeChatAgentAsync([FromBody] ChatRequestDTO chatRequestDTO)
     {
-        ArgumentNullException.ThrowIfNull(chatRequestDTO);
-        if (base.IsAuthorized(UserBased))
+        string result = string.Empty;
+        try
         {
-            var result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
-            if (!string.IsNullOrEmpty(result)) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
-        }
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(InvokeChatAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, chatRequestDTO }));
 
-        return HandleUnAuthorizedRequestResponse();
+            ArgumentNullException.ThrowIfNull(chatRequestDTO);
+            if (base.IsAuthorized(UserBased))
+            {
+                result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO).ConfigureAwait(false);
+                if (!string.IsNullOrEmpty(result))
+                    return HandleSuccessRequestResponse(result);
+                else
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            }
+
+            return HandleUnAuthorizedRequestResponse();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(InvokeChatAgentAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(InvokeChatAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+        }
     }
 
     /// <summary>
@@ -61,22 +86,36 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
     [SwaggerOperation(Summary = GetDirectChatResponseAction.Summary, Description = GetDirectChatResponseAction.Description, OperationId = GetDirectChatResponseAction.OperationId)]
     public async Task<ResponseDTO> GetDirectChatResponseAsync([FromBody] DirectChatRequestDTO userChatMessage)
     {
-        ArgumentNullException.ThrowIfNull(userChatMessage);
-        ArgumentException.ThrowIfNullOrEmpty(userChatMessage.UserMessage);
-
-        if (base.IsAuthorized(UserBased))
+        string result = string.Empty;
+        try
         {
-            var result = await chatHandler.GetDirectChatResponseAsync(
-                userQuery: userChatMessage.UserMessage,
-                userEmail: base.UserEmail).ConfigureAwait(false);
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, userChatMessage }));
 
-            if (!string.IsNullOrEmpty(result))
-                return HandleSuccessRequestResponse(result);
-            else
-                return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            ArgumentNullException.ThrowIfNull(userChatMessage);
+            ArgumentException.ThrowIfNullOrEmpty(userChatMessage.UserMessage);
+            if (base.IsAuthorized(UserBased))
+            {
+                result = await chatHandler.GetDirectChatResponseAsync(
+                    userQuery: userChatMessage.UserMessage,
+                    userEmail: base.UserEmail).ConfigureAwait(false);
+
+                if (!string.IsNullOrEmpty(result))
+                    return HandleSuccessRequestResponse(result);
+                else
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            }
+
+            return HandleUnAuthorizedRequestResponse();
         }
-
-        return HandleUnAuthorizedRequestResponse();
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+        }
     }
 
     /// <summary>
@@ -91,14 +130,30 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
     [SwaggerOperation(Summary = ClearConversationHistoryForUserAction.Summary, Description = ClearConversationHistoryForUserAction.Description, OperationId = ClearConversationHistoryForUserAction.OperationId)]
     public async Task<ResponseDTO> ClearConversationHistoryForUserAsync()
     {
-        if (base.IsAuthorized(UserBased))
+        bool result = false;
+        try
         {
-            var result = await chatHandler.ClearConversationHistoryForUserAsync(base.UserEmail).ConfigureAwait(false);
-            if (result) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeClearedMessageConstant);
-        }
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            if (base.IsAuthorized(UserBased))
+            {
+                result = await chatHandler.ClearConversationHistoryForUserAsync(base.UserEmail).ConfigureAwait(false);
+                if (result)
+                    return HandleSuccessRequestResponse(result);
+                else
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeClearedMessageConstant);
+            }
 
-        return HandleUnAuthorizedRequestResponse();
+            return HandleUnAuthorizedRequestResponse();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+        }
     }
 
     /// <summary>
@@ -113,13 +168,29 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
     [SwaggerOperation(Summary = GetConversationHistoryDataForUserAction.Summary, Description = GetConversationHistoryDataForUserAction.Description, OperationId = GetConversationHistoryDataForUserAction.OperationId)]
     public async Task<ResponseDTO> GetConversationHistoryDataForUserAsync()
     {
-        if (base.IsAuthorized(UserBased))
+        ConversationHistoryDTO result = new();
+        try
         {
-            var result = await chatHandler.GetConversationHistoryDataAsync(base.UserEmail).ConfigureAwait(false);
-            if (result is not null) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeFetchedMessageConstant);
-        }
+            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            if (base.IsAuthorized(UserBased))
+            {
+                result = await chatHandler.GetConversationHistoryDataAsync(base.UserEmail).ConfigureAwait(false);
+                if (result is not null)
+                    return HandleSuccessRequestResponse(result);
+                else
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeFetchedMessageConstant);
+            }
 
-        return HandleUnAuthorizedRequestResponse();
+            return HandleUnAuthorizedRequestResponse();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message);
+        }
+        finally
+        {
+            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+        }
     }
 }

@@ -8,6 +8,7 @@ import {
 	Info,
 	Laptop,
 	UserCircle,
+	MonitorSmartphone,
 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@heroui/react";
@@ -65,6 +66,11 @@ export default function SidebarComponent() {
 			name: "Agents Workspaces",
 			href: "/workspaces",
 			icon: Laptop,
+		},
+		{
+			name: "Register Applications",
+			href: "/register-applications",
+			icon: MonitorSmartphone,
 		},
 	];
 

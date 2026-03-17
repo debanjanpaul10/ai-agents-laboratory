@@ -306,3 +306,11 @@ export const AdminPageConstants = {
 			"You do not have permission to access the admin panel. If you believe this is an error, please contact the system administrator.",
 	},
 };
+
+export const RegisterApplicationsConstants = {
+	LoadingConstants: {
+		MainLoader: "Loading AI Agents Applications Registrations",
+		LoginRedirectLoader: "Redirecting to Login",
+		UpdateWorkspace: "Updating workspace details",
+	},
+};
