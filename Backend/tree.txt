@@ -1,0 +1,296 @@
+.
+├── AIAgents.Laboratory.API
+│   ├── AIAgents.Laboratory.API.csproj
+│   ├── AIAgents.Laboratory.API.csproj.user
+│   ├── Controllers
+│   │   ├── BaseController.cs
+│   │   └── v2
+│   │       ├── AIAgentsLabController.cs
+│   │       ├── AgentsController.cs
+│   │       ├── ApplicationAdminController.cs
+│   │       ├── ChatController.cs
+│   │       ├── RegisteredApplicationController.cs
+│   │       ├── ToolSkillsController.cs
+│   │       └── WorkspacesController.cs
+│   ├── Helpers
+│   │   ├── Constants.cs
+│   │   ├── CorrelationContext.cs
+│   │   ├── Enums.cs
+│   │   ├── LogContext.cs
+│   │   ├── RouteConstants.cs
+│   │   └── SwaggerConstants.cs
+│   ├── IOC
+│   │   └── DIContainer.cs
+│   ├── Middleware
+│   │   ├── CorrelationIdMiddleware.cs
+│   │   ├── ExceptionMiddleware.cs
+│   │   └── RequestLoggingMiddleware.cs
+│   ├── Program.cs
+│   ├── Properties
+│   │   └── launchSettings.json
+│   └── appsettings.json
+├── AIAgents.Laboratory.Database
+│   ├── AIAgents.Laboratory.Database.sqlproj
+│   ├── AIAgents.Laboratory.Database.sqlproj.user
+│   ├── PostDeploymentScripts
+│   │   ├── Script.INSERT_BugItemStatusMapping.sql
+│   │   └── Script.INSERT_BugSeverityMapping.sql
+│   ├── Tables
+│   │   ├── BugItemStatusMapping.sql
+│   │   ├── BugReportDetails.sql
+│   │   ├── BugSeverityMapping.sql
+│   │   ├── NewFeatureRequests.sql
+│   │   └── RegisteredApplications.sql
+│   └── global.json
+├── AIAgents.Laboratory.sln
+├── AIAgents.Laboratory.slnLaunch.user
+├── Adapters
+│   ├── Infrastructure
+│   │   ├── AIAgents.Laboratory.Infrastructure.AgentsFramework
+│   │   │   ├── AIAgents.Laboratory.Infrastructure.AgentsFramework.csproj
+│   │   │   ├── AgentServices
+│   │   │   │   ├── AgentFrameworkServices.cs
+│   │   │   │   └── McpAgentServices.cs
+│   │   │   ├── Helpers
+│   │   │   │   ├── AgentServiceHelpers.cs
+│   │   │   │   ├── Constants.cs
+│   │   │   │   └── TokenHelper.cs
+│   │   │   ├── IOC
+│   │   │   │   ├── AgentsFactory.cs
+│   │   │   │   └── DIContainer.cs
+│   │   │   └── Models
+│   │   │       ├── AgentCapabilities.cs
+│   │   │       ├── AgentConfiguration.cs
+│   │   │       └── ChatMessage.cs
+│   │   ├── AIAgents.Laboratory.Persistence.MongoDatabase
+│   │   │   ├── AIAgents.Laboratory.Persistence.MongoDatabase.csproj
+│   │   │   ├── DataManager
+│   │   │   │   └── MongoDatabaseManager.cs
+│   │   │   ├── Helpers
+│   │   │   │   └── Constants.cs
+│   │   │   └── IOC
+│   │   │       └── DIContainer.cs
+│   │   ├── AIAgents.Laboratory.Persistence.SQLDatabase
+│   │   │   ├── AIAgents.Laboratory.Persistence.SQLDatabase.csproj
+│   │   │   ├── Context
+│   │   │   │   └── SqlDbContext.cs
+│   │   │   ├── Contracts
+│   │   │   │   ├── IRepository.cs
+│   │   │   │   └── IUnitOfWork.cs
+│   │   │   ├── DataManagers
+│   │   │   │   ├── FeedbackDataManager.cs
+│   │   │   │   ├── RegisteredApplicationDataManager.cs
+│   │   │   │   └── UnitOfWork.cs
+│   │   │   ├── Helpers
+│   │   │   │   ├── Constants.cs
+│   │   │   │   └── Extensions
+│   │   │   │       └── QueryableExtensions.cs
+│   │   │   ├── IOC
+│   │   │   │   └── DIContainer.cs
+│   │   │   ├── Mapper
+│   │   │   │   └── DataMapperProfile.cs
+│   │   │   ├── Models
+│   │   │   │   └── RegisteredApplicationEntity.cs
+│   │   │   └── Repositories
+│   │   │       └── GenericRepository.cs
+│   │   └── AIAgents.Laboratory.Storage.Blobs
+│   │       ├── AIAgents.Laboratory.Storage.Blobs.csproj
+│   │       ├── DataManager
+│   │       │   ├── CloudinaryStorageManager.cs
+│   │       │   └── GCPCloudStorageManager.cs
+│   │       ├── Helpers
+│   │       │   └── Constants.cs
+│   │       └── IOC
+│   │           └── DIContainer.cs
+│   └── Services
+│       ├── AIAgents.Laboratory.API.Adapters
+│       │   ├── AIAgents.Laboratory.API.Adapters.csproj
+│       │   ├── Contracts
+│       │   │   ├── IAgentsHandler.cs
+│       │   │   ├── IApplicationAdminHandler.cs
+│       │   │   ├── IChatHandler.cs
+│       │   │   ├── ICommonAiHandler.cs
+│       │   │   ├── IFeedbackHandler.cs
+│       │   │   ├── IRegisteredApplicationHandler.cs
+│       │   │   ├── IToolSkillsHandler.cs
+│       │   │   └── IWorkspacesHandler.cs
+│       │   ├── Handlers
+│       │   │   ├── AgentsHandler.cs
+│       │   │   ├── ApplicationAdminHandler.cs
+│       │   │   ├── ChatHandler.cs
+│       │   │   ├── CommonAiHandler.cs
+│       │   │   ├── FeedbackHandler.cs
+│       │   │   ├── RegisteredApplicationHandler.cs
+│       │   │   ├── ToolSkillsHandler.cs
+│       │   │   └── WorkspacesHandler.cs
+│       │   ├── Helpers
+│       │   │   └── Constants.cs
+│       │   ├── IOC
+│       │   │   └── DIContainer.cs
+│       │   ├── Mapper
+│       │   │   └── DomainMapperProfile.cs
+│       │   └── Models
+│       │       ├── Base
+│       │       │   ├── BaseModelDTO.cs
+│       │       │   ├── ResponseDTO.cs
+│       │       │   └── SkillsInputDTO.cs
+│       │       ├── Request
+│       │       │   ├── AddBugReportDTO.cs
+│       │       │   ├── ChatRequestDTO.cs
+│       │       │   ├── CreateAgentDTO.cs
+│       │       │   ├── DirectChatRequestDTO.cs
+│       │       │   ├── DownloadFileDTO.cs
+│       │       │   ├── FollowupQuestionsRequestDTO.cs
+│       │       │   ├── McpServerToolRequestDTO.cs
+│       │       │   ├── NewFeatureRequestDTO.cs
+│       │       │   ├── NltosqlInputDTO.cs
+│       │       │   ├── SqlQueryResultDTO.cs
+│       │       │   ├── UserQueryRequestDTO.cs
+│       │       │   ├── UserStoryRequestDTO.cs
+│       │       │   ├── WorkspaceAgentChatRequestDTO.cs
+│       │       │   └── WorkspaceAgentsDataDTO.cs
+│       │       └── Response
+│       │           ├── AIAgentResponseDTO.cs
+│       │           ├── AgentDataDTO.cs
+│       │           ├── AgentStatusDTO.cs
+│       │           ├── AgentsWorkspaceDTO.cs
+│       │           ├── AiVisionImagesDataDTO.cs
+│       │           ├── AssociatedAgentsSkillDataDTO.cs
+│       │           ├── BugReportDataDTO.cs
+│       │           ├── ChatHistoryDTO.cs
+│       │           ├── ConversationHistoryDTO.cs
+│       │           ├── GroupChatAgentsResponseDTO.cs
+│       │           ├── GroupChatResponseDTO.cs
+│       │           ├── McpServerToolsDTO.cs
+│       │           ├── NewFeatureRequestDataDTO.cs
+│       │           ├── RegisteredApplicationDTO.cs
+│       │           ├── ToolSkillDTO.cs
+│       │           └── TopActiveAgentsDTO.cs
+│       ├── AIAgents.Laboratory.Logging
+│       │   └── AIAgents.Laboratory.Logging.csproj
+│       ├── AIAgents.Laboratory.Messaging.Adapters
+│       │   ├── AIAgents.Laboratory.Messaging.Adapters.csproj
+│       │   ├── Helpers
+│       │   │   └── Constants.cs
+│       │   ├── IOC
+│       │   │   └── DIContainer.cs
+│       │   └── Services
+│       │       └── EmailNotificationService.cs
+│       └── AIAgents.Laboratory.Persistence.Caching
+│           ├── AIAgents.Laboratory.Persistence.Caching.csproj
+│           ├── Helpers
+│           │   └── Constants.cs
+│           ├── IOC
+│           │   └── DIContainer.cs
+│           └── Services
+│               └── CacheService.cs
+├── Core
+│   ├── AIAgents.Laboratory.Domain
+│   │   ├── AIAgents.Laboratory.Domain.csproj
+│   │   ├── Contracts
+│   │   │   ├── IConversationHistoryService.cs
+│   │   │   ├── ICorrelationContext.cs
+│   │   │   ├── IDocumentIntelligenceService.cs
+│   │   │   ├── IMcpClientServices.cs
+│   │   │   └── IOrchestratorService.cs
+│   │   ├── DomainEntities
+│   │   │   ├── AIAgentResponseDomain.cs
+│   │   │   ├── AgentStatus.cs
+│   │   │   ├── AgentsEntities
+│   │   │   │   ├── AgentDataDomain.cs
+│   │   │   │   ├── AiVisionImagesDomain.cs
+│   │   │   │   ├── ChatMessageDomain.cs
+│   │   │   │   ├── ChatRequestDomain.cs
+│   │   │   │   ├── GroupChatAgentsResponseDomain.cs
+│   │   │   │   ├── GroupChatResponseDomain.cs
+│   │   │   │   ├── OrchestratorFinalResponseDomain.cs
+│   │   │   │   └── ToolSelectionResultDomain.cs
+│   │   │   ├── AssociatedAgentsSkillDataDomain.cs
+│   │   │   ├── BaseEntity.cs
+│   │   │   ├── ChatHistoryDomain.cs
+│   │   │   ├── ConversationHistoryDomain.cs
+│   │   │   ├── FeedbackEntities
+│   │   │   │   ├── BugItemStatusMapping.cs
+│   │   │   │   ├── BugReportData.cs
+│   │   │   │   ├── BugSeverityMapping.cs
+│   │   │   │   └── NewFeatureRequestData.cs
+│   │   │   ├── McpServerToolsDomain.cs
+│   │   │   ├── RegisteredApplication.cs
+│   │   │   ├── SkillsEntities
+│   │   │   │   ├── FollowupQuestionsRequestDomain.cs
+│   │   │   │   ├── NltosqlInputDomain.cs
+│   │   │   │   └── SkillsInputDomain.cs
+│   │   │   ├── ToolSkillDomain.cs
+│   │   │   ├── UserRequestDomain.cs
+│   │   │   └── Workspaces
+│   │   │       ├── AgentsWorkspaceDomain.cs
+│   │   │       ├── OrchestratorAgentResponseDomain.cs
+│   │   │       ├── WorkspaceAgentChatRequestDomain.cs
+│   │   │       └── WorkspaceAgentsDataDomain.cs
+│   │   ├── DrivenPorts
+│   │   │   ├── IAiServices.cs
+│   │   │   ├── IBlobStorageManager.cs
+│   │   │   ├── ICacheService.cs
+│   │   │   ├── IEmailNotificationService.cs
+│   │   │   ├── IFeedbackDataManager.cs
+│   │   │   ├── IMongoDatabaseService.cs
+│   │   │   └── IRegisteredApplicationDataManager.cs
+│   │   ├── DrivingPorts
+│   │   │   ├── IAgentChatService.cs
+│   │   │   ├── IAgentsService.cs
+│   │   │   ├── IApplicationAdminService.cs
+│   │   │   ├── ICommonAiService.cs
+│   │   │   ├── IDirectChatService.cs
+│   │   │   ├── IFeedbackService.cs
+│   │   │   ├── IRegisteredApplicationService.cs
+│   │   │   ├── IToolSkillsService.cs
+│   │   │   └── IWorkspacesService.cs
+│   │   ├── Helpers
+│   │   │   ├── AIAgentsBusinessException.cs
+│   │   │   ├── ApplicationPluginsHelpers.cs
+│   │   │   ├── CacheKeys.cs
+│   │   │   ├── Constants.cs
+│   │   │   ├── DocumentHandlerService.cs
+│   │   │   ├── DomainEnums.cs
+│   │   │   ├── DomainUtilities.cs
+│   │   │   ├── FormFileImplementation.cs
+│   │   │   └── OrchestratorHelpers.cs
+│   │   ├── IOC
+│   │   │   └── DIContainer.cs
+│   │   ├── Templates
+│   │   │   └── FeedbackEmail.html
+│   │   └── UseCases
+│   │       ├── AgentChatService.cs
+│   │       ├── AgentsService.cs
+│   │       ├── ApplicationAdminService.cs
+│   │       ├── CommonAiService.cs
+│   │       ├── ConversationHistoryService.cs
+│   │       ├── DirectChatService.cs
+│   │       ├── DocumentIntelligenceService.cs
+│   │       ├── FeedbackService.cs
+│   │       ├── OrchestratorService.cs
+│   │       ├── RegisteredApplicationService.cs
+│   │       ├── ToolSkillsService.cs
+│   │       └── WorkspacesService.cs
+│   └── AIAgents.Laboratory.Processor
+│       ├── AIAgents.Laboratory.Processor.csproj
+│       ├── Contracts
+│       │   ├── IKnowledgeBaseProcessor.cs
+│       │   └── IVisionProcessor.cs
+│       ├── Helpers
+│       │   ├── AIAgentsException.cs
+│       │   ├── ProcessorConstants.cs
+│       │   └── Utility.cs
+│       ├── IOC
+│       │   └── DIContainer.cs
+│       ├── Models
+│       │   └── KnowledgeBaseDocumentDomain.cs
+│       └── Services
+│           ├── KnowledgeBaseProcessor.cs
+│           └── VisionProcessor.cs
+├── Tests
+│   └── AIAgents.Laboratory.Domain.UnitTests
+│       └── AIAgents.Laboratory.Domain.UnitTests.csproj
+└── tree.txt
+
+78 directories, 216 files
