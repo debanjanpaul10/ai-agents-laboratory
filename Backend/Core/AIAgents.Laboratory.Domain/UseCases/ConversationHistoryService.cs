@@ -5,17 +5,22 @@ using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
 
 /// <summary>
-/// The conversation history service.
+/// Provides services for managing and persisting conversation history for chat users.
 /// </summary>
-/// <param name="logger">The logger service.</param>
-/// <param name="mongoDatabaseService">The mongo database service.</param>
+/// <remarks>This service enables retrieval, storage, and clearing of conversation history for individual users.
+/// It relies on MongoDB for data persistence and supports correlation tracking for distributed operations. All operations are asynchronous and log relevant events for monitoring and troubleshooting.</remarks>
+/// <param name="logger">The logger used for recording diagnostic and operational information.</param>
+/// <param name="configuration">The application configuration source used to retrieve database and collection settings.</param>
+/// <param name="correlationContext">The correlation context used for tracking request and operation correlation across services.</param>
+/// <param name="mongoDatabaseService">The MongoDB database service used for data access and persistence operations.</param>
 /// <seealso cref="IConversationHistoryService"/>
-public sealed class ConversationHistoryService(ILogger<ConversationHistoryService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService) : IConversationHistoryService
+public sealed class ConversationHistoryService(ILogger<ConversationHistoryService> logger, IConfiguration configuration, ICorrelationContext correlationContext, IMongoDatabaseService mongoDatabaseService) : IConversationHistoryService
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -38,7 +43,8 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryAsync), DateTime.UtcNow, userName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
+
             var allConversationHistoryData = await mongoDatabaseService.GetDataFromCollectionAsync(
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.ConversationHistoryCollectionName,
@@ -68,12 +74,12 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryAsync), DateTime.UtcNow, userName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
         }
     }
 
@@ -88,7 +94,7 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, conversationHistory.ConversationId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, conversationHistory.ConversationId }));
 
             var filter = Builders<ConversationHistoryDomain>.Filter.Where(x => x.ConversationId == conversationHistory.ConversationId && x.UserName == conversationHistory.UserName);
             var allConversationHistoryData = await mongoDatabaseService.GetDataFromCollectionAsync(
@@ -115,12 +121,12 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, conversationHistory.ConversationId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, conversationHistory.ConversationId }));
         }
     }
 
@@ -135,7 +141,7 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
 
             var filter = Builders<ConversationHistoryDomain>.Filter.Where(x => x.UserName == userName && x.IsActive);
             var allConversationHistoryData = await mongoDatabaseService.GetDataFromCollectionAsync(
@@ -150,12 +156,12 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, userName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
         }
     }
 }

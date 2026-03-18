@@ -22,25 +22,26 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
     /// Asynchronously retrieves all available MCP client tools from the specified MCP server endpoint.
     /// </summary>
     /// <param name="mcpServerUrl">The URL of the MCP server endpoint from which to retrieve the list of client tools. Must be a valid, absolute URI.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see
     /// cref="McpClientTool"/> objects representing the available client tools. The collection will be empty if no tools are found.</returns>
-    public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAsync(string mcpServerUrl)
+    public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAsync(string mcpServerUrl, CancellationToken cancellationToken = default)
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
 
             var mcpClient = await this.CreateMcpClientAsync(mcpServerUrl).ConfigureAwait(false);
-            return await mcpClient.ListToolsAsync().ConfigureAwait(false);
+            return await mcpClient.ListToolsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
         }
     }
 
@@ -50,31 +51,32 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
     /// <param name="mcpServerUrl">The MCP server URL.</param>
     /// <param name="toolName">Name of the tool.</param>
     /// <param name="toolArguments">The tool arguments.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The MCP Tool Response.
     /// </returns>
-    public async Task<string> GetMcpToolResponseAsync(string mcpServerUrl, string toolName, Dictionary<string, object?> toolArguments)
+    public async Task<string> GetMcpToolResponseAsync(string mcpServerUrl, string toolName, Dictionary<string, object?> toolArguments, CancellationToken cancellationToken = default)
     {
         string response = string.Empty;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl, toolName, toolArguments }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl, toolName, toolArguments }));
 
             var arguments = toolArguments ?? [];
-            var mcpClient = await this.CreateMcpClientAsync(mcpServerUrl).ConfigureAwait(false);
-            var callToolResult = await mcpClient.CallToolAsync(toolName, arguments).ConfigureAwait(false);
+            var mcpClient = await this.CreateMcpClientAsync(mcpServerUrl, cancellationToken).ConfigureAwait(false);
+            var callToolResult = await mcpClient.CallToolAsync(toolName, arguments, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             response = JsonConvert.SerializeObject(callToolResult);
             return response;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl, toolName, toolArguments, response }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl, toolName, toolArguments, response }));
         }
     }
 
@@ -84,14 +86,16 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
     /// Creates the MCP client asynchronous.
     /// </summary>
     /// <param name="mcpServerUrl">The MCP server URL.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The MCP client.</returns>
-    private async Task<McpClient> CreateMcpClientAsync(string mcpServerUrl)
+    private async Task<McpClient> CreateMcpClientAsync(string mcpServerUrl, CancellationToken cancellationToken = default)
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateMcpClientAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateMcpClientAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
 
-            var aiAgentsToken = await TokenHelper.GetAiAgentsLabTokenAsync(configuration, logger).ConfigureAwait(false);
+            var aiAgentsToken = await TokenHelper.GetAiAgentsLabTokenAsync(
+                correlationId: correlationContext.CorrelationId, configuration, logger).ConfigureAwait(false);
             var transportOptions = new HttpClientTransportOptions
             {
                 Endpoint = new Uri(mcpServerUrl),
@@ -102,16 +106,16 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
             };
 
             var httpClientTransport = new HttpClientTransport(transportOptions);
-            return await McpClient.CreateAsync(httpClientTransport);
+            return await McpClient.CreateAsync(clientTransport: httpClientTransport, cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateMcpClientAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateMcpClientAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateMcpClientAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateMcpClientAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
         }
     }
 

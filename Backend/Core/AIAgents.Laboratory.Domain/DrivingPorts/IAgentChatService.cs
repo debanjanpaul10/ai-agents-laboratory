@@ -11,6 +11,7 @@ public interface IAgentChatService
     /// Gets the agent chat response asynchronous.
     /// </summary>
     /// <param name="chatRequest">The chat request.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The AI response.</returns>
-    Task<string> GetAgentChatResponseAsync(ChatRequestDomain chatRequest);
+    Task<string> GetAgentChatResponseAsync(ChatRequestDomain chatRequest, CancellationToken cancellationToken = default);
 }

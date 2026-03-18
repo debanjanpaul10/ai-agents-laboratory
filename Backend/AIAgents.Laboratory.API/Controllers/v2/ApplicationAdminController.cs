@@ -13,8 +13,8 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <summary>
 /// The <c>ApplicationAdminController</c> class is an API controller responsible for handling application administration related endpoints,
 /// such as retrieving submitted feature requests. 
-/// <remarks>It utilizes the <see cref="IApplicationAdminHandler"/> to perform the necessary operations and returns appropriate HTTP responses based on the outcome of the requests.</remarks>
 /// </summary>
+/// <remarks>It utilizes the <see cref="IApplicationAdminHandler"/> to perform the necessary operations and returns appropriate HTTP responses based on the outcome of the requests.</remarks>
 /// <param name="httpContextAccessor">The http context accessor.</param>
 /// <param name="configuration">The configuration service.</param>
 /// <param name="applicationAdminHandler">The application admin api adapter handler.</param>
@@ -34,13 +34,13 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllSubmittedFeatureRequestsAction.Summary, Description = GetAllSubmittedFeatureRequestsAction.Description, OperationId = GetAllSubmittedFeatureRequestsAction.OperationId)]
-    public async Task<ResponseDTO> GetAllSubmittedFeatureRequestsAsync()
+    public async Task<ResponseDto> GetAllSubmittedFeatureRequestsAsync()
     {
         if (base.IsAuthorized(UserBased))
         {
             var result = await applicationAdminHandler.GetAllSubmittedFeatureRequestsAsync(base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -56,13 +56,13 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllBugReportsDataAction.Summary, Description = GetAllBugReportsDataAction.Description, OperationId = GetAllBugReportsDataAction.OperationId)]
-    public async Task<ResponseDTO> GetAllBugReportsDataAsync()
+    public async Task<ResponseDto> GetAllBugReportsDataAsync()
     {
         if (base.IsAuthorized(UserBased))
         {
             var result = await applicationAdminHandler.GetAllBugReportsDataAsync(base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -78,7 +78,7 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = IsAdminAccessEnabledAction.Summary, Description = IsAdminAccessEnabledAction.Description, OperationId = IsAdminAccessEnabledAction.OperationId)]
-    public ResponseDTO IsAdminAccessEnabledAsync()
+    public ResponseDto IsAdminAccessEnabledAsync()
     {
         if (base.IsAuthorized(UserBased))
         {

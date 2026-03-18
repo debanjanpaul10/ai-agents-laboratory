@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Context;
-using AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Helpers.Extensions;
 using Microsoft.EntityFrameworkCore;
 

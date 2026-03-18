@@ -1,4 +1,4 @@
-﻿namespace AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
+﻿namespace AIAgents.Laboratory.Domain.DrivenPorts;
 
 /// <summary>
 /// The Unit of Work Interface.

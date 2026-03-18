@@ -3,8 +3,8 @@
 /// <summary>
 /// The registered application class representing the registered applications in the system.
 /// </summary>
-/// <seealso cref="BaseEntity"/>
-public sealed record RegisteredApplication : BaseEntity
+/// <seealso cref="BaseDomainModel"/>
+public sealed record RegisteredApplication : BaseDomainModel
 {
     /// <summary>
     /// Gets or sets the identifier of the registered application.

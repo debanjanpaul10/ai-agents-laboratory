@@ -41,31 +41,31 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetConfigurationsDataAction.Summary, Description = GetConfigurationsDataAction.Description, OperationId = GetConfigurationsDataAction.OperationId)]
-    public ResponseDTO GetConfigurationsData()
+    public ResponseDto GetConfigurationsData()
     {
         Dictionary<string, string> result = [];
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationsData), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationsData), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
             if (base.IsAuthorized(UserBased))
             {
                 result = commonAiHandler.GetConfigurationsData(base.UserEmail);
                 if (result is not null && result.Count > 0)
                     return HandleSuccessRequestResponse(result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationsData), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationsData), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationsData), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationsData), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
@@ -80,12 +80,12 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetConfigurationsDataAction.Summary, Description = GetConfigurationsDataAction.Description, OperationId = GetConfigurationsDataAction.OperationId)]
-    public ResponseDTO GetConfigurationByKeyName([FromRoute] string configKey)
+    public ResponseDto GetConfigurationByKeyName([FromRoute] string configKey)
     {
         Dictionary<string, string> result = [];
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationByKeyName), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, configKey }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationByKeyName), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, configKey }));
 
             ArgumentException.ThrowIfNullOrEmpty(configKey);
             if (base.IsAuthorized(UserBased))
@@ -94,19 +94,19 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
                 if (result is not null && result.Count > 0)
                     return HandleSuccessRequestResponse(result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationByKeyName), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationByKeyName), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationByKeyName), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, configKey, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationByKeyName), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, configKey, result }));
         }
     }
 
@@ -121,12 +121,12 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = AddBugReportDataAction.Summary, Description = AddBugReportDataAction.Description, OperationId = AddBugReportDataAction.OperationId)]
-    public async Task<ResponseDTO> AddBugReportDataAsync([FromBody] AddBugReportDTO addBugReport)
+    public async Task<ResponseDto> AddBugReportDataAsync([FromBody] AddBugReportDTO addBugReport)
     {
         bool result = false;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(AddBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, addBugReport }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(AddBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, addBugReport }));
 
             ArgumentNullException.ThrowIfNull(addBugReport);
             if (base.IsAuthorized(UserBased))
@@ -136,19 +136,19 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
                 if (result)
                     return HandleSuccessRequestResponse(result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddBugReportDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddBugReportDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
@@ -163,12 +163,12 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = SubmitFeatureRequestDataAction.Summary, Description = SubmitFeatureRequestDataAction.Description, OperationId = SubmitFeatureRequestDataAction.OperationId)]
-    public async Task<ResponseDTO> SubmitFeatureRequestDataAsync([FromBody] NewFeatureRequestDTO newFeatureRequest)
+    public async Task<ResponseDto> SubmitFeatureRequestDataAsync([FromBody] NewFeatureRequestDTO newFeatureRequest)
     {
         bool result = false;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(SubmitFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, newFeatureRequest }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(SubmitFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, newFeatureRequest }));
 
             ArgumentNullException.ThrowIfNull(newFeatureRequest);
             if (base.IsAuthorized(UserBased))
@@ -178,19 +178,19 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
                 if (result)
                     return HandleSuccessRequestResponse(result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(SubmitFeatureRequestDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(SubmitFeatureRequestDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(SubmitFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(SubmitFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
@@ -203,31 +203,31 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ResponseDTO> GetTopActiveAgentsDataAsync()
+    public async Task<ResponseDto> GetTopActiveAgentsDataAsync()
     {
         TopActiveAgentsDTO result = new();
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
             if (base.IsAuthorized(UserBased))
             {
                 result = await commonAiHandler.GetTopActiveAgentsDataAsync(base.UserEmail).ConfigureAwait(false);
                 if (result is not null)
                     return HandleSuccessRequestResponse(result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status500InternalServerError, ExceptionConstants.AiServicesDownMessage);
+                    return HandleBadRequestResponse(StatusCodes.Status500InternalServerError, ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 }

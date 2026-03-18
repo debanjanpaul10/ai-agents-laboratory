@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Context;
-using AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.DataManagers;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Mapper;
 using Microsoft.EntityFrameworkCore;
@@ -51,9 +50,13 @@ public static class DIContainer
     {
         var sqlConnectionString = configuration[ConfigurationConstants.PostgreSQLConnectionStringConstant];
         ArgumentException.ThrowIfNullOrWhiteSpace(sqlConnectionString);
+
         services.AddHealthChecks().AddNpgSql(
-            sqlConnectionString, healthQuery: HealthCheckConstants.DBHealthQuery, name: DatabaseConstants.PostgreSQLConstant,
-            failureStatus: HealthStatus.Unhealthy, tags: [HealthCheckConstants.ApplicationName, HealthCheckConstants.PostgreSQLHealthCheckTag]);
+            connectionString: sqlConnectionString,
+            healthQuery: HealthCheckConstants.DBHealthQuery,
+            name: DatabaseConstants.PostgreSQLConstant,
+            failureStatus: HealthStatus.Unhealthy,
+            tags: [HealthCheckConstants.ApplicationName, HealthCheckConstants.PostgreSQLHealthCheckTag]);
 
         return services.AddDbContext<SqlDbContext>(options =>
             options.UseNpgsql(
@@ -72,9 +75,13 @@ public static class DIContainer
     {
         var sqlConnectionString = isDevelopmentMode ? configuration[ConfigurationConstants.LocalSqlConnectionStringConstant] : configuration[ConfigurationConstants.AzureSqlConnectionStringConstant];
         ArgumentException.ThrowIfNullOrWhiteSpace(sqlConnectionString);
+
         services.AddHealthChecks().AddSqlServer(
-            sqlConnectionString, healthQuery: HealthCheckConstants.DBHealthQuery, name: DatabaseConstants.AzureSQLConstant,
-            failureStatus: HealthStatus.Unhealthy, tags: [HealthCheckConstants.ApplicationName, HealthCheckConstants.AzureSQLHealthCheckTag]);
+            connectionString: sqlConnectionString,
+            healthQuery: HealthCheckConstants.DBHealthQuery,
+            name: DatabaseConstants.AzureSQLConstant,
+            failureStatus: HealthStatus.Unhealthy,
+            tags: [HealthCheckConstants.ApplicationName, HealthCheckConstants.AzureSQLHealthCheckTag]);
 
         return services.AddDbContext<SqlDbContext>(options =>
             options.UseSqlServer(

@@ -41,21 +41,23 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
     /// Gets the agent chat response asynchronous.
     /// </summary>
     /// <param name="chatRequest">The chat request.</param>
-    /// <returns>
-    /// The AI response.
-    /// </returns>
-    public async Task<string> GetAgentChatResponseAsync(ChatRequestDomain chatRequest)
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The AI response.</returns>
+    public async Task<string> GetAgentChatResponseAsync(ChatRequestDomain chatRequest, CancellationToken cancellationToken = default)
     {
         string response = string.Empty;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
 
-            var agentData = await agentsService.GetAgentDataByIdAsync(chatRequest.AgentId, string.Empty);
+            var agentData = await agentsService.GetAgentDataByIdAsync(
+                agentId: chatRequest.AgentId,
+                userEmail: string.Empty).ConfigureAwait(false);
+
             if (agentData is null || string.IsNullOrEmpty(agentData.AgentMetaPrompt))
             {
                 var ex = new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
-                logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message);
+                logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message);
                 throw ex;
             }
 
@@ -80,23 +82,25 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
             if (agentData.AssociatedSkillGuids is not null && agentData.AssociatedSkillGuids.Count > 0)
                 response = await this.GetResponseWithIntegratedSkillAsync(
                     chatMessage: chatMessage,
-                    associatedSkillGuids: agentData.AssociatedSkillGuids).ConfigureAwait(false);
+                    associatedSkillGuids: agentData.AssociatedSkillGuids,
+                    cancellationToken).ConfigureAwait(false);
             else
                 response = await aiServices.GetAiFunctionResponseAsync(
                     input: chatMessage,
                     pluginName: ApplicationPluginsHelpers.PluginName,
-                    functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+                    functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName,
+                    cancellationToken).ConfigureAwait(false);
 
             return response;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response }));
         }
     }
 
@@ -105,16 +109,19 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
     /// </summary>
     /// <param name="chatMessage">The chat message request domain model.</param>
     /// <param name="associatedSkillGuids">The associated skill guids list</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The AI agent response string.</returns>
-    private async Task<string> GetResponseWithIntegratedSkillAsync(ChatMessageDomain chatMessage, IList<string> associatedSkillGuids)
+    private async Task<string> GetResponseWithIntegratedSkillAsync(ChatMessageDomain chatMessage, IList<string> associatedSkillGuids, CancellationToken cancellationToken = default)
     {
         string response = string.Empty;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatMessage }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatMessage }));
 
             var associatedSkill = await toolSkillsService.GetToolSkillBySkillIdAsync(
-                toolSkillId: associatedSkillGuids[0], currentUserEmail: string.Empty).ConfigureAwait(false);
+                toolSkillId: associatedSkillGuids[0],
+                currentUserEmail: string.Empty).ConfigureAwait(false);
+
             ArgumentNullException.ThrowIfNull(associatedSkill);
             ArgumentException.ThrowIfNullOrWhiteSpace(associatedSkill.ToolSkillMcpServerUrl);
 
@@ -122,18 +129,19 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
                 input: chatMessage,
                 mcpServerUrl: associatedSkill.ToolSkillMcpServerUrl,
                 pluginName: ApplicationPluginsHelpers.PluginName,
-                functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName).ConfigureAwait(false);
+                functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName,
+                cancellationToken).ConfigureAwait(false);
             return response;
 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response }));
         }
     }
 }

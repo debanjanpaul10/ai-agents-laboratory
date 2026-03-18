@@ -12,7 +12,7 @@
 		}
 	],
 	"servers": {
-		"Github debanjanpaul10": {
+		"Github ai-agents-laboratory": {
 			"type": "stdio",
 			"command": "npx",
 			"args": [

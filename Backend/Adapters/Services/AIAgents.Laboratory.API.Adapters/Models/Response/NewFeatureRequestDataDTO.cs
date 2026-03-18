@@ -5,8 +5,8 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 /// <summary>
 /// The New Feature Request Data DTO Class.
 /// </summary>
-/// <seealso cref="BaseModelDTO"/>
-public sealed record NewFeatureRequestDataDto : BaseModelDTO
+/// <seealso cref="BaseModelDto"/>
+public sealed record NewFeatureRequestDataDto : BaseModelDto
 {
     /// <summary>
     /// Gets or sets the identifier.

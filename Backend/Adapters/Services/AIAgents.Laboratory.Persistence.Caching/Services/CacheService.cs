@@ -1,4 +1,5 @@
-﻿using AIAgents.Laboratory.Domain.DrivenPorts;
+﻿using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -12,9 +13,10 @@ namespace AIAgents.Laboratory.Persistence.Caching.Services;
 /// </summary>
 /// <param name="memoryCache">The memory cache service.</param>
 /// <param name="logger">The logger.</param>
+/// <param name="correlationContext">The correlation context for logging.</param>
 /// <param name="configuration">The configuration.</param>
 /// <seealso cref="ICacheService"/>
-public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger, IConfiguration configuration) : ICacheService
+public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService> logger, IConfiguration configuration, ICorrelationContext correlationContext) : ICacheService
 {
     /// <summary>
     /// The is cache service enabled.
@@ -35,29 +37,29 @@ public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService>
         if (string.IsNullOrEmpty(key))
         {
             var ex = new ArgumentNullException(key);
-            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetCachedData), DateTime.UtcNow, ex.Message);
+            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetCachedData), DateTime.UtcNow, ex.Message);
             throw ex;
         }
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetCachedData), DateTime.UtcNow, key);
+            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetCachedData), DateTime.UtcNow, key);
             if (memoryCache.TryGetValue(key, out T? value))
             {
-                logger.LogInformation(LoggingConstants.CacheKeyFoundMessageConstant, key);
+                logger.LogAppInformation(LoggingConstants.CacheKeyFoundMessageConstant, key);
                 return value;
             }
 
-            logger.LogInformation(LoggingConstants.CacheKeyNotFoundMessageConstant, key);
+            logger.LogAppInformation(LoggingConstants.CacheKeyNotFoundMessageConstant, key);
             return value;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetCachedData), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetCachedData), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetCachedData), DateTime.UtcNow, key);
+            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetCachedData), DateTime.UtcNow, key);
         }
     }
 
@@ -74,31 +76,31 @@ public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService>
         if (string.IsNullOrEmpty(key))
         {
             var ex = new ArgumentNullException(nameof(key), ExceptionConstants.KeyNameIsNullMessageConstant);
-            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(RemoveCachedData), DateTime.UtcNow, ex.Message);
+            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(RemoveCachedData), DateTime.UtcNow, ex.Message);
             throw ex;
         }
 
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(RemoveCachedData), DateTime.UtcNow, key);
+            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(RemoveCachedData), DateTime.UtcNow, key);
             if (memoryCache.TryGetValue(key, out _)) // Check if key exists
             {
                 memoryCache.Remove(key);
-                logger.LogInformation("Successfully removed cache for key: {CacheKey}", key);
+                logger.LogAppInformation("Successfully removed cache for key: {CacheKey}", key);
                 return true;
             }
 
-            logger.LogInformation(LoggingConstants.CacheKeyNotFoundMessageConstant, key);
+            logger.LogAppInformation(LoggingConstants.CacheKeyNotFoundMessageConstant, key);
             return false;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(RemoveCachedData), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(RemoveCachedData), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(RemoveCachedData), DateTime.UtcNow, key);
+            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(RemoveCachedData), DateTime.UtcNow, key);
         }
     }
 
@@ -118,24 +120,24 @@ public sealed class CacheService(IMemoryCache memoryCache, ILogger<CacheService>
         if (string.IsNullOrEmpty(key))
         {
             var ex = new ArgumentNullException(nameof(key), ExceptionConstants.KeyNameIsNullMessageConstant);
-            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(SetCacheData), DateTime.UtcNow, ex.Message);
+            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(SetCacheData), DateTime.UtcNow, ex.Message);
             throw ex;
         }
 
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(SetCacheData), DateTime.UtcNow, key);
+            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(SetCacheData), DateTime.UtcNow, key);
             memoryCache.Set(key, value, expirationTime);
             return true;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(SetCacheData), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(SetCacheData), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(SetCacheData), DateTime.UtcNow, key);
+            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(SetCacheData), DateTime.UtcNow, key);
         }
     }
 }

@@ -3,7 +3,7 @@
 /// <summary>
 /// The Skills input dto model class.
 /// </summary>
-public record SkillsInputDTO
+public record SkillsInputDto
 {
     /// <summary>
     /// Gets or sets the user query.

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Storage.Blobs.DataManager;
+using AIAgents.Laboratory.Storage.Blobs.StorageManager;
 using CloudinaryDotNet;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;

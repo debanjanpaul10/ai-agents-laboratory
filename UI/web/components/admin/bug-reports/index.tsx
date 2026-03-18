@@ -2,17 +2,18 @@ import { useEffect, useState } from "react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { GetAllBugReportsDataAsync } from "@store/app-admin/actions";
+import { BugReportDataDto } from "@models/response/bug-reports-data.dto";
 
 export default function BugReportsAdminComponent() {
 	const dispatch = useAppDispatch();
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	const IsBugReportLoadingStoreData = useAppSelector(
+	const IsBugReportLoadingStoreData = useAppSelector<boolean>(
 		(state) => state.ApplicationAdminReducer.isBugReportLoading,
 	);
 
-	const BugReportsData = useAppSelector(
+	const BugReportsData = useAppSelector<BugReportDataDto[]>(
 		(state) => state.ApplicationAdminReducer.bugReportsData,
 	);
 
@@ -49,40 +50,36 @@ export default function BugReportsAdminComponent() {
 
 			{BugReportsData && BugReportsData.length > 0 ? (
 				<div className="space-y-3">
-					{BugReportsData.map((report: any, index: number) => (
-						<div
-							key={index}
-							className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-colors"
-						>
-							<div className="flex items-start justify-between">
-								<div className="flex-1">
-									<h3 className="text-white font-medium mb-2">
-										{report.title ||
-											`Bug Report #${index + 1}`}
-									</h3>
-									<p className="text-gray-300 text-sm mb-2">
-										{report.description ||
-											report.message ||
-											"No description provided"}
-									</p>
-									<div className="flex items-center space-x-4 text-xs text-gray-400">
-										{report.createdAt && (
-											<span>
-												{new Date(
-													report.createdAt,
-												).toLocaleDateString()}
-											</span>
-										)}
-										{report.status && (
-											<span className="px-2 py-1 bg-red-500/20 text-red-300 rounded">
-												{report.status}
-											</span>
-										)}
+					{BugReportsData.map(
+						(report: BugReportDataDto, index: number) => (
+							<div
+								key={report.id}
+								className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-colors"
+							>
+								<div className="flex items-start justify-between">
+									<div className="flex-1">
+										<h3 className="text-white font-medium mb-2">
+											{report.title ||
+												`Bug Report #${index + 1}`}
+										</h3>
+										<p className="text-gray-300 text-sm mb-2">
+											{report.description ||
+												"No description provided"}
+										</p>
+										<div className="flex items-center space-x-4 text-xs text-gray-400">
+											{report.dateCreated && (
+												<span>
+													{new Date(
+														report.dateCreated,
+													).toLocaleDateString()}
+												</span>
+											)}
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
-					))}
+						),
+					)}
 				</div>
 			) : (
 				<div className="text-center py-12">

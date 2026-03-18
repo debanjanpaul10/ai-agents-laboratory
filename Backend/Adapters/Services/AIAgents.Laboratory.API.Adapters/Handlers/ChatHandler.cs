@@ -24,9 +24,9 @@ public sealed class ChatHandler(IMapper mapper, IAgentChatService agentChatServi
     /// <param name="userQuery">The user query.</param>
     /// <param name="userEmail">The user email address.</param>
     /// <returns>The AI response.</returns>
-    public async Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail)
+    public async Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail, CancellationToken cancellationToken = default)
     {
-        return await directChatService.GetDirectChatResponseAsync(userQuery, userEmail).ConfigureAwait(false);
+        return await directChatService.GetDirectChatResponseAsync(userQuery, userEmail, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -61,10 +61,10 @@ public sealed class ChatHandler(IMapper mapper, IAgentChatService agentChatServi
     /// <returns>
     /// The chatbot response.
     /// </returns>
-    public async Task<string> InvokeChatAgentAsync(ChatRequestDTO chatRequestDTO)
+    public async Task<string> InvokeChatAgentAsync(ChatRequestDTO chatRequestDTO, CancellationToken cancellationToken = default)
     {
         var domainInput = mapper.Map<ChatRequestDomain>(chatRequestDTO);
-        return await agentChatService.GetAgentChatResponseAsync(domainInput).ConfigureAwait(false);
+        return await agentChatService.GetAgentChatResponseAsync(chatRequest: domainInput, cancellationToken).ConfigureAwait(false);
     }
 
     #endregion

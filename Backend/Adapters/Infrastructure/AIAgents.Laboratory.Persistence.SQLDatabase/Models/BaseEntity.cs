@@ -1,4 +1,4 @@
-namespace AIAgents.Laboratory.Domain.DomainEntities;
+namespace AIAgents.Laboratory.Persistence.SQLDatabase.Models;
 
 /// <summary>
 /// The Base Entity Class.

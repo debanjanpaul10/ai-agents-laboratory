@@ -2,7 +2,7 @@
 
 namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 
-public sealed record RegisteredApplicationDto : BaseModelDTO
+public sealed record RegisteredApplicationDto : BaseModelDto
 {
     /// <summary>
     /// Gets or sets the identifier of the registered application.

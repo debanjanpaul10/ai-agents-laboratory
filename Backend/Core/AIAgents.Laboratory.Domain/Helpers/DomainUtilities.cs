@@ -13,7 +13,7 @@ public static class DomainUtilities
     /// </summary>
     /// <param name="entityModel">The entity data model.</param>
     /// <param name="currentUser">The current logged in user.</param>
-    internal static void PrepareAuditEntityData(this BaseEntity entityModel, string currentUser)
+    internal static void PrepareAuditEntityData(this BaseDomainModel entityModel, string currentUser)
     {
         entityModel.IsActive = true;
         entityModel.DateModified = DateTime.UtcNow;

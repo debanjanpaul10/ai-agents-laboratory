@@ -27,7 +27,6 @@ builder.Services.ConfigureApplicationDependencies(
     isDevelopmentMode: builder.Environment.IsDevelopment());
 
 builder.Services.AddControllers();
-builder.Services.AddSignalR();
 builder.Services.AddOpenApi();
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.SetIsOriginAllowed(_ => true).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 builder.Services.AddApiVersions();

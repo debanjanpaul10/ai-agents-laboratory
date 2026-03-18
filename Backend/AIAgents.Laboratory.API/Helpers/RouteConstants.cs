@@ -11,6 +11,11 @@ public static class RouteConstants
     internal const string AgentStatusHub_Route = "/hubs/agent-status";
 
     /// <summary>
+    /// The base route template for all API endpoints, which includes the API version as a route parameter and the controller name.
+    /// </summary>
+    internal const string ApiBaseRoute = "aiagentsapi/v{version:apiVersion}/[controller]";
+
+    /// <summary>
     /// Provides constant values for supported API version identifiers.
     /// </summary>
     internal static class ApiVersionsConstants

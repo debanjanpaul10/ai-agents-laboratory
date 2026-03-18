@@ -1,3 +1,4 @@
+using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using Google.Cloud.Storage.V1;
@@ -7,16 +8,17 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Storage.Blobs.Helpers.Constants;
 
-namespace AIAgents.Laboratory.Storage.Blobs.DataManager;
+namespace AIAgents.Laboratory.Storage.Blobs.StorageManager;
 
 /// <summary>
 /// The Google Cloud Storage Manager implementation for handling file operations with Google Cloud Storage.
 /// </summary>
 /// <param name="logger">The logger instance.</param>
 /// <param name="configuration">The configuration service.</param>
+/// <param name="correlationContext">The correlation context for logging.</param>
 /// <param name="storageClient">The Google Cloud Storage client instance.</param>
 /// <seealso cref="IBlobStorageManager"/>
-public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logger, IConfiguration configuration, StorageClient storageClient) : IBlobStorageManager
+public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logger, IConfiguration configuration, ICorrelationContext correlationContext, StorageClient storageClient) : IBlobStorageManager
 {
     /// <summary>
     /// The Google Cloud Platform storage bucket name.
@@ -45,7 +47,7 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
 
             var folderNames = new List<string>();
             if (!string.IsNullOrEmpty(this.GCPKnowledgeBaseFolderName)) folderNames.Add(this.GCPKnowledgeBaseFolderName);
@@ -80,7 +82,7 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
                 }
                 catch (Exception folderEx)
                 {
-                    logger.LogError(folderEx, "Failed to delete objects from folder {FolderName} for agent {AgentId}. Error: {ErrorMessage}", folderName, agentId, folderEx.Message);
+                    logger.LogAppError(folderEx, "Failed to delete objects from folder {FolderName} for agent {AgentId}. Error: {ErrorMessage}", folderName, agentId, folderEx.Message);
                     allDeletionsSuccessful = false;
                 }
             }
@@ -89,12 +91,12 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
         }
     }
 
@@ -111,7 +113,7 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
 
             var safeFileName = Path.GetFileName(fileName);
             string objectName = string.Format(GcpCloudStorageConstants.AgentFolderStructureFormat, this.GCPKnowledgeBaseFolderName, agentGuid) + "/" + safeFileName;
@@ -129,12 +131,12 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
         }
     }
 
@@ -150,7 +152,7 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
         if (documentFile.Length == 0) return string.Empty;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, documentFile.FileName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, documentFile.FileName }));
 
             var folderName = fileType switch
             {
@@ -174,12 +176,12 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, documentFile.FileName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, documentFile.FileName }));
         }
     }
 

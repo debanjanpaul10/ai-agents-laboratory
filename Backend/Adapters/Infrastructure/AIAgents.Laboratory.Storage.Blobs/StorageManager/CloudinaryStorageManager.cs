@@ -1,4 +1,5 @@
-﻿using AIAgents.Laboratory.Domain.DrivenPorts;
+﻿using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -8,16 +9,17 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Storage.Blobs.Helpers.Constants;
 
-namespace AIAgents.Laboratory.Storage.Blobs.DataManager;
+namespace AIAgents.Laboratory.Storage.Blobs.StorageManager;
 
 /// <summary>
 /// The Cloudinary Storage Manager implementation for handling file operations with Cloudinary.
 /// </summary>
 /// <param name="logger">The logger instance.</param>
 /// <param name="configuration">The configuration service.</param>
+/// <param name="correlationContext">The correlation context for logging.</param>
 /// <param name="cloudinary">The Cloudinary client instance.</param>
-/// <seealso cref="ICloudinaryStorageManager"/>
-public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> logger, IConfiguration configuration, ICloudinary cloudinary) : IBlobStorageManager
+/// <seealso cref="IBlobStorageManager"/>
+public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> logger, IConfiguration configuration, ICorrelationContext correlationContext, ICloudinary cloudinary) : IBlobStorageManager
 {
     /// <summary>
     /// The Cloudinary knowledge base folder name.
@@ -40,7 +42,7 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
 
             var folderNames = new List<string>();
             if (!string.IsNullOrEmpty(this.CloudinaryKnowledgeBaseFolderName)) folderNames.Add(this.CloudinaryKnowledgeBaseFolderName);
@@ -76,7 +78,7 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
                 }
                 catch (Exception folderEx)
                 {
-                    logger.LogError(folderEx, "Failed to delete objects from folder {FolderName} for agent {AgentId}. Error: {ErrorMessage}", folderName, agentId, folderEx.Message);
+                    logger.LogAppError(folderEx, "Failed to delete objects from folder {FolderName} for agent {AgentId}. Error: {ErrorMessage}", folderName, agentId, folderEx.Message);
                     allDeletionsSuccessful = false;
                 }
             }
@@ -85,12 +87,12 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
         }
     }
 
@@ -107,11 +109,11 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
 
             var safeFileName = Path.GetFileName(fileName);
             // Try to get resource as Raw first (most documents are Raw)
-            string folderPath = string.Format(CloudinaryConstants.AgentImagesFolderStructureFormat, this.CloudinaryKnowledgeBaseFolderName, agentGuid);
+            string folderPath = string.Format(CloudinaryConstants.AgentImagesFolderStructureFormat, this.CloudinaryKnowledgeBaseFolderName, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid }));
             string publicId = folderPath + "/" + safeFileName;
 
             var getResourceParams = new GetResourceParams(publicId)
@@ -131,7 +133,7 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
             if (resource.Error is not null)
             {
                 var ex = new FileNotFoundException(string.Format(ExceptionConstants.FileNotFoundExceptionMessage, fileName, agentGuid));
-                logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
+                logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
                 throw ex;
             }
 
@@ -139,12 +141,12 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
         }
     }
 
@@ -159,7 +161,7 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, documentFile.FileName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, documentFile.FileName }));
 
             if (documentFile.Length == 0) return string.Empty;
             var folderName = fileType switch
@@ -186,12 +188,12 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, documentFile.FileName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, documentFile.FileName }));
         }
     }
 

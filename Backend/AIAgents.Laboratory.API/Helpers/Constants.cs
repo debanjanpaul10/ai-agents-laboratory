@@ -150,9 +150,9 @@ internal static class Constants
     internal static class ExceptionConstants
     {
         /// <summary>
-        /// The ai services down message constant.
+        /// The default message for unhandled exceptions, providing a user-friendly response when an unexpected error occurs during request processing.
         /// </summary>
-        internal const string AiServicesDownMessage = "Our AI Services are down right now. Please try again after sometime.";
+        internal const string SomethingWentWrongDefaultMessage = "Oops! Something went wrong while processing the request. Please try again after sometime!";
 
         /// <summary>
         /// The missing configuration message.

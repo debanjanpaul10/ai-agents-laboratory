@@ -16,12 +16,13 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// The Agents Service class.
 /// </summary>
 /// <param name="logger">The logger service.</param>
-/// <param name="mongoDatabaseService">The mongo db database service.</param>
 /// <param name="configuration">The configuration service.</param>
+/// <param name="correlationContext">The correlation context for logging.</param>
+/// <param name="mongoDatabaseService">The mongo db database service.</param>
 /// <param name="documentIntelligenceService">The document intelligence service.</param>
 /// <param name="toolSkillsService">The tools skill service.</param>
 /// <seealso cref="IAgentsService" />
-public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService,
+public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration configuration, ICorrelationContext correlationContext, IMongoDatabaseService mongoDatabaseService,
     IDocumentIntelligenceService documentIntelligenceService, IToolSkillsService toolSkillsService) : IAgentsService
 {
     /// <summary>
@@ -59,7 +60,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userEmail, agentData.AgentName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, agentData.AgentName }));
 
             agentData.AgentId = Guid.NewGuid().ToString();
             if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Any() && this.IsKnowledgeBaseServiceAllowed)
@@ -79,12 +80,12 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewAgentAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewAgentAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { userEmail, agentData.AgentName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, agentData.AgentName }));
         }
     }
 
@@ -101,7 +102,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId, userEmail }));
 
             var filter = Builders<AgentDataDomain>.Filter.And(
                 Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
@@ -132,12 +133,12 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId, userEmail }));
         }
     }
 
@@ -150,7 +151,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, userEmail);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail }));
 
             var filter = Builders<AgentDataDomain>.Filter.And(
                 Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
@@ -176,12 +177,12 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, userEmail);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail }));
         }
     }
 
@@ -199,7 +200,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { updateDataDomain.AgentId, updateDataDomain.ModifiedBy }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId, updateDataDomain.ModifiedBy }));
 
             var filter = Builders<AgentDataDomain>.Filter.And(Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
             var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(
@@ -210,7 +211,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             {
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentMetaPrompt, updateDataDomain.AgentMetaPrompt),
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentName, updateDataDomain.AgentName),
-                Builders<AgentDataDomain>.Update.Set(x => x.ApplicationName, updateDataDomain.ApplicationName),
+                Builders<AgentDataDomain>.Update.Set(x => x.ApplicationId, updateDataDomain.ApplicationId),
                 Builders<AgentDataDomain>.Update.Set(x => x.IsPrivate, updateDataDomain.IsPrivate),
                 Builders<AgentDataDomain>.Update.Set(x => x.AgentDescription, updateDataDomain.AgentDescription),
                 Builders<AgentDataDomain>.Update.Set(x => x.DateModified, DateTime.UtcNow),
@@ -237,12 +238,12 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { updateDataDomain.AgentId, updateDataDomain.ModifiedBy }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId, updateDataDomain.ModifiedBy }));
         }
     }
 
@@ -259,7 +260,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, agentId }));
 
             var filter = Builders<AgentDataDomain>.Filter.Where(x => x.IsActive && x.AgentId == agentId);
             var allAgents = await mongoDatabaseService.GetDataFromCollectionAsync(
@@ -286,12 +287,12 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, agentId }));
         }
     }
 
@@ -305,17 +306,17 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
             return await documentIntelligenceService.DownloadKnowledgebaseFileAsync(agentGuid, fileName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentGuid, fileName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
         }
     }
 

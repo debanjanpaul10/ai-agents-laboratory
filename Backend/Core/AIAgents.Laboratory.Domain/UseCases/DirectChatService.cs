@@ -28,8 +28,9 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
     /// </summary>
     /// <param name="userQuery">The user query.</param>
     /// <param name="userEmail">The user email address.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The AI response.</returns>
-    public async Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail)
+    public async Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userQuery);
         ArgumentException.ThrowIfNullOrWhiteSpace(userEmail);
@@ -37,12 +38,12 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
         string aiResponse = string.Empty;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, userQuery }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, userQuery }));
 
             var chatbotAgentGuid = configuration[AzureAppConfigurationConstants.AIChatbotAgentId] ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
             var agentDataTask = agentsService.GetAgentDataByIdAsync(chatbotAgentGuid, userEmail);
             var conversationHistoryTask = conversationHistoryService.GetConversationHistoryAsync(userEmail);
-            await Task.WhenAll(agentDataTask, conversationHistoryTask).ConfigureAwait(false);
+            await Task.WhenAll(agentDataTask, conversationHistoryTask).WaitAsync(cancellationToken).ConfigureAwait(false);
 
             var conversationHistoryData = conversationHistoryTask.Result;
             var agentMetaprompt = agentDataTask.Result.AgentMetaPrompt;
@@ -51,7 +52,8 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
             aiResponse = await aiServices.GetChatbotResponseAsync(
                 conversationDataDomain: conversationHistoryData,
                 userMessage: userQuery,
-                agentMetaPrompt: agentMetaprompt).ConfigureAwait(false);
+                agentMetaPrompt: agentMetaprompt,
+                cancellationToken).ConfigureAwait(false);
 
             chatHistoryList.Add(new ChatHistoryDomain
             {
@@ -64,12 +66,12 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, aiResponse }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, aiResponse }));
         }
     }
 
@@ -83,17 +85,17 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
         ArgumentException.ThrowIfNullOrWhiteSpace(userName);
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
             return await conversationHistoryService.ClearConversationHistoryForUserAsync(userName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
         }
     }
 
@@ -108,18 +110,18 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
         ConversationHistoryDomain? result = null;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
             result = await conversationHistoryService.GetConversationHistoryAsync(userName).ConfigureAwait(false) ?? new();
             return result;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName, result }));
         }
     }
 }

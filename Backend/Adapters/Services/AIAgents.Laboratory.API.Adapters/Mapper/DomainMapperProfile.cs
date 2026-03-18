@@ -21,7 +21,7 @@ public sealed class DomainMapperProfile : Profile
     /// </summary>
     public DomainMapperProfile()
     {
-        CreateMap<SkillsInputDTO, SkillsInputDomain>();
+        CreateMap<SkillsInputDto, SkillsInputDomain>();
         CreateMap<NltosqlInputDTO, NltosqlInputDomain>();
         CreateMap<UserQueryRequestDTO, UserRequestDomain>();
         CreateMap<FollowupQuestionsRequestDTO, FollowupQuestionsRequestDomain>();
@@ -40,7 +40,6 @@ public sealed class DomainMapperProfile : Profile
             .ForMember(destination => destination.CreatedBy, options => options.MapFrom(source => source.CreatedBy));
         CreateMap<WorkspaceAgentChatRequestDTO, WorkspaceAgentChatRequestDomain>();
 
-        CreateMap<AgentStatus, AgentStatusDTO>();
         CreateMap<AIAgentResponseDomain, AIAgentResponseDTO>();
         CreateMap<ChatHistoryDomain, ChatHistoryDTO>();
         CreateMap<ConversationHistoryDomain, ConversationHistoryDTO>();

@@ -13,8 +13,9 @@ using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.WorkspacesControll
 namespace AIAgents.Laboratory.API.Controllers.v2;
 
 /// <summary>
-/// The workspaces controller class.
+/// The <c>WorkspacesController</c> class is an API controller responsible for handling HTTP requests related to workspace management in the AIAgents Laboratory application.
 /// </summary>
+/// <remarks>It provides endpoints for creating, retrieving, updating, and deleting workspaces, as well as invoking workspace agents via chat.</remarks>
 /// <param name="httpContextAccessor">The http context accessor.</param>
 /// <param name="workspacesHandler">The workspaces api adapter handler.</param>
 /// <param name="configuration">The configuration.</param>
@@ -34,13 +35,13 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllWorkspacesAction.Summary, Description = GetAllWorkspacesAction.Description, OperationId = GetAllWorkspacesAction.OperationId)]
-    public async Task<ResponseDTO> GetAllWorkspacesAsync()
+    public async Task<ResponseDto> GetAllWorkspacesAsync()
     {
         if (base.IsAuthorized(UserBased))
         {
             var result = await workspacesHandler.GetAllWorkspacesAsync(base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -57,14 +58,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetWorkspaceByWorkspaceIdAction.Summary, Description = GetWorkspaceByWorkspaceIdAction.Description, OperationId = GetWorkspaceByWorkspaceIdAction.OperationId)]
-    public async Task<ResponseDTO> GetWorkspaceByWorkspaceIdAsync([FromRoute] string workspaceId)
+    public async Task<ResponseDto> GetWorkspaceByWorkspaceIdAsync([FromRoute] string workspaceId)
     {
         ArgumentException.ThrowIfNullOrEmpty(workspaceId);
         if (base.IsAuthorized(UserBased))
         {
             var result = await workspacesHandler.GetWorkspaceByWorkspaceIdAsync(workspaceId, base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -82,14 +83,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = CreateNewWorkspaceAction.Summary, Description = CreateNewWorkspaceAction.Description, OperationId = CreateNewWorkspaceAction.OperationId)]
-    public async Task<ResponseDTO> CreateNewWorkspaceAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
+    public async Task<ResponseDto> CreateNewWorkspaceAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
     {
         ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
         if (base.IsAuthorized(UserBased))
         {
             var result = await workspacesHandler.CreateNewWorkspaceAsync(agentsWorkspaceData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -106,14 +107,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = DeleteExistingWorkspaceAction.Summary, Description = DeleteExistingWorkspaceAction.Description, OperationId = DeleteExistingWorkspaceAction.OperationId)]
-    public async Task<ResponseDTO> DeleteExistingWorkspaceAsync([FromRoute] string workspaceGuidId)
+    public async Task<ResponseDto> DeleteExistingWorkspaceAsync([FromRoute] string workspaceGuidId)
     {
         ArgumentException.ThrowIfNullOrEmpty(workspaceGuidId);
         if (base.IsAuthorized(UserBased))
         {
             var result = await workspacesHandler.DeleteExistingWorkspaceAsync(workspaceGuidId, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -131,14 +132,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = UpdateExistingWorkspaceDataAction.Summary, Description = UpdateExistingWorkspaceDataAction.Description, OperationId = UpdateExistingWorkspaceDataAction.OperationId)]
-    public async Task<ResponseDTO> UpdateExistingWorkspaceDataAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
+    public async Task<ResponseDto> UpdateExistingWorkspaceDataAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
     {
         ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
         if (base.IsAuthorized(UserBased))
         {
             var result = await workspacesHandler.UpdateExistingWorkspaceDataAsync(agentsWorkspaceData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -156,14 +157,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = InvokeWorkspaceAgentAction.Summary, Description = InvokeWorkspaceAgentAction.Description, OperationId = InvokeWorkspaceAgentAction.OperationId)]
-    public async Task<ResponseDTO> InvokeWorkspaceAgentAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO)
+    public async Task<ResponseDto> InvokeWorkspaceAgentAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO)
     {
         ArgumentNullException.ThrowIfNull(chatRequestDTO);
         if (base.IsAuthorized(ApplicationBased))
         {
             var result = await workspacesHandler.InvokeWorkspaceAgentAsync(chatRequestDTO).ConfigureAwait(false);
             if (!string.IsNullOrWhiteSpace(result)) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -181,14 +182,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetWorkspaceGroupChatResponseAction.Summary, Description = GetWorkspaceGroupChatResponseAction.Description, OperationId = GetWorkspaceGroupChatResponseAction.OperationId)]
-    public async Task<ResponseDTO> GetWorkspaceGroupChatResponseAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO)
+    public async Task<ResponseDto> GetWorkspaceGroupChatResponseAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO)
     {
         ArgumentNullException.ThrowIfNull(chatRequestDTO);
         if (base.IsAuthorized(ApplicationBased))
         {
             var result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(chatRequest: chatRequestDTO).ConfigureAwait(false);
             if (result is not null && !string.IsNullOrEmpty(result.AgentResponse)) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();

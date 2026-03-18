@@ -5,6 +5,7 @@ using AIAgents.Laboratory.API.Adapters.IOC;
 using AIAgents.Laboratory.API.Controllers;
 using AIAgents.Laboratory.API.Helpers;
 using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Domain.IOC;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.IOC;
 using AIAgents.Laboratory.Messaging.Adapters.IOC;
@@ -166,7 +167,7 @@ public static class DIContainer
     {
         var authenticationFailedException = new UnauthorizedAccessException(ExceptionConstants.InvalidTokenExceptionConstant);
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();
-        logger.LogError(authenticationFailedException, authenticationFailedException.Message);
+        logger.LogAppError(authenticationFailedException, authenticationFailedException.Message);
 
         context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
         await context.HttpContext.Response.WriteAsync(authenticationFailedException.Message);

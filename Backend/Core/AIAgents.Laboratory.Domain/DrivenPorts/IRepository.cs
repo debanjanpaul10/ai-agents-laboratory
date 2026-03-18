@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
+namespace AIAgents.Laboratory.Domain.DrivenPorts;
 
 /// <summary>
 /// Interface definition of the contract for a generic repository pattern.

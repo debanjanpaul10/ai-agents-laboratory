@@ -1,3 +1,4 @@
+using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
@@ -14,10 +15,11 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// </summary>
 /// <param name="logger">The logger service.</param>
 /// <param name="configuration">The configuration.</param>
+/// <param name="correlationContext">The correlation context for logging.</param>
 /// <param name="feedbackDataManager">The feedback data manager.</param>
 /// <param name="emailNotificationService">The email notification service.</param>
 /// <seealso cref="IFeedbackService"/>
-public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, IFeedbackDataManager feedbackDataManager, IEmailNotificationService emailNotificationService) : IFeedbackService
+public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, ICorrelationContext correlationContext, IFeedbackDataManager feedbackDataManager, IEmailNotificationService emailNotificationService) : IFeedbackService
 {
     /// <summary>
     /// The admin email address from configuration.
@@ -35,7 +37,7 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(bugReportData));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, bugReportData }));
 
             bugReportData.PrepareAuditEntityData(bugReportData.CreatedBy);
             var feedbackSaveResult = await feedbackDataManager.AddNewBugReportDataAsync(bugReportData).ConfigureAwait(false);
@@ -50,12 +52,12 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(bugReportData));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, bugReportData }));
         }
     }
 
@@ -70,7 +72,7 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(featureRequestData));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, featureRequestData }));
 
             featureRequestData.PrepareAuditEntityData(featureRequestData.CreatedBy);
             var feedbackSaveResult = await feedbackDataManager.AddNewFeatureRequestDataAsync(featureRequestData).ConfigureAwait(false);
@@ -85,12 +87,12 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(featureRequestData));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, featureRequestData }));
         }
     }
 
@@ -103,7 +105,7 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, currentLoggedinUser);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
 
             if (currentLoggedinUser == ADMIN_EMAIL_ADDRESS)
                 return await feedbackDataManager.GetAllBugReportsDataAsync(currentLoggedinUser).ConfigureAwait(false);
@@ -112,12 +114,12 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, currentLoggedinUser);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
         }
     }
 
@@ -130,7 +132,7 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, currentLoggedinUser);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
 
             if (currentLoggedinUser == ADMIN_EMAIL_ADDRESS)
                 return await feedbackDataManager.GetAllSubmittedFeatureRequestsAsync(currentLoggedinUser).ConfigureAwait(false);
@@ -139,12 +141,12 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, currentLoggedinUser);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
         }
     }
 }

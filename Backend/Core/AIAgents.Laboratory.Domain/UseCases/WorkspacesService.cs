@@ -19,11 +19,12 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <remarks>This service provides functionalities to manage workspaces, including creating, updating, deleting, and retrieving workspaces.</remarks>
 /// <param name="logger">The logger service.</param>
 /// <param name="configuration">The configuration service.</param>
+/// <param name="correlationContext">The correlation context for logging.</param>
 /// <param name="mongoDatabaseService">The mongo db service.</param>
 /// <param name="agentChatService">The agent chat service.</param>
 /// <param name="orchestratorService">The orchestrator service.</param>
 /// <seealso cref="IWorkspacesService"/>
-public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService,
+public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, ICorrelationContext correlationContext,
     IAgentChatService agentChatService, IOrchestratorService orchestratorService) : IWorkspacesService
 {
     /// <summary>
@@ -49,7 +50,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
 
             agentsWorkspaceData.AgentWorkspaceGuid = Guid.NewGuid().ToString();
             agentsWorkspaceData.PrepareAuditEntityData(currentUser: currentUserEmail);
@@ -60,12 +61,12 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
         }
     }
 
@@ -82,7 +83,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { workspaceGuidId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuidId, currentUserEmail }));
 
             var filter = Builders<AgentsWorkspaceDomain>.Filter.Where(ws => ws.IsActive && ws.AgentWorkspaceGuid == workspaceGuidId);
             var allWorkspaces = await mongoDatabaseService.GetDataFromCollectionAsync(
@@ -104,12 +105,12 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { workspaceGuidId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuidId, currentUserEmail }));
         }
     }
 
@@ -122,7 +123,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, currentUserEmail);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail }));
 
             var filter = Builders<AgentsWorkspaceDomain>.Filter.And(Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true));
             return await mongoDatabaseService.GetDataFromCollectionAsync(
@@ -130,12 +131,12 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, currentUserEmail);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail }));
         }
     }
 
@@ -151,7 +152,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { workspaceId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail }));
 
             var filter = Builders<AgentsWorkspaceDomain>.Filter.And(
                 Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.AgentWorkspaceGuid, workspaceId));
@@ -162,12 +163,12 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { workspaceId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail }));
         }
     }
 
@@ -184,7 +185,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
             if (string.IsNullOrWhiteSpace(chatRequest.ConversationId))
                 chatRequest.ConversationId = Guid.NewGuid().ToString();
 
@@ -206,12 +207,12 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
         }
     }
 
@@ -229,7 +230,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
 
             if (string.IsNullOrWhiteSpace(chatRequest.ConversationId))
                 chatRequest.ConversationId = Guid.NewGuid().ToString();
@@ -252,12 +253,12 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(chatRequest));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
         }
     }
 
@@ -274,7 +275,7 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
 
             var filter = Builders<AgentsWorkspaceDomain>.Filter.And(
                    Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.AgentWorkspaceGuid, agentsWorkspaceData.AgentWorkspaceGuid));
@@ -300,12 +301,12 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
         }
     }
 }

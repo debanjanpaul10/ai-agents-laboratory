@@ -6,9 +6,9 @@ namespace AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 /// <summary>
 /// The agents workspace domain model.
 /// </summary>
-/// <seealso cref="BaseEntity"/>
+/// <seealso cref="BaseDomainModel"/>
 [BsonIgnoreExtraElements]
-public sealed record AgentsWorkspaceDomain : BaseEntity
+public sealed record AgentsWorkspaceDomain : BaseDomainModel
 {
     /// <summary>
     /// Gets or sets the Tool skill id.

@@ -3,8 +3,8 @@ namespace AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 /// <summary>
 /// The Bug Item Status Mapping Entity Class.
 /// </summary>
-/// <seealso cref="BaseEntity"/>
-public sealed record BugItemStatusMapping : BaseEntity
+/// <seealso cref="BaseDomainModel"/>
+public sealed record BugItemStatusMapping : BaseDomainModel
 {
     /// <summary>
     /// Gets or sets the identifier.

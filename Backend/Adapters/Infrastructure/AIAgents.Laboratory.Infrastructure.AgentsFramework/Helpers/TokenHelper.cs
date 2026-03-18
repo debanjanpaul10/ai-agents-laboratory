@@ -18,15 +18,16 @@ internal static class TokenHelper
     /// <summary>
     /// Gets ai agents lab token async.
     /// </summary>
+    /// <param name="correlationId">The correlation id for logging.</param>
     /// <param name="configuration">The configuration.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>The access token.</returns>
     /// <exception cref="Exception">Exception error.</exception>
-    internal static async Task<string> GetAiAgentsLabTokenAsync(IConfiguration configuration, ILogger logger)
+    internal static async Task<string> GetAiAgentsLabTokenAsync(string correlationId, IConfiguration configuration, ILogger logger)
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiAgentsLabTokenAsync), DateTime.UtcNow, string.Empty);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAiAgentsLabTokenAsync), DateTime.UtcNow, correlationId);
 
             var tenantId = configuration[ConfigurationConstants.AiAgentsLabTenantId];
             var clientId = configuration[ConfigurationConstants.AiAgentsAdClientId];
@@ -42,12 +43,12 @@ internal static class TokenHelper
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiAgentsLabTokenAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAiAgentsLabTokenAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiAgentsLabTokenAsync), DateTime.UtcNow, string.Empty);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAiAgentsLabTokenAsync), DateTime.UtcNow, correlationId);
         }
     }
 }

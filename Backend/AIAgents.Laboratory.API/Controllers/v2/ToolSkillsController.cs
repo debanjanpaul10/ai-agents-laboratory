@@ -13,8 +13,9 @@ using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ToolSkillsControll
 namespace AIAgents.Laboratory.API.Controllers.v2;
 
 /// <summary>
-/// The tool skills controller.
+/// The <c>ToolSkillsController</c> class is an API controller responsible for handling HTTP requests related to tool skills management in the AIAgents Laboratory application.
 /// </summary>
+/// <remarks>It provides endpoints for creating, retrieving, updating, and deleting tool skills, as well as fetching available MCP tools from a given MCP server URL.</remarks>
 /// <param name="httpContextAccessor">The http context accessor service.</param>
 /// <param name="configuration">The configuration.</param>
 /// <param name="toolSkillsHandler">The tool skills handler</param>
@@ -34,13 +35,13 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllToolSkillsAction.Summary, Description = GetAllToolSkillsAction.Description, OperationId = GetAllToolSkillsAction.OperationId)]
-    public async Task<ResponseDTO> GetAllToolSkillsAsync()
+    public async Task<ResponseDto> GetAllToolSkillsAsync()
     {
         if (base.IsAuthorized(UserBased))
         {
             var result = await toolSkillsHandler.GetAllToolSkillsAsync(base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -57,7 +58,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetToolSkillBySkillIdAction.Summary, Description = GetToolSkillBySkillIdAction.Description, OperationId = GetToolSkillBySkillIdAction.OperationId)]
-    public async Task<ResponseDTO> GetToolSkillBySkillIdAsync([FromRoute] string skillId)
+    public async Task<ResponseDto> GetToolSkillBySkillIdAsync([FromRoute] string skillId)
     {
         ArgumentException.ThrowIfNullOrEmpty(skillId);
         if (base.IsAuthorized(UserBased))
@@ -82,14 +83,14 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = AddNewToolSkillAction.Summary, Description = AddNewToolSkillAction.Description, OperationId = AddNewToolSkillAction.OperationId)]
-    public async Task<ResponseDTO> AddNewToolSkillAsync([FromForm] ToolSkillDTO toolSkillData)
+    public async Task<ResponseDto> AddNewToolSkillAsync([FromForm] ToolSkillDTO toolSkillData)
     {
         ArgumentNullException.ThrowIfNull(toolSkillData);
         if (base.IsAuthorized(UserBased))
         {
             var result = await toolSkillsHandler.AddNewToolSkillAsync(toolSkillData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -107,14 +108,14 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = UpdateExistingToolSkillDataAction.Summary, Description = UpdateExistingToolSkillDataAction.Description, OperationId = UpdateExistingToolSkillDataAction.OperationId)]
-    public async Task<ResponseDTO> UpdateExistingToolSkillDataAsync([FromForm] ToolSkillDTO updateToolSkillData)
+    public async Task<ResponseDto> UpdateExistingToolSkillDataAsync([FromForm] ToolSkillDTO updateToolSkillData)
     {
         ArgumentNullException.ThrowIfNull(updateToolSkillData);
         if (base.IsAuthorized(UserBased))
         {
             var result = await toolSkillsHandler.UpdateExistingToolSkillDataAsync(updateToolSkillData, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -131,14 +132,14 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = DeleteExistingToolSkillBySkillIdAction.Summary, Description = DeleteExistingToolSkillBySkillIdAction.Description, OperationId = DeleteExistingToolSkillBySkillIdAction.OperationId)]
-    public async Task<ResponseDTO> DeleteExistingToolSkillBySkillIdAsync([FromRoute] string skillId)
+    public async Task<ResponseDto> DeleteExistingToolSkillBySkillIdAsync([FromRoute] string skillId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
         if (base.IsAuthorized(UserBased))
         {
             var result = await toolSkillsHandler.DeleteExistingToolSkillBySkillIdAsync(skillId, base.UserEmail).ConfigureAwait(false);
             if (result) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();
@@ -155,7 +156,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllMcpToolsAvailableAction.Summary, Description = GetAllMcpToolsAvailableAction.Description, OperationId = GetAllMcpToolsAvailableAction.OperationId)]
-    public async Task<ResponseDTO> GetAllMcpToolsAvailableAsync(McpServerToolRequestDTO mcpServerToolRequest)
+    public async Task<ResponseDto> GetAllMcpToolsAvailableAsync(McpServerToolRequestDTO mcpServerToolRequest)
     {
         ArgumentNullException.ThrowIfNull(mcpServerToolRequest);
         ArgumentException.ThrowIfNullOrWhiteSpace(mcpServerToolRequest.ServerUrl);
@@ -163,7 +164,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
         {
             var result = await toolSkillsHandler.GetAllMcpToolsAvailableAsync(mcpServerToolRequest.ServerUrl, base.UserEmail).ConfigureAwait(false);
             if (result is not null) return HandleSuccessRequestResponse(result);
-            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+            else return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
 
         return HandleUnAuthorizedRequestResponse();

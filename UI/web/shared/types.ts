@@ -3,6 +3,7 @@ import { AgentDataDTO } from "@models/response/agent-data-dto";
 import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
+import { RegisteredApplicationDTO } from "@models/request/registered-application.dto";
 
 export interface Environment {
 	production: boolean;
@@ -29,7 +30,7 @@ export interface ReduxStoreType {
 export interface AgentData {
 	agentName: string;
 	agentMetaPrompt: string;
-	applicationName: string;
+	applicationId: number;
 	agentId: string;
 }
 
@@ -73,6 +74,7 @@ export interface ModifyAgentComponentProps {
 	selectedVisionImages: File[];
 	removedExistingImages: string[];
 	onOpenAssociateSkills: () => void;
+	onOpenAssociateApplications: () => void;
 }
 
 export interface AuthenticatedAppProps {
@@ -86,6 +88,7 @@ export interface AgentsListComponentProps {
 	isDisabled: boolean;
 	showCloseButton?: boolean;
 	actionButton?: React.ReactNode;
+	registeredApplications?: RegisteredApplicationDTO[];
 }
 
 export interface SkillsListComponentProps {
@@ -105,6 +108,15 @@ export interface WorkspacesListComponentProps {
 	showCloseButton?: boolean;
 	actionButton?: React.ReactNode;
 	onEditWorkspace?: (workspace: AgentsWorkspaceDTO) => void;
+}
+
+export interface RegisteredApplicationsListComponentProps {
+	applicationsList: RegisteredApplicationDTO[];
+	onClose: () => void;
+	isDisabled: boolean;
+	showCloseButton?: boolean;
+	actionButton?: React.ReactNode;
+	onEditApplication?: (application: RegisteredApplicationDTO) => void;
 }
 
 export interface ChatMessage {
@@ -140,6 +152,9 @@ export interface CreateAgentFlyoutProps {
 	selectedSkillGuids: string[];
 	onOpenAssociateSkills: () => void;
 	onClearSkillGuids: () => void;
+	selectedApplicationId: number;
+	onOpenAssociateApplications: () => void;
+	onClearApplication: () => void;
 }
 
 // Union type for both new files and existing documents
@@ -222,6 +237,13 @@ export interface AssociateSkillsFlyoutProps {
 	onClose: () => void;
 	onSkillsChange: (skillGuids: string[]) => void;
 	selectedSkillGuids: string[];
+}
+
+export interface AssociateApplicationsFlyoutProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onApplicationChange: (applicationId: number) => void;
+	selectedApplicationId: number;
 }
 
 export interface FullScreenLoadingProps {

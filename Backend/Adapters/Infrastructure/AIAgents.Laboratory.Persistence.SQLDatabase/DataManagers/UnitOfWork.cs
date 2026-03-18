@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Context;
-using AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;

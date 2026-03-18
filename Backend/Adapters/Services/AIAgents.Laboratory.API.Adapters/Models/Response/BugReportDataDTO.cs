@@ -5,8 +5,8 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 /// <summary>
 /// The Bug Report Data DTO Class.
 /// </summary>
-/// <seealso cref="BaseModelDTO"/>
-public sealed record BugReportDataDto : BaseModelDTO
+/// <seealso cref="BaseModelDto"/>
+public sealed record BugReportDataDto : BaseModelDto
 {
     /// <summary>
     /// Gets or sets the identifier.

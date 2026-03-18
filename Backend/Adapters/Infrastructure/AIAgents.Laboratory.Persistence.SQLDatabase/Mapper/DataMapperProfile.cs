@@ -1,4 +1,5 @@
 ﻿using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Models;
 using AutoMapper;
 
@@ -16,5 +17,9 @@ public sealed class DataMapperProfile : Profile
     public DataMapperProfile()
     {
         CreateMap<RegisteredApplication, RegisteredApplicationEntity>().ReverseMap();
+        CreateMap<BugReportData, BugReportDataEntity>().ReverseMap();
+        CreateMap<BaseDomainModel, BaseEntity>().ReverseMap();
+        CreateMap<BugItemStatusMappingEntity, BugItemStatusMapping>().ReverseMap();
+        CreateMap<BugSeverityMappingEntity, BugSeverityMapping>().ReverseMap();
     }
 }

@@ -15,14 +15,16 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// Provides API endpoints for managing registered applications for the authenticated user, including retrieving the list of registered applications, 
 /// getting details of a specific application, creating new applications, updating existing applications, and deleting applications.
 /// </summary>
+/// <remarks>It handles HTTP requests related to registered applications and interacts with the <see cref="IRegisteredApplicationHandler"/> to perform the necessary operations.</remarks>
 /// <param name="httpContextAccessor">The http context accessor service.</param>
 /// <param name="configuration">The configuration service.</param>
 /// <param name="logger">The logger service.</param>
+/// <param name="correlationContext">The correlation context service for tracking request correlation IDs.</param>
 /// <param name="raHandler">The registered application adapter handler.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
-[Route("aiagentsapi/v{version:apiVersion}/[controller]")]
+[Route(ApiBaseRoute)]
 public sealed class RegisteredApplicationController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<RegisteredApplicationController> logger, ICorrelationContext correlationContext,
     IRegisteredApplicationHandler raHandler) : BaseController(httpContextAccessor, configuration)
 {
@@ -31,38 +33,38 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     /// </summary>
     /// <remarks>This method requires the user to be authorized. If the user is not authorized, a 401 Unauthorized response is returned. 
     /// If the request is successful but no applications are found, a 400 Bad Request response is returned with an appropriate message.</remarks>
-    /// <returns>A <see cref="ResponseDTO"/> containing a collection of <see cref="RegisteredApplicationDto"/> objects representing the registered applications. 
+    /// <returns>A <see cref="ResponseDto"/> containing a collection of <see cref="RegisteredApplicationDto"/> objects representing the registered applications. 
     /// Returns a bad request response if the service is unavailable.</returns>
     [HttpGet(RegisteredApplicationRoutes.GetAllRegisteredApplications_Route)]
     [ProducesResponseType(typeof(IEnumerable<RegisteredApplicationDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ResponseDTO> GetAllRegisteredApplicationsAsync()
+    public async Task<ResponseDto> GetAllRegisteredApplicationsAsync()
     {
         IEnumerable<RegisteredApplicationDto> result = [];
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllRegisteredApplicationsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllRegisteredApplicationsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
             if (base.IsAuthorized(UserBased))
             {
                 result = await raHandler.GetRegisteredApplicationsAsync(base.UserEmail).ConfigureAwait(false);
                 if (result is not null)
                     return HandleSuccessRequestResponse(result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllRegisteredApplicationsAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllRegisteredApplicationsAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllRegisteredApplicationsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllRegisteredApplicationsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
@@ -72,37 +74,39 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     /// <remarks>The caller must be authorized to perform this operation. If authorization fails, an unauthorized response is returned. 
     /// If registration fails due to service issues or invalid input, a bad request response is provided.</remarks>
     /// <param name="newApplicationDtoModel">The details of the application to be registered. Must contain all required information for registration.</param>
-    /// <returns>A ResponseDTO indicating whether the registration was successful. Returns a success response if the application is registered; otherwise, returns a bad request or unauthorized response.</returns>
+    /// <returns>A ResponseDto indicating whether the registration was successful. Returns a success response if the application is registered; otherwise, returns a bad request or unauthorized response.</returns>
     [HttpPost(RegisteredApplicationRoutes.RegisterNewApplication_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ResponseDTO> RegisterNewApplicationAsync([FromBody] RegisteredApplicationDto newApplicationDtoModel)
+    public async Task<ResponseDto> RegisterNewApplicationAsync([FromBody] RegisteredApplicationDto newApplicationDtoModel)
     {
         bool result = false;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(RegisterNewApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, newApplicationDtoModel }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(RegisterNewApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, newApplicationDtoModel }));
+
+            ArgumentNullException.ThrowIfNull(newApplicationDtoModel);
             if (base.IsAuthorized(UserBased))
             {
                 result = await raHandler.CreateNewRegisteredApplicationAsync(base.UserEmail, newApplicationDtoModel).ConfigureAwait(false);
                 if (result)
                     return HandleSuccessRequestResponse(result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(RegisterNewApplicationAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(RegisterNewApplicationAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(RegisterNewApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(RegisterNewApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
@@ -112,37 +116,37 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     /// <remarks>This method requires the caller to be authorized. If the user is not authorized, a 401 Unauthorized response is returned. 
     /// If the application ID is invalid or the application is not found, a 400 Bad Request or 404 Not Found response is returned.</remarks>
     /// <param name="applicationId">The unique identifier of the registered application to retrieve. Must be a positive integer.</param>
-    /// <returns>A ResponseDTO containing the registered application's details if found; otherwise, an error response indicating unauthorized access, invalid input, or that the application was not found.</returns>
+    /// <returns>A ResponseDto containing the registered application's details if found; otherwise, an error response indicating unauthorized access, invalid input, or that the application was not found.</returns>
     [HttpGet(RegisteredApplicationRoutes.GetRegisteredApplicationById_Route)]
     [ProducesResponseType(typeof(RegisteredApplicationDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ResponseDTO> GetRegisteredApplicationByIdAsync([FromQuery] int applicationId)
+    public async Task<ResponseDto> GetRegisteredApplicationByIdAsync([FromRoute] int applicationId)
     {
         RegisteredApplicationDto result = new();
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId }));
             if (base.IsAuthorized(UserBased))
             {
                 result = await raHandler.GetRegisteredApplicationByIdAsync(base.UserEmail, applicationId).ConfigureAwait(false);
                 if (result is not null)
                     return HandleSuccessRequestResponse(result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId, result }));
         }
     }
 
@@ -152,18 +156,20 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     /// <remarks>This method requires the user to be authorized. If the user is not authorized, a 401 Unauthorized response is returned. 
     /// If the update fails due to application service issues, a 400 Bad Request response is returned with an appropriate error message.</remarks>
     /// <param name="updateApplicationDtoModel">The data transfer object containing the updated information for the registered application. This parameter cannot be null.</param>
-    /// <returns>A ResponseDTO indicating the outcome of the update operation. Returns <see langword="true"/> if the update is successful; otherwise, returns <see langword="false"/>.</returns>
+    /// <returns>A ResponseDto indicating the outcome of the update operation. Returns <see langword="true"/> if the update is successful; otherwise, returns <see langword="false"/>.</returns>
     [HttpPut(RegisteredApplicationRoutes.UpdateExistingRegisteredApplication_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ResponseDTO> UpdateExistingRegisteredApplicationAsync([FromBody] RegisteredApplicationDto updateApplicationDtoModel)
+    public async Task<ResponseDto> UpdateExistingRegisteredApplicationAsync([FromBody] RegisteredApplicationDto updateApplicationDtoModel)
     {
         bool result = false;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, updateApplicationDtoModel }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, updateApplicationDtoModel }));
+
+            ArgumentNullException.ThrowIfNull(updateApplicationDtoModel);
             if (base.IsAuthorized(UserBased))
             {
                 result = await raHandler.UpdateExistingRegisteredApplicationAsync(
@@ -173,19 +179,19 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
                 if (result)
                     return HandleSuccessRequestResponse(result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
@@ -195,37 +201,37 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     /// <remarks>This method requires the caller to be authorized. If the user is not authorized, a 401 Unauthorized response is returned. 
     /// If the application ID is invalid or the deletion fails, a 400 Bad Request response is returned.</remarks>
     /// <param name="applicationId">The unique identifier of the application to be deleted. Must be a valid positive integer.</param>
-    /// <returns>A ResponseDTO indicating the success or failure of the deletion operation. Returns true if the application was successfully deleted; otherwise, returns false.</returns>
+    /// <returns>A ResponseDto indicating the success or failure of the deletion operation. Returns true if the application was successfully deleted; otherwise, returns false.</returns>
     [HttpDelete(RegisteredApplicationRoutes.DeleteRegisteredApplicationById_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ResponseDTO> DeleteRegisteredApplicationByIdAsync([FromQuery] int applicationId)
+    public async Task<ResponseDto> DeleteRegisteredApplicationByIdAsync([FromRoute] int applicationId)
     {
         bool result = false;
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId }));
             if (base.IsAuthorized(UserBased))
             {
                 result = await raHandler.DeleteRegisteredApplicationByIdAsync(base.UserEmail, applicationId).ConfigureAwait(false);
                 if (result)
                     return HandleSuccessRequestResponse(result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.AiServicesDownMessage);
+                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId, result }));
         }
     }
 }
