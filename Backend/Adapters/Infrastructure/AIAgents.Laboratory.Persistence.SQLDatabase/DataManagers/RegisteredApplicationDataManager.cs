@@ -64,7 +64,8 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
             logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
 
-            var result = await unitOfWork.Repository<RegisteredApplicationEntity>().FirstOrDefaultAsync(x => x.IsActive && x.Id == applicationId).ConfigureAwait(false);
+            var result = await unitOfWork.Repository<RegisteredApplicationEntity>()
+                .FirstOrDefaultAsync(x => x.IsActive && x.Id == applicationId).ConfigureAwait(false);
             if (result is not null)
             {
                 result.IsActive = false;
@@ -103,7 +104,8 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
             logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
 
-            var result = await unitOfWork.Repository<RegisteredApplicationEntity>().FirstOrDefaultAsync(x => x.IsActive && x.Id == applicationId).ConfigureAwait(false);
+            var result = await unitOfWork.Repository<RegisteredApplicationEntity>()
+                .FirstOrDefaultAsync(x => x.IsActive && x.Id == applicationId).ConfigureAwait(false);
             return mapper.Map<RegisteredApplication>(result);
         }
         catch (Exception ex)
@@ -157,7 +159,8 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
             logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, updateApplicationData }));
 
-            var result = await unitOfWork.Repository<RegisteredApplicationEntity>().GetAllAsync(x => x.IsActive && x.Id == updateApplicationData.Id).ConfigureAwait(false);
+            var result = await unitOfWork.Repository<RegisteredApplicationEntity>()
+                .FirstOrDefaultAsync(x => x.IsActive && x.Id == updateApplicationData.Id).ConfigureAwait(false);
             if (result is not null)
             {
                 var dataEntityModel = mapper.Map<RegisteredApplicationEntity>(updateApplicationData);
