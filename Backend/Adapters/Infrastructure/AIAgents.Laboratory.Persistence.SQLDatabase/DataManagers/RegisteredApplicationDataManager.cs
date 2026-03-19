@@ -65,7 +65,7 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
 
             var result = await unitOfWork.Repository<RegisteredApplicationEntity>()
-                .FirstOrDefaultAsync(x => x.IsActive && x.Id == applicationId).ConfigureAwait(false);
+                .FirstOrDefaultAsync(x => x.IsActive && x.Id == applicationId && x.CreatedBy == currentLoggedInUser).ConfigureAwait(false);
             if (result is not null)
             {
                 result.IsActive = false;
