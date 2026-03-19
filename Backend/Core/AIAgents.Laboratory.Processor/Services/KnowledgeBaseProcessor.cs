@@ -1,11 +1,7 @@
 ﻿using AIAgents.Laboratory.Processor.Contracts;
 using AIAgents.Laboratory.Processor.Helpers;
 using AIAgents.Laboratory.Processor.Models;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
-using iText.Kernel.Pdf;
-using iText.Kernel.Pdf.Canvas.Parser;
-using iText.Kernel.Pdf.Canvas.Parser.Listener;
+using AIAgents.Laboratory.Processor.Services.FileReaders;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel.Memory;
@@ -16,15 +12,19 @@ using static AIAgents.Laboratory.Processor.Helpers.ProcessorConstants;
 namespace AIAgents.Laboratory.Processor.Services;
 
 /// <summary>
-/// The knowledge base processor class.
+/// Provides functionality to process knowledge base documents, including reading file content, generating embeddings, and retrieving relevant knowledge based on queries. 
 /// </summary>
-/// <param name="memoryStore">The memory store service.</param>
-/// <param name="embeddingGeneratorService">The embedding generation service.</param>
-/// <param name="logger">The logger service.</param>
+/// <remarks>This class interacts with a memory store to manage knowledge entries and uses an embedding generator service to create vector representations of text for semantic search. 
+/// It also utilizes a factory to read different types of files based on their extensions, allowing for flexible handling of various document formats.</remarks>
+/// <param name="logger">The logging service.</param>
+/// <param name="memoryStore">The memory store used to manage knowledge entries.</param>
+/// <param name="embeddingGeneratorService">The embedding generator service used to create vector representations of text for semantic search.</param>
+/// <param name="fileContentReaderFactory">The factory used to resolve the appropriate file content reader based on file extensions.</param>
 /// <seealso cref="IKnowledgeBaseProcessor"/>
 #pragma warning disable SKEXP0050
 #pragma warning disable SKEXP0001
-public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingGenerator<string, Embedding<float>> embeddingGeneratorService, ILogger<KnowledgeBaseProcessor> logger) : IKnowledgeBaseProcessor
+public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logger, IMemoryStore memoryStore, IEmbeddingGenerator<string, Embedding<float>> embeddingGeneratorService,
+    FileContentReaderFactory fileContentReaderFactory) : IKnowledgeBaseProcessor
 {
     /// <summary>
     /// Detects the file type of the specified knowledge base document and reads its content accordingly.
@@ -38,35 +38,20 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, knowledgeBaseDocumentDomain.FileName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DetectAndReadFileContent), DateTime.UtcNow, knowledgeBaseDocumentDomain.FileName);
 
-            var fileType = Path.GetExtension(knowledgeBaseDocumentDomain.FileName);
-            if (string.Equals(KnowledgeBaseConstants.FileContentTypes.PlainTextFiles, fileType, StringComparison.OrdinalIgnoreCase))
-                return this.ReadTextFileData(knowledgeBaseDocumentDomain);
-
-            else if (string.Equals(KnowledgeBaseConstants.FileContentTypes.PdfFiles, fileType, StringComparison.OrdinalIgnoreCase))
-                return this.ReadPdfFileData(knowledgeBaseDocumentDomain);
-
-            else if (KnowledgeBaseConstants.FileContentTypes.ExcelFiles.Split(KnowledgeBaseConstants.CommaSeparator).Contains(fileType))
-                return this.ReadSpreadsheetData(knowledgeBaseDocumentDomain);
-
-            else if (KnowledgeBaseConstants.FileContentTypes.WordFiles.Split(KnowledgeBaseConstants.CommaSeparator).Contains(fileType))
-                return this.ReadWordFileData(knowledgeBaseDocumentDomain);
-
-            else if (string.Equals(KnowledgeBaseConstants.FileContentTypes.JsonFiles, fileType, StringComparison.OrdinalIgnoreCase))
-                return this.ReadTextFileData(knowledgeBaseDocumentDomain);
-
-            else
-                throw new FileFormatException(ExceptionConstants.UnsupportedFileTypeMessage);
+            var fileExtension = Path.GetExtension(knowledgeBaseDocumentDomain.FileName);
+            var reader = fileContentReaderFactory.Resolve(fileExtension);
+            return reader.Read(knowledgeBaseDocumentDomain);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DetectAndReadFileContent), DateTime.UtcNow, ex.Message);
             throw new AIAgentsException(ex);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, knowledgeBaseDocumentDomain.FileName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DetectAndReadFileContent), DateTime.UtcNow, knowledgeBaseDocumentDomain.FileName);
         }
     }
 
@@ -85,7 +70,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { query, agentId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { query, agentId }));
 
             var queryEmbeddingResult = await embeddingGeneratorService.GenerateAsync(query).ConfigureAwait(false);
             var queryEmbedding = queryEmbeddingResult.Vector;
@@ -101,12 +86,12 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, ex.Message);
             return string.Empty;
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { query, agentId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { query, agentId }));
         }
     }
 
@@ -126,7 +111,7 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
 
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId);
 
             // Ensure the collection exists before upserting records
             var collections = new List<string>();
@@ -156,174 +141,12 @@ public sealed class KnowledgeBaseProcessor(IMemoryStore memoryStore, IEmbeddingG
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message);
             throw new AIAgentsException(ex);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId);
         }
     }
-
-    #region PRIVATE METHODS
-
-    /// <summary>
-    /// Reads the contents of a spreadsheet file from the specified knowledge base document and returns its data as a formatted string.
-    /// </summary>
-    /// <remarks>The returned string includes each sheet's name as a header, followed by its rows with cell
-    /// values separated by tabs. This method does not modify the input document. Only basic formatting is applied; cell
-    /// formulas and advanced formatting are not preserved.</remarks>
-    /// <param name="knowledgeBaseFile">The knowledge base document containing the spreadsheet file to read. The document's FileContent property must contain the binary content of a valid spreadsheet file. Cannot be null.</param>
-    /// <returns>A string containing the tab-delimited contents of the spreadsheet, including sheet names as headers. Returns an empty string if the file content is null, empty, or the spreadsheet contains no readable data.</returns>
-    private string ReadSpreadsheetData(KnowledgeBaseDocumentDomain knowledgeBaseFile)
-    {
-        ArgumentNullException.ThrowIfNull(knowledgeBaseFile);
-        ArgumentNullException.ThrowIfNull(knowledgeBaseFile.FileContent);
-
-        try
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadSpreadsheetData), DateTime.UtcNow, knowledgeBaseFile.FileName);
-
-            if (knowledgeBaseFile.FileContent.Length == 0)
-                return string.Empty;
-
-            using var memoryStream = new MemoryStream(knowledgeBaseFile.FileContent);
-            using var spreadsheetDocument = SpreadsheetDocument.Open(memoryStream, false);
-
-            var workbookPart = spreadsheetDocument.WorkbookPart;
-            if (workbookPart?.Workbook?.Sheets is null)
-                return string.Empty;
-
-            return Utility.PrepareExcelData(workbookPart);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadSpreadsheetData), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsException(ex);
-        }
-        finally
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ReadSpreadsheetData), DateTime.UtcNow, knowledgeBaseFile.FileName);
-        }
-    }
-
-    /// <summary>
-    /// Extracts and returns the plain text content from the body of a Word document provided as a knowledge base file.
-    /// </summary>
-    /// <remarks>This method reads only the main body text of the Word document and ignores formatting,
-    /// images, and other non-text elements. The returned text preserves paragraph breaks as line breaks. If the file
-    /// content is not a valid WordprocessingML document, an exception may be thrown.</remarks>
-    /// <param name="knowledgeBaseFile">The knowledge base document containing the Word file data to read. Cannot be null. The file content must represent a valid WordprocessingML (.docx) file.</param>
-    /// <returns>A string containing the concatenated plain text from all non-empty paragraphs in the document body. Returns an empty string if the file content is null, empty, or does not contain any readable text.</returns>
-    private string ReadWordFileData(KnowledgeBaseDocumentDomain knowledgeBaseFile)
-    {
-        ArgumentNullException.ThrowIfNull(knowledgeBaseFile);
-
-        try
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadWordFileData), DateTime.UtcNow, knowledgeBaseFile.FileName);
-
-            if (knowledgeBaseFile.FileContent is null || knowledgeBaseFile.FileContent.Length == 0) return string.Empty;
-
-            using var memoryStream = new MemoryStream(knowledgeBaseFile.FileContent);
-            using var wordDocument = WordprocessingDocument.Open(memoryStream, false);
-
-            var body = wordDocument.MainDocumentPart?.Document?.Body;
-            if (body is null)
-                return string.Empty;
-
-            var stringBuilder = new System.Text.StringBuilder();
-            foreach (var paragraph in body.Elements<Paragraph>().Select(p => p.InnerText).Where(item => !string.IsNullOrWhiteSpace(item.Trim())))
-                stringBuilder.AppendLine(paragraph);
-
-            return stringBuilder.ToString();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadWordFileData), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsException(ex);
-        }
-        finally
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ReadWordFileData), DateTime.UtcNow, knowledgeBaseFile.FileName);
-        }
-    }
-
-    /// <summary>
-    /// Extracts and returns the text content from a PDF file represented by the specified knowledge base document.
-    /// </summary>
-    /// <param name="knowledgeBaseFile">The knowledge base document containing the PDF file data to be read. Cannot be null. The FileContent property
-    /// must contain the PDF file's binary data.</param>
-    /// <returns>A string containing the extracted text from the PDF file. Returns an empty string if the file content is null or empty.</returns>
-    private string ReadPdfFileData(KnowledgeBaseDocumentDomain knowledgeBaseFile)
-    {
-        ArgumentNullException.ThrowIfNull(knowledgeBaseFile);
-
-        try
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadPdfFileData), DateTime.UtcNow, knowledgeBaseFile.FileName);
-
-            if (knowledgeBaseFile.FileContent is null || knowledgeBaseFile.FileContent.Length == 0) return string.Empty;
-
-            using var memoryStream = new MemoryStream(knowledgeBaseFile.FileContent);
-            using var reader = new PdfReader(memoryStream);
-            using var pdfDocument = new PdfDocument(reader);
-
-            var stringBuilder = new System.Text.StringBuilder();
-            for (int pageNumber = 1; pageNumber <= pdfDocument.GetNumberOfPages(); pageNumber++)
-            {
-                var page = pdfDocument.GetPage(pageNumber);
-                var strategy = new SimpleTextExtractionStrategy();
-                var pageText = PdfTextExtractor.GetTextFromPage(page, strategy);
-
-                if (!string.IsNullOrWhiteSpace(pageText))
-                {
-                    stringBuilder.AppendLine(pageText.Trim());
-                    stringBuilder.AppendLine();
-                }
-            }
-
-            return stringBuilder.ToString();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadPdfFileData), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsException(ex);
-        }
-        finally
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ReadPdfFileData), DateTime.UtcNow, knowledgeBaseFile.FileName);
-        }
-    }
-
-    /// <summary>
-    /// Reads the text file data.
-    /// </summary>
-    /// <param name="knowledgeBaseFile">The knowledge base file.</param>
-    /// <returns>The knowledge base document in string.</returns>
-    private string ReadTextFileData(KnowledgeBaseDocumentDomain knowledgeBaseFile)
-    {
-        ArgumentNullException.ThrowIfNull(knowledgeBaseFile);
-
-        try
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadTextFileData), DateTime.UtcNow, knowledgeBaseFile.FileName);
-
-            if (knowledgeBaseFile.FileContent is null || knowledgeBaseFile.FileContent.Length == 0)
-                return string.Empty;
-
-            return System.Text.Encoding.UTF8.GetString(knowledgeBaseFile.FileContent);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadTextFileData), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsException(ex);
-        }
-        finally
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ReadTextFileData), DateTime.UtcNow, knowledgeBaseFile.FileName);
-        }
-    }
-
-    #endregion
 }
