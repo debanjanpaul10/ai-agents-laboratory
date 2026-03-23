@@ -7,9 +7,9 @@ namespace AIAgents.Laboratory.Domain.DomainEntities;
 /// <summary>
 /// The tool skill domain model.
 /// </summary>
-/// <seealso cref="BaseEntity"/>
+/// <seealso cref="BaseDomainModel"/>
 [BsonIgnoreExtraElements]
-public sealed record ToolSkillDomain : BaseEntity
+public sealed record ToolSkillDomain : BaseDomainModel
 {
     /// <summary>
     /// The Tool skill id.

@@ -1,4 +1,5 @@
 ﻿using System.Data.SqlTypes;
+using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Logging;
@@ -11,10 +12,11 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
 /// <summary>
 /// The Mongo Database Manager service.
 /// </summary>
-/// <param name="mongoClient">The mongo db client.</param>
 /// <param name="logger">The logger service.</param>
+/// <param name="correlationContext">The correlation context for logging.</param>
+/// <param name="mongoClient">The mongo db client.</param>
 /// <seealso cref="IMongoDatabaseService"/>
-public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<MongoDatabaseManager> logger) : IMongoDatabaseService
+public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<MongoDatabaseManager> logger, ICorrelationContext correlationContext) : IMongoDatabaseService
 {
     /// <summary>
     /// Gets the data from collection asynchronous with a filter condition.
@@ -28,7 +30,7 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     {
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TResult>(collectionName);
             if (collectionData is not null)
@@ -38,12 +40,12 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
         }
     }
 
@@ -59,7 +61,7 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     {
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TInput>(collectionName);
             if (collectionData is not null)
@@ -72,15 +74,14 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
         }
     }
-
 
     /// <summary>
     /// Updates the data in collection asynchronous using filter and update definitions.
@@ -95,7 +96,7 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     {
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TDocument>(collectionName) ?? throw new FileNotFoundException(ExceptionConstants.CollectionDoesNotExistsMessage);
@@ -108,12 +109,12 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
         }
     }
 
@@ -129,7 +130,7 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     {
         try
         {
-            logger.LogInformation(LoggingConstants.MethodStartedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TDocument>(collectionName) ?? throw new FileNotFoundException(ExceptionConstants.CollectionDoesNotExistsMessage);
@@ -142,12 +143,12 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.MethodEndedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
         }
     }
 }

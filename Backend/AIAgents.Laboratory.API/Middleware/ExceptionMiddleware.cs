@@ -58,13 +58,13 @@ public sealed class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, Req
             [HeaderLoggingConstants.StatusCode] = statusCode
         }))
         {
-            logger.LogError(ex, UnhandledExceptionMessage,
+            logger.LogAppError(ex, UnhandledExceptionMessage,
                 correlationId, httpContext.Request.Path, httpContext.Request.Method);
         }
 
         httpContext.Response.ContentType = EnvironmentConfigurationConstants.ApplicationJsonConstant;
         httpContext.Response.StatusCode = statusCode;
-        var errorResponse = new AIAgentsBusinessException(message, statusCode, error);
+        var errorResponse = new AIAgentsBusinessException(message, statusCode, error, correlationId);
         await httpContext.Response.WriteAsJsonAsync(errorResponse);
     }
 }

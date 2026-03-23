@@ -1,4 +1,3 @@
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 
 namespace AIAgents.Laboratory.Domain.DrivingPorts;
@@ -13,12 +12,6 @@ public interface ICommonAiService
     /// </summary>
     /// <returns>The current model identifier.</returns>
     string GetCurrentModelId();
-
-    /// <summary>
-    /// Gets the agent current status.
-    /// </summary>
-    /// <returns>The agent status data.</returns>
-    AgentStatus GetAgentCurrentStatus();
 
     /// <summary>
     /// Gets the configurations data for application.

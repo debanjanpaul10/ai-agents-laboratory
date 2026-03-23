@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Context;
-using AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -49,7 +49,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
     /// <returns>A task to wait on.</returns>
     public async Task BeginTransactionAsync()
     {
-        this._transaction = await dbContext.Database.BeginTransactionAsync();
+        this._transaction = await dbContext.Database.BeginTransactionAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
     {
         await dbContext.SaveChangesAsync();
         if (this._transaction is not null)
-            await this._transaction.CommitAsync();
+            await this._transaction.CommitAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
     public async Task RollbackAsync()
     {
         if (this._transaction is not null)
-            await this._transaction.RollbackAsync();
+            await this._transaction.RollbackAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
     /// <returns>The save changes count.</returns>
     public async Task<int> SaveChangesAsync()
     {
-        return await dbContext.SaveChangesAsync();
+        return await dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -104,13 +104,13 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
         // For scalar types, treat as non-query and return rows affected or success as bool
         if (typeof(T) == typeof(bool))
         {
-            var rows = await dbContext.Database.ExecuteSqlRawAsync(sql, parameters);
+            var rows = await dbContext.Database.ExecuteSqlRawAsync(sql, parameters).ConfigureAwait(false);
             return [(T)(object)(rows > 0)];
         }
 
         if (typeof(T) == typeof(int))
         {
-            var rows = await dbContext.Database.ExecuteSqlRawAsync(sql, parameters);
+            var rows = await dbContext.Database.ExecuteSqlRawAsync(sql, parameters).ConfigureAwait(false);
             return [(T)(object)rows];
         }
 
@@ -119,7 +119,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
         // Usage: await ExecuteSqlQueryAsync<object>(sql, params) or ExecuteSqlQueryAsync<bool>(sql, params)
         if (typeof(T) == typeof(object))
         {
-            await dbContext.Database.ExecuteSqlRawAsync(sql, parameters);
+            await dbContext.Database.ExecuteSqlRawAsync(sql, parameters).ConfigureAwait(false);
             return [];
         }
 

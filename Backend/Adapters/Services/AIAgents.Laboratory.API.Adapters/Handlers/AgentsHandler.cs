@@ -26,7 +26,7 @@ public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) 
     public async Task<bool> CreateNewAgentAsync(CreateAgentDTO agentData, string userEmail)
     {
         var domainInput = mapper.Map<AgentDataDomain>(agentData);
-        return await agentsService.CreateNewAgentAsync(domainInput, userEmail).ConfigureAwait(false);
+        return await agentsService.CreateNewAgentAsync(agentData: domainInput, userEmail).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) 
     public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData, string currentUserEmail)
     {
         var domainRequest = mapper.Map<AgentDataDomain>(updateAgentData);
-        return await agentsService.UpdateExistingAgentDataAsync(domainRequest, currentUserEmail).ConfigureAwait(false);
+        return await agentsService.UpdateExistingAgentDataAsync(updateDataDomain: domainRequest, userEmail: currentUserEmail).ConfigureAwait(false);
     }
 
     /// <summary>

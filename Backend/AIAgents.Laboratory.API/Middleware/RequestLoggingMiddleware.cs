@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using AIAgents.Laboratory.Domain.Helpers;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 
 namespace AIAgents.Laboratory.API.Middleware;
@@ -20,7 +21,7 @@ public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<Reque
         var stopwatch = Stopwatch.StartNew();
 
         // Log request
-        logger.LogInformation(LoggingConstants.HttpLoggingMessage, httpContext.Request.Method, httpContext.Request.Path);
+        logger.LogAppInformation(LoggingConstants.HttpLoggingMessage, httpContext.Request.Method, httpContext.Request.Path);
 
         try
         {

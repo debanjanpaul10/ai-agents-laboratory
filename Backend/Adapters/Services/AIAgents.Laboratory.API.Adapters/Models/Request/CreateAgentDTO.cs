@@ -32,12 +32,12 @@ public record CreateAgentDTO
     public string AgentMetaPrompt { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the name of the application.
+    /// Gets or sets the id of the application.
     /// </summary>
     /// <value>
-    /// The name of the application.
+    /// The id of the application.
     /// </value>
-    public string ApplicationName { get; set; } = string.Empty;
+    public int ApplicationId { get; set; }
 
     /// <summary>
     /// Gets or sets the knowledge base document.

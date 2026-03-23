@@ -8,6 +8,9 @@ export const ToolSkillsToasterConstants = {
 	CREATE_SKILL: "Skill created successfully",
 	DELETE_SKILL: "Skill deleted successfully",
 	UPDATE_SKILL: "Skill updated successfully",
+	CREATE_NEW_APPLICATION: "Application registered successfully",
+	UPDATE_APPLICATION: "Application registration updated successfully",
+	DELETE_APPLICATION: "Application registration deleted successfully",
 };
 
 export const AgentsToasterConstants = {

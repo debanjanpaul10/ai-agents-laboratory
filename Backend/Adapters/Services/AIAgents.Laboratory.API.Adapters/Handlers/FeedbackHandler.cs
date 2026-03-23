@@ -22,7 +22,7 @@ public sealed class FeedbackHandler(IMapper mapper, IFeedbackService feedbackSer
     public async Task<bool> AddNewBugReportDataAsync(AddBugReportDTO bugReportData)
     {
         var domainInput = mapper.Map<BugReportData>(bugReportData);
-        return await feedbackService.AddNewBugReportDataAsync(domainInput).ConfigureAwait(false);
+        return await feedbackService.AddNewBugReportDataAsync(bugReportData: domainInput).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -33,6 +33,6 @@ public sealed class FeedbackHandler(IMapper mapper, IFeedbackService feedbackSer
     public async Task<bool> AddNewFeatureRequestDataAsync(NewFeatureRequestDTO featureRequestData)
     {
         var domainInput = mapper.Map<NewFeatureRequestData>(featureRequestData);
-        return await feedbackService.AddNewFeatureRequestDataAsync(domainInput).ConfigureAwait(false);
+        return await feedbackService.AddNewFeatureRequestDataAsync(featureRequestData: domainInput).ConfigureAwait(false);
     }
 }

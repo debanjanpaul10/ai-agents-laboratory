@@ -3,8 +3,8 @@ namespace AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 /// <summary>
 /// The Bug Severity Mapping.
 /// </summary>
-/// <seealso cref="BaseEntity"/>
-public sealed record BugSeverityMapping : BaseEntity
+/// <seealso cref="BaseDomainModel"/>
+public sealed record BugSeverityMapping : BaseDomainModel
 {
     /// <summary>
     /// Gets or sets the identifier.

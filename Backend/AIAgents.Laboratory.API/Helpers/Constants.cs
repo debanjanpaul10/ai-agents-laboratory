@@ -1,11 +1,4 @@
-﻿// *********************************************************************************
-//	<copyright file="Constants.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The Constants Class.</summary>
-// *********************************************************************************
-
-namespace AIAgents.Laboratory.API.Helpers;
+﻿namespace AIAgents.Laboratory.API.Helpers;
 
 /// <summary>
 /// The Constants Class.
@@ -157,9 +150,9 @@ internal static class Constants
     internal static class ExceptionConstants
     {
         /// <summary>
-        /// The ai services down message constant.
+        /// The default message for unhandled exceptions, providing a user-friendly response when an unexpected error occurs during request processing.
         /// </summary>
-        internal const string AiServicesDownMessage = "Our AI Services are down right now. Please try again after sometime.";
+        internal const string SomethingWentWrongDefaultMessage = "Oops! Something went wrong while processing the request. Please try again after sometime!";
 
         /// <summary>
         /// The missing configuration message.
@@ -297,5 +290,26 @@ internal static class Constants
         /// The client id claim constant.
         /// </summary>
         public const string ClientIdClaimConstant = "aud";
+    }
+
+    /// <summary>
+    /// Provides constant values used for health check operations within the application.
+    /// </summary>
+    internal static class HealthCheckConstants
+    {
+        /// <summary>
+        /// The application name constant used for health check tagging and identification.
+        /// </summary>
+        internal const string AppHealthCheckName = "AI Agents Laboratory API";
+
+        /// <summary>
+        /// The endpoint path for the health check API, which is used to monitor the health status of the application.
+        /// </summary>
+        internal const string AppHealthCheckEndpoint = "/api/health";
+
+        /// <summary>
+        /// The endpoint path for the health check UI, which provides a visual interface to view the health status of the application and its dependencies.
+        /// </summary>
+        internal const string AppHealthCheckEndpointUI = "/healthcheck-ui";
     }
 }

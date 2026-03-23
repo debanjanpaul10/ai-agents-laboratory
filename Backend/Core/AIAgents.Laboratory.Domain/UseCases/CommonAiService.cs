@@ -1,23 +1,27 @@
-using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
 
 /// <summary>
-/// Common AI Service.
+/// Provides common AI-related services for retrieving configuration data, model identifiers, and agent information within the application.
 /// </summary>
-/// <param name="configuration">The configuration.</param>
-/// <param name="agentStatusStore">THe agent status store.</param>
-/// <param name="logger">The logger service.</param>
-/// <param name="cacheService">The cache service.</param>
+/// <remarks>This class centralizes access to AI configuration and agent data, supporting caching and logging for
+/// operational efficiency. It is intended to be used as a singleton within the application's service layer.</remarks>
+/// <param name="configuration">The application configuration provider used to access settings and model identifiers.</param>
+/// <param name="logger">The logger instance used for logging operational and error information.</param>
+/// <param name="correlationContext">The correlation context used to track and propagate request correlation information.</param>
+/// <param name="cacheService">The cache service used for storing and retrieving configuration data to improve performance.</param>
+/// <param name="agentsService">The agents service used to access agent-related data and operations.</param>
 /// <seealso cref="ICommonAiService"/>
-public sealed class CommonAiService(IConfiguration configuration, ILogger<CommonAiService> logger, IAgentStatusStore agentStatusStore, ICacheService cacheService, IAgentsService agentsService) : ICommonAiService
+public sealed class CommonAiService(IConfiguration configuration, ILogger<CommonAiService> logger, ICorrelationContext correlationContext, ICacheService cacheService, IAgentsService agentsService) : ICommonAiService
 {
     /// <summary>
     /// Gets the current model identifier.
@@ -31,30 +35,6 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
     }
 
     /// <summary>
-    /// Gets the agent current status.
-    /// </summary> 
-    /// <returns>
-    /// The agent status data.
-    /// </returns>
-    public AgentStatus GetAgentCurrentStatus()
-    {
-        try
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentCurrentStatus), DateTime.UtcNow, string.Empty);
-            return agentStatusStore.Current;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentCurrentStatus), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
-        }
-        finally
-        {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentCurrentStatus), DateTime.UtcNow, string.Empty);
-        }
-    }
-
-    /// <summary>
     /// Gets the configurations data for application.
     /// </summary>
     /// <param name="userName">The current logged in user.</param>
@@ -63,7 +43,7 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationsData), DateTime.UtcNow, userName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationsData), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
 
             var cachedValues = cacheService.GetCachedData<Dictionary<string, string>>(CacheKeys.AllAppSettingsKeyName);
             if (cachedValues is not null && cachedValues.Count > 0)
@@ -89,12 +69,12 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationsData), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationsData), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationsData), DateTime.UtcNow, userName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationsData), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
         }
     }
 
@@ -107,7 +87,7 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationByKeyName), DateTime.UtcNow, key);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConfigurationByKeyName), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, key }));
 
             var cachedkeyValue = cacheService.GetCachedData<Dictionary<string, string>>(key);
             if (cachedkeyValue is not null && cachedkeyValue.Count > 0)
@@ -122,12 +102,12 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationByKeyName), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConfigurationByKeyName), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationByKeyName), DateTime.UtcNow, key);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConfigurationByKeyName), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, key }));
         }
     }
 
@@ -140,19 +120,19 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, userName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
 
-            var activeAgentsList = await agentsService.GetAllAgentsDataAsync(userName).ConfigureAwait(false);
+            var activeAgentsList = await agentsService.GetAllAgentsDataAsync(userEmail: userName).ConfigureAwait(false);
             return (activeAgentsList.Count(), [.. activeAgentsList.OrderByDescending(x => x.DateModified).Take(3)]);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, userName);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
         }
     }
 }

@@ -1,8 +1,14 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using static AIAgents.Laboratory.Persistence.SQLDatabase.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Persistence.SQLDatabase.Helpers.Extensions;
 
+/// <summary>
+/// Provides extension methods for filtering queryable collections based on the presence of an 'IsActive' property.
+/// </summary>
+/// <remarks>This class is intended for use with entity types that define a public boolean 'IsActive' property.
+/// The extension methods enable filtering of query results to include only active entities, supporting scenarios where soft deletion or active/inactive status is modeled in the data layer.</remarks>
 internal static class QueryableExtensions
 {
     /// <summary>
@@ -19,7 +25,7 @@ internal static class QueryableExtensions
             return query;
         }
 
-        var property = typeof(T).GetProperty("IsActive", BindingFlags.Public | BindingFlags.Instance);
+        var property = typeof(T).GetProperty(DatabaseConstants.IsActiveBooleanFlag, BindingFlags.Public | BindingFlags.Instance);
         if (property is null || property.PropertyType != typeof(bool))
         {
             return query;

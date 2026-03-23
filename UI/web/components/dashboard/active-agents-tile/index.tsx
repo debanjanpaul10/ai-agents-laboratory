@@ -57,12 +57,6 @@ export default function ActiveAgentsTileComponent() {
 											</span>
 										</p>
 										<div className="flex items-center justify-between gap-4 py-1 text-gray-400 text-xs">
-											<span className="flex items-center gap-2 truncate">
-												<Settings className="w-4 h-4 flex-shrink-0" />
-												<span className="truncate">
-													{agent.applicationName}
-												</span>
-											</span>
 											<span className="flex items-center gap-2 whitespace-nowrap">
 												<Clock className="w-4 h-4 flex-shrink-0" />
 												<span>

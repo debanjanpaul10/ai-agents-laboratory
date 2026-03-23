@@ -23,7 +23,7 @@ public sealed class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSki
     public async Task<bool> AddNewToolSkillAsync(ToolSkillDTO toolSkillData, string userEmail)
     {
         var domainInput = mapper.Map<ToolSkillDomain>(toolSkillData);
-        return await toolSkillsService.AddNewToolSkillAsync(domainInput, userEmail).ConfigureAwait(false);
+        return await toolSkillsService.AddNewToolSkillAsync(toolSkillData: domainInput, userEmail).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -85,6 +85,6 @@ public sealed class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSki
     public async Task<bool> UpdateExistingToolSkillDataAsync(ToolSkillDTO updateToolSkillData, string currentUserEmail)
     {
         var domainInput = mapper.Map<ToolSkillDomain>(updateToolSkillData);
-        return await toolSkillsService.UpdateExistingToolSkillDataAsync(domainInput, currentUserEmail).ConfigureAwait(false);
+        return await toolSkillsService.UpdateExistingToolSkillDataAsync(updateToolSkillData: domainInput, currentUserEmail).ConfigureAwait(false);
     }
 }

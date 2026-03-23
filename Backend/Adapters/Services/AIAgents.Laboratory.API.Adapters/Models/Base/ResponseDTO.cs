@@ -3,7 +3,7 @@
 /// <summary>
 /// The Response DTO.
 /// </summary>
-public sealed record ResponseDTO
+public sealed record ResponseDto
 {
     /// <summary>
     /// Gets or sets the status code.

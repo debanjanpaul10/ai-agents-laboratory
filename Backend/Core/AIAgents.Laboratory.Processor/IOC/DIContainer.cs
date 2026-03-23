@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Processor.Contracts;
 using AIAgents.Laboratory.Processor.Services;
+using AIAgents.Laboratory.Processor.Services.FileReaders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel.Memory;
@@ -27,6 +28,13 @@ public static class DIContainer
     public static IServiceCollection AddProcessorDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.RegisterTextEmbeddingGenerationService(configuration);
+
+        services.AddScoped<IFileContentReader, TextFileContentReader>()
+            .AddScoped<IFileContentReader, PdfFileContentReader>()
+            .AddScoped<IFileContentReader, SpreadsheetFileContentReader>()
+            .AddScoped<IFileContentReader, WordFileContentReader>()
+            .AddScoped<FileContentReaderFactory>();
+
         return services.AddScoped<IKnowledgeBaseProcessor, KnowledgeBaseProcessor>()
             .AddScoped<IVisionProcessor, VisionProcessor>()
             .AddSingleton<IMemoryStore, VolatileMemoryStore>();

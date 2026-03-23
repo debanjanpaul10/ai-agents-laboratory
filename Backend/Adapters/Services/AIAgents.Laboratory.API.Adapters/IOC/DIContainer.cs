@@ -24,5 +24,7 @@ public static class DIContainer
             .AddScoped<IFeedbackHandler, FeedbackHandler>()
             .AddScoped<IToolSkillsHandler, ToolSkillsHandler>()
             .AddScoped<IWorkspacesHandler, WorkspacesHandler>()
+            .AddScoped<IApplicationAdminHandler, ApplicationAdminHandler>()
+            .AddScoped<IRegisteredApplicationHandler, RegisteredApplicationHandler>()
             .AddAutoMapper(config => config.AddProfile<DomainMapperProfile>());
 }

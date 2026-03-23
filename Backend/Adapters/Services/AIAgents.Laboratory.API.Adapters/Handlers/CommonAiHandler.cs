@@ -14,18 +14,6 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 public sealed class CommonAiHandler(ICommonAiService commonAiService, IMapper mapper) : ICommonAiHandler
 {
     /// <summary>
-    /// Gets the agent current status.
-    /// </summary>
-    /// <returns>
-    /// The agent status data.
-    /// </returns>
-    public AgentStatusDTO GetAgentCurrentStatus()
-    {
-        var domainStatusResponse = commonAiService.GetAgentCurrentStatus();
-        return mapper.Map<AgentStatusDTO>(domainStatusResponse);
-    }
-
-    /// <summary>
     /// Retrieves a collection of configuration settings associated with the specified key name.
     /// </summary>
     /// <param name="key">The key name used to identify the configuration group. Cannot be null or empty.</param>

@@ -2,7 +2,7 @@
 
 **appsettings.Development.json
 .vs
-.vscode
+.vscode/settings.json
 
 # BUILD TARGETS
 obj

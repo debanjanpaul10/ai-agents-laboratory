@@ -31,12 +31,21 @@ public sealed class AIAgentsBusinessException : Exception
     public string? Details { get; set; }
 
     /// <summary>
+    /// Gets or sets the unique identifier used to correlate related operations or requests.
+    /// </summary>
+    /// <remarks>Use this property to track and associate actions across distributed systems or components.
+    /// The value should be unique for each logical operation to ensure accurate correlation.</remarks>
+    public string CorrelationId { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="AIAgentsBusinessException"/> class.
     /// </summary>
     /// <param name="message">The message.</param>
-    public AIAgentsBusinessException(string? message) : base(message)
+    /// <param name="correlationId">The correlation id.</param>
+    public AIAgentsBusinessException(string? message, string correlationId) : base(message)
     {
         this.ExceptionMessage = message;
+        this.CorrelationId = correlationId;
     }
 
     /// <summary>
@@ -45,10 +54,12 @@ public sealed class AIAgentsBusinessException : Exception
     /// <param name="message">The message.</param>
     /// <param name="statusCode">The status code.</param>
     /// <param name="details">The details.</param>
-    public AIAgentsBusinessException(string? message, int statusCode, string? details) : base(message)
+    /// <param name="correlationId">The correlation id.</param>
+    public AIAgentsBusinessException(string? message, int statusCode, string? details, string correlationId) : base(message)
     {
         this.ExceptionMessage = message;
         this.StatusCode = statusCode;
         this.Details = details;
+        this.CorrelationId = correlationId;
     }
 }

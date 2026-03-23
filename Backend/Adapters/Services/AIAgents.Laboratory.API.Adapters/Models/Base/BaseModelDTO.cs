@@ -3,7 +3,7 @@
 /// <summary>
 /// The Base Model DTO.
 /// </summary>
-public record BaseModelDTO
+public record BaseModelDto
 {
     /// <summary>
     /// Gets or sets the date created.

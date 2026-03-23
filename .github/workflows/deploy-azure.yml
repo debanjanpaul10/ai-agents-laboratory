@@ -14,7 +14,7 @@ on:
         inputs:
             deploy_api:
                 description: "AIAgents.Laboratory.API"
-                required: true
+                required: false
                 default: true
                 type: boolean
 
@@ -27,7 +27,7 @@ on:
             deploy_db:
                 description: "AIAgents.Laboratory.Database"
                 required: false
-                default: false
+                default: true
                 type: boolean
 
 jobs:

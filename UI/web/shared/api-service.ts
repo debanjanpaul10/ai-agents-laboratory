@@ -15,6 +15,7 @@ import { ToolSkillDTO } from "@models/response/tool-skill-dto";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
 import { DownloadFileDTO } from "@models/request/download-file.dto";
+import { RegisteredApplicationDTO } from "@models/request/registered-application.dto";
 
 // #region AGENTS
 
@@ -23,7 +24,7 @@ export async function GetAgentsApiAsync() {
 }
 
 export async function GetAgentByIdApiAsync(agentId: string) {
-	return await GetAsync(`agents/getagentbyid/${agentId}`);
+	return await GetAsync(`agents/getagentbyid?agentId=${agentId}`);
 }
 
 export async function CreateNewAgentApiAsync(
@@ -39,7 +40,7 @@ export async function UpdateExistingAgentApiAsync(
 }
 
 export async function DeleteExistingAgentApiAsync(agentId: string) {
-	return await DeleteAsync(`agents/deleteagent/${agentId}`);
+	return await DeleteAsync(`agents/deleteagent?agentId=${agentId}`);
 }
 
 export async function DownloadKnowledgebaseFileApiAsync(
@@ -82,7 +83,9 @@ export async function GetConfigurationsDataApiAsync() {
 }
 
 export async function GetConfigurationByKeyNameApiAsync(keyName: string) {
-	return await GetAsync(`aiagentslab/getconfigurationbykey/${keyName}`);
+	return await GetAsync(
+		`aiagentslab/getconfigurationbykey?configKey=${keyName}`,
+	);
 }
 
 export async function AddBugReportDataApiAsync(addBugReport: AddBugReportDTO) {
@@ -92,7 +95,10 @@ export async function AddBugReportDataApiAsync(addBugReport: AddBugReportDTO) {
 export async function SubmitFeatureRequestDataApiAsync(
 	newFeatureRequest: NewFeatureRequestDTO,
 ) {
-	return await PostAsync("aiagentslab/submitfeaturerequest", newFeatureRequest);
+	return await PostAsync(
+		"aiagentslab/submitfeaturerequest",
+		newFeatureRequest,
+	);
 }
 
 export async function GetTopActiveAgentsDataApiAsync() {
@@ -108,7 +114,7 @@ export async function GetAllToolSkillsApiAsync() {
 }
 
 export async function GetToolSkillBySkillIdApiAsync(skillId: string) {
-	return await GetAsync(`toolskills/gettoolskill/${skillId}`);
+	return await GetAsync(`toolskills/gettoolskill?skillId=${skillId}`);
 }
 
 export async function AddNewToolSkillApiAsync(
@@ -126,16 +132,13 @@ export async function UpdateExistingToolSkillDataApiAsync(
 export async function DeleteExistingToolSkillBySkillIdApiAsync(
 	skillId: string,
 ) {
-	return await DeleteAsync(`toolskills/deletetoolskill/${skillId}`);
+	return await DeleteAsync(`toolskills/deletetoolskill?skillId=${skillId}`);
 }
 
 export async function GetAllMcpToolsAvailableApiAsync(
 	mcpServerTool: McpServerToolRequestDTO,
 ) {
-	return await PostAsync(
-		"toolskills/getallmcptoolsavailable",
-		mcpServerTool,
-	);
+	return await PostAsync("toolskills/getallmcptoolsavailable", mcpServerTool);
 }
 
 // #endregion
@@ -147,7 +150,7 @@ export async function GetAllWorkspacesDataApiAsync() {
 }
 
 export async function GetWorkspaceByWorkspaceIdApiAsync(workspaceId: string) {
-	return await GetAsync(`workspaces/getworkspace/${workspaceId}`);
+	return await GetAsync(`workspaces/getworkspace?workspaceId=${workspaceId}`);
 }
 
 export async function CreateNewWorkspaceApiAsync(
@@ -157,7 +160,9 @@ export async function CreateNewWorkspaceApiAsync(
 }
 
 export async function DeleteExistingWorkspaceApiAsync(workspaceGuidId: string) {
-	return await DeleteAsync(`workspaces/deleteworkspace/${workspaceGuidId}`);
+	return await DeleteAsync(
+		`workspaces/deleteworkspace?workspaceGuid=${workspaceGuidId}`,
+	);
 }
 
 export async function UpdateExistingWorkspaceDataApiAsync(
@@ -172,6 +177,64 @@ export async function GetWorkspaceGroupChatResponseApiAsync(
 	return await PostAsync(
 		"workspaces/workspacegroupchatresponse",
 		chatRequestDto,
+	);
+}
+
+// #endregion
+
+// #region APPLICATION ADMIN
+
+export async function GetAllSubmittedFeatureRequestsApiAsync() {
+	return await GetAsync("applicationadmin/getallsubmittedfeaturerequests");
+}
+
+export async function GetAllBugReportsDataApiAsync() {
+	return await GetAsync("applicationadmin/getallreportedbugs");
+}
+
+export async function IsAdminAccessEnabledApiAsync() {
+	return await GetAsync("applicationadmin/isadminaccessenabled");
+}
+
+// #endregion
+
+// #region REGISTERED APPLICATIONS
+
+export async function GetAllRegisteredApplicationsApiAsync() {
+	return await GetAsync("registeredapplication/getallregisteredapplications");
+}
+
+export async function RegisterNewApplicationApiAsync(
+	newApplicationDtoModel: RegisteredApplicationDTO,
+) {
+	return await PostAsync(
+		"registeredapplication/registernewapplication",
+		newApplicationDtoModel,
+	);
+}
+
+export async function GetRegisteredApplicationByIdApiAsync(
+	applicationId: number,
+) {
+	return await GetAsync(
+		`registeredapplication/getregisteredapplication?applicationId=${applicationId}`,
+	);
+}
+
+export async function UpdateExistingRegisteredApplicationApiAsync(
+	updateApplicationDtoModel: RegisteredApplicationDTO,
+) {
+	return await PutAsync(
+		"registeredapplication/updateregisteredapplication",
+		updateApplicationDtoModel,
+	);
+}
+
+export async function DeleteRegisteredApplicationByIdApiAsync(
+	applicationId: number,
+) {
+	return await DeleteAsync(
+		`registeredapplication/deleteregisteredapplication?applicationId=${applicationId}`,
 	);
 }
 

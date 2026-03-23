@@ -8,12 +8,6 @@ namespace AIAgents.Laboratory.API.Adapters.Contracts;
 public interface ICommonAiHandler
 {
     /// <summary>
-    /// Gets the agent current status.
-    /// </summary>
-    /// <returns>The agent status data.</returns>
-    AgentStatusDTO GetAgentCurrentStatus();
-
-    /// <summary>
     /// Gets the configurations data for application.
     /// </summary>
     /// <param name="userName">The current logged in user.</param>

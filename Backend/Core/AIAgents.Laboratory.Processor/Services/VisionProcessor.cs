@@ -29,7 +29,7 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
     {
         try
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl);
 
             IList<string> imageTextData = [];
 
@@ -48,7 +48,7 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
             ReadOperationResult results;
             do
             {
-                results = await computerVisionClient.GetReadResultAsync(Guid.Parse(operationId)).ConfigureAwait(false);
+                results = await computerVisionClient.GetReadResultAsync(operationId: Guid.Parse(operationId)).ConfigureAwait(false);
             }
             while (results.Status == OperationStatusCodes.Running || results.Status == OperationStatusCodes.NotStarted);
 
@@ -62,12 +62,12 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, ex.Message);
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, ex.Message);
             throw new AIAgentsException(ex);
         }
         finally
         {
-            logger.LogInformation(LoggingConstants.LogHelperMethodEnd, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl);
         }
     }
 
