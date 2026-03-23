@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.1.1" />
-    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.72.0-alpha" />
   </ItemGroup>
 
   <ItemGroup>

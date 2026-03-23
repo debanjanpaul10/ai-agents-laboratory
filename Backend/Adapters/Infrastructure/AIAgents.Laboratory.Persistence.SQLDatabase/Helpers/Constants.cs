@@ -21,11 +21,6 @@ internal static class Constants
         internal const string AzureSqlConnectionStringConstant = "AzureSqlConnectionString";
 
         /// <summary>
-        /// The postgres SQL connection string constant.
-        /// </summary>
-        internal const string PostgreSQLConnectionStringConstant = "PostgreSQL:Connectionstring";
-
-        /// <summary>
         /// The current sql service provider constant.
         /// </summary>
         internal const string CurrentSQLProviderConstant = "CurrentSQLProvider";
@@ -51,22 +46,6 @@ internal static class Constants
         /// </summary>
         /// <returns>{0} failed at {1} with {2}</returns>
         internal const string MethodFailedWithMessageConstant = "Method {0} failed at {1} with {2}";
-    }
-
-    /// <summary>
-    /// The error messages class.
-    /// </summary>
-    internal static class ErrorMessages
-    {
-        /// <summary>
-        /// The database connection not found
-        /// </summary>
-        internal const string DatabaseConnectionNotFound = "Oops! It seems the database connection is missing from the configuration!";
-
-        /// <summary>
-        /// The email identifier cannot be null message
-        /// </summary>
-        internal const string EmailIDCannotBeNullMessage = "Email ID cannot be null or empty";
     }
 
     /// <summary>
@@ -119,11 +98,6 @@ internal static class Constants
         /// The application name constant used for health check tagging and identification.
         /// </summary>
         internal const string ApplicationName = "AI.Agents.Laboratory";
-
-        /// <summary>
-        /// The PostgreSQL health check tag constant used to categorize health checks related to PostgreSQL databases in monitoring and diagnostics.
-        /// </summary>
-        internal const string PostgreSQLHealthCheckTag = "PostgreSQL.Database";
 
         /// <summary>
         /// The Azure SQL health check tag constant used to categorize health checks related to Azure SQL databases in monitoring and diagnostics.

@@ -16,7 +16,6 @@ public sealed class DataMapperProfile : Profile
     /// </summary>
     public DataMapperProfile()
     {
-        CreateMap<RegisteredApplication, RegisteredApplicationEntity>().ReverseMap();
         CreateMap<BugReportData, BugReportDataEntity>().ReverseMap();
         CreateMap<BaseDomainModel, BaseEntity>().ReverseMap();
         CreateMap<BugItemStatusMappingEntity, BugItemStatusMapping>().ReverseMap();

@@ -217,6 +217,11 @@ internal static class Constants
         /// The agents workspace collection name.
         /// </summary>
         internal const string WorkspaceCollectionName = "WorkspaceCollection";
+
+        /// <summary>
+        /// The registered applications collection name.
+        /// </summary>
+        internal const string RegisteredApplicationsCollectionName = "RegisteredApplicationsCollection";
     }
 
     /// <summary>
