@@ -45,6 +45,7 @@ export default function AgentsListComponent({
         );
         return app?.applicationName || "Unknown App";
     };
+    
     useEffect(() => {
         if (
             agentsDataList !== null &&
