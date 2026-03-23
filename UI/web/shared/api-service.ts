@@ -24,7 +24,7 @@ export async function GetAgentsApiAsync() {
 }
 
 export async function GetAgentByIdApiAsync(agentId: string) {
-	return await GetAsync(`agents/getagentbyid/${agentId}`);
+	return await GetAsync(`agents/getagentbyid?agentId=${agentId}`);
 }
 
 export async function CreateNewAgentApiAsync(
@@ -40,7 +40,7 @@ export async function UpdateExistingAgentApiAsync(
 }
 
 export async function DeleteExistingAgentApiAsync(agentId: string) {
-	return await DeleteAsync(`agents/deleteagent/${agentId}`);
+	return await DeleteAsync(`agents/deleteagent?agentId=${agentId}`);
 }
 
 export async function DownloadKnowledgebaseFileApiAsync(
@@ -83,7 +83,9 @@ export async function GetConfigurationsDataApiAsync() {
 }
 
 export async function GetConfigurationByKeyNameApiAsync(keyName: string) {
-	return await GetAsync(`aiagentslab/getconfigurationbykey/${keyName}`);
+	return await GetAsync(
+		`aiagentslab/getconfigurationbykey?configKey=${keyName}`,
+	);
 }
 
 export async function AddBugReportDataApiAsync(addBugReport: AddBugReportDTO) {
@@ -112,7 +114,7 @@ export async function GetAllToolSkillsApiAsync() {
 }
 
 export async function GetToolSkillBySkillIdApiAsync(skillId: string) {
-	return await GetAsync(`toolskills/gettoolskill/${skillId}`);
+	return await GetAsync(`toolskills/gettoolskill?skillId=${skillId}`);
 }
 
 export async function AddNewToolSkillApiAsync(
@@ -130,7 +132,7 @@ export async function UpdateExistingToolSkillDataApiAsync(
 export async function DeleteExistingToolSkillBySkillIdApiAsync(
 	skillId: string,
 ) {
-	return await DeleteAsync(`toolskills/deletetoolskill/${skillId}`);
+	return await DeleteAsync(`toolskills/deletetoolskill?skillId=${skillId}`);
 }
 
 export async function GetAllMcpToolsAvailableApiAsync(
@@ -148,7 +150,7 @@ export async function GetAllWorkspacesDataApiAsync() {
 }
 
 export async function GetWorkspaceByWorkspaceIdApiAsync(workspaceId: string) {
-	return await GetAsync(`workspaces/getworkspace/${workspaceId}`);
+	return await GetAsync(`workspaces/getworkspace?workspaceId=${workspaceId}`);
 }
 
 export async function CreateNewWorkspaceApiAsync(
@@ -158,7 +160,9 @@ export async function CreateNewWorkspaceApiAsync(
 }
 
 export async function DeleteExistingWorkspaceApiAsync(workspaceGuidId: string) {
-	return await DeleteAsync(`workspaces/deleteworkspace/${workspaceGuidId}`);
+	return await DeleteAsync(
+		`workspaces/deleteworkspace?workspaceGuid=${workspaceGuidId}`,
+	);
 }
 
 export async function UpdateExistingWorkspaceDataApiAsync(
@@ -213,7 +217,7 @@ export async function GetRegisteredApplicationByIdApiAsync(
 	applicationId: number,
 ) {
 	return await GetAsync(
-		`registeredapplication/getregisteredapplication/${applicationId}`,
+		`registeredapplication/getregisteredapplication?applicationId=${applicationId}`,
 	);
 }
 
@@ -230,7 +234,7 @@ export async function DeleteRegisteredApplicationByIdApiAsync(
 	applicationId: number,
 ) {
 	return await DeleteAsync(
-		`registeredapplication/deleteregisteredapplication/${applicationId}`,
+		`registeredapplication/deleteregisteredapplication?applicationId=${applicationId}`,
 	);
 }
 

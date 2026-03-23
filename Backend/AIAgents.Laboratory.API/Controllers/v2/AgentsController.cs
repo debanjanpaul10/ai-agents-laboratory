@@ -129,7 +129,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAgentDataByIdAction.Summary, Description = GetAgentDataByIdAction.Description, OperationId = GetAgentDataByIdAction.OperationId)]
-    public async Task<ResponseDto> GetAgentDataByIdAsync([FromRoute] string agentId)
+    public async Task<ResponseDto> GetAgentDataByIdAsync([FromQuery] string agentId)
     {
         AgentDataDTO result = new();
         try
@@ -216,7 +216,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = DeleteExistingAgentDataAction.Summary, Description = DeleteExistingAgentDataAction.Description, OperationId = DeleteExistingAgentDataAction.OperationId)]
-    public async Task<ResponseDto> DeleteExistingAgentDataAsync([FromRoute] string agentId)
+    public async Task<ResponseDto> DeleteExistingAgentDataAsync([FromQuery] string agentId)
     {
         bool result = false;
         try

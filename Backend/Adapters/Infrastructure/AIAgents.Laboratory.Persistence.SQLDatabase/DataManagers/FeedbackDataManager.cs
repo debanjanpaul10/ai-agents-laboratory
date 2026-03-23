@@ -37,7 +37,8 @@ public sealed class FeedbackDataManager(IMapper mapper, IUnitOfWork unitOfWork, 
             var bugStatusEntity = await unitOfWork.Repository<BugItemStatusMappingEntity>().FirstOrDefaultAsync(status => status.StatusName == DatabaseConstants.NotStartedConstant && status.IsActive);
             bugReportData.BugStatusId = bugStatusEntity?.Id ?? 0;
 
-            await unitOfWork.Repository<BugReportDataEntity>().AddAsync(entityData).ConfigureAwait(false);
+            await unitOfWork.Repository<BugReportDataEntity>()
+                .AddAsync(entityData).ConfigureAwait(false);
             await unitOfWork.SaveChangesAsync().ConfigureAwait(false);
 
             return true;
@@ -66,7 +67,8 @@ public sealed class FeedbackDataManager(IMapper mapper, IUnitOfWork unitOfWork, 
 
             var entityData = mapper.Map<NewFeatureRequestDataEntity>(featureRequestData);
 
-            await unitOfWork.Repository<NewFeatureRequestDataEntity>().AddAsync(entityData).ConfigureAwait(false);
+            await unitOfWork.Repository<NewFeatureRequestDataEntity>()
+                .AddAsync(entityData).ConfigureAwait(false);
             await unitOfWork.SaveChangesAsync().ConfigureAwait(false);
 
             return true;
@@ -93,7 +95,8 @@ public sealed class FeedbackDataManager(IMapper mapper, IUnitOfWork unitOfWork, 
         {
             logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
 
-            var result = await unitOfWork.Repository<BugReportDataEntity>().GetAllAsync(x => x.IsActive).ConfigureAwait(false);
+            var result = await unitOfWork.Repository<BugReportDataEntity>()
+                .GetAllAsync(x => x.IsActive).ConfigureAwait(false);
             return mapper.Map<IEnumerable<BugReportData>>(result);
         }
         catch (Exception ex)
@@ -118,7 +121,8 @@ public sealed class FeedbackDataManager(IMapper mapper, IUnitOfWork unitOfWork, 
         {
             logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
 
-            var result = await unitOfWork.Repository<NewFeatureRequestDataEntity>().GetAllAsync(x => x.IsActive).ConfigureAwait(false);
+            var result = await unitOfWork.Repository<NewFeatureRequestDataEntity>()
+                .GetAllAsync(x => x.IsActive).ConfigureAwait(false);
             return mapper.Map<IEnumerable<NewFeatureRequestData>>(result);
         }
         catch (Exception ex)

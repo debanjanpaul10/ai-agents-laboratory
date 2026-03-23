@@ -34,7 +34,8 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, newApplicationData }));
 
             var dataEntityModel = mapper.Map<RegisteredApplicationEntity>(newApplicationData);
-            await unitOfWork.Repository<RegisteredApplicationEntity>().AddAsync(dataEntityModel).ConfigureAwait(false);
+            await unitOfWork.Repository<RegisteredApplicationEntity>()
+                .AddAsync(dataEntityModel).ConfigureAwait(false);
             await unitOfWork.SaveChangesAsync().ConfigureAwait(false);
             return true;
         }
@@ -65,7 +66,12 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
 
             var result = await unitOfWork.Repository<RegisteredApplicationEntity>()
-                .FirstOrDefaultAsync(x => x.IsActive && x.Id == applicationId && x.CreatedBy == currentLoggedInUser).ConfigureAwait(false);
+                .FirstOrDefaultAsync(x =>
+                    x.IsActive
+                    && x.Id == applicationId
+                    && x.CreatedBy == currentLoggedInUser)
+                .ConfigureAwait(false);
+
             if (result is not null)
             {
                 result.IsActive = false;
@@ -105,7 +111,10 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
 
             var result = await unitOfWork.Repository<RegisteredApplicationEntity>()
-                .FirstOrDefaultAsync(x => x.IsActive && x.Id == applicationId).ConfigureAwait(false);
+                .FirstOrDefaultAsync(x =>
+                    x.IsActive
+                    && x.Id == applicationId)
+                .ConfigureAwait(false);
             return mapper.Map<RegisteredApplication>(result);
         }
         catch (Exception ex)
@@ -131,7 +140,8 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
         {
             logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetRegisteredApplicationsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser }));
 
-            var result = await unitOfWork.Repository<RegisteredApplicationEntity>().GetAllAsync(x => x.IsActive).ConfigureAwait(false);
+            var result = await unitOfWork.Repository<RegisteredApplicationEntity>()
+                .GetAllAsync(x => x.IsActive).ConfigureAwait(false);
             return mapper.Map<IEnumerable<RegisteredApplication>>(result);
         }
         catch (Exception ex)
@@ -160,7 +170,10 @@ public sealed class RegisteredApplicationDataManager(IUnitOfWork unitOfWork, ILo
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, updateApplicationData }));
 
             var result = await unitOfWork.Repository<RegisteredApplicationEntity>()
-                .FirstOrDefaultAsync(x => x.IsActive && x.Id == updateApplicationData.Id).ConfigureAwait(false);
+                .FirstOrDefaultAsync(x =>
+                    x.IsActive
+                    && x.Id == updateApplicationData.Id)
+                .ConfigureAwait(false);
             if (result is not null)
             {
                 var dataEntityModel = mapper.Map<RegisteredApplicationEntity>(updateApplicationData);

@@ -5,9 +5,11 @@ using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Annotations;
 using static AIAgents.Laboratory.API.Helpers.AuthorizationTypes;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
+using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.RegisteredApplicationController;
 
 namespace AIAgents.Laboratory.API.Controllers.v2;
 
@@ -20,13 +22,13 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="logger">The logger service.</param>
 /// <param name="correlationContext">The correlation context service for tracking request correlation IDs.</param>
-/// <param name="raHandler">The registered application adapter handler.</param>
+/// <param name="registerAppHandler">The registered application adapter handler.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route(ApiBaseRoute)]
-public sealed class RegisteredApplicationController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<RegisteredApplicationController> logger, ICorrelationContext correlationContext,
-    IRegisteredApplicationHandler raHandler) : BaseController(httpContextAccessor, configuration)
+public sealed class RegisteredApplicationController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration,
+    ILogger<RegisteredApplicationController> logger, ICorrelationContext correlationContext, IRegisteredApplicationHandler registerAppHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Retrieves all registered applications for the authenticated user.
@@ -40,15 +42,18 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = GetAllRegisteredApplicationsAction.Summary, Description = GetAllRegisteredApplicationsAction.Description, OperationId = GetAllRegisteredApplicationsAction.OperationId)]
     public async Task<ResponseDto> GetAllRegisteredApplicationsAsync()
     {
         IEnumerable<RegisteredApplicationDto> result = [];
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllRegisteredApplicationsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllRegisteredApplicationsAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+
             if (base.IsAuthorized(UserBased))
             {
-                result = await raHandler.GetRegisteredApplicationsAsync(base.UserEmail).ConfigureAwait(false);
+                result = await registerAppHandler.GetRegisteredApplicationsAsync(base.UserEmail).ConfigureAwait(false);
                 if (result is not null)
                     return HandleSuccessRequestResponse(result);
                 else
@@ -64,7 +69,8 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllRegisteredApplicationsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllRegisteredApplicationsAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
@@ -80,17 +86,19 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = RegisterNewApplicationAction.Summary, Description = RegisterNewApplicationAction.Description, OperationId = RegisterNewApplicationAction.OperationId)]
     public async Task<ResponseDto> RegisterNewApplicationAsync([FromBody] RegisteredApplicationDto newApplicationDtoModel)
     {
         bool result = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(RegisterNewApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, newApplicationDtoModel }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(RegisterNewApplicationAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, newApplicationDtoModel }));
 
             ArgumentNullException.ThrowIfNull(newApplicationDtoModel);
             if (base.IsAuthorized(UserBased))
             {
-                result = await raHandler.CreateNewRegisteredApplicationAsync(base.UserEmail, newApplicationDtoModel).ConfigureAwait(false);
+                result = await registerAppHandler.CreateNewRegisteredApplicationAsync(base.UserEmail, newApplicationDtoModel).ConfigureAwait(false);
                 if (result)
                     return HandleSuccessRequestResponse(result);
                 else
@@ -106,7 +114,8 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(RegisterNewApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(RegisterNewApplicationAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
@@ -122,15 +131,18 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = GetRegisteredApplicationByIdAction.Summary, Description = GetRegisteredApplicationByIdAction.Description, OperationId = GetRegisteredApplicationByIdAction.OperationId)]
     public async Task<ResponseDto> GetRegisteredApplicationByIdAsync([FromRoute] int applicationId)
     {
         RegisteredApplicationDto result = new();
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId }));
+
             if (base.IsAuthorized(UserBased))
             {
-                result = await raHandler.GetRegisteredApplicationByIdAsync(base.UserEmail, applicationId).ConfigureAwait(false);
+                result = await registerAppHandler.GetRegisteredApplicationByIdAsync(base.UserEmail, applicationId).ConfigureAwait(false);
                 if (result is not null)
                     return HandleSuccessRequestResponse(result);
                 else
@@ -146,7 +158,8 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId, result }));
         }
     }
 
@@ -162,17 +175,19 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = UpdateExistingRegisteredApplicationDataAction.Summary, Description = UpdateExistingRegisteredApplicationDataAction.Description, OperationId = UpdateExistingRegisteredApplicationDataAction.OperationId)]
     public async Task<ResponseDto> UpdateExistingRegisteredApplicationAsync([FromBody] RegisteredApplicationDto updateApplicationDtoModel)
     {
         bool result = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, updateApplicationDtoModel }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, updateApplicationDtoModel }));
 
             ArgumentNullException.ThrowIfNull(updateApplicationDtoModel);
             if (base.IsAuthorized(UserBased))
             {
-                result = await raHandler.UpdateExistingRegisteredApplicationAsync(
+                result = await registerAppHandler.UpdateExistingRegisteredApplicationAsync(
                     currentLoggedInUser: base.UserEmail,
                     updateApplicationData: updateApplicationDtoModel).ConfigureAwait(false);
 
@@ -191,7 +206,8 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
@@ -207,15 +223,18 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = DeleteExistingRegisteredApplicationAction.Summary, Description = DeleteExistingRegisteredApplicationAction.Description, OperationId = DeleteExistingRegisteredApplicationAction.OperationId)]
     public async Task<ResponseDto> DeleteRegisteredApplicationByIdAsync([FromRoute] int applicationId)
     {
         bool result = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId }));
+
             if (base.IsAuthorized(UserBased))
             {
-                result = await raHandler.DeleteRegisteredApplicationByIdAsync(base.UserEmail, applicationId).ConfigureAwait(false);
+                result = await registerAppHandler.DeleteRegisteredApplicationByIdAsync(base.UserEmail, applicationId).ConfigureAwait(false);
                 if (result)
                     return HandleSuccessRequestResponse(result);
                 else
@@ -231,7 +250,8 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, applicationId, result }));
         }
     }
 }

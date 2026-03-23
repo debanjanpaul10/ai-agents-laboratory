@@ -80,7 +80,7 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetConfigurationsDataAction.Summary, Description = GetConfigurationsDataAction.Description, OperationId = GetConfigurationsDataAction.OperationId)]
-    public ResponseDto GetConfigurationByKeyName([FromRoute] string configKey)
+    public ResponseDto GetConfigurationByKeyName([FromQuery] string configKey)
     {
         Dictionary<string, string> result = [];
         try
