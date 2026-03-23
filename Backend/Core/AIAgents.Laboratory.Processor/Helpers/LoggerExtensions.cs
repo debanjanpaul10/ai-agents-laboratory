@@ -40,18 +40,4 @@ public static class LoggerExtensions
         if (logger.IsEnabled(LogLevel.Error))
             logger.LogError(exception, message, args);
     }
-
-    /// <summary>
-    /// Writes a warning log entry using the specified logger, message, and formatting arguments.
-    /// </summary>
-    /// <remarks>This method only writes the log entry if the logger is enabled for the Warning level. 
-    /// Use this extension method to simplify logging warnings with formatted messages.</remarks>
-    /// <param name="logger">The logger instance used to write the warning message. Cannot be null.</param>
-    /// <param name="message">The message template to log. May contain format placeholders for the arguments.</param>
-    /// <param name="args">An array of objects to format into the message template.</param>
-    public static void LogAppWarning(this ILogger logger, string message, params object[] args)
-    {
-        if (logger.IsEnabled(LogLevel.Warning))
-            logger.LogWarning(message, args);
-    }
 }

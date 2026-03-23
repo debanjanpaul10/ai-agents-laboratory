@@ -81,8 +81,8 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
 
             if (relevantChunks is null || relevantChunks.Count == 0)
                 return string.Empty;
-            else
-                return string.Join("\n\n", relevantChunks.Where(c => !string.IsNullOrEmpty(c.Record.Metadata.Text)).Select(c => c.Record.Metadata.Text));
+
+            return string.Join("\n\n", relevantChunks.Where(c => !string.IsNullOrEmpty(c.Record.Metadata.Text)).Select(c => c.Record.Metadata.Text));
         }
         catch (Exception ex)
         {
