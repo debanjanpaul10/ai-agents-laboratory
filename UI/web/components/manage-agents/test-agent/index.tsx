@@ -5,11 +5,12 @@ import { Send, MessageSquare, Bot, Zap, ArrowRight } from "lucide-react";
 
 import { ChatRequestDTO } from "@models/request/chat-request-dto";
 import { InvokeChatAgentAsync } from "@store/chat/actions";
-import { useAppDispatch } from "@store/index";
+import { useAppDispatch, useAppSelector } from "@store/index";
 import { ChatMessage, TestAgentComponentProps } from "@shared/types";
 import { ManageAgentConstants } from "@helpers/constants";
 import { GenerateMessageId } from "@shared/utils";
 import { MarkdownRenderer } from "@components/common/markdown-renderer";
+import { RegisteredApplicationDTO } from "@models/request/registered-application.dto";
 
 export default function TestAgentComponent({
 	editFormData,
@@ -23,7 +24,11 @@ export default function TestAgentComponent({
 	const [showScrollbar, setShowScrollbar] = useState(false);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-	const sendChatbotRequest = async () => {
+	const RegisteredApplicationsListStoreData = useAppSelector<
+		RegisteredApplicationDTO[]
+	>((state) => state.ToolSkillsReducer.registeredApplications);
+
+	async function SendChatbotRequest() {
 		if (!userInput.trim()) return;
 
 		const userMessage: ChatMessage = {
@@ -32,7 +37,7 @@ export default function TestAgentComponent({
 			content: userInput,
 		};
 		await SendChatbotMessageAsync(userMessage);
-	};
+	}
 
 	async function SendChatbotMessageAsync(userMessage: ChatMessage) {
 		setMessages((prev) => [...prev, userMessage]);
@@ -98,8 +103,15 @@ export default function TestAgentComponent({
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === "Enter" && !e.shiftKey) {
 			e.preventDefault();
-			sendChatbotRequest();
+			SendChatbotRequest();
 		}
+	};
+
+	const getApplicationName = (applicationId: number): string => {
+		const app = (
+			RegisteredApplicationsListStoreData as RegisteredApplicationDTO[]
+		).find((a) => a.id === applicationId);
+		return app?.applicationName || "Unknown App";
 	};
 
 	const renderInputArea = () => {
@@ -126,7 +138,7 @@ export default function TestAgentComponent({
 						/>
 					</div>
 					<Button
-						onPress={sendChatbotRequest}
+						onPress={SendChatbotRequest}
 						disabled={!userInput.trim() || isLoading}
 						radius="full"
 						title="Send message"
@@ -189,7 +201,7 @@ export default function TestAgentComponent({
 							{editFormData.agentName || "Unnamed Agent"}
 						</p>
 						<p className="text-white/60 text-xs">
-							{editFormData.applicationName ||
+							{getApplicationName(editFormData.applicationId) ||
 								"No application specified"}
 						</p>
 					</div>
