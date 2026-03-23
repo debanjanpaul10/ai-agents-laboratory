@@ -51,6 +51,8 @@ public static class DIContainer
         var sqlConnectionString = configuration[ConfigurationConstants.PostgreSQLConnectionStringConstant];
         ArgumentException.ThrowIfNullOrWhiteSpace(sqlConnectionString);
 
+        AppContext.SetSwitch("System.Net.DisableIPv6", true);
+
         services.AddHealthChecks().AddNpgSql(
             connectionString: sqlConnectionString,
             healthQuery: HealthCheckConstants.DBHealthQuery,
