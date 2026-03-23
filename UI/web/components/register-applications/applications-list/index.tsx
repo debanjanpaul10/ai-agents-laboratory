@@ -57,6 +57,8 @@ export default function ApplicationsListComponent({
 	const hasActiveFilters =
 		searchTerm || sortBy !== "date" || sortOrder !== "desc";
 
+	const pluralTerm = applicationsList.length > 1 ? "s" : "";
+
 	return (
 		<div className="h-full flex flex-col bg-gradient-to-b from-gray-900 via-slate-900 to-black">
 			{/* Header */}
@@ -266,7 +268,7 @@ export default function ApplicationsListComponent({
 				<div className="flex items-center justify-between">
 					<span className="text-white/60 text-sm">
 						{filteredAndSorted.length === applicationsList.length
-							? `${applicationsList.length} application${applicationsList.length > 1 ? "s" : ""} total`
+							? `${applicationsList.length} application${pluralTerm} total`
 							: `Showing ${filteredAndSorted.length} of ${applicationsList.length} applications`}
 					</span>
 					{hasActiveFilters && (
