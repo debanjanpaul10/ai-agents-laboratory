@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.AgentServices;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.Models;
 using Microsoft.Extensions.AI;

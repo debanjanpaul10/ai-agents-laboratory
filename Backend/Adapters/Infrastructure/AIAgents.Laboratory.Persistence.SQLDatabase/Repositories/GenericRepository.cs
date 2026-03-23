@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Context;
-using AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Helpers.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,7 +24,7 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// </returns>
     public async Task<TEntity> AddAsync(TEntity entity)
     {
-        await context.Set<TEntity>().AddAsync(entity);
+        await context.Set<TEntity>().AddAsync(entity).ConfigureAwait(false);
         return entity;
     }
 
@@ -37,7 +37,7 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// </returns>
     public async Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities)
     {
-        await context.Set<TEntity>().AddRangeAsync(entities);
+        await context.Set<TEntity>().AddRangeAsync(entities).ConfigureAwait(false);
         return entities;
     }
 
@@ -50,7 +50,8 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// </returns>
     public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
     {
-        return await context.Set<TEntity>().Where(predicate).ToListAsync();
+        return await context.Set<TEntity>().AsNoTracking()
+            .Where(predicate).ToListAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -62,7 +63,8 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// </returns>
     public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
     {
-        return await context.Set<TEntity>().FirstOrDefaultAsync(predicate);
+        return await context.Set<TEntity>().AsNoTracking()
+            .FirstOrDefaultAsync(predicate).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -94,7 +96,7 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
             foreach (var includeProperty in includeProperties.Split([','], StringSplitOptions.RemoveEmptyEntries))
                 query = query.Include(includeProperty);
 
-        return await query.AsNoTracking().ToListAsync();
+        return await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -127,7 +129,7 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
             foreach (var includeProperty in includeProperties)
                 query = query.Include(includeProperty);
 
-        var result = await query.AsNoTracking().ToListAsync();
+        var result = await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
         if (result.Count > pageSize)
         {
             hasNextPage = true;
@@ -161,7 +163,7 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
             foreach (var includedProperty in includeProperties.Split([','], StringSplitOptions.RemoveEmptyEntries))
                 query = query.Include(includedProperty);
 
-        return await query.FirstOrDefaultAsync() ?? default!;
+        return await query.AsNoTracking().FirstOrDefaultAsync().ConfigureAwait(false) ?? default!;
     }
 
     /// <summary>
@@ -190,7 +192,7 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// </returns>
     public async Task<int> SaveChangesAsync()
     {
-        return await context.SaveChangesAsync();
+        return await context.SaveChangesAsync().ConfigureAwait(false);
     }
 
     /// <summary>

@@ -3,6 +3,9 @@ using System.Globalization;
 using System.Security.Claims;
 using AIAgents.Laboratory.API.Adapters.IOC;
 using AIAgents.Laboratory.API.Controllers;
+using AIAgents.Laboratory.API.Helpers;
+using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Domain.IOC;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.IOC;
 using AIAgents.Laboratory.Messaging.Adapters.IOC;
@@ -60,12 +63,14 @@ public static class DIContainer
     {
         services.ConfigureAuthenticationServices(configuration);
 
+        // Register correlation context service for cross-layer correlation ID access
+        services.AddScoped<ICorrelationContext, CorrelationContext>();
+
         services.AddAPIAdapterDependencies().AddMessagingDependencies(configuration).AddMemoryCache().AddCacheDependencies();
         services.AddAgentsFrameworkDependencies(configuration).AddMongoDbAdapterDependencies(configuration)
             .AddRelationalSqlDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
 
         services.AddDomainDependencies().AddProcessorDependencies(configuration);
-        services.AddSignalR().AddAzureSignalR(configuration[AzureAppConfigurationConstants.AzureSignalRConnection]);
     }
 
     /// <summary>
@@ -80,6 +85,24 @@ public static class DIContainer
             configuration.DefaultApiVersion = new ApiVersion(2, 0);
             configuration.ReportApiVersions = true;
         });
+    }
+
+    /// <summary>
+    /// Configures health check monitoring and UI for the application by adding health check endpoints and in-memory storage to the service collection.
+    /// </summary>
+    /// <remarks>This method sets the evaluation interval for health checks, limits the number of history entries per endpoint, restricts the maximum number of concurrent API requests, and registers an endpoint for health status. 
+    /// It also configures in-memory storage for health check data. Use this method to enable health check UI and monitoring features in the application.</remarks>
+    /// <param name="services">The collection of services to which health check monitoring and UI components are added.</param>
+    internal static void ConfigureHealthChecks(this IServiceCollection services)
+    {
+        services.AddHealthChecksUI(opt =>
+        {
+            opt.SetEvaluationTimeInSeconds(60);
+            opt.MaximumHistoryEntriesPerEndpoint(60);
+            opt.SetApiMaxActiveRequests(1);
+            opt.AddHealthCheckEndpoint(HealthCheckConstants.AppHealthCheckName, HealthCheckConstants.AppHealthCheckEndpoint);
+
+        }).AddInMemoryStorage();
     }
 
     #region PRIVATE METHODS
@@ -144,7 +167,7 @@ public static class DIContainer
     {
         var authenticationFailedException = new UnauthorizedAccessException(ExceptionConstants.InvalidTokenExceptionConstant);
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();
-        logger.LogError(authenticationFailedException, authenticationFailedException.Message);
+        logger.LogAppError(authenticationFailedException, authenticationFailedException.Message);
 
         context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
         await context.HttpContext.Response.WriteAsync(authenticationFailedException.Message);

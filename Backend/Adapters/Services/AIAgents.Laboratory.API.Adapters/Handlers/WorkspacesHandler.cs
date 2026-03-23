@@ -24,7 +24,7 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     public async Task<bool> CreateNewWorkspaceAsync(AgentsWorkspaceDTO agentsWorkspaceData, string currentUserEmail)
     {
         var domainModel = mapper.Map<AgentsWorkspaceDomain>(agentsWorkspaceData);
-        return await workspacesService.CreateNewWorkspaceAsync(domainModel, currentUserEmail).ConfigureAwait(false);
+        return await workspacesService.CreateNewWorkspaceAsync(agentsWorkspaceData: domainModel, currentUserEmail).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     /// <returns>The list of <see cref="AgentsWorkspaceDTO"/></returns>
     public async Task<IEnumerable<AgentsWorkspaceDTO>> GetAllWorkspacesAsync(string userName)
     {
-        var domainResult = await workspacesService.GetAllWorkspacesAsync(userName).ConfigureAwait(false);
+        var domainResult = await workspacesService.GetAllWorkspacesAsync(currentUserEmail: userName).ConfigureAwait(false);
         return mapper.Map<IEnumerable<AgentsWorkspaceDTO>>(domainResult);
     }
 
@@ -57,7 +57,7 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     public async Task<GroupChatResponseDTO> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDTO chatRequest)
     {
         var domainInput = mapper.Map<WorkspaceAgentChatRequestDomain>(chatRequest);
-        var domainResult = await workspacesService.GetWorkspaceGroupChatResponseAsync(domainInput).ConfigureAwait(false);
+        var domainResult = await workspacesService.GetWorkspaceGroupChatResponseAsync(chatRequest: domainInput).ConfigureAwait(false);
         return mapper.Map<GroupChatResponseDTO>(domainResult);
     }
 
@@ -81,7 +81,7 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     public async Task<string> InvokeWorkspaceAgentAsync(WorkspaceAgentChatRequestDTO chatRequestDTO)
     {
         var domainInput = mapper.Map<WorkspaceAgentChatRequestDomain>(chatRequestDTO);
-        return await workspacesService.InvokeWorkspaceAgentAsync(domainInput).ConfigureAwait(false);
+        return await workspacesService.InvokeWorkspaceAgentAsync(chatRequest: domainInput).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -93,6 +93,6 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     public async Task<bool> UpdateExistingWorkspaceDataAsync(AgentsWorkspaceDTO agentsWorkspaceData, string currentUserEmail)
     {
         var domainModel = mapper.Map<AgentsWorkspaceDomain>(agentsWorkspaceData);
-        return await workspacesService.UpdateExistingWorkspaceDataAsync(domainModel, currentUserEmail).ConfigureAwait(false);
+        return await workspacesService.UpdateExistingWorkspaceDataAsync(agentsWorkspaceData: domainModel, currentUserEmail).ConfigureAwait(false);
     }
 }

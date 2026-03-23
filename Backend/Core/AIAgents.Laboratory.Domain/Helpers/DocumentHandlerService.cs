@@ -47,7 +47,7 @@ internal static class DocumentHandlerService
         foreach (var file in agentData.KnowledgeBaseDocument)
         {
             using var memoryStream = new MemoryStream();
-            await file.CopyToAsync(memoryStream).ConfigureAwait(false);
+            await file.CopyToAsync(memoryStream);
             knowledgeBaseFiles.Add(new KnowledgeBaseDocumentDomain
             {
                 FileName = Path.GetFileName(file.FileName),

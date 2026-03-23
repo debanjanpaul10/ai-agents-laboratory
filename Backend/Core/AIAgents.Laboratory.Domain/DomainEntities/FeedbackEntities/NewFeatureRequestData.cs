@@ -3,8 +3,8 @@
 /// <summary>
 /// The New Feature Request Data Entity Class.
 /// </summary>
-/// <seealso cref="BaseEntity"/>
-public sealed record NewFeatureRequestData : BaseEntity
+/// <seealso cref="BaseDomainModel"/>
+public sealed record NewFeatureRequestData : BaseDomainModel
 {
     /// <summary>
     /// Gets or sets the identifier.

@@ -5,8 +5,8 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 /// <summary>
 /// The tool skill dto model.
 /// </summary>
-/// <seealso cref="BaseModelDTO"/>
-public sealed record ToolSkillDTO : BaseModelDTO
+/// <seealso cref="BaseModelDto"/>
+public sealed record ToolSkillDTO : BaseModelDto
 {
     /// <summary>
     /// The tool skill id guid.

@@ -6,8 +6,8 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 /// <summary>
 /// The Agents Workspace DTO model.
 /// </summary>
-/// <seealso cref="BaseModelDTO"/>
-public sealed record AgentsWorkspaceDTO : BaseModelDTO
+/// <seealso cref="BaseModelDto"/>
+public sealed record AgentsWorkspaceDTO : BaseModelDto
 {
     /// <summary>
     /// Gets or sets the agent workspace guid id.

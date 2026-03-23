@@ -7,8 +7,9 @@ using static AIAgents.Laboratory.API.Helpers.Constants;
 namespace AIAgents.Laboratory.API.Controllers;
 
 /// <summary>
-/// The base controller.
+/// The <c>BaseController</c> class serves as a base API controller that provides common functionality for handling HTTP requests in the AIAgents Laboratory application.
 /// </summary>
+/// <remarks>It includes methods for extracting user information from the HTTP context, checking authorization based on user or application level, and preparing standardized responses for successful, bad, or unauthorized requests.</remarks>
 /// <param name="httpContextAccessor">The http context accessor.</param>
 /// <param name="configuration">The configuration.</param>
 /// <seealso cref="ControllerBase"/>
@@ -31,7 +32,8 @@ public abstract class BaseController(IHttpContextAccessor httpContextAccessor, I
         if (httpContextAccessor.HttpContext is not null && httpContextAccessor.HttpContext?.User is not null)
         {
             // User Authentication
-            if (authorizationType == AuthorizationTypes.UserBased && !string.IsNullOrEmpty(this.UserEmail) && !this.UserEmail.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
+            if (authorizationType == AuthorizationTypes.UserBased && !string.IsNullOrWhiteSpace(this.UserEmail)
+            && !this.UserEmail.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
                 return this.CheckApplicationLevelAuthorization();
 
             // Application Authentication
@@ -47,7 +49,7 @@ public abstract class BaseController(IHttpContextAccessor httpContextAccessor, I
     /// </summary>
     /// <param name="responseData">The response data.</param>
     /// <returns>The response DTO.</returns>
-    protected static ResponseDTO HandleSuccessRequestResponse(object responseData) =>
+    protected static ResponseDto HandleSuccessRequestResponse(object responseData) =>
         new()
         {
             IsSuccess = true,
@@ -61,7 +63,7 @@ public abstract class BaseController(IHttpContextAccessor httpContextAccessor, I
     /// <param name="statusCode">The status code.</param>
     /// <param name="message">The message.</param>
     /// <returns>The response DTO.</returns>
-    protected static ResponseDTO HandleBadRequestResponse(int statusCode, string message) =>
+    protected static ResponseDto HandleBadRequestResponse(int statusCode, string message) =>
         new()
         {
             IsSuccess = false,
@@ -73,7 +75,7 @@ public abstract class BaseController(IHttpContextAccessor httpContextAccessor, I
     /// Handles the unauthorized request response.
     /// </summary>
     /// <returns>The response DTO.</returns>
-    protected static ResponseDTO HandleUnAuthorizedRequestResponse() =>
+    protected static ResponseDto HandleUnAuthorizedRequestResponse() =>
         new()
         {
             IsSuccess = false,
@@ -91,6 +93,7 @@ public abstract class BaseController(IHttpContextAccessor httpContextAccessor, I
         var currentClientId = this.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.ClientIdClaimConstant))?.Value;
         var aiAgentsClientIdFromConfig = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant]
             ?? throw new KeyNotFoundException(configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant]);
+
         if (!string.IsNullOrEmpty(currentClientId) && !currentClientId.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
             return currentClientId.Equals(aiAgentsClientIdFromConfig, StringComparison.OrdinalIgnoreCase);
 

@@ -98,5 +98,36 @@ internal static class Constants
         /// The Azure SQL constant.
         /// </summary>
         internal const string AzureSQLConstant = "AzureSQL";
+
+        /// <summary>
+        /// The IsActive boolean flag constant used for filtering active records in database queries and operations.
+        /// </summary>
+        internal const string IsActiveBooleanFlag = "IsActive";
+    }
+
+    /// <summary>
+    /// Provides constant values used for health check operations within the application.
+    /// </summary>
+    internal static class HealthCheckConstants
+    {
+        /// <summary>
+        /// The database health query constant.
+        /// </summary>
+        internal const string DBHealthQuery = "SELECT 1";
+
+        /// <summary>
+        /// The application name constant used for health check tagging and identification.
+        /// </summary>
+        internal const string ApplicationName = "AI.Agents.Laboratory";
+
+        /// <summary>
+        /// The PostgreSQL health check tag constant used to categorize health checks related to PostgreSQL databases in monitoring and diagnostics.
+        /// </summary>
+        internal const string PostgreSQLHealthCheckTag = "PostgreSQL.Database";
+
+        /// <summary>
+        /// The Azure SQL health check tag constant used to categorize health checks related to Azure SQL databases in monitoring and diagnostics.
+        /// </summary>
+        internal const string AzureSQLHealthCheckTag = "AzureSQL.Database";
     }
 }

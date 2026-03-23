@@ -11,6 +11,11 @@ public static class RouteConstants
     internal const string AgentStatusHub_Route = "/hubs/agent-status";
 
     /// <summary>
+    /// The base route template for all API endpoints, which includes the API version as a route parameter and the controller name.
+    /// </summary>
+    internal const string ApiBaseRoute = "aiagentsapi/v{version:apiVersion}/[controller]";
+
+    /// <summary>
     /// Provides constant values for supported API version identifiers.
     /// </summary>
     internal static class ApiVersionsConstants
@@ -24,101 +29,6 @@ public static class RouteConstants
         /// Represents the API version string for version 2.
         /// </summary>
         internal const string ApiVersionV2 = "2";
-    }
-
-    /// <summary>
-    /// The route constants for plugins.
-    /// </summary>
-    internal static class PluginsRoutes
-    {
-        /// <summary>
-        /// The rewrite text route
-        /// </summary>
-        internal const string RewriteText_Route = "rewritetext";
-
-        /// <summary>
-        /// The generate tag route
-        /// </summary>
-        internal const string GenerateTag_Route = "generatetag";
-
-        /// <summary>
-        /// The moderate content route
-        /// </summary>
-        internal const string ModerateContent_Route = "moderatecontent";
-
-        /// <summary>
-        /// The get bug severity route
-        /// </summary>
-        internal const string GetBugSeverity_Route = "getbugseverity";
-    }
-
-    /// <summary>
-    /// The AI skills routes.
-    /// </summary>
-    internal static class AISkillsRoutes
-    {
-
-        /// <summary>
-        /// The get SQL query markdown response route
-        /// </summary>
-        internal const string GetSQLQueryMarkdownResponse_Route = "getsqlquerymarkdownresponse";
-
-        /// <summary>
-        /// The get followup questions api route.
-        /// </summary>
-        internal const string GetFollowupQuestionsResponse_Route = "getfollowupquestionsresponse";
-
-        /// <summary>
-        /// The detect user intent route
-        /// </summary>
-        internal const string DetectUserIntent_Route = "intentdetectionskill";
-
-        /// <summary>
-        /// The get user greeting response route
-        /// </summary>
-        internal const string GetUserGreetingResponse_Route = "usergreetingskill";
-
-        /// <summary>
-        /// The get rag text response route
-        /// </summary>
-        internal const string GetRAGTextResponse_Route = "ragtextresponseskill";
-
-        /// <summary>
-        /// The get nl to SQL response route
-        /// </summary>
-        internal const string GetNlToSqlResponse_Route = "nltosqlskill";
-    }
-
-    /// <summary>
-    /// The Route constants for Health Check.
-    /// </summary>
-    internal static class HealthCheckRoutes
-    {
-        /// <summary>
-        /// The get agent status route
-        /// </summary>
-        internal const string GetAgentStatus_Route = "agentstatus";
-    }
-
-    /// <summary>
-    /// The Route constants for Agent Skills Controller.
-    /// </summary>
-    internal static class AgentSkillsRoutes
-    {
-        /// <summary>
-        /// The create new skill route
-        /// </summary>
-        internal const string CreateNewSkill_Route = "createskill";
-
-        /// <summary>
-        /// The get all skills route
-        /// </summary>
-        internal const string GetAllSkills_Route = "getallskills";
-
-        /// <summary>
-        /// The get skill by identifier route
-        /// </summary>
-        internal const string GetSkillById_Route = "getskillbyid/{skillId}";
     }
 
     /// <summary>
@@ -139,7 +49,7 @@ public static class RouteConstants
         /// <summary>
         /// The get agent by identifier route
         /// </summary>
-        internal const string GetAgentById_Route = "getagentbyid/{agentid}";
+        internal const string GetAgentById_Route = "getagentbyid";
 
         /// <summary>
         /// The update existing agent data route.
@@ -149,7 +59,7 @@ public static class RouteConstants
         /// <summary>
         /// The delete agent data route.
         /// </summary>
-        internal const string DeleteExistingAgent_Route = "deleteagent/{agentId}";
+        internal const string DeleteExistingAgent_Route = "deleteagent";
 
         /// <summary>
         /// The download associated documents route.
@@ -196,7 +106,7 @@ public static class RouteConstants
         /// <summary>
         /// The get configuration by key route.
         /// </summary>
-        internal const string GetConfigurationByKey_Route = "getconfigurationbykey/{configKey}";
+        internal const string GetConfigurationByKey_Route = "getconfigurationbykey";
 
         /// <summary>
         /// The add bug report route.
@@ -237,12 +147,12 @@ public static class RouteConstants
         /// <summary>
         /// The get tool skill by skill id route.
         /// </summary>
-        internal const string GetToolSkillBySkillId_Route = "gettoolskill/{skillId}";
+        internal const string GetToolSkillBySkillId_Route = "gettoolskill";
 
         /// <summary>
         /// The delete existing tool skill by skill id route.
         /// </summary>
-        internal const string DeleteExistingToolSkillBySkillId_Route = "deletetoolskill/{skillId}";
+        internal const string DeleteExistingToolSkillBySkillId_Route = "deletetoolskill";
 
         /// <summary>
         /// The get all MCP tools available route.
@@ -263,7 +173,7 @@ public static class RouteConstants
         /// <summary>
         /// The get workspace by workspace id route.
         /// </summary>
-        internal const string GetWorkspaceByWorkspaceId_Route = "getworkspace/{workspaceId}";
+        internal const string GetWorkspaceByWorkspaceId_Route = "getworkspace";
 
         /// <summary>
         /// The add new workspace route.
@@ -278,7 +188,7 @@ public static class RouteConstants
         /// <summary>
         /// The delete existing workspace route.
         /// </summary>
-        internal const string DeleteExistingWorkspace_Route = "deleteworkspace/{workspaceGuidId}";
+        internal const string DeleteExistingWorkspace_Route = "deleteworkspace";
 
         /// <summary>
         /// The invoke workspace agent route.
@@ -289,5 +199,57 @@ public static class RouteConstants
         /// The get workspace group chat response route.
         /// </summary>
         internal const string GetWorkspaceGroupChatResponse_Route = "workspacegroupchatresponse";
+    }
+
+    /// <summary>
+    /// The route constants for Application Admin Controller.
+    /// </summary>
+    internal static class ApplicationAdminRoutes
+    {
+        /// <summary>
+        /// The get all reported bugs route.
+        /// </summary>
+        internal const string GetAllReportedBugs_Route = "getallreportedbugs";
+
+        /// <summary>
+        /// The get all submitted feature requests route.
+        /// </summary>
+        internal const string GetAllSubmittedFeatureRequests_Route = "getallsubmittedfeaturerequests";
+
+        /// <summary>
+        /// The route constant for checking if admin access is enabled.
+        /// </summary>
+        internal const string IsAdminAccessEnabled_Route = "isadminaccessenabled";
+    }
+
+    /// <summary>
+    /// The route constants for Registered Application Controller.
+    /// </summary>
+    internal static class RegisteredApplicationRoutes
+    {
+        /// <summary>
+        /// The route constant for registering an application.
+        /// </summary>
+        internal const string RegisterNewApplication_Route = "registernewapplication";
+
+        /// <summary>
+        /// The route constant for getting all registered applications.
+        /// </summary>
+        internal const string GetAllRegisteredApplications_Route = "getallregisteredapplications";
+
+        /// <summary>
+        /// The route constant for getting a registered application by its identifier.
+        /// </summary>
+        internal const string GetRegisteredApplicationById_Route = "getregisteredapplication";
+
+        /// <summary>
+        /// The route constant for deleting a registered application by its identifier.
+        /// </summary>
+        internal const string DeleteRegisteredApplicationById_Route = "deleteregisteredapplication";
+
+        /// <summary>
+        /// The route constant for updating an existing registered application.
+        /// </summary>
+        internal const string UpdateExistingRegisteredApplication_Route = "updateregisteredapplication";
     }
 }

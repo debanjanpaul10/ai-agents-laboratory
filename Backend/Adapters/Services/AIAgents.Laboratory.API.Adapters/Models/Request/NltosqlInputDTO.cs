@@ -5,8 +5,8 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Request;
 /// <summary>
 /// The NL to SQL input DTO.
 /// </summary>
-/// <seealso cref="Base.SkillsInputDTO" />
-public sealed record NltosqlInputDTO : SkillsInputDTO
+/// <seealso cref="Base.SkillsInputDto" />
+public sealed record NltosqlInputDTO : SkillsInputDto
 {
     /// <summary>
     /// Gets or sets the database schema.

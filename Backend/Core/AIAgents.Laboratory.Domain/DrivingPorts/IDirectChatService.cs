@@ -12,8 +12,9 @@ public interface IDirectChatService
     /// </summary>
     /// <param name="userQuery">The user query.</param>
     /// <param name="userEmail">The user email address.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The AI response.</returns>
-    Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail);
+    Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Clears the conversation history data for the user.

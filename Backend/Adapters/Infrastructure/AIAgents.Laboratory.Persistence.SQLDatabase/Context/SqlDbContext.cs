@@ -1,4 +1,4 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
+﻿using AIAgents.Laboratory.Persistence.SQLDatabase.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AIAgents.Laboratory.Persistence.SQLDatabase.Context;
@@ -34,7 +34,7 @@ public class SqlDbContext : DbContext
     /// <value>
     /// The bug report details.
     /// </value>
-    public virtual DbSet<BugReportData> BugReportDetails { get; set; }
+    public virtual DbSet<BugReportDataEntity> BugReportDetails { get; set; }
 
     /// <summary>
     /// Gets or sets the New feature requests.
@@ -42,7 +42,7 @@ public class SqlDbContext : DbContext
     /// <value>
     /// The new feature requests.
     /// </value>
-    public virtual DbSet<NewFeatureRequestData> NewFeatureRequests { get; set; }
+    public virtual DbSet<NewFeatureRequestDataEntity> NewFeatureRequests { get; set; }
 
     /// <summary>
     /// Gets or sets the bug item status mapping.
@@ -50,7 +50,7 @@ public class SqlDbContext : DbContext
     /// <value>
     /// The bug item status mapping.
     /// </value>
-    public virtual DbSet<BugItemStatusMapping> BugItemStatusMapping { get; set; }
+    public virtual DbSet<BugItemStatusMappingEntity> BugItemStatusMapping { get; set; }
 
     /// <summary>
     /// Gets or sets the bug severity mapping.
@@ -58,7 +58,12 @@ public class SqlDbContext : DbContext
     /// <value>
     /// The bug severity mapping.
     /// </value>
-    public virtual DbSet<BugSeverityMapping> BugSeverityMapping { get; set; }
+    public virtual DbSet<BugSeverityMappingEntity> BugSeverityMapping { get; set; }
+
+    /// <summary>
+    /// Gets or sets the registered applications.
+    /// </summary>
+    public virtual DbSet<RegisteredApplicationEntity> RegisteredApplications { get; set; }
 
     /// <summary>
     /// Override this method to further configure the model that was discovered by convention from the entity types
@@ -80,6 +85,7 @@ public class SqlDbContext : DbContext
     /// </remarks>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<BugReportData>().HasKey(brd => brd.Id);
+        modelBuilder.Entity<BugReportDataEntity>().HasKey(brd => brd.Id);
+        modelBuilder.Entity<NewFeatureRequestDataEntity>().HasKey(nfr => nfr.Id);
     }
 }

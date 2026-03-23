@@ -15,7 +15,7 @@ export default function MainLayout({
 				<title>{metadata.title}</title>
 			</Head>
 			<SidebarComponent />
-			<div className={`ml-85 ${contentClassName || "p-8"}`}>
+			<div className={`ml-90 ${contentClassName || "p-8"}`}>
 				<main
 					className={`${
 						isFullWidth ? "w-full" : "max-w-7xl mx-auto"
