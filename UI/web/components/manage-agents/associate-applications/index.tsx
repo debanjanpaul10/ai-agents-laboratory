@@ -162,113 +162,111 @@ export default function AssociateApplicationFlyoutComponent({
 
 	return (
 		isOpen && (
-			<>
-				<div className="flex flex-col h-full overflow-hidden">
-					{/* Header */}
-					<div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0 bg-white/[0.02] backdrop-blur-md">
-						<div className="flex items-center space-x-3">
-							<div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
-								<AppWindow className="w-5 h-5 text-white" />
-							</div>
-							<div>
-								<h2 className="text-xl font-bold bg-gradient-to-r from-white via-blue-100 to-indigo-100 bg-clip-text text-transparent">
-									{
-										AssociateApplicationsFlyoutPropsConstants
-											.Headers.Heading
-									}
-								</h2>
-								<p className="text-white/40 text-sm">
-									{
-										AssociateApplicationsFlyoutPropsConstants
-											.Headers.SubHeading
-									}
-								</p>
-							</div>
+			<div className="flex flex-col h-full overflow-hidden">
+				{/* Header */}
+				<div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0 bg-white/[0.02] backdrop-blur-md">
+					<div className="flex items-center space-x-3">
+						<div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
+							<AppWindow className="w-5 h-5 text-white" />
 						</div>
-						<button
-							onClick={onClose}
-							className="p-2 rounded-lg bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 transition-all duration-300 text-white/50 hover:text-red-400"
-						>
-							<ArrowRight className="w-5 h-5" />
-						</button>
-					</div>
-
-					{/* Info Box */}
-					<div className="px-6 pt-6 flex-shrink-0">
-						<div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4 flex items-start space-x-3">
-							<Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-							<p className="text-white/60 text-xs leading-relaxed">
+						<div>
+							<h2 className="text-xl font-bold bg-gradient-to-r from-white via-blue-100 to-indigo-100 bg-clip-text text-transparent">
 								{
 									AssociateApplicationsFlyoutPropsConstants
-										.Hints.Info
+										.Headers.Heading
+								}
+							</h2>
+							<p className="text-white/40 text-sm">
+								{
+									AssociateApplicationsFlyoutPropsConstants
+										.Headers.SubHeading
 								}
 							</p>
 						</div>
 					</div>
+					<button
+						onClick={onClose}
+						className="p-2 rounded-lg bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 transition-all duration-300 text-white/50 hover:text-red-400"
+					>
+						<ArrowRight className="w-5 h-5" />
+					</button>
+				</div>
 
-					{/* Search */}
-					<div className="p-6 pb-2 flex-shrink-0">
-						<Input
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							placeholder={
+				{/* Info Box */}
+				<div className="px-6 pt-6 flex-shrink-0">
+					<div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4 flex items-start space-x-3">
+						<Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+						<p className="text-white/60 text-xs leading-relaxed">
+							{
 								AssociateApplicationsFlyoutPropsConstants.Hints
-									.Search
+									.Info
 							}
-							variant="bordered"
-							startContent={
-								<Search className="w-4 h-4 text-white/40" />
-							}
-							classNames={{
-								input: "text-white placeholder:text-white/20",
-								inputWrapper:
-									"bg-white/5 border-white/10 hover:border-blue-500/30 focus-within:!border-blue-500/50 transition-all rounded-xl h-12",
-							}}
-						/>
+						</p>
 					</div>
+				</div>
 
-					{/* Applications List */}
-					<div className="flex-1 overflow-y-auto p-6 space-y-3 scrollbar-thin scrollbar-thumb-white/10">
-						{isLoading ? (
-							<div className="h-full flex flex-col items-center justify-center space-y-4">
-								<Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-								<span className="text-white/40 animate-pulse">
-									Loading applications...
-								</span>
-							</div>
-						) : (
-							renderApplicationsList()
-						)}
-					</div>
+				{/* Search */}
+				<div className="p-6 pb-2 flex-shrink-0">
+					<Input
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+						placeholder={
+							AssociateApplicationsFlyoutPropsConstants.Hints
+								.Search
+						}
+						variant="bordered"
+						startContent={
+							<Search className="w-4 h-4 text-white/40" />
+						}
+						classNames={{
+							input: "text-white placeholder:text-white/20",
+							inputWrapper:
+								"bg-white/5 border-white/10 hover:border-blue-500/30 focus-within:!border-blue-500/50 transition-all rounded-xl h-12",
+						}}
+					/>
+				</div>
 
-					{/* Footer */}
-					<div className="p-6 pt-2 border-t border-white/10 bg-black/40 backdrop-blur-xl flex-shrink-0">
-						<div className="flex items-center justify-between">
-							<p className="text-white/30 text-xs">
-								{localSelectedId !== 0
-									? `1 application selected`
-									: "No application selected"}
-							</p>
-							<div className="flex items-center justify-start space-x-3 mt-4">
-								<div className="relative">
-									<Button
-										onPress={handleConfirm}
-										className="group relative bg-gradient-to-r from-blue-400 to-cyan-500 text-white font-semibold hover:from-blue-500 hover:to-cyan-600 shadow-lg hover:shadow-blue-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
-										radius="full"
-									>
-										<div className="flex items-center">
-											<Check className="w-4 h-4 group-hover:scale-110 transition-transform" />
-											<span className="max-w-0 overflow-hidden group-hover:max-w-[100px] transition-all duration-300 ease-in-out ml-0 group-hover:ml-2">
-												Confirm
-											</span>
-										</div>
-									</Button>
-								</div>
+				{/* Applications List */}
+				<div className="flex-1 overflow-y-auto p-6 space-y-3 scrollbar-thin scrollbar-thumb-white/10">
+					{isLoading ? (
+						<div className="h-full flex flex-col items-center justify-center space-y-4">
+							<Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+							<span className="text-white/40 animate-pulse">
+								Loading applications...
+							</span>
+						</div>
+					) : (
+						renderApplicationsList()
+					)}
+				</div>
+
+				{/* Footer */}
+				<div className="p-6 pt-2 border-t border-white/10 bg-black/40 backdrop-blur-xl flex-shrink-0">
+					<div className="flex items-center justify-between">
+						<p className="text-white/30 text-xs">
+							{localSelectedId !== 0
+								? `1 application selected`
+								: "No application selected"}
+						</p>
+						<div className="flex items-center justify-start space-x-3 mt-4">
+							<div className="relative">
+								<Button
+									onPress={handleConfirm}
+									className="group relative bg-gradient-to-r from-blue-400 to-cyan-500 text-white font-semibold hover:from-blue-500 hover:to-cyan-600 shadow-lg hover:shadow-blue-500/50 transition-all duration-300 overflow-hidden whitespace-nowrap disabled:opacity-50"
+									radius="full"
+								>
+									<div className="flex items-center">
+										<Check className="w-4 h-4 group-hover:scale-110 transition-transform" />
+										<span className="max-w-0 overflow-hidden group-hover:max-w-[100px] transition-all duration-300 ease-in-out ml-0 group-hover:ml-2">
+											Confirm
+										</span>
+									</div>
+								</Button>
 							</div>
 						</div>
 					</div>
 				</div>
-			</>
+			</div>
 		)
 	);
 }

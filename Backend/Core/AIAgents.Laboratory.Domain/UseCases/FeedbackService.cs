@@ -107,10 +107,9 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
 
-            if (currentLoggedinUser == ADMIN_EMAIL_ADDRESS)
-                return await feedbackDataManager.GetAllBugReportsDataAsync(currentLoggedinUser).ConfigureAwait(false);
-            else
-                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
+            return await this.GetRespectiveFeedbackResponseAsync(
+                currentUserEmail: currentLoggedinUser,
+                dataManagerMethod: feedbackDataManager.GetAllBugReportsDataAsync).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -134,10 +133,9 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
 
-            if (currentLoggedinUser == ADMIN_EMAIL_ADDRESS)
-                return await feedbackDataManager.GetAllSubmittedFeatureRequestsAsync(currentLoggedinUser).ConfigureAwait(false);
-            else
-                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
+            return await this.GetRespectiveFeedbackResponseAsync(
+                currentUserEmail: currentLoggedinUser,
+                dataManagerMethod: feedbackDataManager.GetAllSubmittedFeatureRequestsAsync).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -149,4 +147,24 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
             logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
         }
     }
+
+    #region PRIVATE METHODS
+
+    /// <summary>
+    /// Gets the respective feedback response based on the user email. If the user is admin, it will return the data from data manager, otherwise it will throw unauthorized access exception.
+    /// </summary>
+    /// <typeparam name="TResponse">The response type inferred.</typeparam>
+    /// <param name="currentUserEmail">The current logged in user email address.</param>
+    /// <param name="dataManagerMethod">The data manager method to perform the respective action.</param>
+    /// <returns>The response type inferred from <see cref="TResponse"/>.</returns>
+    /// <exception cref="UnauthorizedAccessException">If user is not admin, return unauthentication error.</exception>
+    private async Task<TResponse> GetRespectiveFeedbackResponseAsync<TResponse>(string currentUserEmail, Func<string, Task<TResponse>> dataManagerMethod)
+    {
+        if (currentUserEmail == ADMIN_EMAIL_ADDRESS)
+            return await dataManagerMethod(currentUserEmail).ConfigureAwait(false);
+        else
+            throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
+    }
+
+    #endregion
 }

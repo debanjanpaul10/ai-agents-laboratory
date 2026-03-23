@@ -79,7 +79,7 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
             await foreach (var chunk in memoryStore.GetNearestMatchesAsync(collectionName: agentId, embedding: queryEmbedding, limit: 5).ConfigureAwait(false))
                 relevantChunks.Add(chunk);
 
-            if (relevantChunks is null || relevantChunks.Count == 0)
+            if (relevantChunks.Count == 0)
                 return string.Empty;
 
             return string.Join("\n\n", relevantChunks.Where(c => !string.IsNullOrEmpty(c.Record.Metadata.Text)).Select(c => c.Record.Metadata.Text));
