@@ -11,15 +11,18 @@ using static AIAgents.Laboratory.Domain.Helpers.Constants;
 namespace AIAgents.Laboratory.Domain.UseCases;
 
 /// <summary>
-/// The Feedback Service class.
+/// The <c>FeedbackService</c> class provides functionalities to handle user feedback, including bug reports and feature requests. 
 /// </summary>
+/// <remarks>It interacts with a data manager to store feedback data and an email notification service to notify administrators of new feedback submissions. 
+/// The service also includes methods to retrieve submitted feedback for administrative review, ensuring that only authorized users can access this information.</remarks>
 /// <param name="logger">The logger service.</param>
 /// <param name="configuration">The configuration.</param>
 /// <param name="correlationContext">The correlation context for logging.</param>
 /// <param name="feedbackDataManager">The feedback data manager.</param>
 /// <param name="emailNotificationService">The email notification service.</param>
 /// <seealso cref="IFeedbackService"/>
-public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, ICorrelationContext correlationContext, IFeedbackDataManager feedbackDataManager, IEmailNotificationService emailNotificationService) : IFeedbackService
+public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, ICorrelationContext correlationContext,
+    IFeedbackDataManager feedbackDataManager, IEmailNotificationService emailNotificationService) : IFeedbackService
 {
     /// <summary>
     /// The admin email address from configuration.
