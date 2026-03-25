@@ -1,14 +1,28 @@
-﻿namespace AIAgents.Laboratory.Domain.DomainEntities;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace AIAgents.Laboratory.Domain.DomainEntities;
 
 /// <summary>
 /// The registered application class representing the registered applications in the system.
 /// </summary>
 /// <seealso cref="BaseDomainModel"/>
+[BsonIgnoreExtraElements]
 public sealed record RegisteredApplication : BaseDomainModel
 {
     /// <summary>
+    /// The unique identifier for the registered application, represented as an ObjectId in MongoDB.
+    /// </summary>
+    [BsonId]
+    public ObjectId _id { get; set; }
+
+    /// <summary>
     /// Gets or sets the identifier of the registered application.
     /// </summary>
+    /// <summary>
+    /// The Tool skill id.
+    /// </summary>
+    [BsonElement("Id")]
     public int Id { get; set; }
 
     /// <summary>

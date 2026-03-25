@@ -87,24 +87,6 @@ public static class DIContainer
         });
     }
 
-    /// <summary>
-    /// Configures health check monitoring and UI for the application by adding health check endpoints and in-memory storage to the service collection.
-    /// </summary>
-    /// <remarks>This method sets the evaluation interval for health checks, limits the number of history entries per endpoint, restricts the maximum number of concurrent API requests, and registers an endpoint for health status. 
-    /// It also configures in-memory storage for health check data. Use this method to enable health check UI and monitoring features in the application.</remarks>
-    /// <param name="services">The collection of services to which health check monitoring and UI components are added.</param>
-    internal static void ConfigureHealthChecks(this IServiceCollection services)
-    {
-        services.AddHealthChecksUI(opt =>
-        {
-            opt.SetEvaluationTimeInSeconds(60);
-            opt.MaximumHistoryEntriesPerEndpoint(60);
-            opt.SetApiMaxActiveRequests(1);
-            opt.AddHealthCheckEndpoint(HealthCheckConstants.AppHealthCheckName, HealthCheckConstants.AppHealthCheckEndpoint);
-
-        }).AddInMemoryStorage();
-    }
-
     #region PRIVATE METHODS
 
     /// <summary>
