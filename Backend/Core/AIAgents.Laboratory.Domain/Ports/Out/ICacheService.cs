@@ -1,4 +1,4 @@
-﻿namespace AIAgents.Laboratory.Domain.DrivenPorts;
+﻿namespace AIAgents.Laboratory.Domain.Ports.Out;
 
 /// <summary>
 /// Cache service interface.

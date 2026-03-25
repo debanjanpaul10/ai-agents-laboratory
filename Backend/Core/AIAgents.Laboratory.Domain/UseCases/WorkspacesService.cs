@@ -2,9 +2,9 @@ using System.Globalization;
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
-using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.In;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -42,22 +42,26 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// </summary>
     /// <param name="agentsWorkspaceData">The agents workspace data.</param>
     /// <param name="currentUserEmail">The current user email address.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> CreateNewWorkspaceAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail)
+    public async Task<bool> CreateNewWorkspaceAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
         ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
 
             agentsWorkspaceData.AgentWorkspaceGuid = Guid.NewGuid().ToString();
             agentsWorkspaceData.PrepareAuditEntityData(currentUser: currentUserEmail);
             return await mongoDatabaseService.SaveDataAsync(
                 data: agentsWorkspaceData,
                 databaseName: this.MongoDatabaseName,
-                collectionName: this.WorkspacesCollectionName).ConfigureAwait(false);
+                collectionName: this.WorkspacesCollectionName,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -66,7 +70,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
         }
     }
 
@@ -75,19 +80,25 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// </summary>
     /// <param name="workspaceGuidId">The workspace guid id.</param>
     /// <param name="currentUserEmail">The current logged in user email address.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> DeleteExistingWorkspaceAsync(string workspaceGuidId, string currentUserEmail)
+    public async Task<bool> DeleteExistingWorkspaceAsync(string workspaceGuidId, string currentUserEmail, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(workspaceGuidId);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuidId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuidId, currentUserEmail }));
 
             var filter = Builders<AgentsWorkspaceDomain>.Filter.Where(ws => ws.IsActive && ws.AgentWorkspaceGuid == workspaceGuidId);
             var allWorkspaces = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName, collectionName: this.WorkspacesCollectionName, filter).ConfigureAwait(false);
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.WorkspacesCollectionName,
+                filter,
+                cancellationToken
+            ).ConfigureAwait(false);
             var updateWorkspace = allWorkspaces.FirstOrDefault() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
             if (updateWorkspace.CreatedBy != currentUserEmail)
@@ -100,8 +111,14 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
                 Builders<AgentsWorkspaceDomain>.Update.Set(x => x.ModifiedBy, currentUserEmail)
             };
             var update = Builders<AgentsWorkspaceDomain>.Update.Combine(updates);
+
             return await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter, update, databaseName: this.MongoDatabaseName, collectionName: this.WorkspacesCollectionName).ConfigureAwait(false);
+                filter,
+                update,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.WorkspacesCollectionName,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -110,7 +127,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuidId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuidId, currentUserEmail }));
         }
     }
 
@@ -118,8 +136,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// Gets the collection of all available workspaces.
     /// </summary>
     /// <param name="currentUserEmail">The current logged in user name.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="AgentsWorkspaceDomain"/></returns>
-    public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(string currentUserEmail)
+    public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(string currentUserEmail, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -127,7 +146,11 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
 
             var filter = Builders<AgentsWorkspaceDomain>.Filter.And(Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true));
             return await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName, collectionName: this.WorkspacesCollectionName, filter).ConfigureAwait(false);
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.WorkspacesCollectionName,
+                filter,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -145,8 +168,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// </summary>
     /// <param name="workspaceId">The workspace id.</param>
     /// <param name="currentUserEmail">The current logged in user email</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The agent workspace domain model.</returns>
-    public async Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(string workspaceId, string currentUserEmail)
+    public async Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(string workspaceId, string currentUserEmail, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(workspaceId);
 
@@ -158,7 +182,11 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
                 Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.AgentWorkspaceGuid, workspaceId));
 
             var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName, collectionName: this.WorkspacesCollectionName, filter).ConfigureAwait(false);
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.WorkspacesCollectionName,
+                filter,
+                cancellationToken
+            ).ConfigureAwait(false);
             return allData?.First() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
         }
         catch (Exception ex)
@@ -176,8 +204,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// Gets the workspace group chat response.
     /// </summary>
     /// <param name="chatRequest">The workspace agent chat request dto model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The group chat response.</returns>
-    public async Task<GroupChatResponseDomain> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDomain chatRequest)
+    public async Task<GroupChatResponseDomain> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(chatRequest);
         ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.WorkspaceId);
@@ -186,11 +215,15 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+
             if (string.IsNullOrWhiteSpace(chatRequest.ConversationId))
                 chatRequest.ConversationId = Guid.NewGuid().ToString();
 
             var workspaceDetails = await this.GetWorkspaceByWorkspaceIdAsync(
-                workspaceId: chatRequest.WorkspaceId, currentUserEmail: chatRequest.ApplicationName).ConfigureAwait(false);
+                workspaceId: chatRequest.WorkspaceId,
+                currentUserEmail: chatRequest.ApplicationName,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             if (workspaceDetails is null || string.IsNullOrWhiteSpace(workspaceDetails.Id))
                 throw new FileNotFoundException(string.Format(CultureInfo.InvariantCulture, ExceptionConstants.WorkspaceNotFoundExceptionMessage, chatRequest.WorkspaceId));
@@ -198,7 +231,11 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
             if (!workspaceDetails.IsGroupChatEnabled)
                 throw new MethodAccessException(ExceptionConstants.GroupchatNotEnabledExceptionMessage);
 
-            var groupResponse = await orchestratorService.GetOrchestratorAgentResponseAsync(chatRequest, workspaceDetails).ConfigureAwait(false);
+            var groupResponse = await orchestratorService.GetOrchestratorAgentResponseAsync(
+                chatRequest,
+                workspaceDetails,
+                cancellationToken
+            ).ConfigureAwait(false);
             return new GroupChatResponseDomain()
             {
                 AgentResponse = groupResponse.FinalResponse,
@@ -220,8 +257,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// Invoke the workspace agent with user message and get the response.
     /// </summary>
     /// <param name="chatRequest">The chat request domain model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The string response from AI.</returns>
-    public async Task<string> InvokeWorkspaceAgentAsync(WorkspaceAgentChatRequestDomain chatRequest)
+    public async Task<string> InvokeWorkspaceAgentAsync(WorkspaceAgentChatRequestDomain chatRequest, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(chatRequest);
         ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.WorkspaceId);
@@ -237,7 +275,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
 
             var workspaceDetails = await this.GetWorkspaceByWorkspaceIdAsync(
                 workspaceId: chatRequest.WorkspaceId,
-                currentUserEmail: chatRequest.ApplicationName).ConfigureAwait(false) ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
+                currentUserEmail: chatRequest.ApplicationName,
+                cancellationToken
+            ).ConfigureAwait(false) ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
             var agentDetails = workspaceDetails.ActiveAgentsListInWorkspace.FirstOrDefault(agent => agent.AgentGuid == chatRequest.AgentId)
                 ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
@@ -249,7 +289,10 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
                 ConversationId = chatRequest.ConversationId,
                 UserMessage = chatRequest.UserMessage,
             };
-            return await agentChatService.GetAgentChatResponseAsync(chatRequest: agentChatRequestModel).ConfigureAwait(false);
+            return await agentChatService.GetAgentChatResponseAsync(
+                chatRequest: agentChatRequestModel,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -267,20 +310,26 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// </summary>
     /// <param name="agentsWorkspaceData">The agents workspace data domain model.</param>
     /// <param name="currentUserEmail">The current logged in user email.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> UpdateExistingWorkspaceDataAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail)
+    public async Task<bool> UpdateExistingWorkspaceDataAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
 
             var filter = Builders<AgentsWorkspaceDomain>.Filter.And(
                    Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.AgentWorkspaceGuid, agentsWorkspaceData.AgentWorkspaceGuid));
             var allWorkspacesData = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName, collectionName: this.WorkspacesCollectionName, filter).ConfigureAwait(false);
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.WorkspacesCollectionName,
+                filter,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             var existingWorkspaceData = allWorkspacesData.FirstOrDefault() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
             if (!existingWorkspaceData.WorkspaceUsers.Contains(currentUserEmail))
@@ -294,10 +343,15 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
                 Builders<AgentsWorkspaceDomain>.Update.Set(x => x.DateModified, DateTime.UtcNow),
                 Builders<AgentsWorkspaceDomain>.Update.Set(x => x.ModifiedBy, currentUserEmail)
             };
-
             var update = Builders<AgentsWorkspaceDomain>.Update.Combine(updates);
+
             return await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter, update, databaseName: this.MongoDatabaseName, collectionName: this.WorkspacesCollectionName).ConfigureAwait(false);
+                filter,
+                update,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.WorkspacesCollectionName,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -306,7 +360,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
         }
     }
 }

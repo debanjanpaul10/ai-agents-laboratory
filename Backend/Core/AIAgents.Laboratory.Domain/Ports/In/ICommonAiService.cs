@@ -1,6 +1,6 @@
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 
-namespace AIAgents.Laboratory.Domain.DrivingPorts;
+namespace AIAgents.Laboratory.Domain.Ports.In;
 
 /// <summary>
 /// Common AI Service interface.
@@ -31,6 +31,8 @@ public interface ICommonAiService
     /// Gets the top active agents data list and the agents count asynchronously.
     /// </summary>
     /// <param name="userName">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A tupple containing the list of agents and the top 3 active ai agents.</returns>
-    Task<(int ActiveAgentsCount, IEnumerable<AgentDataDomain> TopActiveAgentsList)> GetTopActiveAgentsDataAsync(string userName);
+    Task<(int ActiveAgentsCount, IEnumerable<AgentDataDomain> TopActiveAgentsList)> GetTopActiveAgentsDataAsync(
+        string userName, CancellationToken cancellationToken = default);
 }

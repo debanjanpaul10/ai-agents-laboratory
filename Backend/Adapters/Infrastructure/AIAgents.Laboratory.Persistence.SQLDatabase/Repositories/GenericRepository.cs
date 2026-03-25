@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Context;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Helpers.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -19,12 +19,15 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// Adds a new entity to the repository.
     /// </summary>
     /// <param name="entity">The generic entity.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The generic entity.
     /// </returns>
-    public async Task<TEntity> AddAsync(TEntity entity)
+    public async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        await context.Set<TEntity>().AddAsync(entity).ConfigureAwait(false);
+        await context.Set<TEntity>()
+            .AddAsync(entity, cancellationToken)
+            .ConfigureAwait(false);
         return entity;
     }
 
@@ -32,12 +35,15 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// Adds a range of entities to the repository.
     /// </summary>
     /// <param name="entities">The list of generic entity.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The list of generic entity.
     /// </returns>
-    public async Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities)
+    public async Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
     {
-        await context.Set<TEntity>().AddRangeAsync(entities).ConfigureAwait(false);
+        await context.Set<TEntity>()
+            .AddRangeAsync(entities, cancellationToken)
+            .ConfigureAwait(false);
         return entities;
     }
 
@@ -45,26 +51,33 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// Finds entities based on the provided predicate.
     /// </summary>
     /// <param name="predicate">The entity finder predicate.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The list of generic entity.
     /// </returns>
-    public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
+    public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
-        return await context.Set<TEntity>().AsNoTracking()
-            .Where(predicate).ToListAsync().ConfigureAwait(false);
+        return await context.Set<TEntity>()
+            .AsNoTracking()
+            .Where(predicate)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>
     /// Gets the first entity that matches the provided predicate.
     /// </summary>
     /// <param name="predicate">The filter predicate.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The generic entity.
     /// </returns>
-    public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+    public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
-        return await context.Set<TEntity>().AsNoTracking()
-            .FirstOrDefaultAsync(predicate).ConfigureAwait(false);
+        return await context.Set<TEntity>()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(predicate, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>
@@ -75,10 +88,17 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// <param name="pageSize">The page size.</param>
     /// <param name="pageNumber">The page number.</param>
     /// <param name="isActiveOnly">The isactive only boolean flag.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The list of generic entity.
     /// </returns>
-    public async Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? filter = null, string? includeProperties = null, int pageSize = 0, int pageNumber = 1, bool isActiveOnly = true)
+    public async Task<List<TEntity>> GetAllAsync(
+        Expression<Func<TEntity, bool>>? filter = null,
+        string? includeProperties = null,
+        int pageSize = 0,
+        int pageNumber = 1,
+        bool isActiveOnly = true,
+        CancellationToken cancellationToken = default)
     {
         IQueryable<TEntity> query = context.Set<TEntity>();
         query = query.WhereIsActive(isActiveOnly);
@@ -96,7 +116,9 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
             foreach (var includeProperty in includeProperties.Split([','], StringSplitOptions.RemoveEmptyEntries))
                 query = query.Include(includeProperty);
 
-        return await query.AsNoTracking().ToListAsync().ConfigureAwait(false);
+        return await query.AsNoTracking()
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>
@@ -111,7 +133,13 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// <returns>
     /// A tupple containing values.
     /// </returns>
-    public async Task<(List<TEntity>, int, bool)> GetAllPagedAsync(Expression<Func<TEntity, bool>>? filter = null, Expression<Func<TEntity, object>>? orderByProperty = null, bool ascending = true, int pageSize = 1000, int pageNumber = 1, params Expression<Func<TEntity, object>>[] includeProperties)
+    public async Task<(List<TEntity>, int, bool)> GetAllPagedAsync(
+        Expression<Func<TEntity, bool>>? filter = null,
+        Expression<Func<TEntity, object>>? orderByProperty = null,
+        bool ascending = true,
+        int pageSize = 1000,
+        int pageNumber = 1,
+        params Expression<Func<TEntity, object>>[] includeProperties)
     {
         bool hasNextPage = false;
         IQueryable<TEntity> query = context.Set<TEntity>();
@@ -146,10 +174,11 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// <param name="tracked">The is tracked boolean flag.</param>
     /// <param name="includeProperties">The included properties string.</param>
     /// <param name="isActiveOnly">The isactive only boolean flag.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The generic entity.
     /// </returns>
-    public async Task<TEntity> GetAsync(Expression<Func<TEntity, bool>>? filter = null, bool tracked = true, string? includeProperties = null, bool isActiveOnly = true)
+    public async Task<TEntity> GetAsync(Expression<Func<TEntity, bool>>? filter = null, bool tracked = true, string? includeProperties = null, bool isActiveOnly = true, CancellationToken cancellationToken = default)
     {
         IQueryable<TEntity> query = context.Set<TEntity>();
         query = query.WhereIsActive(isActiveOnly);
@@ -163,7 +192,9 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
             foreach (var includedProperty in includeProperties.Split([','], StringSplitOptions.RemoveEmptyEntries))
                 query = query.Include(includedProperty);
 
-        return await query.AsNoTracking().FirstOrDefaultAsync().ConfigureAwait(false) ?? default!;
+        return await query.AsNoTracking()
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false) ?? default!;
     }
 
     /// <summary>
@@ -187,12 +218,14 @@ public sealed class GenericRepository<TEntity>(SqlDbContext context) : IReposito
     /// <summary>
     /// Saves all changes made in this context to the underlying database.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The integer value.
     /// </returns>
-    public async Task<int> SaveChangesAsync()
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await context.SaveChangesAsync().ConfigureAwait(false);
+        return await context.SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>

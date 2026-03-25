@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Context;
 using AIAgents.Laboratory.Persistence.SQLDatabase.DataManagers;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Mapper;

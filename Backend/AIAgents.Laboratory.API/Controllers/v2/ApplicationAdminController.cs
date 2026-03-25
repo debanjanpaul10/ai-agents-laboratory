@@ -33,6 +33,7 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     /// <summary>
     /// Gets all submitted feature requests asynchronous.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="NewFeatureRequestDataDto"/></returns>
     [HttpGet(ApplicationAdminRoutes.GetAllSubmittedFeatureRequests_Route)]
     [ProducesResponseType(typeof(IEnumerable<NewFeatureRequestDataDto>), StatusCodes.Status200OK)]
@@ -40,7 +41,7 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllSubmittedFeatureRequestsAction.Summary, Description = GetAllSubmittedFeatureRequestsAction.Description, OperationId = GetAllSubmittedFeatureRequestsAction.OperationId)]
-    public async Task<ResponseDto> GetAllSubmittedFeatureRequestsAsync()
+    public async Task<ResponseDto> GetAllSubmittedFeatureRequestsAsync(CancellationToken cancellationToken = default)
     {
         IEnumerable<NewFeatureRequestDataDto> response = [];
         try
@@ -50,11 +51,18 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
 
             if (base.IsAuthorized(UserBased))
             {
-                response = await applicationAdminHandler.GetAllSubmittedFeatureRequestsAsync(base.UserEmail).ConfigureAwait(false);
+                response = await applicationAdminHandler.GetAllSubmittedFeatureRequestsAsync(
+                    currentLoggedinUser: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (response is not null)
-                    return HandleSuccessRequestResponse(response);
+                    return HandleSuccessRequestResponse(
+                        responseData: response);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -74,6 +82,7 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     /// <summary>
     /// Gets all bug reports data asynchronous.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="BugReportDataDto"/></returns>
     [HttpGet(ApplicationAdminRoutes.GetAllReportedBugs_Route)]
     [ProducesResponseType(typeof(IEnumerable<BugReportDataDto>), StatusCodes.Status200OK)]
@@ -81,7 +90,7 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllBugReportsDataAction.Summary, Description = GetAllBugReportsDataAction.Description, OperationId = GetAllBugReportsDataAction.OperationId)]
-    public async Task<ResponseDto> GetAllBugReportsDataAsync()
+    public async Task<ResponseDto> GetAllBugReportsDataAsync(CancellationToken cancellationToken = default)
     {
         IEnumerable<BugReportDataDto> response = [];
         try
@@ -91,11 +100,18 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
 
             if (base.IsAuthorized(UserBased))
             {
-                response = await applicationAdminHandler.GetAllBugReportsDataAsync(base.UserEmail).ConfigureAwait(false);
+                response = await applicationAdminHandler.GetAllBugReportsDataAsync(
+                    currentLoggedinUser: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (response is not null)
-                    return HandleSuccessRequestResponse(response);
+                    return HandleSuccessRequestResponse(
+                        responseData: response);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -132,8 +148,11 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
 
             if (base.IsAuthorized(UserBased))
             {
-                response = applicationAdminHandler.IsAdminAccessEnabledAsync(base.UserEmail);
-                return HandleSuccessRequestResponse(response);
+                response = applicationAdminHandler.IsAdminAccessEnabledAsync(
+                    currentLoggedInUser: base.UserEmail);
+
+                return HandleSuccessRequestResponse(
+                    responseData: response);
             }
 
             return HandleUnAuthorizedRequestResponse();

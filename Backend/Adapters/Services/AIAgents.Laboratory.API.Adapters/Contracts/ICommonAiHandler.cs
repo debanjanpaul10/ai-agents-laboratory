@@ -25,6 +25,7 @@ public interface ICommonAiHandler
     /// Gets the list of top 3 active ai agents being used.
     /// </summary>
     /// <param name="userName">The user name of the current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The top active agents data DTO.</returns>
-    Task<TopActiveAgentsDTO> GetTopActiveAgentsDataAsync(string userName);
+    Task<TopActiveAgentsDTO> GetTopActiveAgentsDataAsync(string userName, CancellationToken cancellationToken = default);
 }

@@ -1,8 +1,8 @@
 ﻿using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.In;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Processor.Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -52,7 +52,9 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
 
             var agentData = await agentsService.GetAgentDataByIdAsync(
                 agentId: chatRequest.AgentId,
-                userEmail: string.Empty).ConfigureAwait(false);
+                userEmail: string.Empty,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             if (agentData is null || string.IsNullOrEmpty(agentData.AgentMetaPrompt))
             {
@@ -72,7 +74,8 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
             if (IsKnowledgeBaseServiceAllowed && agentData.HasKnowledgeBaseContent())
                 chatMessage.KnowledgeBase = await knowledgeBaseProcessor.GetRelevantKnowledgeAsync(
                     query: chatRequest.UserMessage,
-                    agentId: agentData.AgentId).ConfigureAwait(false);
+                    agentId: agentData.AgentId
+                ).ConfigureAwait(false);
 
             // Use AI Vision services if configured
             if (IsAiVisionServiceAllowed && agentData.AiVisionImagesData is not null && agentData.AiVisionImagesData.Any())
@@ -83,13 +86,15 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
                 response = await this.GetResponseWithIntegratedSkillAsync(
                     chatMessage: chatMessage,
                     associatedSkillGuids: agentData.AssociatedSkillGuids,
-                    cancellationToken).ConfigureAwait(false);
+                    cancellationToken
+                ).ConfigureAwait(false);
             else
                 response = await aiServices.GetAiFunctionResponseAsync(
                     input: chatMessage,
                     pluginName: ApplicationPluginsHelpers.PluginName,
                     functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName,
-                    cancellationToken).ConfigureAwait(false);
+                    cancellationToken
+                ).ConfigureAwait(false);
 
             return response;
         }
@@ -120,7 +125,9 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
 
             var associatedSkill = await toolSkillsService.GetToolSkillBySkillIdAsync(
                 toolSkillId: associatedSkillGuids[0],
-                currentUserEmail: string.Empty).ConfigureAwait(false);
+                currentUserEmail: string.Empty,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             ArgumentNullException.ThrowIfNull(associatedSkill);
             ArgumentException.ThrowIfNullOrWhiteSpace(associatedSkill.ToolSkillMcpServerUrl);
@@ -130,7 +137,8 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
                 mcpServerUrl: associatedSkill.ToolSkillMcpServerUrl,
                 pluginName: ApplicationPluginsHelpers.PluginName,
                 functionName: ApplicationPluginsHelpers.GetChatMessageResponseFunction.FunctionName,
-                cancellationToken).ConfigureAwait(false);
+                cancellationToken
+            ).ConfigureAwait(false);
             return response;
 
         }

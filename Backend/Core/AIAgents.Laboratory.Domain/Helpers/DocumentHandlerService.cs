@@ -37,8 +37,9 @@ internal static class DocumentHandlerService
     /// Process the knowledge base document data async.
     /// </summary>
     /// <param name="agentData">The agent data.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task to wait on.</returns>
-    internal static async Task ProcessKnowledgebaseDocumentDataAsync(this AgentDataDomain agentData)
+    internal static async Task ProcessKnowledgebaseDocumentDataAsync(this AgentDataDomain agentData, CancellationToken cancellationToken = default)
     {
         if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any())
             throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
@@ -47,7 +48,11 @@ internal static class DocumentHandlerService
         foreach (var file in agentData.KnowledgeBaseDocument)
         {
             using var memoryStream = new MemoryStream();
-            await file.CopyToAsync(memoryStream);
+            await file.CopyToAsync(
+                memoryStream,
+                cancellationToken
+            ).ConfigureAwait(false);
+
             knowledgeBaseFiles.Add(new KnowledgeBaseDocumentDomain
             {
                 FileName = Path.GetFileName(file.FileName),

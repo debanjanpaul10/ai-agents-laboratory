@@ -1,6 +1,6 @@
 ﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 
-namespace AIAgents.Laboratory.Domain.DrivingPorts;
+namespace AIAgents.Laboratory.Domain.Ports.In;
 
 /// <summary>
 /// Defines methods for managing agent chat interaction services.

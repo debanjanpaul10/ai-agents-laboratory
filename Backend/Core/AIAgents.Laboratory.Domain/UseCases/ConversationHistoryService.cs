@@ -1,7 +1,7 @@
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -36,8 +36,9 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
     /// Gets the conversation history data for current chat.
     /// </summary>
     /// <param name="userName">The user name.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The conversation history domain.</returns>
-    public async Task<ConversationHistoryDomain> GetConversationHistoryAsync(string userName)
+    public async Task<ConversationHistoryDomain> GetConversationHistoryAsync(string userName, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName);
 
@@ -48,7 +49,9 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
             var allConversationHistoryData = await mongoDatabaseService.GetDataFromCollectionAsync(
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.ConversationHistoryCollectionName,
-                filter: Builders<ConversationHistoryDomain>.Filter.Where(x => x.UserName == userName && x.IsActive)).ConfigureAwait(false);
+                filter: Builders<ConversationHistoryDomain>.Filter.Where(x => x.UserName == userName && x.IsActive),
+                cancellationToken
+            ).ConfigureAwait(false);
 
             if (allConversationHistoryData.Any())
             {
@@ -68,7 +71,9 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
                 await mongoDatabaseService.SaveDataAsync(
                     data: newConversationHistory,
                     databaseName: this.MongoDatabaseName,
-                    collectionName: this.ConversationHistoryCollectionName).ConfigureAwait(false);
+                    collectionName: this.ConversationHistoryCollectionName,
+                    cancellationToken
+                ).ConfigureAwait(false);
                 return newConversationHistory;
             }
         }
@@ -87,20 +92,26 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
     /// Saves the current message data to conversation history.
     /// </summary>
     /// <param name="conversationHistory">The conversation history.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> SaveMessageToConversationHistoryAsync(ConversationHistoryDomain conversationHistory)
+    public async Task<bool> SaveMessageToConversationHistoryAsync(ConversationHistoryDomain conversationHistory, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(conversationHistory);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, conversationHistory.ConversationId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, conversationHistory.ConversationId }));
 
-            var filter = Builders<ConversationHistoryDomain>.Filter.Where(x => x.ConversationId == conversationHistory.ConversationId && x.UserName == conversationHistory.UserName);
+            var filter = Builders<ConversationHistoryDomain>.Filter
+                .Where(x => x.ConversationId == conversationHistory.ConversationId && x.UserName == conversationHistory.UserName);
+
             var allConversationHistoryData = await mongoDatabaseService.GetDataFromCollectionAsync(
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.ConversationHistoryCollectionName,
-                filter: filter).ConfigureAwait(false);
+                filter: filter,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             var conversationHistoryData = allConversationHistoryData.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
@@ -113,11 +124,14 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
                 .Set(x => x.ChatHistory, updatedChatHistory)
                 .Set(x => x.LastModifiedOn, DateTime.UtcNow)
                 .Set(x => x.IsActive, true);
+
             return await mongoDatabaseService.UpdateDataInCollectionAsync(
                 filter: filter,
                 update: update,
                 databaseName: this.MongoDatabaseName,
-                collectionName: this.ConversationHistoryCollectionName).ConfigureAwait(false);
+                collectionName: this.ConversationHistoryCollectionName,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -126,7 +140,8 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, conversationHistory.ConversationId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(SaveMessageToConversationHistoryAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, conversationHistory.ConversationId }));
         }
     }
 
@@ -134,25 +149,31 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
     /// Clears the conversation history data for the user.
     /// </summary>
     /// <param name="userName">The user name for user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> ClearConversationHistoryForUserAsync(string userName)
+    public async Task<bool> ClearConversationHistoryForUserAsync(string userName, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
 
             var filter = Builders<ConversationHistoryDomain>.Filter.Where(x => x.UserName == userName && x.IsActive);
             var allConversationHistoryData = await mongoDatabaseService.GetDataFromCollectionAsync(
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.ConversationHistoryCollectionName,
-                filter: filter).ConfigureAwait(false);
+                filter: filter,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             return allConversationHistoryData.Any() && await mongoDatabaseService.DeleteDataFromCollectionAsync(
                 filter: filter,
                 databaseName: this.MongoDatabaseName,
-                collectionName: this.ConversationHistoryCollectionName).ConfigureAwait(false);
+                collectionName: this.ConversationHistoryCollectionName,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -161,7 +182,8 @@ public sealed class ConversationHistoryService(ILogger<ConversationHistoryServic
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
         }
     }
 }

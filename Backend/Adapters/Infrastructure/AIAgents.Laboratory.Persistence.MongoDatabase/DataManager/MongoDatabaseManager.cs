@@ -1,7 +1,7 @@
 ﻿using System.Data.SqlTypes;
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -25,16 +25,26 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     /// <param name="databaseName">Name of the database.</param>
     /// <param name="collectionName">Name of the collection.</param>
     /// <param name="filter">The filter definition to apply when querying the collection.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The filtered mongo db collection results.</returns>
-    public async Task<IEnumerable<TResult>> GetDataFromCollectionAsync<TResult>(string databaseName, string collectionName, FilterDefinition<TResult> filter)
+    public async Task<IEnumerable<TResult>> GetDataFromCollectionAsync<TResult>(string databaseName, string collectionName, FilterDefinition<TResult> filter, CancellationToken cancellationToken = default)
     {
+        IEnumerable<TResult>? response = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TResult>(collectionName);
             if (collectionData is not null)
-                return await collectionData.Find(filter).ToListAsync().ConfigureAwait(false);
+            {
+                response = await collectionData
+                    .Find(filter)
+                    .ToListAsync(cancellationToken)
+                    .ConfigureAwait(false);
+                return response;
+            }
 
             throw new SqlTypeException(ExceptionConstants.SomethingWentWrongMessageConstant);
         }
@@ -45,7 +55,8 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetDataFromCollectionAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName, response }));
         }
     }
 
@@ -57,16 +68,28 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     /// <param name="databaseName">Name of the database.</param>
     /// <param name="collectionName">Name of the collection.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> SaveDataAsync<TInput>(TInput data, string databaseName, string collectionName)
+    public async Task<bool> SaveDataAsync<TInput>(TInput data, string databaseName, string collectionName, CancellationToken cancellationToken = default)
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TInput>(collectionName);
             if (collectionData is not null)
             {
-                await collectionData.InsertOneAsync(data).ConfigureAwait(false);
+                var insertOptions = new InsertOneOptions()
+                {
+                    BypassDocumentValidation = true
+                };
+
+                await collectionData.InsertOneAsync(
+                    document: data,
+                    options: insertOptions,
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
+
                 return true;
             }
 
@@ -79,7 +102,8 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(SaveDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
         }
     }
 
@@ -92,20 +116,23 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     /// <param name="databaseName">Name of the database.</param>
     /// <param name="collectionName">Name of the collection.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> UpdateDataInCollectionAsync<TDocument>(FilterDefinition<TDocument> filter, UpdateDefinition<TDocument> update, string databaseName, string collectionName)
+    public async Task<bool> UpdateDataInCollectionAsync<TDocument>(FilterDefinition<TDocument> filter, UpdateDefinition<TDocument> update, string databaseName, string collectionName, CancellationToken cancellationToken = default)
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TDocument>(collectionName) ?? throw new FileNotFoundException(ExceptionConstants.CollectionDoesNotExistsMessage);
 
-            var result = await collectionData.UpdateOneAsync(filter, update).ConfigureAwait(false);
-            if (result.ModifiedCount == 0)
-                throw new SqlTypeException(ExceptionConstants.NoDocumentWasUpdatedMessageConstant);
+            var result = await collectionData.UpdateOneAsync(
+                filter,
+                update,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
 
-            return true;
+            return (result.ModifiedCount > 0);
         }
         catch (Exception ex)
         {
@@ -114,7 +141,8 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
         }
     }
 
@@ -126,20 +154,22 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
     /// <param name="databaseName">The database name.</param>
     /// <param name="collectionName">The collection name.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> DeleteDataFromCollectionAsync<TDocument>(FilterDefinition<TDocument> filter, string databaseName, string collectionName)
+    public async Task<bool> DeleteDataFromCollectionAsync<TDocument>(FilterDefinition<TDocument> filter, string databaseName, string collectionName, CancellationToken cancellationToken = default)
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TDocument>(collectionName) ?? throw new FileNotFoundException(ExceptionConstants.CollectionDoesNotExistsMessage);
 
-            var result = await collectionData.DeleteOneAsync(filter).ConfigureAwait(false);
-            if (result.DeletedCount == 0)
-                throw new SqlTypeException(ExceptionConstants.NoDocumentWasUpdatedMessageConstant);
+            var result = await collectionData.DeleteOneAsync(
+                filter,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
 
-            return true;
+            return (result.DeletedCount > 0);
         }
         catch (Exception ex)
         {
@@ -148,7 +178,8 @@ public sealed class MongoDatabaseManager(IMongoClient mongoClient, ILogger<Mongo
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
         }
     }
 }

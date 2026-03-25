@@ -1,4 +1,4 @@
-﻿namespace AIAgents.Laboratory.Domain.DrivenPorts;
+﻿namespace AIAgents.Laboratory.Domain.Ports.Out;
 
 /// <summary>
 /// The Unit of Work Interface.
@@ -10,32 +10,37 @@ public interface IUnitOfWork : IDisposable
     /// This method returns a repository for the specified entity type.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
+    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
     /// <returns>The generic entity type.</returns>
     IRepository<TEntity> Repository<TEntity>() where TEntity : class;
 
     /// <summary>
     /// This method saves all changes made in this context to the database asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
     /// <returns>The save changes count.</returns>
-    Task<int> SaveChangesAsync();
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// This method begins a new transaction asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
     /// <returns>A task to wait on.</returns>
-    Task BeginTransactionAsync();
+    Task BeginTransactionAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Commits all changes made in this context to the database asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
     /// <returns>A task to wait on.</returns>
-    Task CommitAsync();
+    Task CommitAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Rollbacks all changes made in this context to the database asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
     /// <returns>A task to wait on.</returns>
-    Task RollbackAsync();
+    Task RollbackAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Executes the SQL query asynchronous.

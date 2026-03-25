@@ -1,6 +1,6 @@
 ﻿using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Azure.Communication.Email;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -31,15 +31,23 @@ public sealed class EmailNotificationService(ILogger<EmailNotificationService> l
     /// <param name="subject">The email subject.</param>
     /// <param name="content">The email content.</param>
     /// <param name="recipient">The email recipient.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> SendEmailNotificationAsync(string subject, string content, string recipient)
+    public async Task<bool> SendEmailNotificationAsync(string subject, string content, string recipient, CancellationToken cancellationToken = default)
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(SendEmailNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, subject, content, recipient }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(SendEmailNotificationAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, subject, content, recipient }));
 
             EmailSendOperation emailSendingOperation = await emailClient.SendAsync(
-                wait: Azure.WaitUntil.Completed, senderAddress: EMAIL_COMMUNICATION_SENDER, recipientAddress: recipient, subject: subject, htmlContent: content).ConfigureAwait(false);
+                wait: Azure.WaitUntil.Completed,
+                senderAddress: EMAIL_COMMUNICATION_SENDER,
+                recipientAddress: recipient,
+                subject,
+                htmlContent: content,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
 
             EmailSendResult status = emailSendingOperation.Value;
             return status.Status == EmailSendStatus.Succeeded;
@@ -51,7 +59,8 @@ public sealed class EmailNotificationService(ILogger<EmailNotificationService> l
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(SendEmailNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, subject, content, recipient }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(SendEmailNotificationAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, subject, content, recipient }));
         }
     }
 }

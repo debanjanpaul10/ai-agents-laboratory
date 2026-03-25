@@ -1,6 +1,6 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Ports.In;
 using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
@@ -19,10 +19,14 @@ public sealed class ApplicationAdminHandler(IMapper mapper, IApplicationAdminSer
     /// Gets all bug reports data asynchronous.
     /// </summary>
     /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A list of <see cref="BugReportDataDto"/></returns>
-    public async Task<IEnumerable<BugReportDataDto>> GetAllBugReportsDataAsync(string currentLoggedinUser)
+    public async Task<IEnumerable<BugReportDataDto>> GetAllBugReportsDataAsync(string currentLoggedinUser, CancellationToken cancellationToken = default)
     {
-        var domainResult = await applicationAdminService.GetAllBugReportsDataAsync(currentLoggedinUser).ConfigureAwait(false);
+        var domainResult = await applicationAdminService.GetAllBugReportsDataAsync(
+            currentLoggedinUser,
+            cancellationToken
+        ).ConfigureAwait(false);
         return mapper.Map<IEnumerable<BugReportDataDto>>(domainResult);
     }
 
@@ -30,10 +34,14 @@ public sealed class ApplicationAdminHandler(IMapper mapper, IApplicationAdminSer
     /// Gets all submitted feature requests asynchronous.
     /// </summary>
     /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A list of <see cref="NewFeatureRequestDataDto"/></returns>
-    public async Task<IEnumerable<NewFeatureRequestDataDto>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser)
+    public async Task<IEnumerable<NewFeatureRequestDataDto>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser, CancellationToken cancellationToken = default)
     {
-        var domainResult = await applicationAdminService.GetAllSubmittedFeatureRequestsAsync(currentLoggedinUser).ConfigureAwait(false);
+        var domainResult = await applicationAdminService.GetAllSubmittedFeatureRequestsAsync(
+            currentLoggedinUser,
+            cancellationToken
+        ).ConfigureAwait(false);
         return mapper.Map<IEnumerable<NewFeatureRequestDataDto>>(domainResult);
     }
 

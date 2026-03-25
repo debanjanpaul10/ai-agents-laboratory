@@ -1,6 +1,6 @@
 ﻿using AIAgents.Laboratory.Domain.DomainEntities;
 
-namespace AIAgents.Laboratory.Domain.DrivenPorts;
+namespace AIAgents.Laboratory.Domain.Ports.Out;
 
 /// <summary>
 /// The AI Services interface.

@@ -62,8 +62,9 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
     /// two newline characters. If no relevant knowledge is found, the method returns an empty string.</remarks>
     /// <param name="query">The search query used to find relevant knowledge. Cannot be null or empty.</param>
     /// <param name="agentId">The unique identifier of the agent whose knowledge base is searched. Cannot be null or empty.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation. Optional.</param>
     /// <returns>A string containing the most relevant knowledge entries separated by double newlines, or an empty string if no relevant entries are found.</returns>
-    public async Task<string> GetRelevantKnowledgeAsync(string query, string agentId)
+    public async Task<string> GetRelevantKnowledgeAsync(string query, string agentId, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrEmpty(query);
         ArgumentException.ThrowIfNullOrEmpty(agentId);
@@ -72,11 +73,15 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { query, agentId }));
 
-            var queryEmbeddingResult = await embeddingGeneratorService.GenerateAsync(query).ConfigureAwait(false);
+            var queryEmbeddingResult = await embeddingGeneratorService.GenerateAsync(
+                value: query,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+
             var queryEmbedding = queryEmbeddingResult.Vector;
             var relevantChunks = new List<(MemoryRecord Record, double Score)>();
 
-            await foreach (var chunk in memoryStore.GetNearestMatchesAsync(collectionName: agentId, embedding: queryEmbedding, limit: 5).ConfigureAwait(false))
+            await foreach (var chunk in memoryStore.GetNearestMatchesAsync(collectionName: agentId, embedding: queryEmbedding, limit: 5, cancellationToken: cancellationToken).ConfigureAwait(false))
                 relevantChunks.Add(chunk);
 
             if (relevantChunks.Count == 0)
@@ -102,9 +107,10 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
     /// agent's collection.</remarks>
     /// <param name="content">The plain text content of the knowledge base document to process. Cannot be null or empty.</param>
     /// <param name="agentId">The unique identifier of the agent whose knowledge base will be updated. Cannot be null or empty.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the document content cannot be split into valid chunks, or if the number of generated embeddings does not match the number of chunks.</exception>
-    public async Task ProcessKnowledgeBaseDocumentAsync(string content, string agentId)
+    public async Task ProcessKnowledgeBaseDocumentAsync(string content, string agentId, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrEmpty(content);
         ArgumentException.ThrowIfNullOrEmpty(agentId);
@@ -115,11 +121,14 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
 
             // Ensure the collection exists before upserting records
             var collections = new List<string>();
-            await foreach (var collection in memoryStore.GetCollectionsAsync().ConfigureAwait(false))
+            await foreach (var collection in memoryStore.GetCollectionsAsync(cancellationToken: cancellationToken).ConfigureAwait(false))
                 collections.Add(collection);
 
             if (!collections.Contains(agentId))
-                await memoryStore.CreateCollectionAsync(agentId).ConfigureAwait(false);
+                await memoryStore.CreateCollectionAsync(
+                    collectionName: agentId,
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
 
             var chunks = TextChunker.SplitPlainTextLines(content, 512);
             if (chunks.Count == 0)
@@ -136,7 +145,11 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
                 var metadata = new MemoryRecordMetadata(false, agentId, chunks[i], chunkDescription, string.Empty, string.Empty);
                 var record = new MemoryRecord(metadata, embeddings[i], null, null);
 
-                await memoryStore.UpsertAsync(agentId, record).ConfigureAwait(false);
+                await memoryStore.UpsertAsync(
+                    collectionName: agentId,
+                    record,
+                    cancellationToken
+                ).ConfigureAwait(false);
             }
         }
         catch (Exception ex)

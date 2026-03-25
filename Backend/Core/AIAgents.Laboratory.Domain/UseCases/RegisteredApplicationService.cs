@@ -1,8 +1,8 @@
 ﻿using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.In;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -41,8 +41,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     /// </summary>
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="newApplicationData">The new application creation data model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> CreateNewRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplication newApplicationData)
+    public async Task<bool> CreateNewRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplication newApplicationData, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(newApplicationData);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentLoggedInUser);
@@ -56,7 +57,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
             return await mongoDatabaseService.SaveDataAsync(
                 data: newApplicationData,
                 databaseName: MongoDatabaseName,
-                collectionName: RegisteredApplicationsCollectionName).ConfigureAwait(false);
+                collectionName: RegisteredApplicationsCollectionName,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -76,8 +79,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     /// <remarks>The deletion is performed as a soft delete, where the IsActive property of the application is set to false instead of physically removing the record from the database.</remarks>
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="applicationId">The application id for which data is to be deleted.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> DeleteRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId)
+    public async Task<bool> DeleteRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(currentLoggedInUser);
 
@@ -90,7 +94,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
             var allApplications = await mongoDatabaseService.GetDataFromCollectionAsync(
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.RegisteredApplicationsCollectionName,
-                filter).ConfigureAwait(false);
+                filter,
+                cancellationToken
+            ).ConfigureAwait(false);
             var updateApplication = allApplications.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
             if (updateApplication.CreatedBy != currentLoggedInUser)
@@ -106,7 +112,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
                 filter,
                 update,
                 databaseName: this.MongoDatabaseName,
-                collectionName: this.RegisteredApplicationsCollectionName).ConfigureAwait(false);
+                collectionName: this.RegisteredApplicationsCollectionName,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -125,8 +133,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     /// </summary>
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="applicationId">The application id to be searched for.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The registered application data model.</returns>
-    public async Task<RegisteredApplication> GetRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId)
+    public async Task<RegisteredApplication> GetRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(currentLoggedInUser);
 
@@ -143,7 +152,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
             var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.RegisteredApplicationsCollectionName,
-                filter).ConfigureAwait(false);
+                filter,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             result = allData.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
             return result;
@@ -164,8 +175,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     /// Gets the list of registered applications for the current logged in user.
     /// </summary>
     /// <param name="currentLoggedInUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="RegisteredApplication"/></returns>
-    public async Task<IEnumerable<RegisteredApplication>> GetRegisteredApplicationsAsync(string currentLoggedInUser)
+    public async Task<IEnumerable<RegisteredApplication>> GetRegisteredApplicationsAsync(string currentLoggedInUser, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -178,7 +190,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
             return await mongoDatabaseService.GetDataFromCollectionAsync(
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.RegisteredApplicationsCollectionName,
-                filter).ConfigureAwait(false);
+                filter,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -198,8 +212,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     /// <remarks>The application to be updated is identified by the Id property of the provided application data model.</remarks>
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="updateApplicationData">The update application data model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> UpdateExistingRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplication updateApplicationData)
+    public async Task<bool> UpdateExistingRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplication updateApplicationData, CancellationToken cancellationToken = default)
     {
         bool response = false;
         try
@@ -223,7 +238,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
                 filter,
                 update,
                 databaseName: this.MongoDatabaseName,
-                collectionName: this.RegisteredApplicationsCollectionName).ConfigureAwait(false);
+                collectionName: this.RegisteredApplicationsCollectionName,
+                cancellationToken
+            ).ConfigureAwait(false);
             return response;
         }
         catch (Exception ex)

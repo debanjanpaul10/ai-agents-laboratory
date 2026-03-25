@@ -2,9 +2,9 @@
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
-using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.In;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.ApplicationPluginsHelpers;
@@ -27,15 +27,22 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
     /// Get the orchestrator agent response for each agent asynchronously.
     /// </summary>
     /// <param name="chatRequest">The chat request domain model.</param>
+    /// <param name="workspaceDetails">The workspace details domain model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The final consolidated orchestrator response domain model.</returns>
-    public async Task<OrchestratorFinalResponseDomain> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails)
+    public async Task<OrchestratorFinalResponseDomain> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails, CancellationToken cancellationToken = default)
     {
         OrchestratorFinalResponseDomain? response = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
 
-            var agentsData = await this.GetActiveAgentsDataAsync(workspaceDetails).ConfigureAwait(false);
+            var agentsData = await this.GetActiveAgentsDataAsync(
+                workspaceDetails,
+                cancellationToken
+            ).ConfigureAwait(false);
+
             var orchestratorSystemPrompt = OrchestratorHelpers.GetOrchestratorSystemPrompt(agentsData);
             ConversationHistoryDomain conversationHistory = new();
             IList<string> agentsInvoked = [];
@@ -48,7 +55,11 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
 
                 // Call Orchestrator
                 var orchestratorResponse = await this.InvokeOrchestratorIterationAsync(
-                    conversationHistory, userMessage: chatRequest.UserMessage, orchestratorSystemPrompt).ConfigureAwait(false);
+                    conversationHistory,
+                    userMessage: chatRequest.UserMessage,
+                    orchestratorSystemPrompt,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
                 // Parse Orchestrator Response
                 var parsedResponse = OrchestratorHelpers.ParseOrchestratorResponse(orchestratorResponse);
@@ -61,7 +72,15 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
                 }
                 else if (parsedResponse?.Type == SystemOrchestratorFunction.OrchestratorResponseTypeDelegate)
                 {
-                    var agentResponse = await this.DelegateToAgentAsync(agentsData, chatRequest, conversationHistory, parsedResponse, agentsInvoked).ConfigureAwait(false);
+                    var agentResponse = await this.DelegateToAgentAsync(
+                        agentsData,
+                        chatRequest,
+                        conversationHistory,
+                        parsedResponse,
+                        agentsInvoked,
+                        cancellationToken
+                    ).ConfigureAwait(false);
+
                     groupChatAgentsResponses.Add(new GroupChatAgentsResponseDomain
                     {
                         AgentName = parsedResponse.AgentName,
@@ -89,7 +108,8 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
         }
     }
 
@@ -101,13 +121,16 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
     /// <param name="conversationHistory">The conversation history.</param>
     /// <param name="userMessage">The user message.</param>
     /// <param name="orchestratorSystemPrompt">The orchestrator system prompt.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The orchestrator response content.</returns>
-    private async Task<string> InvokeOrchestratorIterationAsync(ConversationHistoryDomain conversationHistory, string userMessage, string orchestratorSystemPrompt)
+    private async Task<string> InvokeOrchestratorIterationAsync(ConversationHistoryDomain conversationHistory, string userMessage, string orchestratorSystemPrompt, CancellationToken cancellationToken = default)
     {
         var orchestratorResponse = await aiServices.GetChatbotResponseAsync(
             conversationDataDomain: conversationHistory,
             userMessage,
-            agentMetaPrompt: orchestratorSystemPrompt).ConfigureAwait(false);
+            agentMetaPrompt: orchestratorSystemPrompt,
+            cancellationToken
+        ).ConfigureAwait(false);
 
         // Add Orchestrator's own response to history to maintain context
         conversationHistory.ChatHistory.Add(new ChatHistoryDomain
@@ -123,15 +146,19 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
     /// Gets the active agents data in the workspace.
     /// </summary>
     /// <param name="workspaceDetails">The workspace details.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="AgentDataDomain"/></returns>
-    private async Task<IList<AgentDataDomain>> GetActiveAgentsDataAsync(AgentsWorkspaceDomain workspaceDetails)
+    private async Task<IList<AgentDataDomain>> GetActiveAgentsDataAsync(AgentsWorkspaceDomain workspaceDetails, CancellationToken cancellationToken = default)
     {
         IList<AgentDataDomain> agentsData = [];
         await Parallel.ForEachAsync(workspaceDetails.ActiveAgentsListInWorkspace, async (agent, cancellationToken) =>
         {
             var agentData = await agentsService.GetAgentDataByIdAsync(
                 agentId: agent.AgentGuid,
-                userEmail: string.Empty).ConfigureAwait(false);
+                userEmail: string.Empty,
+                cancellationToken
+            ).ConfigureAwait(false);
+
             if (agentData is not null)
                 lock (agentsData)
                     agentsData.Add(agentData);
@@ -148,8 +175,9 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
     /// <param name="conversationHistory">The conversation history.</param>
     /// <param name="parsedResponse">The parsed response.</param>
     /// <param name="agentsInvoked">The list of agents invoked.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     private async Task<string> DelegateToAgentAsync(IList<AgentDataDomain> agentsData, WorkspaceAgentChatRequestDomain chatRequest, ConversationHistoryDomain conversationHistory,
-        OrchestratorAgentResponseDomain parsedResponse, IList<string> agentsInvoked)
+        OrchestratorAgentResponseDomain parsedResponse, IList<string> agentsInvoked, CancellationToken cancellationToken = default)
     {
         string response = string.Empty;
         try
@@ -182,7 +210,10 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
                 ConversationId = chatRequest.ConversationId,
                 UserMessage = parsedResponse.Instruction,
             };
-            var agentResponse = await agentChatService.GetAgentChatResponseAsync(chatRequest: agentChatRequestModel).ConfigureAwait(false);
+            var agentResponse = await agentChatService.GetAgentChatResponseAsync(
+                chatRequest: agentChatRequestModel,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             // Add Agent's response to history so Orchestrator can see it
             conversationHistory.ChatHistory.Add(new ChatHistoryDomain

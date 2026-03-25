@@ -29,13 +29,14 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route(ApiBaseRoute)]
-public sealed class AgentsController(IHttpContextAccessor httpContext, IConfiguration configuration, ILogger<AgentsController> logger, ICorrelationContext correlationContext,
-    IAgentsHandler agentsHandler) : BaseController(httpContext, configuration)
+public sealed class AgentsController(IHttpContextAccessor httpContext, IConfiguration configuration,
+    ILogger<AgentsController> logger, ICorrelationContext correlationContext, IAgentsHandler agentsHandler) : BaseController(httpContext, configuration)
 {
     /// <summary>
     /// Creates the new agent asynchronous.
     /// </summary>
     /// <param name="agentData">The agent data.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for success/failure.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     [HttpPost(AgentsRoutes.CreateNewAgent_Route)]
@@ -45,7 +46,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = CreateNewAgentAction.Summary, Description = CreateNewAgentAction.Description, OperationId = CreateNewAgentAction.OperationId)]
-    public async Task<ResponseDto> CreateNewAgentAsync([FromForm] CreateAgentDTO agentData)
+    public async Task<ResponseDto> CreateNewAgentAsync([FromForm] CreateAgentDTO agentData, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -56,7 +57,12 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
             ArgumentNullException.ThrowIfNull(agentData);
             if (base.IsAuthorized(UserBased))
             {
-                result = await agentsHandler.CreateNewAgentAsync(agentData, base.UserEmail).ConfigureAwait(false);
+                result = await agentsHandler.CreateNewAgentAsync(
+                    agentData,
+                    userEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
                     return HandleSuccessRequestResponse(result);
                 else
@@ -80,6 +86,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     /// <summary>
     /// Gets all agents data asynchronous.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="CreateAgentDTO"/></returns>
     [HttpGet(AgentsRoutes.GetAllAgents_Route)]
     [ProducesResponseType(typeof(IEnumerable<AgentDataDTO>), StatusCodes.Status200OK)]
@@ -87,7 +94,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllAgentsDataAction.Summary, Description = GetAllAgentsDataAction.Description, OperationId = GetAllAgentsDataAction.OperationId)]
-    public async Task<ResponseDto> GetAllAgentsDataAsync()
+    public async Task<ResponseDto> GetAllAgentsDataAsync(CancellationToken cancellationToken = default)
     {
         IEnumerable<AgentDataDTO> result = [];
         try
@@ -97,7 +104,11 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
 
             if (base.IsAuthorized(UserBased))
             {
-                result = await agentsHandler.GetAllAgentsDataAsync(base.UserEmail).ConfigureAwait(false);
+                result = await agentsHandler.GetAllAgentsDataAsync(
+                    userEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result is not null)
                     return HandleSuccessRequestResponse(result);
                 else
@@ -122,6 +133,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     /// Gets the agent data by identifier asynchronous.
     /// </summary>
     /// <param name="agentId">The agent identifier.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The agent data dto model.</returns>
     [HttpGet(AgentsRoutes.GetAgentById_Route)]
     [ProducesResponseType(typeof(AgentDataDTO), StatusCodes.Status200OK)]
@@ -129,7 +141,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAgentDataByIdAction.Summary, Description = GetAgentDataByIdAction.Description, OperationId = GetAgentDataByIdAction.OperationId)]
-    public async Task<ResponseDto> GetAgentDataByIdAsync([FromQuery] string agentId)
+    public async Task<ResponseDto> GetAgentDataByIdAsync([FromQuery] string agentId, CancellationToken cancellationToken = default)
     {
         AgentDataDTO result = new();
         try
@@ -140,11 +152,19 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
             ArgumentException.ThrowIfNullOrEmpty(agentId);
             if (base.IsAuthorized(UserBased))
             {
-                result = await agentsHandler.GetAgentDataByIdAsync(agentId, base.UserEmail).ConfigureAwait(false);
+                result = await agentsHandler.GetAgentDataByIdAsync(
+                    agentId,
+                    userEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result is not null)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -165,6 +185,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     /// Updates the existing agent data asynchronous.
     /// </summary>
     /// <param name="updateAgentData">The update agent data.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The agent data dto.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     [HttpPut(AgentsRoutes.UpdateExistingAgent_Route)]
@@ -173,7 +194,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = UpdateExistingAgentDataAction.Summary, Description = UpdateExistingAgentDataAction.Description, OperationId = UpdateExistingAgentDataAction.OperationId)]
-    public async Task<ResponseDto> UpdateExistingAgentDataAsync([FromForm] AgentDataDTO updateAgentData)
+    public async Task<ResponseDto> UpdateExistingAgentDataAsync([FromForm] AgentDataDTO updateAgentData, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -184,11 +205,19 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
             ArgumentNullException.ThrowIfNull(updateAgentData);
             if (IsAuthorized(UserBased))
             {
-                result = await agentsHandler.UpdateExistingAgentDataAsync(updateAgentData, base.UserEmail).ConfigureAwait(false);
+                result = await agentsHandler.UpdateExistingAgentDataAsync(
+                    updateAgentData,
+                    currentUserEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -209,6 +238,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     /// Deletes the existing agent data asynchronous.
     /// </summary>
     /// <param name="agentId">The agent identifier.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for success/failure.</returns>
     [HttpDelete(AgentsRoutes.DeleteExistingAgent_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
@@ -216,7 +246,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = DeleteExistingAgentDataAction.Summary, Description = DeleteExistingAgentDataAction.Description, OperationId = DeleteExistingAgentDataAction.OperationId)]
-    public async Task<ResponseDto> DeleteExistingAgentDataAsync([FromQuery] string agentId)
+    public async Task<ResponseDto> DeleteExistingAgentDataAsync([FromQuery] string agentId, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -227,11 +257,19 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
             ArgumentException.ThrowIfNullOrEmpty(agentId);
             if (IsAuthorized(UserBased))
             {
-                result = await agentsHandler.DeleteExistingAgentDataAsync(agentId, base.UserEmail).ConfigureAwait(false);
+                result = await agentsHandler.DeleteExistingAgentDataAsync(
+                    agentId,
+                    currentUserEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -252,6 +290,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     /// Downloads the knowledgebase file asynchronous.
     /// </summary>
     /// <param name="downloadFile">The download file dto model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The downloaded file data.</returns>
     [HttpPost(AgentsRoutes.DownloadAssociatedDocuments_Route)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
@@ -259,7 +298,7 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = DownloadKnowledgebaseFileAction.Summary, Description = DownloadKnowledgebaseFileAction.Description, OperationId = DownloadKnowledgebaseFileAction.OperationId)]
-    public async Task<ResponseDto> DownloadKnowledgebaseFileAsync([FromBody] DownloadFileDTO downloadFile)
+    public async Task<ResponseDto> DownloadKnowledgebaseFileAsync([FromBody] DownloadFileDTO downloadFile, CancellationToken cancellationToken = default)
     {
         string result = string.Empty;
         try
@@ -272,7 +311,9 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
             {
                 result = await agentsHandler.DownloadKnowledgebaseFileAsync(
                     agentGuid: downloadFile.AgentGuid,
-                    fileName: downloadFile.FileName).ConfigureAwait(false);
+                    fileName: downloadFile.FileName,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
                 if (!string.IsNullOrWhiteSpace(result))
                     return HandleSuccessRequestResponse(result);

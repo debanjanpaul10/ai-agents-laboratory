@@ -1,6 +1,6 @@
 ﻿using AIAgents.Laboratory.Domain.DomainEntities;
 
-namespace AIAgents.Laboratory.Domain.DrivingPorts;
+namespace AIAgents.Laboratory.Domain.Ports.In;
 
 /// <summary>
 /// Defines methods for managing direct chat interaction services.
@@ -20,13 +20,15 @@ public interface IDirectChatService
     /// Clears the conversation history data for the user.
     /// </summary>
     /// <param name="userName">The user name for user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> ClearConversationHistoryForUserAsync(string userName);
+    Task<bool> ClearConversationHistoryForUserAsync(string userName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the conversation history data for user.
     /// </summary>
     /// <param name="userName">The current user name.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The conversation history data domain model.</returns>
-    Task<ConversationHistoryDomain> GetConversationHistoryDataAsync(string userName);
+    Task<ConversationHistoryDomain> GetConversationHistoryDataAsync(string userName, CancellationToken cancellationToken = default);
 }

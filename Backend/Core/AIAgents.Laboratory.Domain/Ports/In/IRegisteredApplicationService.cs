@@ -1,6 +1,6 @@
 ﻿using AIAgents.Laboratory.Domain.DomainEntities;
 
-namespace AIAgents.Laboratory.Domain.DrivingPorts;
+namespace AIAgents.Laboratory.Domain.Ports.In;
 
 /// <summary>
 /// Defines the contract for the Registered Application Service, which provides operations to manage registered applications for the current logged in user, 
@@ -14,7 +14,7 @@ public interface IRegisteredApplicationService
     /// </summary>
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <returns>The list of <see cref="RegisteredApplication"/></returns>
-    Task<IEnumerable<RegisteredApplication>> GetRegisteredApplicationsAsync(string currentLoggedInUser);
+    Task<IEnumerable<RegisteredApplication>> GetRegisteredApplicationsAsync(string currentLoggedInUser, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the details of a specific registered application by its ID for the current logged in user.
@@ -22,7 +22,7 @@ public interface IRegisteredApplicationService
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="applicationId">The application id to be searched for.</param>
     /// <returns>The registered application data model.</returns>
-    Task<RegisteredApplication> GetRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId);
+    Task<RegisteredApplication> GetRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Creates a new registered application for the current logged in user with the provided application data.
@@ -30,7 +30,7 @@ public interface IRegisteredApplicationService
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="newApplicationData">The new application creation data model.</param>
     /// <returns>A boolean for success/failure.</returns>
-    Task<bool> CreateNewRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplication newApplicationData);
+    Task<bool> CreateNewRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplication newApplicationData, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates an existing registered application for the current logged in user with the provided application data. 
@@ -39,7 +39,7 @@ public interface IRegisteredApplicationService
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="updateApplicationData">The update application data model.</param>
     /// <returns>A boolean for success/failure.</returns>
-    Task<bool> UpdateExistingRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplication updateApplicationData);
+    Task<bool> UpdateExistingRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplication updateApplicationData, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes a registered application by its ID for the current logged in user. 
@@ -48,5 +48,5 @@ public interface IRegisteredApplicationService
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="applicationId">The application id for which data is to be deleted.</param>
     /// <returns>A boolean for success/failure.</returns>
-    Task<bool> DeleteRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId);
+    Task<bool> DeleteRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId, CancellationToken cancellationToken = default);
 }

@@ -14,8 +14,9 @@ public interface IKnowledgeBaseProcessor
     /// agent's collection.</remarks>
     /// <param name="content">The plain text content of the knowledge base document to process. Cannot be null or empty.</param>
     /// <param name="agentId">The unique identifier of the agent whose knowledge base will be updated. Cannot be null or empty.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task ProcessKnowledgeBaseDocumentAsync(string content, string agentId);
+    Task ProcessKnowledgeBaseDocumentAsync(string content, string agentId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Asynchronously retrieves relevant knowledge entries for a given query and agent identifier.
@@ -24,14 +25,15 @@ public interface IKnowledgeBaseProcessor
     /// two newline characters. If no relevant knowledge is found, the method returns an empty string.</remarks>
     /// <param name="query">The search query used to find relevant knowledge. Cannot be null or empty.</param>
     /// <param name="agentId">The unique identifier of the agent whose knowledge base is searched. Cannot be null or empty.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A string containing the most relevant knowledge entries separated by double newlines, or an empty string if no relevant entries are found.</returns>
-    Task<string> GetRelevantKnowledgeAsync(string query, string agentId);
+    Task<string> GetRelevantKnowledgeAsync(string query, string agentId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Detects the file type of the specified knowledge base document and reads its content accordingly.
     /// </summary>
     /// <remarks>Supported file types include plain text, PDF, Excel, and Word documents. If the file type is not supported, an exception is thrown.</remarks>
-    /// <param name="knowledgeBaseDocument">The knowledge base document to read. Must not be null and must have a valid file name with a supported extension.</param>
+    /// <param name="knowledgeBaseDocumentDomain">The knowledge base document to read. Must not be null and must have a valid file name with a supported extension.</param>
     /// <returns>A string containing the content of the file. The format of the content depends on the file type.</returns>
     string DetectAndReadFileContent(KnowledgeBaseDocumentDomain knowledgeBaseDocumentDomain);
 }

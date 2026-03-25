@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace AIAgents.Laboratory.Domain.DrivenPorts;
+namespace AIAgents.Laboratory.Domain.Ports.Out;
 
 /// <summary>
 /// Interface definition of the contract for a generic repository pattern.
@@ -12,22 +12,25 @@ public interface IRepository<TEntity> where TEntity : class
     /// Adds a new entity to the repository.
     /// </summary>
     /// <param name="entity">The generic entity.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The generic entity.</returns>
-    Task<TEntity> AddAsync(TEntity entity);
+    Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Adds a range of entities to the repository.
     /// </summary>
     /// <param name="entities">The list of generic entity.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of generic entity.</returns>
-    Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities);
+    Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Finds entities based on the provided predicate.
     /// </summary>
     /// <param name="predicate">The entity finder predicate.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of generic entity.</returns>
-    Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
+    Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets all entities from the repository.
@@ -37,8 +40,15 @@ public interface IRepository<TEntity> where TEntity : class
     /// <param name="isActiveOnly">The isactive only boolean flag.</param>
     /// <param name="pageNumber">The page number.</param>
     /// <param name="pageSize">The page size.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of generic entity.</returns>
-    Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? filter = null, string? includeProperties = null, int pageSize = 0, int pageNumber = 1, bool isActiveOnly = true);
+    Task<List<TEntity>> GetAllAsync(
+        Expression<Func<TEntity, bool>>? filter = null,
+        string? includeProperties = null,
+        int pageSize = 0,
+        int pageNumber = 1,
+        bool isActiveOnly = true,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets all entities from the repository with pagination.
@@ -47,8 +57,14 @@ public interface IRepository<TEntity> where TEntity : class
     /// <param name="tracked">The is tracked boolean flag.</param>
     /// <param name="includeProperties">The included properties string.</param>
     /// <param name="isActiveOnly">The isactive only boolean flag.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The generic entity.</returns>
-    Task<TEntity> GetAsync(Expression<Func<TEntity, bool>>? filter = null, bool tracked = true, string? includeProperties = null, bool isActiveOnly = true);
+    Task<TEntity> GetAsync(
+        Expression<Func<TEntity, bool>>? filter = null,
+        bool tracked = true,
+        string? includeProperties = null,
+        bool isActiveOnly = true,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets all entities from the repository with pagination.
@@ -61,15 +77,20 @@ public interface IRepository<TEntity> where TEntity : class
     /// <param name="includeProperties">The included properties string.</param>
     /// <returns>A tupple containing values.</returns>
     Task<(List<TEntity>, int, bool)> GetAllPagedAsync(
-        Expression<Func<TEntity, bool>>? filter = null, Expression<Func<TEntity, object>>? orderByProperty = null, bool ascending = true,
-        int pageSize = 1000, int pageNumber = 1, params Expression<Func<TEntity, object>>[] includeProperties);
+        Expression<Func<TEntity, bool>>? filter = null,
+        Expression<Func<TEntity, object>>? orderByProperty = null,
+        bool ascending = true,
+        int pageSize = 1000,
+        int pageNumber = 1,
+        params Expression<Func<TEntity, object>>[] includeProperties);
 
     /// <summary>
     /// Gets the first entity that matches the provided predicate.
     /// </summary>
     /// <param name="predicate">The filter predicate.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The generic entity.</returns>
-    Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+    Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Removes an entity from the repository.
@@ -93,6 +114,7 @@ public interface IRepository<TEntity> where TEntity : class
     /// <summary>
     /// Saves all changes made in this context to the underlying database.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The integer value.</returns>
-    Task<int> SaveChangesAsync();
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
