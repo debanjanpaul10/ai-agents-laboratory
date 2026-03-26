@@ -43,7 +43,8 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
 
             var folderNames = new List<string>();
             if (!string.IsNullOrEmpty(this.CloudinaryKnowledgeBaseFolderName))
@@ -106,7 +107,8 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
         }
     }
 
@@ -128,9 +130,7 @@ public sealed class CloudinaryStorageManager(ILogger<CloudinaryStorageManager> l
 
             var safeFileName = Path.GetFileName(fileName);
             // Try to get resource as Raw first (most documents are Raw)
-            string folderPath = string.Format(
-                CloudinaryConstants.AgentImagesFolderStructureFormat,
-                this.CloudinaryKnowledgeBaseFolderName, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid }));
+            string folderPath = string.Format(CloudinaryConstants.AgentImagesFolderStructureFormat, this.CloudinaryKnowledgeBaseFolderName, agentGuid);
             string publicId = folderPath + "/" + safeFileName;
 
             var getResourceParams = new GetResourceParams(publicId)
