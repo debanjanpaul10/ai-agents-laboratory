@@ -21,9 +21,10 @@ internal static class TokenHelper
     /// <param name="correlationId">The correlation id for logging.</param>
     /// <param name="configuration">The configuration.</param>
     /// <param name="logger">The logger.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The access token.</returns>
     /// <exception cref="Exception">Exception error.</exception>
-    internal static async Task<string> GetAiAgentsLabTokenAsync(string correlationId, IConfiguration configuration, ILogger logger)
+    internal static async Task<string> GetAiAgentsLabTokenAsync(string correlationId, IConfiguration configuration, ILogger logger, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -36,7 +37,9 @@ internal static class TokenHelper
 
             var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
             var accessToken = await credential.GetTokenAsync(
-                requestContext: new TokenRequestContext(scopes!), cancellationToken: CancellationToken.None).ConfigureAwait(false);
+                requestContext: new TokenRequestContext(scopes!),
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
 
             ArgumentException.ThrowIfNullOrWhiteSpace(accessToken.Token);
             return accessToken.Token;

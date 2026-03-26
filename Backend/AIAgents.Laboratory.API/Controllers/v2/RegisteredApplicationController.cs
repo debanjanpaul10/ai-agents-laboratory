@@ -35,6 +35,7 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     /// </summary>
     /// <remarks>This method requires the user to be authorized. If the user is not authorized, a 401 Unauthorized response is returned. 
     /// If the request is successful but no applications are found, a 400 Bad Request response is returned with an appropriate message.</remarks>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A <see cref="ResponseDto"/> containing a collection of <see cref="RegisteredApplicationDto"/> objects representing the registered applications. 
     /// Returns a bad request response if the service is unavailable.</returns>
     [HttpGet(RegisteredApplicationRoutes.GetAllRegisteredApplications_Route)]
@@ -43,7 +44,7 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllRegisteredApplicationsAction.Summary, Description = GetAllRegisteredApplicationsAction.Description, OperationId = GetAllRegisteredApplicationsAction.OperationId)]
-    public async Task<ResponseDto> GetAllRegisteredApplicationsAsync()
+    public async Task<ResponseDto> GetAllRegisteredApplicationsAsync(CancellationToken cancellationToken = default)
     {
         IEnumerable<RegisteredApplicationDto> result = [];
         try
@@ -53,11 +54,18 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
 
             if (base.IsAuthorized(UserBased))
             {
-                result = await registerAppHandler.GetRegisteredApplicationsAsync(base.UserEmail).ConfigureAwait(false);
+                result = await registerAppHandler.GetRegisteredApplicationsAsync(
+                    currentLoggedInUser: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result is not null)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -80,6 +88,7 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     /// <remarks>The caller must be authorized to perform this operation. If authorization fails, an unauthorized response is returned. 
     /// If registration fails due to service issues or invalid input, a bad request response is provided.</remarks>
     /// <param name="newApplicationDtoModel">The details of the application to be registered. Must contain all required information for registration.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A ResponseDto indicating whether the registration was successful. Returns a success response if the application is registered; otherwise, returns a bad request or unauthorized response.</returns>
     [HttpPost(RegisteredApplicationRoutes.RegisterNewApplication_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
@@ -87,7 +96,7 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = RegisterNewApplicationAction.Summary, Description = RegisterNewApplicationAction.Description, OperationId = RegisterNewApplicationAction.OperationId)]
-    public async Task<ResponseDto> RegisterNewApplicationAsync([FromBody] RegisteredApplicationDto newApplicationDtoModel)
+    public async Task<ResponseDto> RegisterNewApplicationAsync([FromBody] RegisteredApplicationDto newApplicationDtoModel, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -98,11 +107,19 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
             ArgumentNullException.ThrowIfNull(newApplicationDtoModel);
             if (base.IsAuthorized(UserBased))
             {
-                result = await registerAppHandler.CreateNewRegisteredApplicationAsync(base.UserEmail, newApplicationDtoModel).ConfigureAwait(false);
+                result = await registerAppHandler.CreateNewRegisteredApplicationAsync(
+                    currentLoggedInUser: base.UserEmail,
+                    newApplicationData: newApplicationDtoModel,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -125,6 +142,7 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     /// <remarks>This method requires the caller to be authorized. If the user is not authorized, a 401 Unauthorized response is returned. 
     /// If the application ID is invalid or the application is not found, a 400 Bad Request or 404 Not Found response is returned.</remarks>
     /// <param name="applicationId">The unique identifier of the registered application to retrieve. Must be a positive integer.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A ResponseDto containing the registered application's details if found; otherwise, an error response indicating unauthorized access, invalid input, or that the application was not found.</returns>
     [HttpGet(RegisteredApplicationRoutes.GetRegisteredApplicationById_Route)]
     [ProducesResponseType(typeof(RegisteredApplicationDto), StatusCodes.Status200OK)]
@@ -132,7 +150,7 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetRegisteredApplicationByIdAction.Summary, Description = GetRegisteredApplicationByIdAction.Description, OperationId = GetRegisteredApplicationByIdAction.OperationId)]
-    public async Task<ResponseDto> GetRegisteredApplicationByIdAsync([FromRoute] int applicationId)
+    public async Task<ResponseDto> GetRegisteredApplicationByIdAsync([FromRoute] int applicationId, CancellationToken cancellationToken = default)
     {
         RegisteredApplicationDto result = new();
         try
@@ -142,11 +160,19 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
 
             if (base.IsAuthorized(UserBased))
             {
-                result = await registerAppHandler.GetRegisteredApplicationByIdAsync(base.UserEmail, applicationId).ConfigureAwait(false);
+                result = await registerAppHandler.GetRegisteredApplicationByIdAsync(
+                    currentLoggedInUser: base.UserEmail,
+                    applicationId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result is not null)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -169,6 +195,7 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     /// <remarks>This method requires the user to be authorized. If the user is not authorized, a 401 Unauthorized response is returned. 
     /// If the update fails due to application service issues, a 400 Bad Request response is returned with an appropriate error message.</remarks>
     /// <param name="updateApplicationDtoModel">The data transfer object containing the updated information for the registered application. This parameter cannot be null.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A ResponseDto indicating the outcome of the update operation. Returns <see langword="true"/> if the update is successful; otherwise, returns <see langword="false"/>.</returns>
     [HttpPut(RegisteredApplicationRoutes.UpdateExistingRegisteredApplication_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
@@ -176,7 +203,7 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = UpdateExistingRegisteredApplicationDataAction.Summary, Description = UpdateExistingRegisteredApplicationDataAction.Description, OperationId = UpdateExistingRegisteredApplicationDataAction.OperationId)]
-    public async Task<ResponseDto> UpdateExistingRegisteredApplicationAsync([FromBody] RegisteredApplicationDto updateApplicationDtoModel)
+    public async Task<ResponseDto> UpdateExistingRegisteredApplicationAsync([FromBody] RegisteredApplicationDto updateApplicationDtoModel, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -189,12 +216,17 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
             {
                 result = await registerAppHandler.UpdateExistingRegisteredApplicationAsync(
                     currentLoggedInUser: base.UserEmail,
-                    updateApplicationData: updateApplicationDtoModel).ConfigureAwait(false);
+                    updateApplicationData: updateApplicationDtoModel,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -217,6 +249,7 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     /// <remarks>This method requires the caller to be authorized. If the user is not authorized, a 401 Unauthorized response is returned. 
     /// If the application ID is invalid or the deletion fails, a 400 Bad Request response is returned.</remarks>
     /// <param name="applicationId">The unique identifier of the application to be deleted. Must be a valid positive integer.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A ResponseDto indicating the success or failure of the deletion operation. Returns true if the application was successfully deleted; otherwise, returns false.</returns>
     [HttpDelete(RegisteredApplicationRoutes.DeleteRegisteredApplicationById_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
@@ -224,7 +257,7 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = DeleteExistingRegisteredApplicationAction.Summary, Description = DeleteExistingRegisteredApplicationAction.Description, OperationId = DeleteExistingRegisteredApplicationAction.OperationId)]
-    public async Task<ResponseDto> DeleteRegisteredApplicationByIdAsync([FromRoute] int applicationId)
+    public async Task<ResponseDto> DeleteRegisteredApplicationByIdAsync([FromRoute] int applicationId, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -234,11 +267,19 @@ public sealed class RegisteredApplicationController(IHttpContextAccessor httpCon
 
             if (base.IsAuthorized(UserBased))
             {
-                result = await registerAppHandler.DeleteRegisteredApplicationByIdAsync(base.UserEmail, applicationId).ConfigureAwait(false);
+                result = await registerAppHandler.DeleteRegisteredApplicationByIdAsync(
+                    currentLoggedInUser: base.UserEmail,
+                    applicationId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();

@@ -46,6 +46,9 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddProblemDetails();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddApplicationInsightsTelemetry(options =>
+    options.ConnectionString = builder.Configuration[AzureAppConfigurationConstants.ApplicationInsightsConnectionString]
+);
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

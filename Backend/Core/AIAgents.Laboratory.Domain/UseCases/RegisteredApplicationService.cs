@@ -1,11 +1,9 @@
 ﻿using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
-using Microsoft.Extensions.Configuration;
+using AIAgents.Laboratory.Domain.Ports.In;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
@@ -21,42 +19,32 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="correlationContext">The correlation context service.</param>
 /// <param name="mongoDatabaseService">The mongo db database service.</param>
 /// <seealso cref="IRegisteredApplicationService"/>
-public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationService> logger, ICorrelationContext correlationContext,
-    IConfiguration configuration, IMongoDatabaseService mongoDatabaseService) : IRegisteredApplicationService
+public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationService> logger, ICorrelationContext correlationContext, IRegisteredApplicationDataManager registeredApplicationDataManager) : IRegisteredApplicationService
 {
-    /// <summary>
-    /// The mongo database name configuration value.
-    /// </summary>
-    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase]
-        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
-
-    /// <summary>
-    /// The agents data collection name configuration value.
-    /// </summary>
-    private readonly string RegisteredApplicationsCollectionName = configuration[MongoDbCollectionConstants.RegisteredApplicationsCollectionName]
-        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
-
     /// <summary>
     /// Creates a new registered application for the current logged in user with the provided application data.
     /// </summary>
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="newApplicationData">The new application creation data model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> CreateNewRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplication newApplicationData)
+    public async Task<bool> CreateNewRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDomain newApplicationData, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(newApplicationData);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentLoggedInUser);
-
+        bool response = false;
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewRegisteredApplicationAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, newApplicationData }));
 
             newApplicationData.PrepareAuditEntityData(currentLoggedInUser);
-            return await mongoDatabaseService.SaveDataAsync(
-                data: newApplicationData,
-                databaseName: MongoDatabaseName,
-                collectionName: RegisteredApplicationsCollectionName).ConfigureAwait(false);
+            response = await registeredApplicationDataManager.CreateNewRegisteredApplicationAsync(
+                currentLoggedInUser,
+                newApplicationData,
+                cancellationToken
+            ).ConfigureAwait(false);
+            return response;
         }
         catch (Exception ex)
         {
@@ -66,7 +54,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
         finally
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewRegisteredApplicationAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, newApplicationData }));
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, response }));
         }
     }
 
@@ -76,8 +64,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     /// <remarks>The deletion is performed as a soft delete, where the IsActive property of the application is set to false instead of physically removing the record from the database.</remarks>
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="applicationId">The application id for which data is to be deleted.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> DeleteRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId)
+    public async Task<bool> DeleteRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(currentLoggedInUser);
 
@@ -86,27 +75,11 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteRegisteredApplicationByIdAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
 
-            var filter = Builders<RegisteredApplication>.Filter.Where(item => item.IsActive && item.Id == applicationId);
-            var allApplications = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.RegisteredApplicationsCollectionName,
-                filter).ConfigureAwait(false);
-            var updateApplication = allApplications.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
-
-            if (updateApplication.CreatedBy != currentLoggedInUser)
-                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
-
-            var updates = new List<UpdateDefinition<RegisteredApplication>>
-            {
-                Builders<RegisteredApplication>.Update.Set(x => x.IsActive, false),
-                Builders<RegisteredApplication>.Update.Set(x => x.DateModified, DateTime.UtcNow)
-            };
-            var update = Builders<RegisteredApplication>.Update.Combine(updates);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter,
-                update,
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.RegisteredApplicationsCollectionName).ConfigureAwait(false);
+            return await registeredApplicationDataManager.DeleteRegisteredApplicationByIdAsync(
+                currentLoggedInUser,
+                applicationId,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -125,27 +98,22 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     /// </summary>
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="applicationId">The application id to be searched for.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The registered application data model.</returns>
-    public async Task<RegisteredApplication> GetRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId)
+    public async Task<RegisteredApplicationDomain> GetRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(currentLoggedInUser);
-
-        RegisteredApplication? result = null;
+        RegisteredApplicationDomain? result = null;
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRegisteredApplicationByIdAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, applicationId }));
 
-            var filter = Builders<RegisteredApplication>.Filter.And(
-                Builders<RegisteredApplication>.Filter.Eq(x => x.IsActive, true),
-                Builders<RegisteredApplication>.Filter.Eq(x => x.Id, applicationId));
-
-            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.RegisteredApplicationsCollectionName,
-                filter).ConfigureAwait(false);
-
-            result = allData.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
+            result = await registeredApplicationDataManager.GetRegisteredApplicationByIdAsync(
+                currentLoggedInUser,
+                applicationId,
+                cancellationToken
+            ).ConfigureAwait(false);
             return result;
         }
         catch (Exception ex)
@@ -164,21 +132,21 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     /// Gets the list of registered applications for the current logged in user.
     /// </summary>
     /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <returns>The list of <see cref="RegisteredApplication"/></returns>
-    public async Task<IEnumerable<RegisteredApplication>> GetRegisteredApplicationsAsync(string currentLoggedInUser)
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
+    /// <returns>The list of <see cref="RegisteredApplicationDomain"/></returns>
+    public async Task<IEnumerable<RegisteredApplicationDomain>> GetRegisteredApplicationsAsync(string currentLoggedInUser, CancellationToken cancellationToken = default)
     {
+        IEnumerable<RegisteredApplicationDomain>? result = null;
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRegisteredApplicationsAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser }));
 
-            var filter = Builders<RegisteredApplication>.Filter.And(
-                Builders<RegisteredApplication>.Filter.Eq(x => x.IsActive, true));
-
-            return await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.RegisteredApplicationsCollectionName,
-                filter).ConfigureAwait(false);
+            result = await registeredApplicationDataManager.GetRegisteredApplicationsAsync(
+                currentLoggedInUser,
+                cancellationToken
+            ).ConfigureAwait(false);
+            return result;
         }
         catch (Exception ex)
         {
@@ -188,7 +156,7 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
         finally
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRegisteredApplicationsAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser }));
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, result }));
         }
     }
 
@@ -198,8 +166,9 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
     /// <remarks>The application to be updated is identified by the Id property of the provided application data model.</remarks>
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="updateApplicationData">The update application data model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> UpdateExistingRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplication updateApplicationData)
+    public async Task<bool> UpdateExistingRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDomain updateApplicationData, CancellationToken cancellationToken = default)
     {
         bool response = false;
         try
@@ -207,23 +176,11 @@ public sealed class RegisteredApplicationService(ILogger<RegisteredApplicationSe
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingRegisteredApplicationAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, updateApplicationData }));
 
-            var filter = Builders<RegisteredApplication>.Filter.And(
-                Builders<RegisteredApplication>.Filter.Eq(x => x.IsActive, true), Builders<RegisteredApplication>.Filter.Eq(x => x.Id, updateApplicationData.Id));
-            var updates = new List<UpdateDefinition<RegisteredApplication>>
-            {
-                Builders<RegisteredApplication>.Update.Set(ra => ra.ApplicationName, updateApplicationData.ApplicationName),
-                Builders<RegisteredApplication>.Update.Set(ra => ra.Description, updateApplicationData.Description),
-                Builders<RegisteredApplication>.Update.Set(ra => ra.ApplicationRegistrationGuid, updateApplicationData.ApplicationRegistrationGuid),
-                Builders<RegisteredApplication>.Update.Set(ra => ra.DateModified, DateTime.UtcNow),
-                Builders<RegisteredApplication>.Update.Set(ra => ra.ModifiedBy, currentLoggedInUser)
-            };
-
-            var update = Builders<RegisteredApplication>.Update.Combine(updates);
-            response = await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter,
-                update,
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.RegisteredApplicationsCollectionName).ConfigureAwait(false);
+            response = await registeredApplicationDataManager.UpdateExistingRegisteredApplicationAsync(
+                currentLoggedInUser,
+                updateApplicationData,
+                cancellationToken
+            ).ConfigureAwait(false);
             return response;
         }
         catch (Exception ex)

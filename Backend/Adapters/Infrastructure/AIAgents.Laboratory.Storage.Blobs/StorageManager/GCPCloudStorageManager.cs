@@ -1,6 +1,6 @@
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -42,16 +42,21 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
     /// Deletes the documents data and folder from blob storage.
     /// </summary>
     /// <param name="agentId">The agent id.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the asynchronous process. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> DeleteDocumentsFolderAndDataAsync(string agentId)
+    public async Task<bool> DeleteDocumentsFolderAndDataAsync(string agentId, CancellationToken cancellationToken = default)
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
 
             var folderNames = new List<string>();
-            if (!string.IsNullOrEmpty(this.GCPKnowledgeBaseFolderName)) folderNames.Add(this.GCPKnowledgeBaseFolderName);
-            if (!string.IsNullOrEmpty(this.GCPVisionImagesFolderName)) folderNames.Add(this.GCPVisionImagesFolderName);
+            if (!string.IsNullOrEmpty(this.GCPKnowledgeBaseFolderName))
+                folderNames.Add(this.GCPKnowledgeBaseFolderName);
+
+            if (!string.IsNullOrEmpty(this.GCPVisionImagesFolderName))
+                folderNames.Add(this.GCPVisionImagesFolderName);
 
             if (folderNames.Count == 0)
             {
@@ -74,11 +79,18 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
                     // Iterate through all objects with the prefix
                     var deleteTasks = new List<Task>();
                     foreach (var obj in objectsToDelete)
-                        deleteTasks.Add(storageClient.DeleteObjectAsync(this.GCPStorageBucketName, obj.Name));
+                    {
+                        var item = storageClient.DeleteObjectAsync(
+                            bucket: this.GCPStorageBucketName,
+                            objectName: obj.Name,
+                            cancellationToken: cancellationToken);
+
+                        deleteTasks.Add(item);
+                    }
 
                     // Wait for all deletions to complete
                     if (deleteTasks.Count > 0)
-                        await Task.WhenAll(deleteTasks);
+                        await Task.WhenAll(deleteTasks).ConfigureAwait(false);
                 }
                 catch (Exception folderEx)
                 {
@@ -105,24 +117,30 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
     /// </summary>
     /// <param name="agentGuid">The agent guid id.</param>
     /// <param name="fileName">The file name.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the asynchronous process. Optional.</param>
     /// <returns>The download file link.</returns>
-    public async Task<string> DownloadFileFromBlobStorageAsync(string agentGuid, string fileName)
+    public async Task<string> DownloadFileFromBlobStorageAsync(string agentGuid, string fileName, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentGuid);
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
 
             var safeFileName = Path.GetFileName(fileName);
-            string objectName = string.Format(GcpCloudStorageConstants.AgentFolderStructureFormat, this.GCPKnowledgeBaseFolderName, agentGuid) + "/" + safeFileName;
+            string objectName = string.Format(
+                GcpCloudStorageConstants.AgentFolderStructureFormat,
+                this.GCPKnowledgeBaseFolderName, agentGuid) + "/" + safeFileName;
 
             var stream = new MemoryStream();
             var file = await storageClient.DownloadObjectAsync(
                 bucket: this.GCPStorageBucketName,
                 objectName: objectName,
-                destination: stream);
+                destination: stream,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
 
             if (file is not null)
                 return string.Format(GcpCloudStorageConstants.PublicUrlConstant, this.GCPStorageBucketName, file.Name);
@@ -136,7 +154,8 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DownloadFileFromBlobStorageAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
         }
     }
 
@@ -145,14 +164,16 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
     /// </summary>
     /// <param name="documentFile">The user uploaded document file.</param>
     /// <param name="agentGuid">The agent guid id.</param>
-    /// <param name="folderName">The storage folder name.</param>
+    /// <param name="fileType">The storage file type.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the asynchronous process. Optional.</param>
     /// <returns>The public URL for the document.</returns>
-    public async Task<string> UploadDocumentsToStorageAsync(IFormFile documentFile, string agentGuid, UploadedFileType fileType)
+    public async Task<string> UploadDocumentsToStorageAsync(IFormFile documentFile, string agentGuid, UploadedFileType fileType, CancellationToken cancellationToken = default)
     {
         if (documentFile.Length == 0) return string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, documentFile.FileName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, documentFile.FileName }));
 
             var folderName = fileType switch
             {
@@ -169,7 +190,9 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
                 bucket: this.GCPStorageBucketName,
                 objectName: objectName,
                 contentType: documentFile.ContentType,
-                source: stream);
+                source: stream,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
 
             // Construct the public URL for the uploaded object
             return string.Format(GcpCloudStorageConstants.PublicUrlConstant, this.GCPStorageBucketName, uploadedObject.Name);
@@ -181,7 +204,8 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, documentFile.FileName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, documentFile.FileName }));
         }
     }
 

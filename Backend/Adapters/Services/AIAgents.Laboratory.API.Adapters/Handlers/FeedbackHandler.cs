@@ -1,7 +1,7 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
-using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Ports.In;
 using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
@@ -18,8 +18,9 @@ public sealed class FeedbackHandler(IMapper mapper, IFeedbackService feedbackSer
     /// Adds the new bug report data asynchronous.
     /// </summary>
     /// <param name="bugReportData">The bug report data.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> AddNewBugReportDataAsync(AddBugReportDTO bugReportData)
+    public async Task<bool> AddNewBugReportDataAsync(AddBugReportDTO bugReportData, CancellationToken cancellationToken = default)
     {
         var domainInput = mapper.Map<BugReportData>(bugReportData);
         return await feedbackService.AddNewBugReportDataAsync(bugReportData: domainInput).ConfigureAwait(false);
@@ -29,8 +30,9 @@ public sealed class FeedbackHandler(IMapper mapper, IFeedbackService feedbackSer
     /// Adds the new feature request data asynchronous.
     /// </summary>
     /// <param name="featureRequestData">The feature request data.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> AddNewFeatureRequestDataAsync(NewFeatureRequestDTO featureRequestData)
+    public async Task<bool> AddNewFeatureRequestDataAsync(NewFeatureRequestDTO featureRequestData, CancellationToken cancellationToken = default)
     {
         var domainInput = mapper.Map<NewFeatureRequestData>(featureRequestData);
         return await feedbackService.AddNewFeatureRequestDataAsync(featureRequestData: domainInput).ConfigureAwait(false);

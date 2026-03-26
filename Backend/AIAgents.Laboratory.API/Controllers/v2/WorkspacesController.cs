@@ -34,6 +34,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     /// <summary>
     /// Gets the list of all available workspaces available.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="AgentsWorkspaceDTO"/></returns>
     [HttpGet(WorkspacesRoutes.GetAllWorkspaces_Route)]
     [ProducesResponseType(typeof(IEnumerable<AgentsWorkspaceDTO>), StatusCodes.Status200OK)]
@@ -41,7 +42,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllWorkspacesAction.Summary, Description = GetAllWorkspacesAction.Description, OperationId = GetAllWorkspacesAction.OperationId)]
-    public async Task<ResponseDto> GetAllWorkspacesAsync()
+    public async Task<ResponseDto> GetAllWorkspacesAsync(CancellationToken cancellationToken = default)
     {
         IEnumerable<AgentsWorkspaceDTO> result = [];
         try
@@ -51,11 +52,18 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
 
             if (base.IsAuthorized(UserBased))
             {
-                result = await workspacesHandler.GetAllWorkspacesAsync(base.UserEmail).ConfigureAwait(false);
+                result = await workspacesHandler.GetAllWorkspacesAsync(
+                    userName: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result is not null)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -76,6 +84,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     /// Gets the workspace by workspace id.
     /// </summary>
     /// <param name="workspaceId">The workspace guid id.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The agents workspace dto model.</returns>
     [HttpGet(WorkspacesRoutes.GetWorkspaceByWorkspaceId_Route)]
     [ProducesResponseType(typeof(AgentsWorkspaceDTO), StatusCodes.Status200OK)]
@@ -83,7 +92,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetWorkspaceByWorkspaceIdAction.Summary, Description = GetWorkspaceByWorkspaceIdAction.Description, OperationId = GetWorkspaceByWorkspaceIdAction.OperationId)]
-    public async Task<ResponseDto> GetWorkspaceByWorkspaceIdAsync([FromQuery] string workspaceId)
+    public async Task<ResponseDto> GetWorkspaceByWorkspaceIdAsync([FromQuery] string workspaceId, CancellationToken cancellationToken = default)
     {
         AgentsWorkspaceDTO result = new();
         try
@@ -94,11 +103,19 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
             ArgumentException.ThrowIfNullOrEmpty(workspaceId);
             if (base.IsAuthorized(UserBased))
             {
-                result = await workspacesHandler.GetWorkspaceByWorkspaceIdAsync(workspaceId, base.UserEmail).ConfigureAwait(false);
+                result = await workspacesHandler.GetWorkspaceByWorkspaceIdAsync(
+                    workspaceId,
+                    currentUserEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result is not null)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -119,6 +136,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     /// Creates a new workspace.
     /// </summary>
     /// <param name="agentsWorkspaceData">The workspace data dto model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
     [HttpPost(WorkspacesRoutes.AddNewWorkspace_Route)]
     [Consumes(MediaTypeNames.Application.Json)]
@@ -127,7 +145,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = CreateNewWorkspaceAction.Summary, Description = CreateNewWorkspaceAction.Description, OperationId = CreateNewWorkspaceAction.OperationId)]
-    public async Task<ResponseDto> CreateNewWorkspaceAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
+    public async Task<ResponseDto> CreateNewWorkspaceAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -138,11 +156,19 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
             ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
             if (base.IsAuthorized(UserBased))
             {
-                result = await workspacesHandler.CreateNewWorkspaceAsync(agentsWorkspaceData, base.UserEmail).ConfigureAwait(false);
+                result = await workspacesHandler.CreateNewWorkspaceAsync(
+                    agentsWorkspaceData,
+                    currentUserEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -163,6 +189,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     /// Deletes an existing workspace.
     /// </summary>
     /// <param name="workspaceGuidId">The workspace guid id.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
     [HttpDelete(WorkspacesRoutes.DeleteExistingWorkspace_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
@@ -170,7 +197,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = DeleteExistingWorkspaceAction.Summary, Description = DeleteExistingWorkspaceAction.Description, OperationId = DeleteExistingWorkspaceAction.OperationId)]
-    public async Task<ResponseDto> DeleteExistingWorkspaceAsync([FromQuery] string workspaceGuidId)
+    public async Task<ResponseDto> DeleteExistingWorkspaceAsync([FromQuery] string workspaceGuidId, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -181,11 +208,19 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
             ArgumentException.ThrowIfNullOrEmpty(workspaceGuidId);
             if (base.IsAuthorized(UserBased))
             {
-                result = await workspacesHandler.DeleteExistingWorkspaceAsync(workspaceGuidId, base.UserEmail).ConfigureAwait(false);
+                result = await workspacesHandler.DeleteExistingWorkspaceAsync(
+                    workspaceGuidId,
+                    currentUserEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -206,6 +241,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     /// Updates an existing workspace.
     /// </summary>
     /// <param name="agentsWorkspaceData">The agents workspace data dto model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for success/failure.</returns>
     [HttpPut(WorkspacesRoutes.UpdateExistingWorkspace_Route)]
     [Consumes(MediaTypeNames.Application.Json)]
@@ -214,7 +250,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = UpdateExistingWorkspaceDataAction.Summary, Description = UpdateExistingWorkspaceDataAction.Description, OperationId = UpdateExistingWorkspaceDataAction.OperationId)]
-    public async Task<ResponseDto> UpdateExistingWorkspaceDataAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData)
+    public async Task<ResponseDto> UpdateExistingWorkspaceDataAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -225,11 +261,19 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
             ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
             if (base.IsAuthorized(UserBased))
             {
-                result = await workspacesHandler.UpdateExistingWorkspaceDataAsync(agentsWorkspaceData, base.UserEmail).ConfigureAwait(false);
+                result = await workspacesHandler.UpdateExistingWorkspaceDataAsync(
+                    agentsWorkspaceData,
+                    currentUserEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -250,6 +294,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     /// Invokes the workspace agent via chat.
     /// </summary>
     /// <param name="chatRequestDTO">The chat request DTO model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The ai agent response string.</returns>
     [HttpPost(WorkspacesRoutes.InvokeWorkspaceAgent_Route)]
     [Consumes(MediaTypeNames.Application.Json)]
@@ -258,7 +303,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = InvokeWorkspaceAgentAction.Summary, Description = InvokeWorkspaceAgentAction.Description, OperationId = InvokeWorkspaceAgentAction.OperationId)]
-    public async Task<ResponseDto> InvokeWorkspaceAgentAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO)
+    public async Task<ResponseDto> InvokeWorkspaceAgentAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO, CancellationToken cancellationToken = default)
     {
         string result = string.Empty;
         try
@@ -269,11 +314,18 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
             ArgumentNullException.ThrowIfNull(chatRequestDTO);
             if (base.IsAuthorized(ApplicationBased))
             {
-                result = await workspacesHandler.InvokeWorkspaceAgentAsync(chatRequestDTO).ConfigureAwait(false);
+                result = await workspacesHandler.InvokeWorkspaceAgentAsync(
+                    chatRequestDTO,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (!string.IsNullOrWhiteSpace(result))
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -294,6 +346,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     /// Gets the workspace group chat response.
     /// </summary>
     /// <param name="chatRequestDTO">The workspace agent chat request dto model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The response from the group chat.</returns>
     [HttpPost(WorkspacesRoutes.GetWorkspaceGroupChatResponse_Route)]
     [Consumes(MediaTypeNames.Application.Json)]
@@ -302,7 +355,7 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetWorkspaceGroupChatResponseAction.Summary, Description = GetWorkspaceGroupChatResponseAction.Description, OperationId = GetWorkspaceGroupChatResponseAction.OperationId)]
-    public async Task<ResponseDto> GetWorkspaceGroupChatResponseAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO)
+    public async Task<ResponseDto> GetWorkspaceGroupChatResponseAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO, CancellationToken cancellationToken = default)
     {
         GroupChatResponseDTO result = new();
         try
@@ -313,15 +366,21 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
             ArgumentNullException.ThrowIfNull(chatRequestDTO);
             if (base.IsAuthorized(ApplicationBased))
             {
-                result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(chatRequest: chatRequestDTO).ConfigureAwait(false);
+                result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(
+                    chatRequest: chatRequestDTO,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result is not null && !string.IsNullOrEmpty(result.AgentResponse))
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
-
         }
         catch (Exception ex)
         {

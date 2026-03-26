@@ -1,8 +1,8 @@
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.In;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -115,15 +115,22 @@ public sealed class CommonAiService(IConfiguration configuration, ILogger<Common
     /// Gets the top active agents data list and the agents count asynchronously.
     /// </summary>
     /// <param name="userName">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A tupple containing the list of agents and the top 3 active ai agents.</returns>
-    public async Task<(int ActiveAgentsCount, IEnumerable<AgentDataDomain> TopActiveAgentsList)> GetTopActiveAgentsDataAsync(string userName)
+    public async Task<(int ActiveAgentsCount, IEnumerable<AgentDataDomain> TopActiveAgentsList)> GetTopActiveAgentsDataAsync(string userName, CancellationToken cancellationToken = default)
     {
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetTopActiveAgentsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
 
-            var activeAgentsList = await agentsService.GetAllAgentsDataAsync(userEmail: userName).ConfigureAwait(false);
-            return (activeAgentsList.Count(), [.. activeAgentsList.OrderByDescending(x => x.DateModified).Take(3)]);
+            var activeAgentsList = await agentsService.GetAllAgentsDataAsync(
+                userEmail: userName,
+                cancellationToken
+            ).ConfigureAwait(false);
+
+            return (
+                ActiveAgentsCount: activeAgentsList.Count(),
+                TopActiveAgentsList: [.. activeAgentsList.OrderByDescending(x => x.DateModified).Take(3)]);
         }
         catch (Exception ex)
         {

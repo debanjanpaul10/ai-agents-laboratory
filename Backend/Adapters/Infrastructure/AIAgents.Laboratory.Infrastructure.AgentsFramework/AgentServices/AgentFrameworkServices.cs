@@ -1,8 +1,8 @@
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.Helpers;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
@@ -51,7 +51,10 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
             };
 
             var response = await chatClient.GetResponseAsync(
-                messages: chatMessages, cancellationToken: cancellationToken).ConfigureAwait(false);
+                messages: chatMessages,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+
             aiResponse = response?.Text ?? ExceptionConstants.DefaultAIExceptionMessage;
             return aiResponse;
         }
@@ -90,14 +93,18 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
 
             // STEP 1: Get all available MCP Tools
             var availableMcpTools = await mcpClientServices.GetAllMcpToolsAsync(
-                mcpServerUrl, cancellationToken).ConfigureAwait(false);
+                mcpServerUrl,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             // STEP 2: Ask LLM to determine which tool to call (if any)
             var toolDescriptions = string.Join("\n", availableMcpTools.Select(t => $"- {t.Name}: {t.Description}"));
+
             var toolSelectionResultResponse = await this.GetChatMessageAiResponseAsync(
                 prompt: DetermineToolToCallFunction.GetFunctionInstructions(toolDescriptions, jsonInput),
                 input: jsonInput,
-                cancellationToken).ConfigureAwait(false);
+                cancellationToken
+            ).ConfigureAwait(false);
 
             var toolSelectionResult = JsonConvert.DeserializeObject<ToolSelectionResultDomain>(DomainUtilities.ExtractJsonFromMarkdown(toolSelectionResultResponse))
                 ?? throw new JsonSerializationException(ExceptionConstants.InvalidJsonDeserializeExceptionMessage);
@@ -106,13 +113,19 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
             var toolResult = string.Empty;
             if (!string.IsNullOrEmpty(toolSelectionResult.ToolName))
                 toolResult = await mcpClientServices.GetMcpToolResponseAsync(
-                    mcpServerUrl, toolName: toolSelectionResult.ToolName, toolArguments: toolSelectionResult.ToolArguments).ConfigureAwait(false);
+                    mcpServerUrl,
+                    toolName: toolSelectionResult.ToolName,
+                    toolArguments: toolSelectionResult.ToolArguments,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
             // STEP 4: Finally, call the AI function with the original input and the tool result (if any)
             aiResponse = await this.GetChatMessageAiResponseAsync(
                 prompt: GenerateFinalResponseWithToolResultFunction.GetFunctionInstructions(jsonInput, toolResult),
                 input: jsonInput,
-                cancellationToken).ConfigureAwait(false);
+                cancellationToken
+            ).ConfigureAwait(false);
+
             return aiResponse;
         }
         catch (Exception ex)
@@ -163,7 +176,10 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
 
             // Get aiResponse from AI
             var response = await chatClient.GetResponseAsync(
-                messages: chatMessages, cancellationToken: cancellationToken).ConfigureAwait(false);
+                messages: chatMessages,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+
             aiResponse = response?.Text ?? string.Empty;
             return aiResponse;
         }
@@ -201,7 +217,10 @@ public sealed class AgentFrameworkServices(ILogger<AgentFrameworkServices> logge
             };
 
             var aiResponse = await chatClient.GetResponseAsync(
-                messages: chatMessages, cancellationToken: cancellationToken).ConfigureAwait(false);
+                messages: chatMessages,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+
             response = aiResponse?.Text ?? ExceptionConstants.DefaultAIExceptionMessage;
             return response;
         }

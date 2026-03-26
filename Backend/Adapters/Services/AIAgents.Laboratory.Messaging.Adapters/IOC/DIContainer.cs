@@ -1,4 +1,4 @@
-﻿using AIAgents.Laboratory.Domain.DrivenPorts;
+﻿using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Messaging.Adapters.Services;
 using Azure.Communication.Email;
 using Microsoft.Extensions.Configuration;

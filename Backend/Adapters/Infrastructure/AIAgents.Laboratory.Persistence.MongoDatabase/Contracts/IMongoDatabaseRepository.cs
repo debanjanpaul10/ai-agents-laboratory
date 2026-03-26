@@ -1,0 +1,55 @@
+﻿using MongoDB.Driver;
+
+namespace AIAgents.Laboratory.Persistence.MongoDatabase.Contracts;
+
+/// <summary>
+/// Defines the contract for Mongo Database Repository, which provides methods for saving, retrieving, updating, and deleting data in a MongoDB database. 
+/// This interface abstracts the underlying MongoDB operations and allows for easier testing and maintenance of the data access layer in the application.
+/// </summary>
+public interface IMongoDatabaseRepository
+{
+    /// <summary>
+    /// Saves the data asynchronous.
+    /// </summary>
+    /// <typeparam name="TInput">The type of the input.</typeparam>
+    /// <param name="data">The data.</param>
+    /// <param name="databaseName">Name of the database.</param>
+    /// <param name="collectionName">Name of the collection.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The boolean for success/failure.</returns>
+    Task<bool> SaveDataAsync<TInput>(TInput data, string databaseName, string collectionName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the data from collection asynchronous with a filter condition.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="databaseName">Name of the database.</param>
+    /// <param name="collectionName">Name of the collection.</param>
+    /// <param name="filter">The filter definition to apply when querying the collection.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The filtered mongo db collection results.</returns>
+    Task<IEnumerable<TResult>> GetDataFromCollectionAsync<TResult>(string databaseName, string collectionName, FilterDefinition<TResult> filter, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Updates the data in collection asynchronous using filter and update definitions.
+    /// </summary>
+    /// <typeparam name="TDocument">The type of the document.</typeparam>
+    /// <param name="filter">The filter definition to identify documents to update.</param>
+    /// <param name="update">The update definition specifying the updates to apply.</param>
+    /// <param name="databaseName">Name of the database.</param>
+    /// <param name="collectionName">Name of the collection.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The boolean for success/failure.</returns>
+    Task<bool> UpdateDataInCollectionAsync<TDocument>(FilterDefinition<TDocument> filter, UpdateDefinition<TDocument> update, string databaseName, string collectionName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes the data from mongo db collection using filter.
+    /// </summary>
+    /// <typeparam name="TDocument">The type of document.</typeparam>
+    /// <param name="filter">The filter.</param>
+    /// <param name="databaseName">The database name.</param>
+    /// <param name="collectionName">The collection name.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The boolean for success/failure.</returns>
+    Task<bool> DeleteDataFromCollectionAsync<TDocument>(FilterDefinition<TDocument> filter, string databaseName, string collectionName, CancellationToken cancellationToken = default);
+}
