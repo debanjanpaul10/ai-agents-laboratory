@@ -1,5 +1,4 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using MongoDB.Driver;
+using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 
 namespace AIAgents.Laboratory.Domain.Contracts;
 
@@ -21,7 +20,7 @@ public interface IDocumentIntelligenceService
     /// <param name="existingAgent">The current state of the agent's data, used as the baseline for applying knowledge base updates. Cannot be null.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task HandleKnowledgeBaseDataUpdateAsync(AgentDataDomain updateDataDomain, List<UpdateDefinition<AgentDataDomain>> updates, AgentDataDomain existingAgent, CancellationToken cancellationToken = default);
+    Task HandleKnowledgeBaseDataUpdateAsync(AgentDataDomain updateDataDomain, AgentDataDomain existingAgent, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Processes updates to an agent's AI Vision images, including adding new images and removing specified ones, and prepares the corresponding update definitions for persistence.
@@ -33,7 +32,7 @@ public interface IDocumentIntelligenceService
     /// <param name="existingAgent">The current state of the agent's data, used as the baseline for applying AI Vision images updates. Cannot be null.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task HandleAiVisionImagesDataUpdateAsync(AgentDataDomain updateDataDomain, List<UpdateDefinition<AgentDataDomain>> updates, AgentDataDomain existingAgent, CancellationToken cancellationToken = default);
+    Task HandleAiVisionImagesDataUpdateAsync(AgentDataDomain updateDataDomain, AgentDataDomain existingAgent, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Creates and processes a knowledge base document for the specified agent asynchronously.

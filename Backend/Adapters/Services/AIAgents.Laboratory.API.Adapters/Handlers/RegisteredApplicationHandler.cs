@@ -23,7 +23,7 @@ public sealed class RegisteredApplicationHandler(IMapper mapper, IRegisteredAppl
     /// <returns>A boolean for success/failure.</returns>
     public async Task<bool> CreateNewRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDto newApplicationData, CancellationToken cancellationToken = default)
     {
-        var domainInput = mapper.Map<RegisteredApplication>(newApplicationData);
+        var domainInput = mapper.Map<RegisteredApplicationDomain>(newApplicationData);
         return await raService.CreateNewRegisteredApplicationAsync(
             currentLoggedInUser,
             newApplicationData: domainInput,
@@ -90,7 +90,7 @@ public sealed class RegisteredApplicationHandler(IMapper mapper, IRegisteredAppl
     /// <returns>A boolean for success/failure.</returns>
     public async Task<bool> UpdateExistingRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDto updateApplicationData, CancellationToken cancellationToken = default)
     {
-        var domainInput = mapper.Map<RegisteredApplication>(updateApplicationData);
+        var domainInput = mapper.Map<RegisteredApplicationDomain>(updateApplicationData);
         return await raService.UpdateExistingRegisteredApplicationAsync(
             currentLoggedInUser,
             updateApplicationData: domainInput,

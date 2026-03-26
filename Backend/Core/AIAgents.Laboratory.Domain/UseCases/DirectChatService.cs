@@ -49,7 +49,8 @@ public sealed class DirectChatService(ILogger<AgentChatService> logger, IConfigu
             var conversationHistoryTask = conversationHistoryService.GetConversationHistoryAsync(
                 userName: userEmail,
                 cancellationToken);
-            await Task.WhenAll(agentDataTask, conversationHistoryTask).WaitAsync(cancellationToken).ConfigureAwait(false);
+            await Task.WhenAll(agentDataTask, conversationHistoryTask)
+                .WaitAsync(cancellationToken).ConfigureAwait(false);
 
             var conversationHistoryData = conversationHistoryTask.Result;
             var agentMetaprompt = agentDataTask.Result.AgentMetaPrompt;

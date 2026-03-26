@@ -3,7 +3,6 @@ using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Domain.Ports.In;
 using AIAgents.Laboratory.Domain.Ports.Out;
-using AIAgents.Laboratory.Processor.Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

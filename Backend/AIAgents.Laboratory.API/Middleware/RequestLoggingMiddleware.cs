@@ -25,14 +25,19 @@ public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<Reque
 
         try
         {
-            await next(httpContext);
+            await next(
+                httpContext
+            ).ConfigureAwait(false);
         }
         finally
         {
             var loggingForWarning = httpContext.Response.StatusCode >= 400 ? LogLevel.Warning : LogLevel.Information;
             var logLevel = httpContext.Response.StatusCode >= 500 ? LogLevel.Error : loggingForWarning;
-            logger.Log(logLevel, LoggingConstants.HttpLoggingMessageWithTime,
-                httpContext.Request.Method, httpContext.Request.Path, httpContext.Response.StatusCode, stopwatch.ElapsedMilliseconds);
+            if (logger.IsEnabled(logLevel))
+                logger.Log(logLevel, LoggingConstants.HttpLoggingMessageWithTime,
+                    httpContext.Request.Method, httpContext.Request.Path, httpContext.Response.StatusCode, stopwatch.ElapsedMilliseconds);
+
+            stopwatch.Stop();
         }
     }
 }

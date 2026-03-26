@@ -47,7 +47,6 @@ public sealed class ApplicationAdminService(ILogger<ApplicationAdminService> log
         }
     }
 
-
     /// <summary>
     /// Gets all submitted feature requests asynchronous.
     /// </summary>
@@ -89,8 +88,9 @@ public sealed class ApplicationAdminService(ILogger<ApplicationAdminService> log
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(IsAdminAccessEnabledAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser }));
 
             ArgumentException.ThrowIfNullOrWhiteSpace(currentLoggedInUser);
-            var keyValue = commonAiService.GetConfigurationByKeyName(AzureAppConfigurationConstants.AdminEmailAddressConstant).Values.First()
-                ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+            var keyValue = commonAiService.GetConfigurationByKeyName(
+                key: AzureAppConfigurationConstants.AdminEmailAddressConstant
+            ).Values.First() ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
             return keyValue == currentLoggedInUser;
         }

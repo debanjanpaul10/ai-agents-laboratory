@@ -1,0 +1,135 @@
+﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+using Microsoft.AspNetCore.Http;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace AIAgents.Laboratory.Persistence.MongoDatabase.Models;
+
+/// <summary>
+/// The agent data model for MongoDB persistence.
+/// </summary>
+/// <seealso cref="BaseDataModel"/>
+[BsonIgnoreExtraElements]
+public sealed record AgentDataModel : BaseDataModel
+{
+    /// <summary>
+    /// Gets or sets the identifier.
+    /// </summary>
+    /// <value>
+    /// The identifier.
+    /// </value>
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the agent identifier.
+    /// </summary>
+    /// <value>
+    /// The agent identifier.
+    /// </value>
+    public string AgentId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the name of the agent.
+    /// </summary>
+    /// <value>
+    /// The name of the agent.
+    /// </value>
+    public string AgentName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the agent description.
+    /// </summary>
+    /// <value>
+    /// The value of agent description.
+    /// </value>
+    public string AgentDescription { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the agent meta prompt.
+    /// </summary>
+    /// <value>
+    /// The agent meta prompt.
+    /// </value>
+    public string AgentMetaPrompt { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the id of the application.
+    /// </summary>
+    /// <value>
+    /// The id of the application.
+    /// </value>
+    public int ApplicationId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the knowledge base document.
+    /// </summary>
+    /// <value>
+    /// The knowledge base document.
+    /// </value>
+    [BsonIgnore]
+    public IList<IFormFile>? KnowledgeBaseDocument { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the list of knowledge base documents to remove by file name (used for updates only).
+    /// </summary>
+    [BsonIgnore]
+    public IList<string> RemovedKnowledgeBaseDocuments { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the stored knowledge base document.
+    /// </summary>
+    /// <value>
+    /// The knowledge base document domain.
+    /// </value>
+    public IList<KnowledgeBaseDocumentDomain> StoredKnowledgeBase { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the is private boolean flag.
+    /// </summary>
+    /// <value>
+    /// The boolean flag for private agent.
+    /// </value>
+    public bool IsPrivate { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the is default chatbot boolean flag.
+    /// </summary>
+    /// <value>
+    /// The boolean flag for is default chat bot.
+    /// </value>
+    public bool IsDefaultChatbot { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the AI Vision images files.
+    /// </summary>
+    /// <value>
+    ///     The AI Vision images files value.
+    /// </value>
+    [BsonIgnore]
+    public IList<IFormFile>? VisionImages { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the removed AI vision images (To be used for updates only).
+    /// </summary>
+    /// <value>
+    ///     The removed AI vision images value.
+    /// </value>
+    [BsonIgnore]
+    public IList<string> RemovedAiVisionImages { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the AI Vision images data.
+    /// </summary>
+    /// <value>
+    ///     The AI Vision images data value.
+    /// </value>
+    public IList<AiVisionImagesDomain?> AiVisionImagesData { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the associated skill guids.
+    /// </summary>
+    /// <value>The list of associated skill guids.</value>
+    public IList<string> AssociatedSkillGuids { get; set; } = [];
+}

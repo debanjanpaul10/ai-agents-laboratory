@@ -151,7 +151,7 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
     private async Task<IList<AgentDataDomain>> GetActiveAgentsDataAsync(AgentsWorkspaceDomain workspaceDetails, CancellationToken cancellationToken = default)
     {
         IList<AgentDataDomain> agentsData = [];
-        await Parallel.ForEachAsync(workspaceDetails.ActiveAgentsListInWorkspace, async (agent, cancellationToken) =>
+        await Parallel.ForEachAsync(workspaceDetails.ActiveAgentsListInWorkspace, cancellationToken, async (agent, ct) =>
         {
             var agentData = await agentsService.GetAgentDataByIdAsync(
                 agentId: agent.AgentGuid,
@@ -162,7 +162,7 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
             if (agentData is not null)
                 lock (agentsData)
                     agentsData.Add(agentData);
-        });
+        }).ConfigureAwait(false);
 
         return agentsData;
     }

@@ -64,9 +64,12 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
                 ).ConfigureAwait(false);
 
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -110,9 +113,12 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
                 ).ConfigureAwait(false);
 
                 if (result is not null)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -316,9 +322,12 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
                 ).ConfigureAwait(false);
 
                 if (!string.IsNullOrWhiteSpace(result))
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();

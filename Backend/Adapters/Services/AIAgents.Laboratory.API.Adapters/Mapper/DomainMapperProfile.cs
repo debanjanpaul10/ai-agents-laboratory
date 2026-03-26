@@ -58,6 +58,6 @@ public sealed class DomainMapperProfile : Profile
         CreateMap<AgentsWorkspaceDomain, AgentsWorkspaceDTO>().ReverseMap();
         CreateMap<WorkspaceAgentsDataDomain, WorkspaceAgentsDataDTO>().ReverseMap();
         CreateMap<GroupChatResponseDomain, GroupChatResponseDTO>().ReverseMap();
-        CreateMap<RegisteredApplicationDto, RegisteredApplication>().ReverseMap();
+        CreateMap<RegisteredApplicationDto, RegisteredApplicationDomain>().ReverseMap();
     }
 }

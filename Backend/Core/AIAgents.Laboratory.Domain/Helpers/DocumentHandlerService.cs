@@ -1,6 +1,6 @@
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using AIAgents.Laboratory.Processor.Models;
 using Microsoft.AspNetCore.Http;
+using SharpCompress.Common;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.Helpers;
@@ -29,7 +29,7 @@ internal static class DocumentHandlerService
 
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (!allowedExtensions.Contains(fileExtension))
-                throw new FileFormatException(string.Concat(ExceptionConstants.InvalidFileFormatExceptionMessage, allowedFileFormats));
+                throw new InvalidFormatException(string.Concat(ExceptionConstants.InvalidFileFormatExceptionMessage, allowedFileFormats));
         }
     }
 

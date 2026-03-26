@@ -11,11 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNetCore.HealthChecks.UI" Version="9.0.0" />
-    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
-    <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0" />
-    <PackageReference Include="IdentityModel" Version="5.2.0" />
-    <PackageReference Include="KubernetesClient" Version="17.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
@@ -33,7 +28,6 @@
     <ProjectReference Include="..\Adapters\Infrastructure\AIAgents.Laboratory.Persistence.SQLDatabase\AIAgents.Laboratory.Persistence.SQLDatabase.csproj" />
     <ProjectReference Include="..\Adapters\Infrastructure\AIAgents.Laboratory.Storage.Blobs\AIAgents.Laboratory.Storage.Blobs.csproj" />
     <ProjectReference Include="..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
-    <ProjectReference Include="..\Core\AIAgents.Laboratory.Processor\AIAgents.Laboratory.Processor.csproj" />
   </ItemGroup>
 
 </Project>

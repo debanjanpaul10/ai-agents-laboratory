@@ -29,7 +29,6 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
         // Store in custom LogContext for async-safe access
         Helpers.LogContext.CorrelationId = correlationId;
 
-        // Use Microsoft's ILogger.BeginScope to enrich ALL logs in this scope
         try
         {
             using (logger.BeginScope(new Dictionary<string, object>

@@ -5,7 +5,6 @@ using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Domain.Ports.In;
 using AIAgents.Laboratory.Domain.Ports.Out;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -18,25 +17,14 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// </summary>
 /// <remarks>This service provides functionalities to manage workspaces, including creating, updating, deleting, and retrieving workspaces.</remarks>
 /// <param name="logger">The logger service.</param>
-/// <param name="configuration">The configuration service.</param>
 /// <param name="correlationContext">The correlation context for logging.</param>
-/// <param name="mongoDatabaseService">The mongo db service.</param>
+/// <param name="workspacesDataManager">The workspaces data manager.</param>
 /// <param name="agentChatService">The agent chat service.</param>
 /// <param name="orchestratorService">The orchestrator service.</param>
 /// <seealso cref="IWorkspacesService"/>
-public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfiguration configuration, IMongoDatabaseService mongoDatabaseService, ICorrelationContext correlationContext,
+public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorkspacesDataManager workspacesDataManager, ICorrelationContext correlationContext,
     IAgentChatService agentChatService, IOrchestratorService orchestratorService) : IWorkspacesService
 {
-    /// <summary>
-    /// The mongo database name configuration value.
-    /// </summary>
-    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
-
-    /// <summary>
-    /// The workspaces collection name configuration value.
-    /// </summary>
-    private readonly string WorkspacesCollectionName = configuration[MongoDbCollectionConstants.WorkspaceCollectionName] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
-
     /// <summary>
     /// Creates a new workspace.
     /// </summary>
@@ -56,10 +44,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
 
             agentsWorkspaceData.AgentWorkspaceGuid = Guid.NewGuid().ToString();
             agentsWorkspaceData.PrepareAuditEntityData(currentUser: currentUserEmail);
-            return await mongoDatabaseService.SaveDataAsync(
-                data: agentsWorkspaceData,
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.WorkspacesCollectionName,
+            return await workspacesDataManager.CreateNewWorkspaceAsync(
+                agentsWorkspaceData,
+                currentUserEmail,
                 cancellationToken
             ).ConfigureAwait(false);
         }
@@ -92,31 +79,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuidId, currentUserEmail }));
 
-            var filter = Builders<AgentsWorkspaceDomain>.Filter.Where(ws => ws.IsActive && ws.AgentWorkspaceGuid == workspaceGuidId);
-            var allWorkspaces = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.WorkspacesCollectionName,
-                filter,
-                cancellationToken
-            ).ConfigureAwait(false);
-            var updateWorkspace = allWorkspaces.FirstOrDefault() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
-
-            if (updateWorkspace.CreatedBy != currentUserEmail)
-                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
-
-            var updates = new List<UpdateDefinition<AgentsWorkspaceDomain>>
-            {
-                Builders<AgentsWorkspaceDomain>.Update.Set(x => x.IsActive, false),
-                Builders<AgentsWorkspaceDomain>.Update.Set(x => x.DateModified, DateTime.UtcNow),
-                Builders<AgentsWorkspaceDomain>.Update.Set(x => x.ModifiedBy, currentUserEmail)
-            };
-            var update = Builders<AgentsWorkspaceDomain>.Update.Combine(updates);
-
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter,
-                update,
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.WorkspacesCollectionName,
+            return await workspacesDataManager.DeleteExistingWorkspaceAsync(
+                workspaceGuidId,
+                currentUserEmail,
                 cancellationToken
             ).ConfigureAwait(false);
         }
@@ -140,17 +105,17 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     /// <returns>The list of <see cref="AgentsWorkspaceDomain"/></returns>
     public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(string currentUserEmail, CancellationToken cancellationToken = default)
     {
+        IEnumerable<AgentsWorkspaceDomain>? result = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllWorkspacesAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail }));
 
-            var filter = Builders<AgentsWorkspaceDomain>.Filter.And(Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true));
-            return await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.WorkspacesCollectionName,
-                filter,
+            result = await workspacesDataManager.GetAllWorkspacesAsync(
+                currentUserEmail,
                 cancellationToken
             ).ConfigureAwait(false);
+            return result;
         }
         catch (Exception ex)
         {
@@ -159,7 +124,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllWorkspacesAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, result }));
         }
     }
 
@@ -173,21 +139,18 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
     public async Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(string workspaceId, string currentUserEmail, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(workspaceId);
-
+        AgentsWorkspaceDomain? result = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail }));
 
-            var filter = Builders<AgentsWorkspaceDomain>.Filter.And(
-                Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.AgentWorkspaceGuid, workspaceId));
-
-            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.WorkspacesCollectionName,
-                filter,
+            result = await workspacesDataManager.GetWorkspaceByWorkspaceIdAsync(
+                workspaceId,
+                currentUserEmail,
                 cancellationToken
             ).ConfigureAwait(false);
-            return allData?.First() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
+            return result;
         }
         catch (Exception ex)
         {
@@ -196,7 +159,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail, result }));
         }
     }
 
@@ -214,7 +178,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
 
             if (string.IsNullOrWhiteSpace(chatRequest.ConversationId))
                 chatRequest.ConversationId = Guid.NewGuid().ToString();
@@ -249,7 +214,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
         }
     }
 
@@ -322,34 +288,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IConfig
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
 
-            var filter = Builders<AgentsWorkspaceDomain>.Filter.And(
-                   Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.IsActive, true), Builders<AgentsWorkspaceDomain>.Filter.Eq(x => x.AgentWorkspaceGuid, agentsWorkspaceData.AgentWorkspaceGuid));
-            var allWorkspacesData = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.WorkspacesCollectionName,
-                filter,
-                cancellationToken
-            ).ConfigureAwait(false);
-
-            var existingWorkspaceData = allWorkspacesData.FirstOrDefault() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
-            if (!existingWorkspaceData.WorkspaceUsers.Contains(currentUserEmail))
-                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
-
-            var updates = new List<UpdateDefinition<AgentsWorkspaceDomain>>
-            {
-                Builders<AgentsWorkspaceDomain>.Update.Set(x => x.AgentWorkspaceName, agentsWorkspaceData.AgentWorkspaceName),
-                Builders<AgentsWorkspaceDomain>.Update.Set(x => x.ActiveAgentsListInWorkspace, agentsWorkspaceData.ActiveAgentsListInWorkspace),
-                Builders<AgentsWorkspaceDomain>.Update.Set(x => x.WorkspaceUsers, agentsWorkspaceData.WorkspaceUsers),
-                Builders<AgentsWorkspaceDomain>.Update.Set(x => x.DateModified, DateTime.UtcNow),
-                Builders<AgentsWorkspaceDomain>.Update.Set(x => x.ModifiedBy, currentUserEmail)
-            };
-            var update = Builders<AgentsWorkspaceDomain>.Update.Combine(updates);
-
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter,
-                update,
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.WorkspacesCollectionName,
+            return await workspacesDataManager.UpdateExistingWorkspaceDataAsync(
+                agentsWorkspaceData,
+                currentUserEmail,
                 cancellationToken
             ).ConfigureAwait(false);
         }

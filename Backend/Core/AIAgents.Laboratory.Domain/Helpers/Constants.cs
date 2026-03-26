@@ -189,42 +189,6 @@ internal static class Constants
     }
 
     /// <summary>
-    /// The MongoDB collection constants class.
-    /// </summary>
-    internal static class MongoDbCollectionConstants
-    {
-        /// <summary>
-        /// The skills database name
-        /// </summary>
-        internal const string AiAgentsPrimaryDatabase = "AiAgentsPrimaryDatabase";
-
-        /// <summary>
-        /// The agents collection name
-        /// </summary>
-        internal const string AgentsCollectionName = "AgentsCollection";
-
-        /// <summary>
-        /// The conversation history collection name.
-        /// </summary>
-        internal const string ConversationHistoryCollectionName = "ConversationHistoryCollection";
-
-        /// <summary>
-        /// The tool skills collection name.
-        /// </summary>
-        internal const string ToolSkillsCollectionName = "ToolSkillsCollection";
-
-        /// <summary>
-        /// The agents workspace collection name.
-        /// </summary>
-        internal const string WorkspaceCollectionName = "WorkspaceCollection";
-
-        /// <summary>
-        /// The registered applications collection name.
-        /// </summary>
-        internal const string RegisteredApplicationsCollectionName = "RegisteredApplicationsCollection";
-    }
-
-    /// <summary>
     /// The chatbot helper constants.
     /// </summary>
     internal static class ChatbotHelperConstants

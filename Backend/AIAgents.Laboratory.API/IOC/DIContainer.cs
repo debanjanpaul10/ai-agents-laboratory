@@ -12,7 +12,6 @@ using AIAgents.Laboratory.Messaging.Adapters.IOC;
 using AIAgents.Laboratory.Persistence.Caching.IOC;
 using AIAgents.Laboratory.Persistence.MongoDatabase.IOC;
 using AIAgents.Laboratory.Persistence.SQLDatabase.IOC;
-using AIAgents.Laboratory.Processor.IOC;
 using AIAgents.Laboratory.Storage.Blobs.IOC;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -70,7 +69,7 @@ public static class DIContainer
         services.AddAgentsFrameworkDependencies(configuration).AddMongoDbAdapterDependencies(configuration)
             .AddRelationalSqlDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
 
-        services.AddDomainDependencies().AddProcessorDependencies(configuration);
+        services.AddDomainDependencies();
     }
 
     /// <summary>
@@ -110,7 +109,9 @@ public static class DIContainer
                 RequireExpirationTime = true,
                 RequireSignedTokens = true,
                 ValidAudience = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant],
-                ValidIssuer = string.Format(CultureInfo.CurrentCulture, AzureAppConfigurationConstants.TokenFormatUrl, configuration[AzureAppConfigurationConstants.AzureAdTenantIdConstant]),
+                ValidIssuer = string.Format(CultureInfo.CurrentCulture,
+                    AzureAppConfigurationConstants.TokenFormatUrl,
+                    configuration[AzureAppConfigurationConstants.AzureAdTenantIdConstant]),
                 SignatureValidator = (token, _) => new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(token)
             };
             options.Events = new JwtBearerEvents
