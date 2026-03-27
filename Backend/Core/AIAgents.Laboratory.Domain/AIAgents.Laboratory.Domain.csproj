@@ -8,13 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.9" />
-    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.72.0-alpha" />
     <PackageReference Include="ModelContextProtocol" Version="1.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="3.6.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AIAgents.Laboratory.Processor\AIAgents.Laboratory.Processor.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Ports.In;
 using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.Extensions.DependencyInjection;
 

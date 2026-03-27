@@ -31,7 +31,11 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
 
-            var mcpClient = await this.CreateMcpClientAsync(mcpServerUrl).ConfigureAwait(false);
+            var mcpClient = await this.CreateMcpClientAsync(
+                mcpServerUrl,
+                cancellationToken
+            ).ConfigureAwait(false);
+
             return await mcpClient.ListToolsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -60,11 +64,20 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         string response = string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl, toolName, toolArguments }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetMcpToolResponseAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl, toolName, toolArguments }));
 
             var arguments = toolArguments ?? [];
-            var mcpClient = await this.CreateMcpClientAsync(mcpServerUrl, cancellationToken).ConfigureAwait(false);
-            var callToolResult = await mcpClient.CallToolAsync(toolName, arguments, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var mcpClient = await this.CreateMcpClientAsync(
+                mcpServerUrl,
+                cancellationToken
+            ).ConfigureAwait(false);
+
+            var callToolResult = await mcpClient.CallToolAsync(
+                toolName,
+                arguments,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
 
             response = JsonConvert.SerializeObject(callToolResult);
             return response;
@@ -76,7 +89,8 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetMcpToolResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl, toolName, toolArguments, response }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetMcpToolResponseAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl, toolName, toolArguments, response }));
         }
     }
 
@@ -95,7 +109,12 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateMcpClientAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl));
 
             var aiAgentsToken = await TokenHelper.GetAiAgentsLabTokenAsync(
-                correlationId: correlationContext.CorrelationId, configuration, logger).ConfigureAwait(false);
+                correlationId: correlationContext.CorrelationId,
+                configuration,
+                logger,
+                cancellationToken
+            ).ConfigureAwait(false);
+
             var transportOptions = new HttpClientTransportOptions
             {
                 Endpoint = new Uri(mcpServerUrl),
@@ -106,7 +125,10 @@ public sealed class McpAgentServices(IConfiguration configuration, ILogger<McpAg
             };
 
             var httpClientTransport = new HttpClientTransport(transportOptions);
-            return await McpClient.CreateAsync(clientTransport: httpClientTransport, cancellationToken: cancellationToken);
+            return await McpClient.CreateAsync(
+                clientTransport: httpClientTransport,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

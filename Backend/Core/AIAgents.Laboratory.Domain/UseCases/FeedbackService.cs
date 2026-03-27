@@ -1,8 +1,8 @@
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
-using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.In;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -33,8 +33,9 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
     /// Adds the new bug report data asynchronous.
     /// </summary>
     /// <param name="bugReportData">The bug report data.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> AddNewBugReportDataAsync(BugReportData bugReportData)
+    public async Task<bool> AddNewBugReportDataAsync(BugReportData bugReportData, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(bugReportData);
 
@@ -43,14 +44,22 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, bugReportData }));
 
             bugReportData.PrepareAuditEntityData(bugReportData.CreatedBy);
-            var feedbackSaveResult = await feedbackDataManager.AddNewBugReportDataAsync(bugReportData).ConfigureAwait(false);
+            var feedbackSaveResult = await feedbackDataManager.AddNewBugReportDataAsync(
+                bugReportData,
+                cancellationToken
+            ).ConfigureAwait(false);
 
-            var template = await File.ReadAllTextAsync(FeedbackTemplateConstants.FileName).ConfigureAwait(false);
+            var template = await File.ReadAllTextAsync(
+                path: FeedbackTemplateConstants.FileName,
+                cancellationToken
+            ).ConfigureAwait(false);
+
             var emailSendResult = await emailNotificationService.SendEmailNotificationAsync(
                 subject: bugReportData.Title,
                 content: string.Format(template, bugReportData.Title, bugReportData.Description, bugReportData.CreatedBy),
-                recipient: ADMIN_EMAIL_ADDRESS).ConfigureAwait(false);
-
+                recipient: ADMIN_EMAIL_ADDRESS,
+                cancellationToken
+            ).ConfigureAwait(false);
             return feedbackSaveResult && emailSendResult;
         }
         catch (Exception ex)
@@ -68,8 +77,9 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
     /// Adds the new feature request data asynchronous.
     /// </summary>
     /// <param name="featureRequestData">The feature request data.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> AddNewFeatureRequestDataAsync(NewFeatureRequestData featureRequestData)
+    public async Task<bool> AddNewFeatureRequestDataAsync(NewFeatureRequestData featureRequestData, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(featureRequestData);
 
@@ -78,13 +88,22 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, featureRequestData }));
 
             featureRequestData.PrepareAuditEntityData(featureRequestData.CreatedBy);
-            var feedbackSaveResult = await feedbackDataManager.AddNewFeatureRequestDataAsync(featureRequestData).ConfigureAwait(false);
+            var feedbackSaveResult = await feedbackDataManager.AddNewFeatureRequestDataAsync(
+                featureRequestData,
+                cancellationToken
+            ).ConfigureAwait(false);
 
-            var template = await File.ReadAllTextAsync(FeedbackTemplateConstants.FileName).ConfigureAwait(false);
+            var template = await File.ReadAllTextAsync(
+                path: FeedbackTemplateConstants.FileName,
+                cancellationToken
+            ).ConfigureAwait(false);
+
             var emailSendResult = await emailNotificationService.SendEmailNotificationAsync(
                 subject: featureRequestData.Title,
                 content: string.Format(template, featureRequestData.Title, featureRequestData.Description, featureRequestData.CreatedBy),
-                recipient: ADMIN_EMAIL_ADDRESS).ConfigureAwait(false);
+                recipient: ADMIN_EMAIL_ADDRESS,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             return feedbackSaveResult && emailSendResult;
         }
@@ -103,16 +122,22 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
     /// Gets all bug reports data asynchronous.
     /// </summary>
     /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A list of <see cref="BugReportData"/></returns>
-    public async Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(string currentLoggedinUser)
+    public async Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(string currentLoggedinUser, CancellationToken cancellationToken = default)
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
 
-            return await this.GetRespectiveFeedbackResponseAsync(
-                currentUserEmail: currentLoggedinUser,
-                dataManagerMethod: feedbackDataManager.GetAllBugReportsDataAsync).ConfigureAwait(false);
+            if (currentLoggedinUser == ADMIN_EMAIL_ADDRESS)
+                return await feedbackDataManager.GetAllBugReportsDataAsync(
+                    currentLoggedinUser,
+                    cancellationToken
+                ).ConfigureAwait(false);
+            else
+                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
         }
         catch (Exception ex)
         {
@@ -121,7 +146,8 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
         }
     }
 
@@ -129,16 +155,22 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
     /// Gets all submitted feature requests asynchronous.
     /// </summary>
     /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation. Optional.</param>
     /// <returns>A list of <see cref="NewFeatureRequestData"/></returns>
-    public async Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser)
+    public async Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser, CancellationToken cancellationToken = default)
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
 
-            return await this.GetRespectiveFeedbackResponseAsync(
-                currentUserEmail: currentLoggedinUser,
-                dataManagerMethod: feedbackDataManager.GetAllSubmittedFeatureRequestsAsync).ConfigureAwait(false);
+            if (currentLoggedinUser == ADMIN_EMAIL_ADDRESS)
+                return await feedbackDataManager.GetAllSubmittedFeatureRequestsAsync(
+                    currentLoggedinUser,
+                    cancellationToken
+                ).ConfigureAwait(false);
+            else
+                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
         }
         catch (Exception ex)
         {
@@ -147,27 +179,8 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
         }
     }
-
-    #region PRIVATE METHODS
-
-    /// <summary>
-    /// Gets the respective feedback response based on the user email. If the user is admin, it will return the data from data manager, otherwise it will throw unauthorized access exception.
-    /// </summary>
-    /// <typeparam name="TResponse">The response type inferred.</typeparam>
-    /// <param name="currentUserEmail">The current logged in user email address.</param>
-    /// <param name="dataManagerMethod">The data manager method to perform the respective action.</param>
-    /// <returns>The response type inferred from <see cref="TResponse"/>.</returns>
-    /// <exception cref="UnauthorizedAccessException">If user is not admin, return unauthentication error.</exception>
-    private async Task<TResponse> GetRespectiveFeedbackResponseAsync<TResponse>(string currentUserEmail, Func<string, Task<TResponse>> dataManagerMethod)
-    {
-        if (currentUserEmail == ADMIN_EMAIL_ADDRESS)
-            return await dataManagerMethod(currentUserEmail).ConfigureAwait(false);
-        else
-            throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
-    }
-
-    #endregion
 }

@@ -1,6 +1,4 @@
-﻿using AIAgents.Laboratory.Processor.Models;
-using Microsoft.AspNetCore.Http;
-using MongoDB.Bson;
+﻿using Microsoft.AspNetCore.Http;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
@@ -8,7 +6,6 @@ namespace AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 /// <summary>
 /// The Agent Data Domain model.
 /// </summary>
-[BsonIgnoreExtraElements]
 public sealed record AgentDataDomain : BaseDomainModel
 {
     /// <summary>
@@ -17,8 +14,6 @@ public sealed record AgentDataDomain : BaseDomainModel
     /// <value>
     /// The identifier.
     /// </value>
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = string.Empty;
 
     /// <summary>

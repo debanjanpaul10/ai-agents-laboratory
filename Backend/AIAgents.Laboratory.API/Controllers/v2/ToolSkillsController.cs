@@ -32,6 +32,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     /// <summary>
     /// Gets the list of all active tool skills asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="ToolSkillDTO"/></returns>
     [HttpGet(ToolSkillsRoutes.GetAllToolSkills_Route)]
     [ProducesResponseType(typeof(IEnumerable<ToolSkillDTO>), StatusCodes.Status200OK)]
@@ -39,7 +40,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllToolSkillsAction.Summary, Description = GetAllToolSkillsAction.Description, OperationId = GetAllToolSkillsAction.OperationId)]
-    public async Task<ResponseDto> GetAllToolSkillsAsync()
+    public async Task<ResponseDto> GetAllToolSkillsAsync(CancellationToken cancellationToken = default)
     {
         IEnumerable<ToolSkillDTO> result = [];
         try
@@ -49,11 +50,18 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
 
             if (base.IsAuthorized(UserBased))
             {
-                result = await toolSkillsHandler.GetAllToolSkillsAsync(base.UserEmail).ConfigureAwait(false);
+                result = await toolSkillsHandler.GetAllToolSkillsAsync(
+                    userEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result is not null)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -74,6 +82,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     /// Gets a single tool skill by id.
     /// </summary>
     /// <param name="skillId">The tool skill id.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The tool skill dto model.</returns>
     [HttpGet(ToolSkillsRoutes.GetToolSkillBySkillId_Route)]
     [ProducesResponseType(typeof(ToolSkillDTO), StatusCodes.Status200OK)]
@@ -81,7 +90,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetToolSkillBySkillIdAction.Summary, Description = GetToolSkillBySkillIdAction.Description, OperationId = GetToolSkillBySkillIdAction.OperationId)]
-    public async Task<ResponseDto> GetToolSkillBySkillIdAsync([FromQuery] string skillId)
+    public async Task<ResponseDto> GetToolSkillBySkillIdAsync([FromQuery] string skillId, CancellationToken cancellationToken = default)
     {
         ToolSkillDTO result = new();
         try
@@ -92,11 +101,19 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
             ArgumentException.ThrowIfNullOrEmpty(skillId);
             if (base.IsAuthorized(UserBased))
             {
-                result = await toolSkillsHandler.GetToolSkillBySkillIdAsync(skillId, base.UserEmail).ConfigureAwait(false);
+                result = await toolSkillsHandler.GetToolSkillBySkillIdAsync(
+                    toolSkillId: skillId,
+                    currentUserEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result is not null && result.ToolSkillGuid is not null)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status500InternalServerError, ExceptionConstants.DataCannotBeFoundExceptionMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status500InternalServerError,
+                        message: ExceptionConstants.DataCannotBeFoundExceptionMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -118,6 +135,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     /// Creates a new tool skill data.
     /// </summary>
     /// <param name="toolSkillData">The tool skill data dto model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for <c>success/failure.</c></returns>
     [HttpPost(ToolSkillsRoutes.AddNewToolSkill_Route)]
     [Consumes(MediaTypeNames.Multipart.FormData)]
@@ -126,7 +144,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = AddNewToolSkillAction.Summary, Description = AddNewToolSkillAction.Description, OperationId = AddNewToolSkillAction.OperationId)]
-    public async Task<ResponseDto> AddNewToolSkillAsync([FromForm] ToolSkillDTO toolSkillData)
+    public async Task<ResponseDto> AddNewToolSkillAsync([FromForm] ToolSkillDTO toolSkillData, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -137,11 +155,19 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
             ArgumentNullException.ThrowIfNull(toolSkillData);
             if (base.IsAuthorized(UserBased))
             {
-                result = await toolSkillsHandler.AddNewToolSkillAsync(toolSkillData, base.UserEmail).ConfigureAwait(false);
+                result = await toolSkillsHandler.AddNewToolSkillAsync(
+                    toolSkillData,
+                    userEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -162,6 +188,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     /// Updates an existing tool skill data.
     /// </summary>
     /// <param name="updateToolSkillData">The updated tool skill data dto model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for <c>success/failure.</c></returns>
     [HttpPut(ToolSkillsRoutes.UpdateExistingToolSkillData_Route)]
     [Consumes(MediaTypeNames.Multipart.FormData)]
@@ -170,7 +197,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = UpdateExistingToolSkillDataAction.Summary, Description = UpdateExistingToolSkillDataAction.Description, OperationId = UpdateExistingToolSkillDataAction.OperationId)]
-    public async Task<ResponseDto> UpdateExistingToolSkillDataAsync([FromForm] ToolSkillDTO updateToolSkillData)
+    public async Task<ResponseDto> UpdateExistingToolSkillDataAsync([FromForm] ToolSkillDTO updateToolSkillData, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -181,11 +208,19 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
             ArgumentNullException.ThrowIfNull(updateToolSkillData);
             if (base.IsAuthorized(UserBased))
             {
-                result = await toolSkillsHandler.UpdateExistingToolSkillDataAsync(updateToolSkillData, base.UserEmail).ConfigureAwait(false);
+                result = await toolSkillsHandler.UpdateExistingToolSkillDataAsync(
+                    updateToolSkillData,
+                    currentUserEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -206,6 +241,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     /// Deletes an existing tool skill by its skill id.
     /// </summary>
     /// <param name="skillId">The tool skill id.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for <c>success/failure.</c></returns>
     [HttpDelete(ToolSkillsRoutes.DeleteExistingToolSkillBySkillId_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
@@ -213,7 +249,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = DeleteExistingToolSkillBySkillIdAction.Summary, Description = DeleteExistingToolSkillBySkillIdAction.Description, OperationId = DeleteExistingToolSkillBySkillIdAction.OperationId)]
-    public async Task<ResponseDto> DeleteExistingToolSkillBySkillIdAsync([FromQuery] string skillId)
+    public async Task<ResponseDto> DeleteExistingToolSkillBySkillIdAsync([FromQuery] string skillId, CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
@@ -224,11 +260,19 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
             ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
             if (base.IsAuthorized(UserBased))
             {
-                result = await toolSkillsHandler.DeleteExistingToolSkillBySkillIdAsync(skillId, base.UserEmail).ConfigureAwait(false);
+                result = await toolSkillsHandler.DeleteExistingToolSkillBySkillIdAsync(
+                    toolSkillId: skillId,
+                    currentUserEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -249,6 +293,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     /// Gets all the MCP tools available from the given MCP server url.
     /// </summary>
     /// <param name="mcpServerToolRequest">The provided MCP server tools data request model DTO.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="McpServerToolsDTO"/></returns>
     [HttpPost(ToolSkillsRoutes.GetAllMcpToolsAvailable_Route)]
     [ProducesResponseType(typeof(IEnumerable<McpServerToolsDTO>), StatusCodes.Status200OK)]
@@ -256,7 +301,7 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetAllMcpToolsAvailableAction.Summary, Description = GetAllMcpToolsAvailableAction.Description, OperationId = GetAllMcpToolsAvailableAction.OperationId)]
-    public async Task<ResponseDto> GetAllMcpToolsAvailableAsync(McpServerToolRequestDTO mcpServerToolRequest)
+    public async Task<ResponseDto> GetAllMcpToolsAvailableAsync(McpServerToolRequestDTO mcpServerToolRequest, CancellationToken cancellationToken = default)
     {
         IEnumerable<McpServerToolsDTO> result = [];
         try
@@ -264,18 +309,21 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, mcpServerToolRequest }));
 
-            ArgumentNullException.ThrowIfNull(mcpServerToolRequest);
-            ArgumentException.ThrowIfNullOrWhiteSpace(mcpServerToolRequest.ServerUrl);
             if (base.IsAuthorized(UserBased))
             {
                 result = await toolSkillsHandler.GetAllMcpToolsAvailableAsync(
                     serverUrl: mcpServerToolRequest.ServerUrl,
-                    currentUserEmail: base.UserEmail).ConfigureAwait(false);
+                    currentUserEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
                 if (result is not null)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();

@@ -1,4 +1,4 @@
-﻿using AIAgents.Laboratory.Domain.DrivenPorts;
+﻿using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.Caching.Services;
 using Microsoft.Extensions.DependencyInjection;
 

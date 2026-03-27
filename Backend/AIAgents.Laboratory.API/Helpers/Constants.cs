@@ -241,34 +241,9 @@ internal static class Constants
         internal const string AIAgentsClientIdConstant = "AiAgentsClientId";
 
         /// <summary>
-        /// The gemini api key constant.
+        /// The application insights connection string constant.
         /// </summary>
-        internal const string GeminiAPIKeyConstant = "GeminiAPIKey";
-
-        /// <summary>
-        /// The gemini flash model
-        /// </summary>
-        internal const string GeminiFlashModel = "GeminiFlashModel";
-
-        /// <summary>
-        /// The gemini pro model
-        /// </summary>
-        internal const string GeminiProModel = "GeminiProModel";
-
-        /// <summary>
-        /// The is pro model enabled flag
-        /// </summary>
-        internal const string IsProModelEnabledFlag = "IsProModelEnabled";
-
-        /// <summary>
-        /// The azure application configuration constant
-        /// </summary>
-        internal const string AzureAppConfigurationConstant = "AzureAppConfiguration";
-
-        /// <summary>
-        /// The azure signal r connection
-        /// </summary>
-        internal const string AzureSignalRConnection = "AzureSignalRConnection";
+        internal const string ApplicationInsightsConnectionString = "ApplicationInsights:ConnectionString";
     }
 
     /// <summary>

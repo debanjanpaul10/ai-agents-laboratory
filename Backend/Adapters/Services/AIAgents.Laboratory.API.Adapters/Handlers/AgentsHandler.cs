@@ -2,7 +2,7 @@
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Ports.In;
 using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
@@ -20,13 +20,18 @@ public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) 
     /// </summary>
     /// <param name="agentData">The agent data.</param>
     /// <param name="userEmail">The user email address.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The boolean for success/failure.
     /// </returns>
-    public async Task<bool> CreateNewAgentAsync(CreateAgentDTO agentData, string userEmail)
+    public async Task<bool> CreateNewAgentAsync(CreateAgentDTO agentData, string userEmail, CancellationToken cancellationToken = default)
     {
         var domainInput = mapper.Map<AgentDataDomain>(agentData);
-        return await agentsService.CreateNewAgentAsync(agentData: domainInput, userEmail).ConfigureAwait(false);
+        return await agentsService.CreateNewAgentAsync(
+            agentData: domainInput,
+            userEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -34,12 +39,17 @@ public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) 
     /// </summary>
     /// <param name="agentId">The agent identifier.</param>
     /// <param name="userEmail">The user email address.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The agent data dto.
     /// </returns>
-    public async Task<AgentDataDTO> GetAgentDataByIdAsync(string agentId, string userEmail)
+    public async Task<AgentDataDTO> GetAgentDataByIdAsync(string agentId, string userEmail, CancellationToken cancellationToken = default)
     {
-        var domainResult = await agentsService.GetAgentDataByIdAsync(agentId, userEmail).ConfigureAwait(false);
+        var domainResult = await agentsService.GetAgentDataByIdAsync(
+            agentId,
+            userEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
         return mapper.Map<AgentDataDTO>(domainResult);
     }
 
@@ -47,10 +57,14 @@ public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) 
     /// Gets all agents data asynchronous.
     /// </summary>
     /// <param name="userEmail">The current logged in user email.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of <see cref="AgentDataDTO"/></returns>
-    public async Task<IEnumerable<AgentDataDTO>> GetAllAgentsDataAsync(string userEmail)
+    public async Task<IEnumerable<AgentDataDTO>> GetAllAgentsDataAsync(string userEmail, CancellationToken cancellationToken = default)
     {
-        var domainResult = await agentsService.GetAllAgentsDataAsync(userEmail).ConfigureAwait(false);
+        var domainResult = await agentsService.GetAllAgentsDataAsync(
+            userEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
         return mapper.Map<IEnumerable<AgentDataDTO>>(domainResult);
     }
 
@@ -59,11 +73,16 @@ public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) 
     /// </summary>
     /// <param name="updateAgentData">The update agent data DTO model.</param>
     /// <param name="currentUserEmail">The current logged in user email.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData, string currentUserEmail)
+    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData, string currentUserEmail, CancellationToken cancellationToken = default)
     {
         var domainRequest = mapper.Map<AgentDataDomain>(updateAgentData);
-        return await agentsService.UpdateExistingAgentDataAsync(updateDataDomain: domainRequest, userEmail: currentUserEmail).ConfigureAwait(false);
+        return await agentsService.UpdateExistingAgentDataAsync(
+            updateDataDomain: domainRequest,
+            userEmail: currentUserEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -71,10 +90,15 @@ public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) 
     /// </summary>
     /// <param name="agentId">The agent id.</param>
     /// <param name="currentUserEmail">The current logged in user email.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail)
+    public async Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail, CancellationToken cancellationToken = default)
     {
-        return await agentsService.DeleteExistingAgentDataAsync(agentId, currentUserEmail).ConfigureAwait(false);
+        return await agentsService.DeleteExistingAgentDataAsync(
+            agentId,
+            currentUserEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -82,9 +106,14 @@ public sealed class AgentsHandler(IMapper mapper, IAgentsService agentsService) 
     /// </summary>
     /// <param name="agentGuid">The agent guid id.</param>
     /// <param name="fileName">The file name.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The downloaded file url</returns>
-    public async Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName)
+    public async Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName, CancellationToken cancellationToken = default)
     {
-        return await agentsService.DownloadKnowledgebaseFileAsync(agentGuid, fileName).ConfigureAwait(false);
+        return await agentsService.DownloadKnowledgebaseFileAsync(
+            agentGuid,
+            fileName,
+            cancellationToken
+        ).ConfigureAwait(false);
     }
 }
