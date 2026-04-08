@@ -1,14 +1,14 @@
-using AIAgents.Laboratory.Domain.DomainEntities;
+﻿using AIAgents.Laboratory.Domain.DomainEntities;
 
 namespace AIAgents.Laboratory.Domain.Ports.Out;
 
 /// <summary>
-/// Email-specific notification service.
+/// The Application Notification Service interface.
 /// </summary>
-public interface IEmailNotificationService
+public interface IApplicationNotificationsService
 {
     /// <summary>
-    /// Sends an email notification asynchronously based on the provided notification request domain entity.
+    /// Sends a notification asynchronously based on the provided notification request domain entity.
     /// </summary>
     /// <param name="notificationRequest">The notification request domain entity.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
@@ -17,4 +17,3 @@ public interface IEmailNotificationService
         NotificationRequestDomain notificationRequest,
         CancellationToken cancellationToken = default);
 }
-

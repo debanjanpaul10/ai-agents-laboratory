@@ -1,4 +1,5 @@
 using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Domain.Ports.In;
@@ -21,8 +22,12 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="feedbackDataManager">The feedback data manager.</param>
 /// <param name="emailNotificationService">The email notification service.</param>
 /// <seealso cref="IFeedbackService"/>
-public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfiguration configuration, ICorrelationContext correlationContext,
-    IFeedbackDataManager feedbackDataManager, IEmailNotificationService emailNotificationService) : IFeedbackService
+public sealed class FeedbackService(
+    ILogger<FeedbackService> logger,
+    IConfiguration configuration,
+    ICorrelationContext correlationContext,
+    IFeedbackDataManager feedbackDataManager,
+    IEmailNotificationService emailNotificationService) : IFeedbackService
 {
     /// <summary>
     /// The admin email address from configuration.
@@ -54,12 +59,16 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
                 cancellationToken
             ).ConfigureAwait(false);
 
-            var emailSendResult = await emailNotificationService.SendEmailNotificationAsync(
-                subject: bugReportData.Title,
-                content: string.Format(template, bugReportData.Title, bugReportData.Description, bugReportData.CreatedBy),
-                recipient: ADMIN_EMAIL_ADDRESS,
-                cancellationToken
-            ).ConfigureAwait(false);
+            var emailSendResult = await emailNotificationService.SendNotificationAsync(
+                notificationRequest: new NotificationRequestDomain
+                {
+                    Title = bugReportData.Title,
+                    Message = string.Format(template, bugReportData.Title, bugReportData.Description, bugReportData.CreatedBy),
+                    RecipientUserName = ADMIN_EMAIL_ADDRESS,
+                    NotificationType = "email",
+                    CreatedBy = bugReportData.CreatedBy
+                },
+                cancellationToken: cancellationToken).ConfigureAwait(false);
             return feedbackSaveResult && emailSendResult;
         }
         catch (Exception ex)
@@ -98,12 +107,16 @@ public sealed class FeedbackService(ILogger<FeedbackService> logger, IConfigurat
                 cancellationToken
             ).ConfigureAwait(false);
 
-            var emailSendResult = await emailNotificationService.SendEmailNotificationAsync(
-                subject: featureRequestData.Title,
-                content: string.Format(template, featureRequestData.Title, featureRequestData.Description, featureRequestData.CreatedBy),
-                recipient: ADMIN_EMAIL_ADDRESS,
-                cancellationToken
-            ).ConfigureAwait(false);
+            var emailSendResult = await emailNotificationService.SendNotificationAsync(
+                notificationRequest: new NotificationRequestDomain
+                {
+                    Title = featureRequestData.Title,
+                    Message = string.Format(template, featureRequestData.Title, featureRequestData.Description, featureRequestData.CreatedBy),
+                    RecipientUserName = ADMIN_EMAIL_ADDRESS,
+                    NotificationType = "email",
+                    CreatedBy = featureRequestData.CreatedBy
+                },
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             return feedbackSaveResult && emailSendResult;
         }

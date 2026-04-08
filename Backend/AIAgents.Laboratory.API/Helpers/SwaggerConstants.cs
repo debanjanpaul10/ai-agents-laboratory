@@ -396,5 +396,40 @@ internal static class SwaggerConstants
             internal const string OperationId = nameof(UpdateExistingRegisteredApplicationDataAction);
         }
     }
-}
 
+    /// <summary>
+    /// Swagger documentation for NotificationsController.
+    /// </summary>
+    internal static class NotificationsController
+    {
+        /// <summary>
+        /// Swagger documentation for CreateNewNotificationAsync.
+        /// </summary>
+        internal static class CreateNewNotificationAction
+        {
+            internal const string Summary = "Creates a new notification.";
+            internal const string Description = "Creates a new notification for the users.";
+            internal const string OperationId = nameof(CreateNewNotificationAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for PollNotificationsForUserAsync.
+        /// </summary>
+        internal static class PollNotificationsForUserAction
+        {
+            internal const string Summary = "Polls the notifications for user.";
+            internal const string Description = "Polls the notifications for user based on the user id passed.";
+            internal const string OperationId = nameof(PollNotificationsForUserAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for MarkExistingNotificationAsReadAsync.
+        /// </summary>
+        internal static class MarkExistingNotificationAsReadAction
+        {
+            internal const string Summary = "Marks an existing notification as read.";
+            internal const string Description = "Marks an existing notification as read in the system based on the notification guid id passed.";
+            internal const string OperationId = nameof(MarkExistingNotificationAsReadAction);
+        }
+    }
+}

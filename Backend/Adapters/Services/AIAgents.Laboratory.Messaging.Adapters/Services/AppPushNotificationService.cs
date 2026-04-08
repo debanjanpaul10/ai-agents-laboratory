@@ -2,8 +2,7 @@ using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Domain.Ports.Out;
-using Azure.Communication.Email;
-using Microsoft.Extensions.Configuration;
+using AIAgents.Laboratory.Messaging.Adapters.Contracts;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Messaging.Adapters.Helpers.Constants;
@@ -11,34 +10,24 @@ using static AIAgents.Laboratory.Messaging.Adapters.Helpers.Constants;
 namespace AIAgents.Laboratory.Messaging.Adapters.Services;
 
 /// <summary>
-/// The email notification service.
+/// Provides functionality for sending application push notifications using the specified configuration and logging context.
 /// </summary>
-/// <param name="logger">The logger service.</param>
-/// <param name="configuration">The configuration service.</param>
-/// <param name="correlationContext">The correlation context for logging.</param>
-/// <param name="emailClient">The email client service.</param>
-/// <seealso cref="IEmailNotificationService"/>
-public sealed class EmailNotificationService(
-    ILogger<EmailNotificationService> logger,
-    IConfiguration configuration,
+/// <param name="logger">The logger used to record informational and error messages related to notification operations.</param>
+/// <param name="correlationContext">The correlation context used to track and correlate notification operations across system boundaries.</param>
+/// <param name="serviceBusManager">The service bus manager used to send messages to the appropriate Azure Service Bus queue for processing push notifications.</param>
+/// <seealso cref="IApplicationNotificationsService"/>
+public sealed class AppPushNotificationService(
+    ILogger<AppPushNotificationService> logger,
     ICorrelationContext correlationContext,
-    EmailClient emailClient) : IEmailNotificationService
+    IServiceBusManager serviceBusManager) : IApplicationNotificationsService
 {
-    /// <summary>
-    /// The email communication service sender address.
-    /// </summary>
-    private readonly string EMAIL_COMMUNICATION_SENDER = configuration[AzureAppConfigurationConstants.EmailNotificationServiceSenderAddress]
-        ?? throw new KeyNotFoundException(ExceptionMessagesConstants.ConfigurationMissingExceptionMessage);
-
     /// <summary>
     /// Sends a notification asynchronously based on the provided notification request domain entity.
     /// </summary>
     /// <param name="notificationRequest">The notification request domain entity.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> SendNotificationAsync(
-        NotificationRequestDomain notificationRequest,
-        CancellationToken cancellationToken = default)
+    public async Task<bool> SendNotificationAsync(NotificationRequestDomain notificationRequest, CancellationToken cancellationToken = default)
     {
         bool response = false;
         try
@@ -46,16 +35,12 @@ public sealed class EmailNotificationService(
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(SendNotificationAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationRequest }));
 
-            EmailSendOperation emailSendingOperation = await emailClient.SendAsync(
-                wait: Azure.WaitUntil.Completed,
-                senderAddress: EMAIL_COMMUNICATION_SENDER,
-                recipientAddress: notificationRequest.RecipientUserName,
-                subject: notificationRequest.Title,
-                htmlContent: notificationRequest.Message,
-                cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
+            await serviceBusManager.SendQueueMessageAsync(
+                payload: notificationRequest,
+                queueName: null,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            response = emailSendingOperation.Value.Status == EmailSendStatus.Succeeded;
+            response = true;
             return response;
         }
         catch (Exception ex)

@@ -1,10 +1,3 @@
-﻿// *********************************************************************************
-//	<copyright file="Constants.cs" company="Personal">
-//		Copyright (c) 2025 Personal
-//	</copyright>
-// <summary>The Constants Class.</summary>
-// *********************************************************************************
-
 namespace AIAgents.Laboratory.Messaging.Adapters.Helpers;
 
 /// <summary>
@@ -67,27 +60,21 @@ internal static class Constants
         /// The email notification service sender address.
         /// </summary>
         internal const string EmailNotificationServiceSenderAddress = "EmailNotification:SenderAddress";
-    }
-
-    /// <summary>
-    /// The Messaging Constants Class.
-    /// </summary>
-    internal static class MessagingConstants
-    {
-        /// <summary>
-        /// The delay between iterations ms
-        /// </summary>
-        internal const int DelayBetweenIterationsMs = 60000;
 
         /// <summary>
-        /// The agent status changed
+        /// The Azure Service Bus connection string.
         /// </summary>
-        internal const string AgentStatusChanged = "AgentStatusChanged";
+        internal const string ServiceBusConnectionString = "ServiceBus:ConnectionString";
 
         /// <summary>
-        /// The receive agent status function
+        /// The default Azure Service Bus queue name.
         /// </summary>
-        internal const string ReceiveAgentStatusFunction = "ReceiveAgentStatus";
+        internal const string PushNotificationsQueueName = "ServiceBus:PushNotificationsQueue";
+
+        /// <summary>
+        /// The application json constant.
+        /// </summary>
+        internal const string ApplicationJsonConstant = "application/json";
     }
 
     /// <summary>
