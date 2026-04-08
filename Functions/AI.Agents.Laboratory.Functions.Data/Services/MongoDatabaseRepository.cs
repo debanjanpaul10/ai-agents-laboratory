@@ -86,13 +86,10 @@ public sealed class MongoDatabaseRepository(
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TInput>(collectionName);
 
-            var insertOptions = new InsertOneOptions { BypassDocumentValidation = true };
             await collectionData.InsertOneAsync(
                 document: data,
-                options: insertOptions,
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
-
             return true;
         }
         catch (Exception ex)

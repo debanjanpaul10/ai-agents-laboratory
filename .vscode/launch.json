@@ -8,9 +8,9 @@
 		},
 		{
 			"name": "Functions DEBUG",
-			"type": "coreclr",
-			"request": "attach",
-			"processId": "${command:azureFunctions.pickProcess}"
+			"type": "dotnet",
+			"request": "launch",
+			"projectPath": "${workspaceFolder}/Functions/AI.Agents.Laboratory.Functions/AI.Agents.Laboratory.Functions.csproj"
 		}
 	],
 	"version": "0.2.0"

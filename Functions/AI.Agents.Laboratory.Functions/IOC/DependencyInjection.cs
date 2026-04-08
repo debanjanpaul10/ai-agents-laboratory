@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using AI.Agents.Laboratory.Functions.Business.Contracts;
 using AI.Agents.Laboratory.Functions.Business.Services;
 using AI.Agents.Laboratory.Functions.Data.Contracts;
@@ -25,16 +26,22 @@ public static class DependencyInjection
     /// </summary>
     /// <param name="context">The HostBuilderContext provides information about the hosting environment and configuration during application startup.</param>
     /// <param name="config">The IConfigurationBuilder is used to build the application's configuration, allowing it to read from various sources such as JSON files, environment variables, and Azure App Configuration.</param>
-    public static void ConfigureAzureAppConfiguration(this HostBuilderContext context, IConfigurationBuilder config)
+    public static IConfigurationBuilder ConfigureAzureAppConfiguration(this HostBuilderContext context, IConfigurationBuilder config)
     {
-        if (context.HostingEnvironment.IsDevelopment())
-            config.AddJsonFile(EnvironmentConfigurationConstants.LocalAppsetingsFileName, optional: true, reloadOnChange: true)
-                .AddUserSecrets<Program>()
-                .AddEnvironmentVariables();
+        var environment = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") ?? context.HostingEnvironment.EnvironmentName;
+        var currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        var rootDirectory = GetRootDirectory(currentDirectory!);
+        config.SetBasePath(rootDirectory)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+            .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false)
+            .AddEnvironmentVariables();
+
+        config.AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true);
 
         // Build the configuration to access the Managed Identity Client ID for Azure App Configuration authentication
-        var builtConfig = config.Build();
-        var miCredentials = builtConfig[EnvironmentConfigurationConstants.ManagedIdentityClientIdConstant];
+        var configuration = config.Build();
+        var miCredentials = configuration[EnvironmentConfigurationConstants.ManagedIdentityClientIdConstant];
 
         var credentials = context.HostingEnvironment.IsDevelopment()
             ? new DefaultAzureCredential()
@@ -43,7 +50,7 @@ public static class DependencyInjection
                 ManagedIdentityClientId = miCredentials,
             });
 
-        var appConfigurationEndpoint = builtConfig[EnvironmentConfigurationConstants.AppConfigurationEndpointKeyConstant];
+        var appConfigurationEndpoint = configuration[EnvironmentConfigurationConstants.AppConfigurationEndpointKeyConstant];
         if (string.IsNullOrEmpty(appConfigurationEndpoint))
             throw new InvalidOperationException(ExceptionConstants.MissingConfigurationMessage);
 
@@ -57,6 +64,7 @@ public static class DependencyInjection
                 .Select(KeyFilter.Any, AzureAppConfigurationConstants.FunctionAppConfigKeyConstant)
             .ConfigureKeyVault(configure => configure.SetCredential(credentials));
         });
+        return config;
     }
 
     /// <summary>
@@ -99,5 +107,27 @@ public static class DependencyInjection
 
         services.AddSingleton<IMongoClient>(new MongoClient(settings));
         return services;
+    }
+
+    /// <summary>
+    /// Determines the root directory for configuration file loading based on the current directory of the executing assembly. 
+    /// </summary>
+    /// <remarks>It checks if the current directory contains the configuration files, and if not, it traverses up one level in the directory structure to find the root directory where the configuration files are located. 
+    /// This ensures that the application can correctly load configuration files regardless of the execution context or directory structure.</remarks>
+    /// <param name="currentDirectory">The current directory to check for configuration files.</param>
+    /// <returns>The root directory where the configuration files are located.</returns>
+    private static string GetRootDirectory(string currentDirectory)
+    {
+        string rootDirectory;
+        if (string.IsNullOrEmpty(currentDirectory))
+            rootDirectory = Directory.GetCurrentDirectory();
+
+        else if (Directory.GetFiles(currentDirectory, "appsettings.*", SearchOption.TopDirectoryOnly).Length > 0)
+            rootDirectory = currentDirectory;
+
+        else
+            rootDirectory = Path.GetFullPath(Path.Combine(currentDirectory, ".."));
+
+        return rootDirectory;
     }
 }

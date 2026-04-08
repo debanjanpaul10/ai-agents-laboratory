@@ -38,7 +38,7 @@ public sealed class PushNotificationsFunction(
     /// <returns>A task representing the asynchronous operation of processing the push notification message.</returns>
     [Function(nameof(PushNotificationsFunction))]
     public async Task RunAsync(
-        [ServiceBusTrigger("%PushNotificationsQueue%", Connection = "%AzureServiceBusConnectionString%")] ServiceBusReceivedMessage message,
+        [ServiceBusTrigger("%PushNotificationsQueue%", Connection = "AzureServiceBusConnectionString")] ServiceBusReceivedMessage message,
         ServiceBusMessageActions messageActions,
         CancellationToken cancellationToken = default)
     {
