@@ -1,9 +1,9 @@
-namespace AIAgents.Laboratory.API.Adapters.Models.Request;
+﻿namespace AI.Agents.Laboratory.Functions.Shared.Models;
 
 /// <summary>
-/// The Create Notification Request DTO.
+/// The <c>NotificationRequest</c> class represents a request to send a notification to a user or group of users.
 /// </summary>
-public sealed record CreateNotificationRequestDto
+public sealed record NotificationRequest
 {
     /// <summary>
     /// Gets or sets the notification title.

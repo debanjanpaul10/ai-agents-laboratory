@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="AI.Agents.Laboratory.Functions.Business/AI.Agents.Laboratory.Functions.Business.csproj" Id="06fde962-4cd4-4427-8fe0-5cc77a6ce9b8" />
+  <Project Path="AI.Agents.Laboratory.Functions.Data/AI.Agents.Laboratory.Functions.Data.csproj" Id="ac1fb631-d8d6-4be8-9c0b-ba75e9f3491b" />
+  <Project Path="AI.Agents.Laboratory.Functions.Shared/AI.Agents.Laboratory.Functions.Shared.csproj" Id="c1aa3e29-ce7e-4cab-a12b-d32aaa393723" />
+  <Project Path="AI.Agents.Laboratory.Functions/AI.Agents.Laboratory.Functions.csproj" />
+</Solution>

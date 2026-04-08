@@ -1,0 +1,14 @@
+{
+	"IsEncrypted": false,
+	"Values": {
+		"AppConfigurationEndpoint": "https://appcs-ai-agents-lab.azconfig.io",
+		"ManagedIdentityClientId": "738f988b-7a90-4384-85b7-49ce3e2eef7f",
+		"ApplicationInsights": {
+			"ConnectionString": "InstrumentationKey=5c54a9bd-a552-424c-a8c5-cb4f7e301d19;IngestionEndpoint=https://centralindia-0.in.applicationinsights.azure.com/;LiveEndpoint=https://centralindia.livediagnostics.monitor.azure.com/;ApplicationId=7f4cc23b-f19f-47ff-a6a0-da9964d7ce3d"
+		},
+		"AzureWebJobsStorage": "UseDevelopmentStorage=true",
+		"AzureServiceBusConnectionString": "",
+		"FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+		"PushNotificationsQueue": "pushnotificationsqueue"
+	}
+}

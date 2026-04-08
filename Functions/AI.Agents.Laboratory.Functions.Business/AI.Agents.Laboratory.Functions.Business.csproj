@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AI.Agents.Laboratory.Functions.Data\AI.Agents.Laboratory.Functions.Data.csproj" />
+    <ProjectReference Include="..\AI.Agents.Laboratory.Functions.Shared\AI.Agents.Laboratory.Functions.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

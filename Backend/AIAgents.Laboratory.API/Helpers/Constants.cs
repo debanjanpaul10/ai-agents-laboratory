@@ -91,6 +91,7 @@ internal static class Constants
         /// The unhandled exception logging message constant.
         /// </summary>
         internal const string UnhandledExceptionMessage = "Unhandled exception occurred. CorrelationId: {CorrelationId}, Path: {Path}, Method: {Method}";
+
         /// <summary>
         /// The header logging constants class.
         /// </summary>
@@ -265,26 +266,5 @@ internal static class Constants
         /// The client id claim constant.
         /// </summary>
         public const string ClientIdClaimConstant = "aud";
-    }
-
-    /// <summary>
-    /// Provides constant values used for health check operations within the application.
-    /// </summary>
-    internal static class HealthCheckConstants
-    {
-        /// <summary>
-        /// The application name constant used for health check tagging and identification.
-        /// </summary>
-        internal const string AppHealthCheckName = "AI Agents Laboratory API";
-
-        /// <summary>
-        /// The endpoint path for the health check API, which is used to monitor the health status of the application.
-        /// </summary>
-        internal const string AppHealthCheckEndpoint = "/api/health";
-
-        /// <summary>
-        /// The endpoint path for the health check UI, which provides a visual interface to view the health status of the application and its dependencies.
-        /// </summary>
-        internal const string AppHealthCheckEndpointUI = "/healthcheck-ui";
     }
 }

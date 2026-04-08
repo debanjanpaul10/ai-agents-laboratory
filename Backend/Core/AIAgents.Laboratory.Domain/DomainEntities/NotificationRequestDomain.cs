@@ -44,4 +44,9 @@ public sealed record NotificationRequestDomain
     /// The created by user identifier.
     /// </value>
     public string CreatedBy { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether this notification is global (visible to all users) or user-specific.
+    /// </summary>
+    public bool IsGlobal { get; set; }
 }

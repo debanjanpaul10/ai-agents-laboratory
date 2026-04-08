@@ -28,7 +28,7 @@ public sealed class NotificationsHandler(
     {
         var domainInput = mapper.Map<NotificationRequestDomain>(request);
         return await notificationsService.CreateNewNotificationAsync(
-            domainInput,
+            request: domainInput,
             cancellationToken
         ).ConfigureAwait(false);
     }
