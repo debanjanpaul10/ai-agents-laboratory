@@ -118,6 +118,11 @@ internal static class Constants
         /// The registered applications collection name.
         /// </summary>
         internal const string RegisteredApplicationsCollectionName = "RegisteredApplicationsCollection";
+
+        /// <summary>
+        /// The notifications collection name key.
+        /// </summary>
+        internal const string NotificationsCollectionName = "NotificationsCollection";
     }
 
 }

@@ -68,7 +68,8 @@ public static class DIContainer
         .AddScoped<IConversationHistoryDataManager, ConversationHistoryDataManager>()
         .AddScoped<IRegisteredApplicationDataManager, RegisteredApplicationDataManager>()
         .AddScoped<IWorkspacesDataManager, WorkspacesDataManager>()
-        .AddScoped<IToolSkillsDataManager, ToolSkillsDataManager>();
+        .AddScoped<IToolSkillsDataManager, ToolSkillsDataManager>()
+        .AddScoped<INotificationsDataManager, NotificationsDataManager>();
 
     /// <summary>
     /// Adds the data repositories.

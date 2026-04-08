@@ -27,7 +27,7 @@ public sealed class AppPushNotificationService(
     /// <param name="notificationRequest">The notification request domain entity.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> SendNotificationAsync(NotificationRequestDomain notificationRequest, CancellationToken cancellationToken = default)
+    public async Task<bool> SendNotificationAsync(NotificationsDomain notificationRequest, CancellationToken cancellationToken = default)
     {
         bool response = false;
         try

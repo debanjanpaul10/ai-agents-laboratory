@@ -14,7 +14,7 @@ public interface IEmailNotificationService
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
     Task<bool> SendNotificationAsync(
-        NotificationRequestDomain notificationRequest,
+        NotificationsDomain notificationRequest,
         CancellationToken cancellationToken = default);
 }
 

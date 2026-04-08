@@ -26,5 +26,6 @@ public sealed class MongoDataMapperProfile : Profile
         CreateMap<RegisteredApplicationDomain, RegisteredApplicationDataModel>().ReverseMap();
         CreateMap<ToolSkillDomain, ToolSkillModel>().ReverseMap();
         CreateMap<AssociatedAgentsSkillDataDomain, AssociatedAgentsSkillDataModel>().ReverseMap();
+        CreateMap<NotificationsDomain, NotificationsModel>().ReverseMap();
     }
 }

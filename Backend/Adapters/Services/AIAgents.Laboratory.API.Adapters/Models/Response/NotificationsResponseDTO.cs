@@ -1,9 +1,9 @@
-namespace AIAgents.Laboratory.Domain.DomainEntities;
+namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 
 /// <summary>
-/// The Notification Request Domain Entity.
+/// The Notifications Response DTO is a data transfer object used to represent the details of a notification in the AIAgents Laboratory application.
 /// </summary>
-public sealed record NotificationsDomain
+public sealed record NotificationsResponseDto
 {
     /// <summary>
     /// Gets or sets the notification title.

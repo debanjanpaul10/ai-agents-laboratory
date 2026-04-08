@@ -1,5 +1,6 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
+using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Ports.In;
 using AutoMapper;
@@ -26,10 +27,28 @@ public sealed class NotificationsHandler(
         CreateNotificationRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var domainInput = mapper.Map<NotificationRequestDomain>(request);
+        var domainInput = mapper.Map<NotificationsDomain>(request);
         return await notificationsService.CreateNewNotificationAsync(
             request: domainInput,
             cancellationToken
         ).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Retrieves a list of notifications for a specific user based on their username. 
+    /// This method allows clients to fetch all notifications that are relevant to a particular user
+    /// </summary>
+    /// <param name="recipientUserName">The username of the user for whom to retrieve notifications.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
+    /// <returns>A list of notifications relevant to the specified user.</returns>
+    public async Task<IEnumerable<NotificationsResponseDto>> GetNotificationsForUserAsync(
+        string recipientUserName,
+        CancellationToken cancellationToken = default)
+    {
+        var domainResponse = await notificationsService.GetNotificationsForUserAsync(
+            recipientUserName: recipientUserName,
+            cancellationToken: cancellationToken
+        ).ConfigureAwait(false);
+        return mapper.Map<IEnumerable<NotificationsResponseDto>>(domainResponse);
     }
 }

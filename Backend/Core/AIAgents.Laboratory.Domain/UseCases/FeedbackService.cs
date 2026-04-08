@@ -60,7 +60,7 @@ public sealed class FeedbackService(
             ).ConfigureAwait(false);
 
             var emailSendResult = await emailNotificationService.SendNotificationAsync(
-                notificationRequest: new NotificationRequestDomain
+                notificationRequest: new NotificationsDomain
                 {
                     Title = bugReportData.Title,
                     Message = string.Format(template, bugReportData.Title, bugReportData.Description, bugReportData.CreatedBy),
@@ -108,7 +108,7 @@ public sealed class FeedbackService(
             ).ConfigureAwait(false);
 
             var emailSendResult = await emailNotificationService.SendNotificationAsync(
-                notificationRequest: new NotificationRequestDomain
+                notificationRequest: new NotificationsDomain
                 {
                     Title = featureRequestData.Title,
                     Message = string.Format(template, featureRequestData.Title, featureRequestData.Description, featureRequestData.CreatedBy),

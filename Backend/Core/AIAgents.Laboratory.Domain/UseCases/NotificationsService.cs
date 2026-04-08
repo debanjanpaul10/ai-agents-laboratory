@@ -15,11 +15,13 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="logger">The ILogger instance is used for logging information, warnings, and errors that occur within the service's methods. This helps in monitoring the application's behavior and diagnosing issues when they arise.</param>
 /// <param name="correlationContext">The ICorrelationContext is used to manage correlation IDs for requests, which helps in tracing and correlating logs across different components of the application, especially in distributed systems.</param>
 /// <param name="notificationsService">The IApplicationNotificationsService is an abstraction that encapsulates the business logic for handling notifications.</param>
+/// <param name="notificationsDataManager">The INotificationsDataManager is an abstraction for data access operations related to notifications, allowing the service to interact with the underlying data storage without being tightly coupled to a specific implementation.</param>
 /// <seealso cref="INotificationsService"/>
 public sealed class NotificationsService(
     ILogger<NotificationsService> logger,
     ICorrelationContext correlationContext,
-    IApplicationNotificationsService notificationsService) : INotificationsService
+    IApplicationNotificationsService notificationsService,
+    INotificationsDataManager notificationsDataManager) : INotificationsService
 {
     /// <summary>
     /// Creates a new notification based on the provided request data.
@@ -28,7 +30,7 @@ public sealed class NotificationsService(
     /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
     /// <returns>True if the notification was created successfully; otherwise, false.</returns>
     public async Task<bool> CreateNewNotificationAsync(
-        NotificationRequestDomain request,
+        NotificationsDomain request,
         CancellationToken cancellationToken = default)
     {
         bool response = false;
@@ -52,6 +54,41 @@ public sealed class NotificationsService(
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewNotificationAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request, response }));
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a list of notifications for a specific user based on their username. 
+    /// This method allows clients to fetch all notifications that are relevant to a particular user
+    /// </summary>
+    /// <param name="recipientUserName">The username of the user for whom to retrieve notifications.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
+    /// <returns>A list of notifications relevant to the specified user.</returns>
+    public async Task<IEnumerable<NotificationsDomain>> GetNotificationsForUserAsync(
+        string recipientUserName,
+        CancellationToken cancellationToken = default)
+    {
+        IEnumerable<NotificationsDomain>? response = null;
+        try
+        {
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetNotificationsForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName }));
+
+            response = await notificationsDataManager.GetNotificationsForUserAsync(
+                recipientUserName: recipientUserName,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetNotificationsForUserAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+        }
+        finally
+        {
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetNotificationsForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName, response }));
         }
     }
 }

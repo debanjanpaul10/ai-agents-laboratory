@@ -1,6 +1,7 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Base;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
+using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -91,6 +92,56 @@ public sealed class NotificationsController(
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewNotificationAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request, response }));
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a list of notifications for a specific user based on their username. 
+    /// This method allows clients to fetch all notifications that are relevant to a particular user.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
+    /// <returns>A list of notifications relevant to the specified user.</returns>
+    [HttpGet(NotificationsRoutes.PollNotificationsForUser_Route)]
+    [ProducesResponseType(typeof(IEnumerable<NotificationsResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(Summary = PollNotificationsForUserAction.Summary, Description = PollNotificationsForUserAction.Description, OperationId = PollNotificationsForUserAction.OperationId)]
+    public async Task<ResponseDto> PollNotificationsForUserAsync(CancellationToken cancellationToken = default)
+    {
+        IEnumerable<NotificationsResponseDto> response = [];
+        try
+        {
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(PollNotificationsForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+
+            if (base.IsAuthorized(UserBased))
+            {
+                response = await notificationsHandler.GetNotificationsForUserAsync(
+                    recipientUserName: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+                if (response is not null)
+                    return HandleSuccessRequestResponse(
+                        responseData: response);
+                else
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+            }
+
+            return HandleUnAuthorizedRequestResponse();
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(PollNotificationsForUserAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+        }
+        finally
+        {
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(PollNotificationsForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, response }));
         }
     }
 }
