@@ -1,7 +1,8 @@
-﻿namespace AIAgents.Laboratory.Persistence.MongoDatabase.Models;
+namespace AI.Agents.Laboratory.Functions.Data.Models;
 
 /// <summary>
-/// The BaseDataModel class serves as a base class for all data models in the AIAgents Laboratory application, providing common properties for tracking the state and history of documents stored in the MongoDB database.
+/// The BaseDataModel class serves as a foundational data model that includes common properties for all data models in the AIAgents Laboratory application, such as IsActive, DateCreated, CreatedBy, DateModified, and ModifiedBy. 
+/// This class can be inherited by other data models to ensure consistency and reduce code duplication across the application.
 /// </summary>
 public record BaseDataModel
 {

@@ -64,7 +64,9 @@ public sealed class NotificationsDataManager(
                 NotificationType = request.NotificationType,
                 CreatedBy = request.CreatedBy,
                 IsGlobal = request.IsGlobal,
-                CreatedOnUtc = DateTime.UtcNow
+                DateCreated = DateTime.UtcNow,
+                DateModified = DateTime.UtcNow,
+                ModifiedBy = request.CreatedBy
             };
 
             response = await mongoDatabaseRepository.SaveDataAsync(

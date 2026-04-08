@@ -3,24 +3,62 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace AI.Agents.Laboratory.Functions.Data.Models;
 
-public sealed class NotificationModel
+/// <summary>
+/// The NotificationModel class represents the structure of a notification document stored in the MongoDB database for the AIAgents Laboratory application.
+/// </summary>
+/// <seealso cref="BaseDataModel"/>
+public sealed record NotificationModel : BaseDataModel
 {
+    /// <summary>
+    /// The unique identifier for the registered application, represented as an ObjectId in MongoDB.
+    /// </summary>
     [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string? Id { get; set; }
+    public ObjectId _id { get; set; }
 
+    /// <summary>
+    /// Gets or sets the identifier of the registered application.
+    /// </summary>
+    /// <summary>
+    /// The Tool skill id.
+    /// </summary>
+    [BsonElement("Id")]
+    public int Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the notification title.
+    /// </summary>
+    /// <value>
+    /// The notification title.
+    /// </value>
     public string Title { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the notification message content.
+    /// </summary>
+    /// <value>
+    /// The notification message content.
+    /// </value>
     public string Message { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the recipient user identifier.
+    /// </summary>
+    /// <value>
+    /// The recipient user identifier.
+    /// </value>
     public string RecipientUserName { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the notification type.
+    /// </summary>
+    /// <value>
+    /// The notification type (e.g., email, in-app, push).
+    /// </value>
     public string NotificationType { get; set; } = string.Empty;
 
-    public string CreatedBy { get; set; } = string.Empty;
-
+    /// <summary>
+    /// Gets or sets a value indicating whether this notification is global (visible to all users) or user-specific.
+    /// </summary>
     public bool IsGlobal { get; set; }
-
-    public DateTime CreatedOnUtc { get; set; } = DateTime.UtcNow;
 }
 
