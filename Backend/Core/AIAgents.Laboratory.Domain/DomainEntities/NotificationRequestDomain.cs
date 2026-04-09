@@ -6,6 +6,14 @@ namespace AIAgents.Laboratory.Domain.DomainEntities;
 public sealed record NotificationsDomain
 {
     /// <summary>
+    /// Gets or sets the identifier of the registered application.
+    /// </summary>
+    /// <summary>
+    /// The Tool skill id.
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
     /// Gets or sets the notification title.
     /// </summary>
     /// <value>

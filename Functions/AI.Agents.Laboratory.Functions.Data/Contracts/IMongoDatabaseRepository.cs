@@ -20,7 +20,8 @@ public interface IMongoDatabaseRepository
         TInput data,
         string databaseName,
         string collectionName,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Retrieves data from a specified collection within a MongoDB database based on a provided filter, returning an enumerable of the specified result type.
@@ -35,7 +36,8 @@ public interface IMongoDatabaseRepository
         string databaseName,
         string collectionName,
         FilterDefinition<TResult> filter,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Updates data in a specified collection within a MongoDB database based on a provided filter and update definition, returning a boolean indicating the success of the operation.
@@ -52,7 +54,8 @@ public interface IMongoDatabaseRepository
         UpdateDefinition<TDocument> update,
         string databaseName,
         string collectionName,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Deletes data from a specified collection within a MongoDB database based on a provided filter, returning a boolean indicating the success of the operation.
@@ -67,6 +70,7 @@ public interface IMongoDatabaseRepository
         FilterDefinition<TDocument> filter,
         string databaseName,
         string collectionName,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }
 

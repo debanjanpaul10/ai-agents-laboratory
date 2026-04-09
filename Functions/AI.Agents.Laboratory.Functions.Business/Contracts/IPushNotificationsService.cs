@@ -15,5 +15,6 @@ public interface IPushNotificationsService
     /// <returns>A task representing the asynchronous operation.</returns>
     Task<bool> ReceivePushNotificationAsync(
         NotificationRequest request,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

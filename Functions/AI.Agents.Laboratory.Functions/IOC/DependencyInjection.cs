@@ -15,8 +15,13 @@ using MongoDB.Driver;
 namespace AI.Agents.Laboratory.Functions.IOC;
 
 /// <summary>
-/// The Dependency Injection Container Class.
+/// This static class is responsible for configuring dependency injection for the Azure Functions application. 
 /// </summary>
+/// <remarks>
+/// It includes methods to set up Azure App Configuration, register business, data, and repository dependencies, and configure the MongoDB client for database interactions. 
+/// The class ensures that all necessary services are registered in the IServiceCollection, allowing for seamless dependency injection throughout the application. 
+/// It also includes logic to determine the root directory for configuration file loading, ensuring that the application can correctly access configuration settings regardless of the execution context.
+///</remarks>
 [ExcludeFromCodeCoverage]
 public static class DependencyInjection
 {
@@ -28,16 +33,24 @@ public static class DependencyInjection
     /// <param name="config">The IConfigurationBuilder is used to build the application's configuration, allowing it to read from various sources such as JSON files, environment variables, and Azure App Configuration.</param>
     public static IConfigurationBuilder ConfigureAzureAppConfiguration(this HostBuilderContext context, IConfigurationBuilder config)
     {
-        var environment = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") ?? context.HostingEnvironment.EnvironmentName;
+        var environment = Environment.GetEnvironmentVariable(EnvironmentConfigurationConstants.AzureFunctionsEnvironmentConstant)
+            ?? context.HostingEnvironment.EnvironmentName;
         var currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         var rootDirectory = GetRootDirectory(currentDirectory!);
         config.SetBasePath(rootDirectory)
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-            .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false)
+            .AddJsonFile(
+                path: EnvironmentConfigurationConstants.AppsettingsLocalJsonFileName,
+                optional: true, reloadOnChange: false)
+            .AddJsonFile(
+                path: string.Format(EnvironmentConfigurationConstants.AppsettingsEnvironmentBasedFileName, environment),
+                optional: true, reloadOnChange: false)
             .AddEnvironmentVariables();
 
-        config.AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true);
+        config.AddUserSecrets(
+            assembly: Assembly.GetExecutingAssembly(),
+            optional: true
+        );
 
         // Build the configuration to access the Managed Identity Client ID for Azure App Configuration authentication
         var configuration = config.Build();
@@ -82,13 +95,21 @@ public static class DependencyInjection
     /// <returns>The updated IServiceCollection with the registered data dependencies.</returns>
     public static IServiceCollection AddDataDependencies(this IServiceCollection services, IConfiguration configuration) =>
         services.ConfigureMongoDbServer(configuration)
-            .AddScoped<IMongoDatabaseRepository, MongoDatabaseRepository>()
             .AddScoped<INotificationsDataManager, NotificationsDataManager>();
 
     /// <summary>
-    /// Configures the MongoDB server connection settings and registers the MongoDB client in the service collection for dependency injection. 
-    /// It retrieves the MongoDB connection string from the configuration, sets up the MongoClientSettings with TLS and SSL settings, and adds the IMongoClient as a singleton service to the IServiceCollection, allowing it to be injected and used throughout the application for database operations.
+    /// Adds repository layer dependencies to the service collection, allowing for dependency injection of repository services throughout the application.
     /// </summary>
+    /// <param name="services">The IServiceCollection to register the repository services in.</param>
+    /// <returns>The updated IServiceCollection with the registered repository dependencies.</returns>
+    public static IServiceCollection AddRepositories(this IServiceCollection services) =>
+        services.AddScoped<IMongoDatabaseRepository, MongoDatabaseRepository>();
+
+    /// <summary>
+    /// Configures the MongoDB server connection settings and registers the MongoDB client in the service collection for dependency injection. 
+    /// </summary>
+    /// <remarks>It retrieves the MongoDB connection string from the configuration, sets up the MongoClientSettings with TLS and SSL settings, and adds the IMongoClient as a singleton service to the IServiceCollection, 
+    /// allowing it to be injected and used throughout the application for database operations.</remarks>
     /// <param name="services">The IServiceCollection to register the MongoDB client in.</param>
     /// <param name="configuration">The IConfiguration to retrieve the MongoDB connection string from.</param>
     /// <returns>The updated IServiceCollection with the registered MongoDB client.</returns>
@@ -122,7 +143,7 @@ public static class DependencyInjection
         if (string.IsNullOrEmpty(currentDirectory))
             rootDirectory = Directory.GetCurrentDirectory();
 
-        else if (Directory.GetFiles(currentDirectory, "appsettings.*", SearchOption.TopDirectoryOnly).Length > 0)
+        else if (Directory.GetFiles(currentDirectory, EnvironmentConfigurationConstants.AppsettingsSearchPattern, SearchOption.TopDirectoryOnly).Length > 0)
             rootDirectory = currentDirectory;
 
         else

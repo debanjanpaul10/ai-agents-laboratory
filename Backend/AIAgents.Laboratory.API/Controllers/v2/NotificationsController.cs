@@ -53,19 +53,25 @@ public sealed class NotificationsController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = CreateNewNotificationAction.Summary, Description = CreateNewNotificationAction.Description, OperationId = CreateNewNotificationAction.OperationId)]
+    [SwaggerOperation(
+        Summary = CreateNewNotificationAction.Summary,
+        Description = CreateNewNotificationAction.Description,
+        OperationId = CreateNewNotificationAction.OperationId)]
     public async Task<ResponseDto> CreateNewNotificationAsync(
         [FromBody] CreateNotificationRequestDto request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewNotificationAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(CreateNewNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request })
+            );
 
             ArgumentNullException.ThrowIfNull(request);
-            if (base.IsAuthorized(ApplicationBased))
+            if (base.IsAuthorized(authorizationType: ApplicationBased))
             {
                 response = await notificationsHandler.CreateNewNotificationAsync(
                     request,
@@ -74,24 +80,35 @@ public sealed class NotificationsController(
 
                 if (response)
                     return HandleSuccessRequestResponse(
-                        responseData: response);
+                        responseData: response
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewNotificationAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(CreateNewNotificationAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewNotificationAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(CreateNewNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request, response })
+            );
         }
     }
 
@@ -106,16 +123,22 @@ public sealed class NotificationsController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = PollNotificationsForUserAction.Summary, Description = PollNotificationsForUserAction.Description, OperationId = PollNotificationsForUserAction.OperationId)]
+    [SwaggerOperation(
+        Summary = PollNotificationsForUserAction.Summary,
+        Description = PollNotificationsForUserAction.Description,
+        OperationId = PollNotificationsForUserAction.OperationId)]
     public async Task<ResponseDto> PollNotificationsForUserAsync(CancellationToken cancellationToken = default)
     {
         IEnumerable<NotificationsResponseDto> response = [];
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(PollNotificationsForUserAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(PollNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail })
+            );
 
-            if (base.IsAuthorized(UserBased))
+            ArgumentException.ThrowIfNullOrWhiteSpace(base.UserEmail);
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 response = await notificationsHandler.GetNotificationsForUserAsync(
                     recipientUserName: base.UserEmail,
@@ -124,24 +147,104 @@ public sealed class NotificationsController(
 
                 if (response is not null)
                     return HandleSuccessRequestResponse(
-                        responseData: response);
+                        responseData: response
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(PollNotificationsForUserAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed, nameof(PollNotificationsForUserAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(PollNotificationsForUserAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(PollNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, response })
+            );
+        }
+    }
+
+    /// <summary>
+    /// Marks an existing notification as read for a specific user based on the notification identifier.
+    /// </summary>
+    /// <param name="notificationId">The identifier of the notification to be marked as read.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
+    /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
+    [HttpPost(NotificationsRoutes.MarkExistingNotificationAsRead_Route)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+        Summary = MarkExistingNotificationAsReadAction.Summary,
+        Description = MarkExistingNotificationAsReadAction.Description,
+        OperationId = MarkExistingNotificationAsReadAction.OperationId)]
+    public async Task<ResponseDto> MarkExistingNotificationAsReadAsync(
+        [FromRoute] int notificationId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        bool response = false;
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, notificationId })
+            );
+
+            ArgumentException.ThrowIfNullOrWhiteSpace(base.UserEmail);
+            if (base.IsAuthorized(authorizationType: UserBased))
+            {
+                response = await notificationsHandler.MarkExistingNotificationAsReadAsync(
+                    recipientUserName: base.UserEmail,
+                    notificationId: notificationId,
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
+
+                if (response)
+                    return HandleSuccessRequestResponse(
+                        responseData: response
+                    );
+                else
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
+            }
+
+            return HandleUnAuthorizedRequestResponse();
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed, nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, notificationId, response })
+            );
         }
     }
 }

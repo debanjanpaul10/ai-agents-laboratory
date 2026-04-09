@@ -6,6 +6,14 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Response;
 public sealed record NotificationsResponseDto
 {
     /// <summary>
+    /// Gets or sets the identifier of the registered application.
+    /// </summary>
+    /// <summary>
+    /// The Tool skill id.
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
     /// Gets or sets the notification title.
     /// </summary>
     /// <value>

@@ -40,7 +40,8 @@ public sealed class PushNotificationsFunction(
     public async Task RunAsync(
         [ServiceBusTrigger("%PushNotificationsQueue%", Connection = "AzureServiceBusConnectionString")] ServiceBusReceivedMessage message,
         ServiceBusMessageActions messageActions,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var messageBody = Encoding.UTF8.GetString(message.Body);
         var notificationMessageBody = JsonConvert.DeserializeObject<NotificationRequest>(messageBody.ToString());
@@ -49,8 +50,8 @@ public sealed class PushNotificationsFunction(
             logger.LogError("Message {MessageId} has null payload - moving to dead-letter queue", message.MessageId);
             await messageActions.DeadLetterMessageAsync(
                 message,
-                deadLetterReason: "InvalidPayload",
-                deadLetterErrorDescription: "Deserialized NotificationRequest was null",
+                deadLetterReason: FunctionsDomainConstants.DeadLetterConstants.InvalidPayloadReason,
+                deadLetterErrorDescription: FunctionsDomainConstants.DeadLetterConstants.InvalidPayloadDescription,
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
             return;
@@ -59,14 +60,15 @@ public sealed class PushNotificationsFunction(
         bool response = false;
         try
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodStart, nameof(PushNotificationsFunction), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodStart,
+                nameof(PushNotificationsFunction), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody })
+            );
 
             response = await pushNotificationsService.ReceivePushNotificationAsync(
                 request: notificationMessageBody,
                 cancellationToken
             ).ConfigureAwait(false);
-
             await messageActions.CompleteMessageAsync(
                 message,
                 cancellationToken: cancellationToken
@@ -74,7 +76,11 @@ public sealed class PushNotificationsFunction(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggerConstants.LogHelperMethodFailed, nameof(PushNotificationsFunction), DateTime.UtcNow, ex.Message);
+            logger.LogAppError(
+                ex,
+                LoggerConstants.LogHelperMethodFailed,
+                nameof(PushNotificationsFunction), DateTime.UtcNow, ex.Message
+            );
             await messageActions.AbandonMessageAsync(
                 message,
                 cancellationToken: cancellationToken
@@ -82,8 +88,10 @@ public sealed class PushNotificationsFunction(
         }
         finally
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodEnd, nameof(PushNotificationsFunction), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody, response }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodEnd,
+                nameof(PushNotificationsFunction), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody, response })
+            );
         }
     }
 }

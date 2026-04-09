@@ -16,5 +16,6 @@ public interface INotificationsDataManager
     /// <returns>A task representing the asynchronous operation, with a boolean indicating success.</returns>
     Task<bool> SavePushNotificationsDataAsync(
         NotificationRequest request,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

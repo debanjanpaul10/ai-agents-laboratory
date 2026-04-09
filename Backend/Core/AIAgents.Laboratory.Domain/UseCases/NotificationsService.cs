@@ -31,13 +31,16 @@ public sealed class NotificationsService(
     /// <returns>True if the notification was created successfully; otherwise, false.</returns>
     public async Task<bool> CreateNewNotificationAsync(
         NotificationsDomain request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewNotificationAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(CreateNewNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request })
+            );
 
             response = await notificationsService.SendNotificationAsync(
                 notificationRequest: request,
@@ -47,13 +50,22 @@ public sealed class NotificationsService(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewNotificationAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(CreateNewNotificationAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewNotificationAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(CreateNewNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request, response })
+            );
         }
     }
 
@@ -66,13 +78,16 @@ public sealed class NotificationsService(
     /// <returns>A list of notifications relevant to the specified user.</returns>
     public async Task<IEnumerable<NotificationsDomain>> GetNotificationsForUserAsync(
         string recipientUserName,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<NotificationsDomain>? response = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetNotificationsForUserAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName })
+            );
 
             response = await notificationsDataManager.GetNotificationsForUserAsync(
                 recipientUserName: recipientUserName,
@@ -82,13 +97,74 @@ public sealed class NotificationsService(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetNotificationsForUserAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetNotificationsForUserAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetNotificationsForUserAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName, response })
+            );
+        }
+    }
+
+    /// <summary>
+    /// Marks an existing notification as read for a specific user based on the notification identifier.
+    /// </summary>
+    /// <remarks>
+    /// Marking a notification as read typically involves updating the status of the notification in the data store to indicate that it has been acknowledged or viewed by the recipient user.
+    /// </remarks>
+    /// <param name="recipientUserName">The username of the user for whom to mark the notification as read.</param>
+    /// <param name="notificationId">The identifier of the notification to be marked as read.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
+    /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
+    public async Task<bool> MarkExistingNotificationAsReadAsync(
+        string recipientUserName,
+        int notificationId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        bool response = false;
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName, notificationId })
+            );
+
+            response = await notificationsDataManager.MarkExistingNotificationAsReadAsync(
+                recipientUserName: recipientUserName,
+                notificationId: notificationId,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName, notificationId, response })
+            );
         }
     }
 }

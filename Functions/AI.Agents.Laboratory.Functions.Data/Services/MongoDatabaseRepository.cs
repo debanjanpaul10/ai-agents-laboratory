@@ -36,28 +36,42 @@ public sealed class MongoDatabaseRepository(
         string databaseName,
         string collectionName,
         FilterDefinition<TResult> filter,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<TResult>? response = null;
         try
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodStart, nameof(GetDataFromCollectionAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodStart,
+                nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName })
+            );
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TResult>(collectionName);
-            response = await collectionData.Find(filter).ToListAsync(cancellationToken).ConfigureAwait(false);
+            response = await collectionData.Find(filter)
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
             return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggerConstants.LogHelperMethodFailed, nameof(GetDataFromCollectionAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggerConstants.LogHelperMethodFailed,
+                nameof(GetDataFromCollectionAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodEnd, nameof(GetDataFromCollectionAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName, response }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodEnd,
+                nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName, response })
+            );
         }
     }
 
@@ -76,16 +90,18 @@ public sealed class MongoDatabaseRepository(
         TInput data,
         string databaseName,
         string collectionName,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodStart, nameof(SaveDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodStart,
+                nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName })
+            );
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TInput>(collectionName);
-
             await collectionData.InsertOneAsync(
                 document: data,
                 cancellationToken: cancellationToken
@@ -94,13 +110,21 @@ public sealed class MongoDatabaseRepository(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggerConstants.LogHelperMethodFailed, nameof(SaveDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggerConstants.LogHelperMethodFailed, nameof(SaveDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodEnd, nameof(SaveDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodEnd,
+                nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName })
+            );
         }
     }
 
@@ -119,16 +143,18 @@ public sealed class MongoDatabaseRepository(
         UpdateDefinition<TDocument> update,
         string databaseName,
         string collectionName,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodStart, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodStart,
+                nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName })
+            );
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TDocument>(collectionName);
-
             var result = await collectionData.UpdateOneAsync(
                 filter,
                 update,
@@ -138,13 +164,22 @@ public sealed class MongoDatabaseRepository(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggerConstants.LogHelperMethodFailed, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggerConstants.LogHelperMethodFailed,
+                nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodEnd, nameof(UpdateDataInCollectionAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodEnd,
+                nameof(UpdateDataInCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName })
+            );
         }
     }
 
@@ -161,16 +196,18 @@ public sealed class MongoDatabaseRepository(
         FilterDefinition<TDocument> filter,
         string databaseName,
         string collectionName,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodStart, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodStart,
+                nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName })
+            );
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TDocument>(collectionName);
-
             var result = await collectionData.DeleteOneAsync(
                 filter,
                 cancellationToken: cancellationToken
@@ -179,13 +216,22 @@ public sealed class MongoDatabaseRepository(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggerConstants.LogHelperMethodFailed, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggerConstants.LogHelperMethodFailed,
+                nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodEnd, nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodEnd,
+                nameof(DeleteDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName })
+            );
         }
     }
 }

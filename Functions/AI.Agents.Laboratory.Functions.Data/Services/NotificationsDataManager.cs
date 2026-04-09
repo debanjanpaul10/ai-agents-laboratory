@@ -48,13 +48,16 @@ public sealed class NotificationsDataManager(
     /// <returns>A task representing the asynchronous operation, with a boolean indicating success.</returns>
     public async Task<bool> SavePushNotificationsDataAsync(
         NotificationRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         bool response = false;
         try
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodStart, nameof(SavePushNotificationsDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodStart,
+                nameof(SavePushNotificationsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request })
+            );
 
             var document = new NotificationModel
             {
@@ -75,18 +78,26 @@ public sealed class NotificationsDataManager(
                 collectionName: NotificationsCollectionName,
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
-
             return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggerConstants.LogHelperMethodFailed, nameof(SavePushNotificationsDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggerConstants.LogHelperMethodFailed,
+                nameof(SavePushNotificationsDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggerConstants.LogHelperMethodEnd, nameof(SavePushNotificationsDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request, response }));
+            logger.LogAppInformation(
+                LoggerConstants.LogHelperMethodEnd,
+                nameof(SavePushNotificationsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request, response })
+            );
         }
     }
 }

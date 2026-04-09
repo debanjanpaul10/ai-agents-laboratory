@@ -6,7 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using var startupLoggerFactory = LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Information));
+using var startupLoggerFactory = LoggerFactory.Create(
+    builder => builder.AddConsole().SetMinimumLevel(LogLevel.Information));
 var startupLogger = startupLoggerFactory.CreateLogger<Program>();
 
 var host = new HostBuilder()
@@ -24,7 +25,7 @@ var host = new HostBuilder()
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICorrelationContext, CorrelationContext>();
-        services.AddBusinessDependencies().AddDataDependencies(configuration);
+        services.AddBusinessDependencies().AddDataDependencies(configuration).AddRepositories();
     })
     .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Information))
     .Build();

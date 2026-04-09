@@ -15,7 +15,8 @@ public interface INotificationsService
     /// <returns>True if the notification was created successfully; otherwise, false.</returns>
     Task<bool> CreateNewNotificationAsync(
         NotificationsDomain request,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Retrieves a list of notifications for a specific user based on their username. 
@@ -26,5 +27,22 @@ public interface INotificationsService
     /// <returns>A list of notifications relevant to the specified user.</returns>
     Task<IEnumerable<NotificationsDomain>> GetNotificationsForUserAsync(
         string recipientUserName,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
+    /// Marks an existing notification as read for a specific user based on the notification identifier.
+    /// </summary>
+    /// <remarks>
+    /// Marking a notification as read typically involves updating the status of the notification in the data store to indicate that it has been acknowledged or viewed by the recipient user.
+    /// </remarks>
+    /// <param name="recipientUserName">The username of the user for whom to mark the notification as read.</param>
+    /// <param name="notificationId">The identifier of the notification to be marked as read.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
+    /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
+    Task<bool> MarkExistingNotificationAsReadAsync(
+        string recipientUserName,
+        int notificationId,
+        CancellationToken cancellationToken = default
+    );
 }
