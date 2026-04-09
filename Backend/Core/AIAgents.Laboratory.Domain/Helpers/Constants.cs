@@ -234,5 +234,15 @@ internal static class Constants
         /// The agent data has been updated message template.
         /// </summary>
         internal const string AgentDataHasBeenUpdatedMessageTemplate = "The data for agent '{0}' with agent id: '{1}' has been updated.";
+
+        /// <summary>
+        /// The tool skill data update title template.
+        /// </summary>
+        internal const string ToolSkillDataUpdateTitleTemplate = "Tool Skill '{0}' Data Updated";
+
+        /// <summary>
+        /// The tool skill data has been updated message template.
+        /// </summary>
+        internal const string ToolSkillDataHasBeenUpdatedMessageTemplate = "The data for tool skill '{0}' with id: '{1}' has been updated.";
     }
 }
