@@ -194,7 +194,7 @@ public sealed class NotificationsController(
         Description = MarkExistingNotificationAsReadAction.Description,
         OperationId = MarkExistingNotificationAsReadAction.OperationId)]
     public async Task<ResponseDto> MarkExistingNotificationAsReadAsync(
-        [FromRoute] int notificationId,
+        [FromQuery] int notificationId,
         CancellationToken cancellationToken = default
     )
     {

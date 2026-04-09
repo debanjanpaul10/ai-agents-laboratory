@@ -7,6 +7,7 @@ import { ChatReducer } from "@store/chat/reducers";
 import { ToolSkillsReducer } from "@store/tools-skills/reducers";
 import { WorkspacesReducer } from "@store/workspaces/reducers";
 import { ApplicationAdminReducer } from "@store/app-admin/reducers";
+import { NotificationsReducer } from "@store/notifications/reducers";
 
 export const store = configureStore({
 	reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
 		ToolSkillsReducer: ToolSkillsReducer,
 		WorkspacesReducer: WorkspacesReducer,
 		ApplicationAdminReducer: ApplicationAdminReducer,
+		NotificationsReducer: NotificationsReducer,
 	},
 });
 

@@ -62,8 +62,7 @@ public sealed class NotificationsDataManager(
             );
 
             var filter = Builders<NotificationsModel>.Filter.And(
-                Builders<NotificationsModel>.Filter.Eq(n => n.RecipientUserName, recipientUserName),
-                Builders<NotificationsModel>.Filter.Eq(n => n.IsActive, true)
+                Builders<NotificationsModel>.Filter.Eq(n => n.RecipientUserName, recipientUserName)
             );
 
             var allData = await mongoDatabaseRepository.GetDataFromCollectionAsync(

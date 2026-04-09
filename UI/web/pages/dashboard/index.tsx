@@ -16,6 +16,7 @@ import {
 } from "@store/common/actions";
 import MainLayout from "@components/common/main-layout";
 import FeedbackComponent from "@components/feedback";
+import { PollNotificationsAsync } from "@store/notifications/actions";
 
 export default function DashboardComponent() {
 	const dispatch = useAppDispatch();
@@ -32,6 +33,7 @@ export default function DashboardComponent() {
 	useEffect(() => {
 		if (authContext.isAuthenticated && !authContext.isLoading) {
 			GetTopActiveAgentsData();
+			PollUserNotifications();
 			if (
 				!ConfigurationsStoreData ||
 				Object.keys(ConfigurationsStoreData).length === 0
@@ -47,6 +49,10 @@ export default function DashboardComponent() {
 
 	function GetAllConfigurationsData() {
 		dispatch(GetAllConfigurations());
+	}
+
+	function PollUserNotifications() {
+		dispatch(PollNotificationsAsync());
 	}
 
 	const renderAuthorizedDashboard = () =>
