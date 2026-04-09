@@ -219,4 +219,20 @@ internal static class Constants
         /// </summary>
         internal const string FileName = "Templates/FeedbackEmail.html";
     }
+
+    /// <summary>
+    /// The notification messages constants.
+    /// </summary>
+    internal static class NotificationMessagesConstants
+    {
+        /// <summary>
+        /// The agent data update title template.
+        /// </summary>
+        internal const string AgentDataUpdateTitleTemplate = "Agent '{0}' Data Updated";
+
+        /// <summary>
+        /// The agent data has been updated message template.
+        /// </summary>
+        internal const string AgentDataHasBeenUpdatedMessageTemplate = "The data for agent '{0}' with agent id: '{1}' has been updated.";
+    }
 }
