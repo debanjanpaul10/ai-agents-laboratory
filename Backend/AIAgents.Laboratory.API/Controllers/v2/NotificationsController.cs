@@ -344,7 +344,7 @@ public sealed class NotificationsController(
             if (base.IsAuthorized(authorizationType: UserBased))
             {
                 response = await notificationsHandler.DeleteAllNotificationsForUserAsync(
-                    recipientUserName: base.UserEmail,
+                    currentLoggedInUser: base.UserEmail,
                     cancellationToken
                 ).ConfigureAwait(false);
 

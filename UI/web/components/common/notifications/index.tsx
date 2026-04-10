@@ -1,13 +1,15 @@
 import { useEffect } from "react";
-import { Bell, Check, Loader2, X } from "lucide-react";
-import { Tooltip } from "@heroui/react";
+import { Bell, Check, Loader2, Trash, X } from "lucide-react";
+import { Button, Tooltip } from "@heroui/react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import {
+	DeleteAllNotificationsForUserAsync,
 	MarkNotificationAsReadAsync,
 	ToggleNotificationsPanel,
 } from "@store/notifications/actions";
 import { NotificationsResponseDTO } from "@models/response/notifications-response-dto.model";
+import { NotificationsConstants } from "@helpers/constants";
 
 export default function NotificationsDrawerComponent() {
 	const dispatch = useAppDispatch();
@@ -33,6 +35,9 @@ export default function NotificationsDrawerComponent() {
 
 	const handleMarkAsRead = (id: string) =>
 		dispatch(MarkNotificationAsReadAsync(id));
+
+	const handleClearAllNotifications = () =>
+		dispatch(DeleteAllNotificationsForUserAsync());
 
 	const getNotificationTypeColor = (type: string) => {
 		switch (type?.toLowerCase()) {
@@ -65,7 +70,9 @@ export default function NotificationsDrawerComponent() {
 			return (
 				<div className="flex flex-col items-center justify-center h-full space-y-3 text-white/40">
 					<Loader2 className="w-8 h-8 animate-spin text-purple-400" />
-					<span className="text-sm">Loading notifications...</span>
+					<span className="text-sm">
+						{NotificationsConstants.MainLoader}
+					</span>
 				</div>
 			);
 		}
@@ -74,15 +81,21 @@ export default function NotificationsDrawerComponent() {
 			return (
 				<div className="flex flex-col items-center justify-center h-full space-y-3 text-white/30">
 					<Bell className="w-12 h-12 opacity-20" />
-					<p className="text-sm">No notifications</p>
+					<p className="text-sm">
+						{NotificationsConstants.NoNotifications}
+					</p>
 				</div>
 			);
 		}
 
 		return [...notifications]
-			.sort((a, b) => new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime())
+			.sort(
+				(a, b) =>
+					new Date(b.dateCreated).getTime() -
+					new Date(a.dateCreated).getTime(),
+			)
 			.map((notification) => {
-				const isUnread = notification.isActive;
+				const isUnread = notification.isRead;
 
 				return (
 					<div
@@ -103,7 +116,7 @@ export default function NotificationsDrawerComponent() {
 							</Tooltip>
 						) : (
 							<span className="absolute top-3 right-3 text-white/50 text-[10px] uppercase tracking-wider">
-								Read
+								{NotificationsConstants.ReadTooltip}
 							</span>
 						)}
 
@@ -168,24 +181,38 @@ export default function NotificationsDrawerComponent() {
 							</div>
 							<div>
 								<h2 className="text-xl font-bold bg-gradient-to-r from-white via-indigo-100 to-purple-100 bg-clip-text text-transparent">
-									Notifications
+									{NotificationsConstants.Header}
 								</h2>
 								<p className="text-white/40 text-xs">
 									{
-										notifications.filter((n) => n.isActive)
+										notifications.filter((n) => n.isRead)
 											.length
 									}{" "}
 									unread
 								</p>
 							</div>
 						</div>
-						<button
-							onClick={handleClose}
-							aria-label="Close notifications"
-							className="p-2.5 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 transition-all duration-300 text-white/50 hover:text-red-400 group"
-						>
-							<X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-						</button>
+						<div className="flex items-center space-x-3">
+							<Button
+								onPress={handleClearAllNotifications}
+								aria-label="Clear Notifications"
+								tabIndex={0}
+								className="p-2.5 rounded-xl bg-red-400 border border-red-400  transition-all duration-300 text-white group"
+								title="Clear Notifications"
+							>
+								<Trash className="w-5 h-5" />
+							</Button>
+
+							<Button
+								onPress={handleClose}
+								aria-label="Close Notifications"
+								tabIndex={0}
+								className="p-2.5 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 transition-all duration-300 text-white/50 hover:text-red-400 group"
+								title="Close Notifications"
+							>
+								<X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+							</Button>
+						</div>
 					</div>
 
 					{/* Content */}

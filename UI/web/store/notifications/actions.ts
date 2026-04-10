@@ -1,6 +1,7 @@
 import { Action, Dispatch } from "redux";
 
 import {
+	CLEAR_ALL_NOTIFICATIONS,
 	MARK_NOTIFICATION_AS_READ,
 	POLL_NOTIFICATIONS,
 	RECEIVE_NOTIFICATION,
@@ -9,6 +10,7 @@ import {
 } from "@store/notifications/actionTypes";
 import { ShowErrorToaster } from "@shared/toaster";
 import {
+	DeleteAllNotificationsForUserApiAsync,
 	MarkNotificationAsReadApiAsync,
 	PollNotificationsApiAsync,
 } from "@shared/api-service";
@@ -66,6 +68,27 @@ export function MarkNotificationAsReadAsync(notificationId: string) {
 				dispatch({
 					type: MARK_NOTIFICATION_AS_READ,
 					payload: response.responseData as boolean,
+				});
+				dispatch(PollNotificationsAsync() as any);
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleNotificationsLoader(false));
+		}
+	};
+}
+
+export function DeleteAllNotificationsForUserAsync() {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleNotificationsLoader(true));
+			const response = await DeleteAllNotificationsForUserApiAsync();
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: CLEAR_ALL_NOTIFICATIONS,
+					payload: response.responseData,
 				});
 				dispatch(PollNotificationsAsync() as any);
 			}

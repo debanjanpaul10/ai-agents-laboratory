@@ -7,5 +7,6 @@ export class NotificationsResponseDTO {
 	createdBy: string = "";
 	isGlobal: boolean = false;
 	isActive: boolean = false;
+	isRead: boolean = false;
 	dateCreated: Date = new Date();
 }
