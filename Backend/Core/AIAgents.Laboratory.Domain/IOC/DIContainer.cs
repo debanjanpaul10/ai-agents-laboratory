@@ -30,6 +30,5 @@ public static class DIContainer
         .AddScoped<IOrchestratorService, OrchestratorService>()
         .AddScoped<IApplicationAdminService, ApplicationAdminService>()
         .AddScoped<IRegisteredApplicationService, RegisteredApplicationService>()
-        .AddScoped<INotificationsService, NotificationsService>()
-        .AddScoped<INotificationsStream, NotificationsStream>();
+        .AddScoped<INotificationsService, NotificationsService>();
 }
