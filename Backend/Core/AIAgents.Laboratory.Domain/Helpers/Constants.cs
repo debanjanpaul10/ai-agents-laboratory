@@ -186,6 +186,11 @@ internal static class Constants
         /// The admin user email address constant.
         /// </summary>
         internal const string AdminEmailAddressConstant = "AdminEmailAddress";
+
+        /// <summary>
+        /// The heartbeat time delay in seconds configuration
+        /// </summary>
+        internal const string HeartbeatTimeDelayInSecondsConfig = "HeartbeatTimeDelayInSeconds";
     }
 
     /// <summary>
@@ -284,5 +289,26 @@ internal static class Constants
         /// The registered application data has been updated message template.
         /// </summary>
         internal const string RegisteredApplicationDataHasBeenUpdatedMessageTemplate = "The data for registered application '{0}' with id: '{1}' has been updated.";
+
+        /// <summary>
+        /// The heartbeat noficiations constants class.
+        /// </summary>
+        internal static class HeartbeatNotficationConstants
+        {
+            /// <summary>
+            /// The connected message constant.
+            /// </summary>
+            internal const string ConnectedMessageConstant = "event: connected\ndata: {}\n\n";
+
+            /// <summary>
+            /// The event heartbeat data message constant
+            /// </summary>
+            internal const string EventHeartbeatDataMessageConstant = "event: heartbeat\ndata: {}\n\n";
+
+            /// <summary>
+            /// The event notification data message constant
+            /// </summary>
+            internal const string EventNotificationDataMessageConstant = "event: notification\ndata: {0}\n\n";
+        }
     }
 }

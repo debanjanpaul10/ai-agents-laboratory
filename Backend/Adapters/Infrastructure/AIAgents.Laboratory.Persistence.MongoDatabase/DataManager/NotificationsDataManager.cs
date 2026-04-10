@@ -62,7 +62,8 @@ public sealed class NotificationsDataManager(
             );
 
             var filter = Builders<NotificationsModel>.Filter.And(
-                Builders<NotificationsModel>.Filter.Eq(n => n.RecipientUserName, recipientUserName)
+                Builders<NotificationsModel>.Filter.Eq(n => n.RecipientUserName, recipientUserName),
+                Builders<NotificationsModel>.Filter.Eq(n => n.IsActive, true)
             );
 
             var allData = await mongoDatabaseRepository.GetDataFromCollectionAsync(
@@ -125,7 +126,7 @@ public sealed class NotificationsDataManager(
             );
             var updates = new List<UpdateDefinition<NotificationsModel>>
             {
-                Builders<NotificationsModel>.Update.Set(field => field.IsActive, false),
+                Builders<NotificationsModel>.Update.Set(field => field.IsRead, false),
                 Builders<NotificationsModel>.Update.Set(field =>field.DateModified, DateTime.UtcNow)
             };
             var update = Builders<NotificationsModel>.Update.Combine(updates);

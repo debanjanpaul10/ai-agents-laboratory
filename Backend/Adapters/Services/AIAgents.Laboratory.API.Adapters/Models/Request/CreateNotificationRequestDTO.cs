@@ -6,6 +6,11 @@ namespace AIAgents.Laboratory.API.Adapters.Models.Request;
 public sealed record CreateNotificationRequestDto
 {
     /// <summary>
+    /// Gets or sets the notification identifier.
+    /// </summary>
+    public Guid Id { get; set; }
+
+    /// <summary>
     /// Gets or sets the notification title.
     /// </summary>
     /// <value>

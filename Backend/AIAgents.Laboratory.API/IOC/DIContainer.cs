@@ -7,6 +7,7 @@ using AIAgents.Laboratory.API.Helpers;
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Domain.IOC;
+using AIAgents.Laboratory.Domain.UseCases;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.IOC;
 using AIAgents.Laboratory.Messaging.Adapters.IOC;
 using AIAgents.Laboratory.Persistence.Caching.IOC;
@@ -64,6 +65,8 @@ public static class DIContainer
 
         // Register correlation context service for cross-layer correlation ID access
         services.AddScoped<ICorrelationContext, CorrelationContext>();
+
+        services.AddSingleton<INotificationsStream, NotificationsStream>();
 
         services.AddAPIAdapterDependencies().AddMessagingDependencies(configuration).AddMemoryCache().AddCacheDependencies();
         services.AddAgentsFrameworkDependencies(configuration).AddMongoDbAdapterDependencies(configuration)

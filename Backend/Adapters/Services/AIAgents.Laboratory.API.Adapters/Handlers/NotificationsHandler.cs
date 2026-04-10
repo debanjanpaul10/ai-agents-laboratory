@@ -4,6 +4,7 @@ using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Ports.In;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
@@ -74,6 +75,29 @@ public sealed class NotificationsHandler(
             recipientUserName: recipientUserName,
             notificationId: notificationId,
             cancellationToken: cancellationToken
+        ).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Streams notifications for a specific user in real-time using Server-Sent Events (SSE).
+    /// </summary>
+    /// <param name="recipientUserName">The username of the user for whom to stream notifications.</param>
+    /// <param name="response">The HttpResponse object used to send the streamed notifications to the client.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
+    /// <param name="requestAborted">The cancellation token to handle request abortion.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public async Task StreamNotificationsForUserAsync(
+        string recipientUserName,
+        HttpResponse response,
+        CancellationToken cancellationToken = default,
+        CancellationToken requestAborted = default
+    )
+    {
+        await notificationsService.StreamNotificationsForUserAsync(
+            recipientUserName: recipientUserName,
+            response: response,
+            cancellationToken: cancellationToken,
+            requestAborted: requestAborted
         ).ConfigureAwait(false);
     }
 }

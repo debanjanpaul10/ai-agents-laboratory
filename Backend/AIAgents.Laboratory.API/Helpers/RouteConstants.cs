@@ -269,6 +269,11 @@ public static class RouteConstants
         internal const string PollNotificationsForUser_Route = "pollnotifications";
 
         /// <summary>
+        /// The route constant for streaming notifications for a user (Server-Sent Events).
+        /// </summary>
+        internal const string StreamNotificationsForUser_Route = "streamnotifications";
+
+        /// <summary>
         /// The route constant for marking an existing notification as read.
         /// </summary>
         internal const string MarkExistingNotificationAsRead_Route = "marknotificationasread";

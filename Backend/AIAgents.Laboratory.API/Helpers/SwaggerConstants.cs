@@ -431,5 +431,15 @@ internal static class SwaggerConstants
             internal const string Description = "Marks an existing notification as read in the system based on the notification guid id passed.";
             internal const string OperationId = nameof(MarkExistingNotificationAsReadAction);
         }
+
+        /// <summary>
+        /// Swagger documentation for StreamNotificationsForUserAsync.
+        /// </summary>
+        internal static class StreamNotificationsForUserAction
+        {
+            internal const string Summary = "Streams the notifications for user.";
+            internal const string Description = "Streams the notifications for user based on the user id passed.";
+            internal const string OperationId = nameof(StreamNotificationsForUserAction);
+        }
     }
 }

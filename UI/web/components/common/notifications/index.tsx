@@ -79,68 +79,70 @@ export default function NotificationsDrawerComponent() {
 			);
 		}
 
-		return notifications.map((notification) => {
-			const isUnread = notification.isActive;
+		return [...notifications]
+			.sort((a, b) => new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime())
+			.map((notification) => {
+				const isUnread = notification.isActive;
 
-			return (
-				<div
-					key={notification.id}
-					className={`relative bg-gradient-to-br ${getNotificationTypeColor(notification.notificationType)} border rounded-xl p-4 transition-all duration-200 hover:bg-white/[0.07] ${isUnread ? "" : "opacity-75 grayscale-[30%]"}`}
-				>
-					{isUnread ? (
-						<Tooltip content="Mark as read" placement="top">
-							<button
-								onClick={() =>
-									handleMarkAsRead(notification.id)
-								}
-								aria-label="Mark as read"
-								className="absolute top-3 right-3 p-1.5 rounded-lg bg-white/5 hover:bg-green-500/20 border border-white/10 hover:border-green-500/30 transition-all duration-200 text-white/30 hover:text-green-400 group"
-							>
-								<Check className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-							</button>
-						</Tooltip>
-					) : (
-						<span className="absolute top-3 right-3 text-white/50 text-[10px] uppercase tracking-wider">
-							Read
-						</span>
-					)}
-
-					<div className="pr-12 space-y-1.5">
-						<div className="flex items-center space-x-2">
-							{isUnread && (
-								<span
-									className={`w-2 h-2 rounded-full flex-shrink-0 ${getNotificationTypeDot(notification.notificationType)}`}
-								/>
-							)}
-							<span
-								className={`font-semibold text-sm truncate ${isUnread ? "text-white" : "text-white/80"}`}
-							>
-								{notification.title}
-							</span>
-						</div>
-						<p
-							className={`text-xs leading-relaxed ${isUnread ? "text-white/60" : "text-white/70"}`}
-						>
-							{notification.message}
-						</p>
-						<div className="flex items-center justify-between pt-1">
-							<span
-								className={`text-[10px] uppercase tracking-wider ${isUnread ? "text-white/30" : "text-white/50"}`}
-							>
-								{notification.notificationType || "Info"}
-							</span>
-							{notification.createdBy && (
-								<span
-									className={`text-[10px] ${isUnread ? "text-white/25" : "text-white/45"}`}
+				return (
+					<div
+						key={notification.id}
+						className={`relative bg-gradient-to-br ${getNotificationTypeColor(notification.notificationType)} border rounded-xl p-4 transition-all duration-200 hover:bg-white/[0.07] ${isUnread ? "" : "opacity-75 grayscale-[30%]"}`}
+					>
+						{isUnread ? (
+							<Tooltip content="Mark as read" placement="top">
+								<button
+									onClick={() =>
+										handleMarkAsRead(notification.id)
+									}
+									aria-label="Mark as read"
+									className="absolute top-3 right-3 p-1.5 rounded-lg bg-white/5 hover:bg-green-500/20 border border-white/10 hover:border-green-500/30 transition-all duration-200 text-white/30 hover:text-green-400 group"
 								>
-									{notification.createdBy}
+									<Check className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+								</button>
+							</Tooltip>
+						) : (
+							<span className="absolute top-3 right-3 text-white/50 text-[10px] uppercase tracking-wider">
+								Read
+							</span>
+						)}
+
+						<div className="pr-12 space-y-1.5">
+							<div className="flex items-center space-x-2">
+								{isUnread && (
+									<span
+										className={`w-2 h-2 rounded-full flex-shrink-0 ${getNotificationTypeDot(notification.notificationType)}`}
+									/>
+								)}
+								<span
+									className={`font-semibold text-sm truncate ${isUnread ? "text-white" : "text-white/80"}`}
+								>
+									{notification.title}
 								</span>
-							)}
+							</div>
+							<p
+								className={`text-xs leading-relaxed ${isUnread ? "text-white/60" : "text-white/70"}`}
+							>
+								{notification.message}
+							</p>
+							<div className="flex items-center justify-between pt-1">
+								<span
+									className={`text-[10px] uppercase tracking-wider ${isUnread ? "text-white/30" : "text-white/50"}`}
+								>
+									{notification.notificationType || "Info"}
+								</span>
+								{notification.createdBy && (
+									<span
+										className={`text-[10px] ${isUnread ? "text-white/25" : "text-white/45"}`}
+									>
+										{notification.createdBy}
+									</span>
+								)}
+							</div>
 						</div>
 					</div>
-				</div>
-			);
-		});
+				);
+			});
 	};
 
 	if (!isOpen) return null;

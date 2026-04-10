@@ -3,6 +3,7 @@ import { Action, Dispatch } from "redux";
 import {
 	MARK_NOTIFICATION_AS_READ,
 	POLL_NOTIFICATIONS,
+	RECEIVE_NOTIFICATION,
 	TOGGLE_NOTIFICATIONS_LOADER,
 	TOGGLE_NOTIFICATIONS_PANEL,
 } from "@store/notifications/actionTypes";
@@ -45,6 +46,13 @@ export function PollNotificationsAsync() {
 		} finally {
 			dispatch(ToggleNotificationsLoader(false));
 		}
+	};
+}
+
+export function ReceiveNotification(notification: NotificationsResponseDTO) {
+	return {
+		type: RECEIVE_NOTIFICATION,
+		payload: notification,
 	};
 }
 
