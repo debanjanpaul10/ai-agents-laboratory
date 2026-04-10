@@ -11,7 +11,7 @@ public sealed record NotificationsDomain
     /// <summary>
     /// The Tool skill id.
     /// </summary>
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the notification title.

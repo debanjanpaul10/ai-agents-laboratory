@@ -29,20 +29,26 @@ public sealed class NotificationsDataManager(
     ILogger<NotificationsDataManager> logger) : INotificationsDataManager
 {
     /// <summary>
-    /// The name of the MongoDB database and collection are retrieved from the configuration settings, with error handling to manage missing configuration values. The class uses these values to interact with the MongoDB database for saving push notification data. The SavePushNotificationsDataAsync method implements the logic to save a NotificationRequest to the database, including logging at the start and end of the operation, as well as error logging in case of exceptions. It constructs a NotificationModel from the request data and uses the mongoDatabaseRepository to persist it to the specified collection. The method returns a boolean indicating the success of the operation.
+    /// The name of the MongoDB database and collection are retrieved from the configuration settings, with error handling to manage missing configuration values. 
     /// </summary>
     private readonly string MongoDatabaseName = configuration[MongoDbConfigurationConstants.AiAgentsPrimaryDatabase]
         ?? throw new KeyNotFoundException(ExceptionConstants.MissingConfigurationMessage);
 
     /// <summary>
-    /// The name of the MongoDB collection for notifications is retrieved from the configuration settings, with error handling to manage missing configuration values. This collection name is used in the SavePushNotificationsDataAsync method to specify where the notification data should be saved in the MongoDB database. The method constructs a NotificationModel from the incoming NotificationRequest and uses the mongoDatabaseRepository to save it to the specified collection, returning a boolean indicating the success of the operation. Logging is implemented throughout the method to track the processing flow and any issues that arise during data persistence.
+    /// The name of the MongoDB collection for notifications is retrieved from the configuration settings, with error handling to manage missing configuration values. 
     /// </summary>
     private readonly string NotificationsCollectionName = configuration[MongoDbConfigurationConstants.NotificationsCollectionName]
         ?? throw new KeyNotFoundException(ExceptionConstants.MissingConfigurationMessage);
 
     /// <summary>
-    /// Saves push notification data to a data store, returning a boolean indicating the success of the operation. The method takes a NotificationRequest object as input, which contains the details of the notification to be saved. The implementation of this method is responsible for handling the actual data persistence logic, including any necessary transformations or validations before saving the data. It constructs a NotificationModel from the request data and uses the mongoDatabaseRepository to persist it to the specified collection in the MongoDB database. The method includes logging at the start and end of the operation, as well as error logging in case of exceptions, and throws an AIAgentsBusinessException if any issues occur during the process.
+    /// Saves push notification data to a data store, returning a boolean indicating the success of the operation. 
     /// </summary>
+    /// <remarks>
+    /// The method takes a NotificationRequest object as input, which contains the details of the notification to be saved. 
+    /// The implementation of this method is responsible for handling the actual data persistence logic, including any necessary transformations or validations before saving the data. 
+    /// It constructs a NotificationModel from the request data and uses the mongoDatabaseRepository to persist it to the specified collection in the MongoDB database. 
+    /// The method includes logging at the start and end of the operation, as well as error logging in case of exceptions, and throws an AIAgentsBusinessException if any issues occur during the process.
+    /// </remarks>
     /// <param name="request">The notification request containing the details to be saved.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation, with a boolean indicating success.</returns>
@@ -100,6 +106,7 @@ public sealed class NotificationsDataManager(
     private static NotificationModel PrepareNotificationDataModel(NotificationRequest request) =>
         new()
         {
+            Id = request.Id,
             Title = request.Title,
             Message = request.Message,
             RecipientUserName = request.RecipientUserName,
@@ -108,7 +115,7 @@ public sealed class NotificationsDataManager(
             IsGlobal = request.IsGlobal,
             DateCreated = DateTime.UtcNow,
             DateModified = DateTime.UtcNow,
-            ModifiedBy = request.CreatedBy
+            ModifiedBy = request.CreatedBy,
         };
 
     #endregion

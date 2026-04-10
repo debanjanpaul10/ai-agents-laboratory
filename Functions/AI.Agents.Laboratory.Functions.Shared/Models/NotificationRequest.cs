@@ -6,6 +6,14 @@
 public sealed record NotificationRequest
 {
     /// <summary>
+    /// Gets or sets the identifier of the registered application.
+    /// </summary>
+    /// <summary>
+    /// The Tool skill id.
+    /// </summary>
+    public Guid Id { get; set; }
+
+    /// <summary>
     /// Gets or sets the notification title.
     /// </summary>
     /// <value>
