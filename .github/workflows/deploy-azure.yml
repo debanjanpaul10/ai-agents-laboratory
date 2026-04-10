@@ -190,16 +190,15 @@ jobs:
                   action: "publish"
                   arguments: "/p:DropObjectsNotInSource=true /p:BlockOnPossibleDataLoss=false /p:IgnoreUserSettingsObjects=true /p:IgnoreLoginSids=true /p:IgnorePermissions=true /p:IgnoreRoleMembership=true"
 
-    build-function:
+    build-and-deploy-function:
         name: Build Azure Functions project
-        runs-on: ubuntu-latest
         if: ${{ github.event_name == 'push' || inputs.deploy_functions }}
-        outputs:
-            artifact_path: ${{ steps.set-artifact-path.outputs.path }}
+        runs-on: ubuntu-latest
+        environment: Production
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Setup .NET 10
               uses: actions/setup-dotnet@v3
@@ -208,36 +207,14 @@ jobs:
 
             - name: Install dependencies and build Functions solution
               run: |
-                  dotnet restore "${{ env.FUNCTIONS_PROJECT_PATH }}"
-                  dotnet build "${{ env.FUNCTIONS_PROJECT_PATH }}" --configuration Release --no-restore
+                  dotnet restore ${{ env.FUNCTIONS_PROJECT_PATH }}
+                  dotnet build ${{ env.FUNCTIONS_PROJECT_PATH }} --configuration Release --no-restore
 
             - name: Publish the Functions project
               run: |
-                  dotnet publish "${{ env.FUNCTIONS_PROJECT_PATH }}" --configuration Release --output ./publish-functions --self-contained true --runtime linux-x64
+                  dotnet publish ${{ env.FUNCTIONS_PROJECT_PATH }} --configuration Release --output ./publish-functions
 
-            - name: Set functions artifact path
-              id: set-artifact-path
-              run: echo "path=./publish-functions" >> $GITHUB_OUTPUT
-
-            - name: Upload Functions artifact
-              uses: actions/upload-artifact@v4
-              with:
-                  name: functions-artifact
-                  path: ./publish-functions
-
-    deploy-function:
-        name: Deploy Azure Functions project
-        runs-on: ubuntu-latest
-        needs: build-function
-        environment: Production
-        steps:
-            - name: Download Functions artifact
-              uses: actions/download-artifact@v4
-              with:
-                  name: functions-artifact
-                  path: ./publish-functions
-
-            - name: Deploy to Azure Functions
+            - name: Run Azure Functions action
               uses: Azure/functions-action@v1
               with:
                   app-name: ${{ vars.AZURE_FUNCTIONS_NAME }}
