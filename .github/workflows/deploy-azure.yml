@@ -1,5 +1,8 @@
 name: Build and Deploy AI Agents Laboratory
 
+permissions:
+    contents: read
+
 env:
     API_PROJECT_PATH: Backend/AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj
     WEB_UI_PROJECT_PATH: UI/web
