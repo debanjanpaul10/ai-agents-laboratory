@@ -57,4 +57,9 @@ public sealed record NotificationsDomain
     /// Gets or sets a value indicating whether this notification is global (visible to all users) or user-specific.
     /// </summary>
     public bool IsGlobal { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether this notification is active (should be displayed to users) or inactive (archived or dismissed).
+    /// </summary>
+    public bool IsActive { get; set; }
 }

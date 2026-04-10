@@ -106,7 +106,7 @@ public sealed class NotificationsDataManager(
     /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
     public async Task<bool> MarkExistingNotificationAsReadAsync(
         string recipientUserName,
-        int notificationId,
+        Guid notificationId,
         CancellationToken cancellationToken = default
     )
     {

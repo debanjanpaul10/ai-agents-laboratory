@@ -116,6 +116,7 @@ public sealed class NotificationsDataManager(
             DateCreated = DateTime.UtcNow,
             DateModified = DateTime.UtcNow,
             ModifiedBy = request.CreatedBy,
+            IsActive = true,
         };
 
     #endregion

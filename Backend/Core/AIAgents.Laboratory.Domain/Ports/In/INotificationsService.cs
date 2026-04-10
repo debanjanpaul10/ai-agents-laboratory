@@ -42,7 +42,7 @@ public interface INotificationsService
     /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
     Task<bool> MarkExistingNotificationAsReadAsync(
         string recipientUserName,
-        int notificationId,
+        Guid notificationId,
         CancellationToken cancellationToken = default
     );
 }

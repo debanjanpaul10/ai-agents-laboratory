@@ -1,5 +1,5 @@
 export class NotificationsResponseDTO {
-	id: number = 0;
+	id: string = "";
 	title: string = "";
 	message: string = "";
 	recipientUserName: string = "";

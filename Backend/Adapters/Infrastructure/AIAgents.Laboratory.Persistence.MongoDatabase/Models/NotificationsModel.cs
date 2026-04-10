@@ -22,7 +22,8 @@ public sealed record NotificationsModel : BaseDataModel
     /// The Tool skill id.
     /// </summary>
     [BsonElement("Id")]
-    public int Id { get; set; }
+    [BsonRepresentation(BsonType.String)]
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the notification title.
