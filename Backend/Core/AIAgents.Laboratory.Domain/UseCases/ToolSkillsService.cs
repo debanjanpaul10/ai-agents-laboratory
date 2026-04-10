@@ -34,7 +34,11 @@ public sealed class ToolSkillsService(
     /// <param name="userEmail">The user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for <c>success/failure</c></returns>
-    public async Task<bool> AddNewToolSkillAsync(ToolSkillDomain toolSkillData, string userEmail, CancellationToken cancellationToken = default)
+    public async Task<bool> AddNewToolSkillAsync(
+        ToolSkillDomain toolSkillData,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
@@ -67,7 +71,12 @@ public sealed class ToolSkillsService(
     /// <param name="currentUserEmail">The current user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> AssociateSkillAndAgentAsync(IList<AssociatedAgentsSkillDataDomain> agentData, string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<bool> AssociateSkillAndAgentAsync(
+        IList<AssociatedAgentsSkillDataDomain> agentData,
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(agentData);
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
@@ -112,7 +121,11 @@ public sealed class ToolSkillsService(
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
@@ -158,7 +171,11 @@ public sealed class ToolSkillsService(
     /// <param name="currentUserEmail">The current user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="McpClientTool"/></returns>
-    public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAvailableAsync(
+        string serverUrl,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(serverUrl);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
@@ -191,7 +208,10 @@ public sealed class ToolSkillsService(
     /// <param name="userEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="ToolSkillDomain"/></returns>
-    public async Task<IEnumerable<ToolSkillDomain>> GetAllToolSkillsAsync(string userEmail, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ToolSkillDomain>> GetAllToolSkillsAsync(
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<ToolSkillDomain>? result = null;
         try
@@ -224,7 +244,11 @@ public sealed class ToolSkillsService(
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The tool skill domain model.</returns>
-    public async Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
         ToolSkillDomain? result = null;
@@ -259,7 +283,11 @@ public sealed class ToolSkillsService(
     /// <param name="currentUserEmail">The user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for <c>success/failure</c></returns>
-    public async Task<bool> UpdateExistingToolSkillDataAsync(ToolSkillDomain updateToolSkillData, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateExistingToolSkillDataAsync(
+        ToolSkillDomain updateToolSkillData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(updateToolSkillData);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);

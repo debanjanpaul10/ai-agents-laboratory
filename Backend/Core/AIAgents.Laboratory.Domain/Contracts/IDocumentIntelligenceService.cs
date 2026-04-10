@@ -16,11 +16,14 @@ public interface IDocumentIntelligenceService
     /// <remarks>This method only adds update definitions to the provided list if changes to the knowledge base are detected. It validates and processes any newly uploaded documents and ensures that removed documents
     /// are excluded from the persisted knowledge base. The caller is responsible for applying the accumulated updates to the data store.</remarks>
     /// <param name="updateDataDomain">The domain object containing the knowledge base update information, including any new or removed documents. Cannot be null.</param>
-    /// <param name="updates">A list to which update definitions for the agent's knowledge base will be added if changes are detected. Cannot be null.</param>
     /// <param name="existingAgent">The current state of the agent's data, used as the baseline for applying knowledge base updates. Cannot be null.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task HandleKnowledgeBaseDataUpdateAsync(AgentDataDomain updateDataDomain, AgentDataDomain existingAgent, CancellationToken cancellationToken = default);
+    Task HandleKnowledgeBaseDataUpdateAsync(
+        AgentDataDomain updateDataDomain,
+        AgentDataDomain existingAgent,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Processes updates to an agent's AI Vision images, including adding new images and removing specified ones, and prepares the corresponding update definitions for persistence.
@@ -28,11 +31,14 @@ public interface IDocumentIntelligenceService
     /// <remarks>This method only adds update definitions to the provided list if changes to the images are detected. It validates and processes any newly uploaded images and ensures that removed images
     /// are excluded from the persisted AI Vision images store. The caller is responsible for applying the accumulated updates to the data store.</remarks>
     /// <param name="updateDataDomain">The domain object containing the images update information, including any new or removed images. Cannot be null.</param>
-    /// <param name="updates">A list to which update definitions for the agent's AI Vision images will be added if changes are detected. Cannot be null.</param>
     /// <param name="existingAgent">The current state of the agent's data, used as the baseline for applying AI Vision images updates. Cannot be null.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task HandleAiVisionImagesDataUpdateAsync(AgentDataDomain updateDataDomain, AgentDataDomain existingAgent, CancellationToken cancellationToken = default);
+    Task HandleAiVisionImagesDataUpdateAsync(
+        AgentDataDomain updateDataDomain,
+        AgentDataDomain existingAgent,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Creates and processes a knowledge base document for the specified agent asynchronously.
@@ -42,7 +48,10 @@ public interface IDocumentIntelligenceService
     /// <param name="agentData">The agent data domain object containing information and files to be processed for the knowledge base. Cannot be null.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task CreateAndProcessKnowledgeBaseDocumentAsync(AgentDataDomain agentData, CancellationToken cancellationToken = default);
+    Task CreateAndProcessKnowledgeBaseDocumentAsync(
+        AgentDataDomain agentData,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Processes the vision images associated with the specified agent by uploading them to cloud storage, extracting keywords using AI vision processing, and updating the agent's data with the results.
@@ -52,7 +61,10 @@ public interface IDocumentIntelligenceService
     /// <param name="agentData">The agent data containing the vision images to process. Must not be null and must contain valid uploaded images.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task CreateAndProcessAiVisionImagesKeywordsAsync(AgentDataDomain agentData, CancellationToken cancellationToken = default);
+    Task CreateAndProcessAiVisionImagesKeywordsAsync(
+        AgentDataDomain agentData,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Deletes the knowledge base documents and AI Vision images data associated with a specific agent from the storage.
@@ -64,7 +76,10 @@ public interface IDocumentIntelligenceService
     /// <param name="agentId">The unique identifier of the agent whose data is to be deleted. Cannot be null or empty.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous delete operation.</returns>
-    Task DeleteKnowledgebaseAndImagesDataAsync(string agentId, CancellationToken cancellationToken = default);
+    Task DeleteKnowledgebaseAndImagesDataAsync(
+        string agentId,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Downloads the knowledgebase file asynchronous.
@@ -73,5 +88,9 @@ public interface IDocumentIntelligenceService
     /// <param name="fileName">The file name.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>The downloaded file url</returns>
-    Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName, CancellationToken cancellationToken = default);
+    Task<string> DownloadKnowledgebaseFileAsync(
+        string agentGuid,
+        string fileName,
+        CancellationToken cancellationToken = default
+    );
 }

@@ -1,5 +1,6 @@
 using System.Globalization;
 using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 using AIAgents.Laboratory.Domain.Helpers;
@@ -21,9 +22,15 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="workspacesDataManager">The workspaces data manager.</param>
 /// <param name="agentChatService">The agent chat service.</param>
 /// <param name="orchestratorService">The orchestrator service.</param>
+/// <param name="notificationsService">The notifications service.</param>
 /// <seealso cref="IWorkspacesService"/>
-public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorkspacesDataManager workspacesDataManager, ICorrelationContext correlationContext,
-    IAgentChatService agentChatService, IOrchestratorService orchestratorService) : IWorkspacesService
+public sealed class WorkspacesService(
+    ILogger<WorkspacesService> logger,
+    IWorkspacesDataManager workspacesDataManager,
+    ICorrelationContext correlationContext,
+    IAgentChatService agentChatService,
+    IOrchestratorService orchestratorService,
+    INotificationsService notificationsService) : IWorkspacesService
 {
     /// <summary>
     /// Creates a new workspace.
@@ -32,15 +39,22 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
     /// <param name="currentUserEmail">The current user email address.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> CreateNewWorkspaceAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<bool> CreateNewWorkspaceAsync(
+        AgentsWorkspaceDomain agentsWorkspaceData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
         ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(CreateNewWorkspaceAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail })
+            );
 
             agentsWorkspaceData.AgentWorkspaceGuid = Guid.NewGuid().ToString();
             agentsWorkspaceData.PrepareAuditEntityData(currentUser: currentUserEmail);
@@ -52,13 +66,23 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(CreateNewWorkspaceAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail })
+            );
         }
     }
 
@@ -69,31 +93,58 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
     /// <param name="currentUserEmail">The current logged in user email address.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> DeleteExistingWorkspaceAsync(string workspaceGuidId, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteExistingWorkspaceAsync(
+        string workspaceGuidId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(workspaceGuidId);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
+        bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuidId, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuidId, currentUserEmail })
+            );
 
-            return await workspacesDataManager.DeleteExistingWorkspaceAsync(
+            response = await workspacesDataManager.DeleteExistingWorkspaceAsync(
                 workspaceGuidId,
                 currentUserEmail,
                 cancellationToken
             ).ConfigureAwait(false);
+            if (response)
+                await this.SendWorkspaceUpdateNotificationAsync(
+                    userToBeNotified: currentUserEmail,
+                    currentUserEmail: currentUserEmail,
+                    workspaceName: workspaceGuidId,
+                    workspaceGuid: workspaceGuidId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+            return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuidId, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuidId, currentUserEmail, response })
+            );
         }
     }
 
@@ -103,13 +154,18 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
     /// <param name="currentUserEmail">The current logged in user name.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="AgentsWorkspaceDomain"/></returns>
-    public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<AgentsWorkspaceDomain>? result = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllWorkspacesAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetAllWorkspacesAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail })
+            );
 
             result = await workspacesDataManager.GetAllWorkspacesAsync(
                 currentUserEmail,
@@ -119,13 +175,21 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllWorkspacesAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetAllWorkspacesAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, result })
+            );
         }
     }
 
@@ -136,14 +200,21 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
     /// <param name="currentUserEmail">The current logged in user email</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The agent workspace domain model.</returns>
-    public async Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(string workspaceId, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(
+        string workspaceId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(workspaceId);
         AgentsWorkspaceDomain? result = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail })
+            );
 
             result = await workspacesDataManager.GetWorkspaceByWorkspaceIdAsync(
                 workspaceId,
@@ -154,13 +225,23 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail, result })
+            );
         }
     }
 
@@ -170,7 +251,10 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
     /// <param name="chatRequest">The workspace agent chat request dto model.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The group chat response.</returns>
-    public async Task<GroupChatResponseDomain> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, CancellationToken cancellationToken = default)
+    public async Task<GroupChatResponseDomain> GetWorkspaceGroupChatResponseAsync(
+        WorkspaceAgentChatRequestDomain chatRequest,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(chatRequest);
         ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.WorkspaceId);
@@ -178,8 +262,11 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest })
+            );
 
             if (string.IsNullOrWhiteSpace(chatRequest.ConversationId))
                 chatRequest.ConversationId = Guid.NewGuid().ToString();
@@ -191,7 +278,8 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
             ).ConfigureAwait(false);
 
             if (workspaceDetails is null || string.IsNullOrWhiteSpace(workspaceDetails.Id))
-                throw new FileNotFoundException(string.Format(CultureInfo.InvariantCulture, ExceptionConstants.WorkspaceNotFoundExceptionMessage, chatRequest.WorkspaceId));
+                throw new FileNotFoundException(
+                    string.Format(CultureInfo.InvariantCulture, ExceptionConstants.WorkspaceNotFoundExceptionMessage, chatRequest.WorkspaceId));
 
             if (!workspaceDetails.IsGroupChatEnabled)
                 throw new MethodAccessException(ExceptionConstants.GroupchatNotEnabledExceptionMessage);
@@ -209,13 +297,23 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest })
+            );
         }
     }
 
@@ -225,7 +323,10 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
     /// <param name="chatRequest">The chat request domain model.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The string response from AI.</returns>
-    public async Task<string> InvokeWorkspaceAgentAsync(WorkspaceAgentChatRequestDomain chatRequest, CancellationToken cancellationToken = default)
+    public async Task<string> InvokeWorkspaceAgentAsync(
+        WorkspaceAgentChatRequestDomain chatRequest,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(chatRequest);
         ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.WorkspaceId);
@@ -234,7 +335,11 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest })
+            );
 
             if (string.IsNullOrWhiteSpace(chatRequest.ConversationId))
                 chatRequest.ConversationId = Guid.NewGuid().ToString();
@@ -245,8 +350,9 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
                 cancellationToken
             ).ConfigureAwait(false) ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
-            var agentDetails = workspaceDetails.ActiveAgentsListInWorkspace.FirstOrDefault(agent => agent.AgentGuid == chatRequest.AgentId)
-                ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
+            var agentDetails = workspaceDetails.ActiveAgentsListInWorkspace
+                .FirstOrDefault(agent => agent.AgentGuid == chatRequest.AgentId)
+                    ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
 
             var agentChatRequestModel = new ChatRequestDomain()
             {
@@ -262,12 +368,23 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest })
+            );
         }
     }
 
@@ -278,31 +395,94 @@ public sealed class WorkspacesService(ILogger<WorkspacesService> logger, IWorksp
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> UpdateExistingWorkspaceDataAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateExistingWorkspaceDataAsync(
+        AgentsWorkspaceDomain agentsWorkspaceData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
+        bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail })
+                );
 
-            return await workspacesDataManager.UpdateExistingWorkspaceDataAsync(
+            response = await workspacesDataManager.UpdateExistingWorkspaceDataAsync(
                 agentsWorkspaceData,
                 currentUserEmail,
                 cancellationToken
             ).ConfigureAwait(false);
+            if (response)
+                await this.SendWorkspaceUpdateNotificationAsync(
+                    userToBeNotified: agentsWorkspaceData.CreatedBy,
+                    currentUserEmail: currentUserEmail,
+                    workspaceName: agentsWorkspaceData.AgentWorkspaceName,
+                    workspaceGuid: agentsWorkspaceData.AgentWorkspaceGuid,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+            return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(UpdateExistingWorkspaceDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentsWorkspaceData, currentUserEmail, response })
+            );
         }
     }
+
+    #region PRIVATE METHODS
+
+    /// <summary>
+    /// Sends the workspace update notification to the user.
+    /// </summary>
+    /// <param name="userToBeNotified">The user to be notified.</param>
+    /// <param name="currentUserEmail">The current user email who made the update.</param>
+    /// <param name="workspaceName">The workspace name which is updated.</param>
+    /// <param name="workspaceGuid">The workspace guid which is updated.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation. Optional.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    private async Task SendWorkspaceUpdateNotificationAsync(
+        string userToBeNotified,
+        string currentUserEmail,
+        string workspaceName,
+        string workspaceGuid,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var notificationsDomainModel = new NotificationsDomain
+        {
+            RecipientUserName = userToBeNotified,
+            Title = string.Format(NotificationMessagesConstants.WorkspaceDataUpdateTitleTemplate, workspaceName),
+            Message = string.Format(NotificationMessagesConstants.WorkspaceDataHasBeenUpdatedMessageTemplate, workspaceName, workspaceGuid),
+            IsGlobal = false,
+            NotificationType = nameof(NotificationTypes.Push),
+            CreatedBy = currentUserEmail
+        };
+        await notificationsService.CreateNewNotificationAsync(
+            request: notificationsDomainModel,
+            cancellationToken: cancellationToken
+        ).ConfigureAwait(false);
+    }
+
+    #endregion
 }

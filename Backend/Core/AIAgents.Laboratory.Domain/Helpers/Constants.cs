@@ -264,5 +264,25 @@ internal static class Constants
         /// The feature request submitted message template.
         /// </summary>
         internal const string FeatureRequestSubmittedMessageTemplate = "A new feature request has been submitted by user '{0}' : '{1}'";
+
+        /// <summary>
+        /// The workspace data update title template.
+        /// </summary>
+        internal const string WorkspaceDataUpdateTitleTemplate = "Workspace '{0}' Data Updated";
+
+        /// <summary>
+        /// The workspace data has been updated message template.
+        /// </summary>
+        internal const string WorkspaceDataHasBeenUpdatedMessageTemplate = "The data for workspace '{0}' with id: '{1}' has been updated.";
+
+        /// <summary>
+        /// The registered application data update title template.
+        /// </summary>
+        internal const string RegisteredApplicationDataUpdateTitleTemplate = "Registered Application '{0}' Data Updated";
+
+        /// <summary>
+        /// The registered application data has been updated message template.
+        /// </summary>
+        internal const string RegisteredApplicationDataHasBeenUpdatedMessageTemplate = "The data for registered application '{0}' with id: '{1}' has been updated.";
     }
 }
