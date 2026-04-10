@@ -14,12 +14,15 @@ namespace AIAgents.Laboratory.API.Controllers;
 /// <param name="configuration">The configuration.</param>
 /// <seealso cref="ControllerBase"/>
 [Authorize]
-public abstract class BaseController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration) : ControllerBase
+public abstract class BaseController(
+    IHttpContextAccessor httpContextAccessor,
+    IConfiguration configuration) : ControllerBase
 {
     /// <summary>
     /// The user email extracted from the token claims.
     /// </summary>
-    protected string UserEmail => httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.UserEmailClaimConstant))?.Value ?? HeaderConstants.NotApplicableStringConstant;
+    protected string UserEmail => httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.UserEmailClaimConstant))?.Value
+        ?? HeaderConstants.NotApplicableStringConstant;
 
     /// <summary>
     /// Determines whether the request is authorized based on the authorization type.
@@ -90,7 +93,8 @@ public abstract class BaseController(IHttpContextAccessor httpContextAccessor, I
     /// <exception cref="Exception">Thrown when the configuration is missing.</exception>
     private bool CheckApplicationLevelAuthorization()
     {
-        var currentClientId = this.User?.Claims?.FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.ClientIdClaimConstant))?.Value;
+        var currentClientId = this.User?.Claims?
+            .FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.ClientIdClaimConstant))?.Value;
         var aiAgentsClientIdFromConfig = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant]
             ?? throw new KeyNotFoundException(configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant]);
 
