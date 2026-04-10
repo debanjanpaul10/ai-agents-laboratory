@@ -211,14 +211,12 @@ jobs:
 
             - name: Install dependencies and build Functions solution
               run: |
-                  cd ${{ env.FUNCTIONS_PROJECT_PATH }}
-                  dotnet restore 
-                  dotnet build --configuration Release --no-restore
+                  dotnet restore "${{ env.FUNCTIONS_PROJECT_PATH }}/AI.Agents.Laboratory.Functions.csproj"
+                  dotnet build "${{ env.FUNCTIONS_PROJECT_PATH }}/AI.Agents.Laboratory.Functions.csproj" --configuration Release --no-restore
 
             - name: Publish the Functions project
               run: |
-                  cd ${{ env.FUNCTIONS_PROJECT_PATH }}
-                  dotnet publish --configuration Release --output ./publish-functions
+                  dotnet publish "${{ env.FUNCTIONS_PROJECT_PATH }}/AI.Agents.Laboratory.Functions.csproj" --configuration Release --output ./publish-functions
 
             - name: Set functions artifact path
               id: set-artifact-path
