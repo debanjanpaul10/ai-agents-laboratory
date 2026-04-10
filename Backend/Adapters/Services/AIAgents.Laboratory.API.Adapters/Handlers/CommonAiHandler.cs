@@ -1,6 +1,6 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Ports.In;
 using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
@@ -38,9 +38,13 @@ public sealed class CommonAiHandler(ICommonAiService commonAiService, IMapper ma
     /// </summary>
     /// <param name="userName">The current logged in user.</param>
     /// <returns>A tupple containing the list of agents and the top 3 active ai agents.</returns>
-    public async Task<TopActiveAgentsDTO> GetTopActiveAgentsDataAsync(string userName)
+    public async Task<TopActiveAgentsDTO> GetTopActiveAgentsDataAsync(string userName, CancellationToken cancellationToken = default)
     {
-        var (ActiveAgentsCount, TopActiveAgentsList) = await commonAiService.GetTopActiveAgentsDataAsync(userName).ConfigureAwait(false);
+        var (ActiveAgentsCount, TopActiveAgentsList) = await commonAiService.GetTopActiveAgentsDataAsync(
+            userName,
+            cancellationToken
+        ).ConfigureAwait(false);
+
         return new()
         {
             ActiveAgentsCount = ActiveAgentsCount,

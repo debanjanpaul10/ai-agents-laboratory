@@ -1,7 +1,7 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Ports.In;
 using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
@@ -20,10 +20,14 @@ public sealed class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSki
     /// <param name="toolSkillData">The tool skill data DTO model.</param>
     /// <param name="userEmail">The user email.</param>
     /// <returns>The boolean for <c>success/failure</c></returns>
-    public async Task<bool> AddNewToolSkillAsync(ToolSkillDTO toolSkillData, string userEmail)
+    public async Task<bool> AddNewToolSkillAsync(ToolSkillDTO toolSkillData, string userEmail, CancellationToken cancellationToken = default)
     {
         var domainInput = mapper.Map<ToolSkillDomain>(toolSkillData);
-        return await toolSkillsService.AddNewToolSkillAsync(toolSkillData: domainInput, userEmail).ConfigureAwait(false);
+        return await toolSkillsService.AddNewToolSkillAsync(
+            toolSkillData: domainInput,
+            userEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -32,9 +36,13 @@ public sealed class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSki
     /// <param name="toolSkillId">The tool skill id to delete.</param>
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail)
+    public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default)
     {
-        return await toolSkillsService.DeleteExistingToolSkillBySkillIdAsync(toolSkillId, currentUserEmail).ConfigureAwait(false);
+        return await toolSkillsService.DeleteExistingToolSkillBySkillIdAsync(
+            toolSkillId,
+            currentUserEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -43,9 +51,13 @@ public sealed class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSki
     /// <param name="serverUrl">The MCP server url.</param>
     /// <param name="currentUserEmail">The current user email.</param>
     /// <returns>The list of <see cref="McpServerToolsDTO"/></returns>
-    public async Task<IEnumerable<McpServerToolsDTO>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail)
+    public async Task<IEnumerable<McpServerToolsDTO>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail, CancellationToken cancellationToken = default)
     {
-        var domainResult = await toolSkillsService.GetAllMcpToolsAvailableAsync(serverUrl, currentUserEmail).ConfigureAwait(false);
+        var domainResult = await toolSkillsService.GetAllMcpToolsAvailableAsync(
+            serverUrl,
+            currentUserEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
         return domainResult.Select(tool => new McpServerToolsDTO
         {
             ToolName = tool.Name,
@@ -58,9 +70,12 @@ public sealed class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSki
     /// </summary>
     /// <param name="userEmail">The current logged in user email.</param>
     /// <returns>The list of <see cref="ToolSkillDTO"/></returns>
-    public async Task<IEnumerable<ToolSkillDTO>> GetAllToolSkillsAsync(string userEmail)
+    public async Task<IEnumerable<ToolSkillDTO>> GetAllToolSkillsAsync(string userEmail, CancellationToken cancellationToken = default)
     {
-        var domainResult = await toolSkillsService.GetAllToolSkillsAsync(userEmail).ConfigureAwait(false);
+        var domainResult = await toolSkillsService.GetAllToolSkillsAsync(
+            userEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
         return mapper.Map<IEnumerable<ToolSkillDTO>>(domainResult);
     }
 
@@ -70,9 +85,13 @@ public sealed class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSki
     /// <param name="toolSkillId">The tool skill id to be fetched.</param>
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <returns>The tool skill DTO model.</returns>
-    public async Task<ToolSkillDTO> GetToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail)
+    public async Task<ToolSkillDTO> GetToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default)
     {
-        var domainResult = await toolSkillsService.GetToolSkillBySkillIdAsync(toolSkillId, currentUserEmail).ConfigureAwait(false);
+        var domainResult = await toolSkillsService.GetToolSkillBySkillIdAsync(
+            toolSkillId,
+            currentUserEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
         return mapper.Map<ToolSkillDTO>(domainResult);
     }
 
@@ -82,9 +101,13 @@ public sealed class ToolSkillsHandler(IMapper mapper, IToolSkillsService toolSki
     /// <param name="updateToolSkillData">The tool skill data DTO model.</param>
     /// <param name="currentUserEmail">The user email.</param>
     /// <returns>The boolean for <c>success/failure</c></returns>
-    public async Task<bool> UpdateExistingToolSkillDataAsync(ToolSkillDTO updateToolSkillData, string currentUserEmail)
+    public async Task<bool> UpdateExistingToolSkillDataAsync(ToolSkillDTO updateToolSkillData, string currentUserEmail, CancellationToken cancellationToken = default)
     {
         var domainInput = mapper.Map<ToolSkillDomain>(updateToolSkillData);
-        return await toolSkillsService.UpdateExistingToolSkillDataAsync(updateToolSkillData: domainInput, currentUserEmail).ConfigureAwait(false);
+        return await toolSkillsService.UpdateExistingToolSkillDataAsync(
+            updateToolSkillData: domainInput,
+            currentUserEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
     }
 }

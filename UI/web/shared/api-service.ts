@@ -239,3 +239,18 @@ export async function DeleteRegisteredApplicationByIdApiAsync(
 }
 
 // #endregion
+
+// #region NOTIFICATIONS
+
+export async function PollNotificationsApiAsync() {
+	return await GetAsync("notifications/pollnotifications");
+}
+
+export async function MarkNotificationAsReadApiAsync(notificationId: string) {
+	return await PostAsync(
+		`notifications/marknotificationasread?notificationId=${notificationId}`,
+		null,
+	);
+}
+
+// #endregion

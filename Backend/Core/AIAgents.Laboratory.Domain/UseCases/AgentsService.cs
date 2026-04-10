@@ -1,12 +1,11 @@
-﻿using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.In;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
@@ -18,23 +17,19 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="logger">The logger service.</param>
 /// <param name="configuration">The configuration service.</param>
 /// <param name="correlationContext">The correlation context for logging.</param>
-/// <param name="mongoDatabaseService">The mongo db database service.</param>
 /// <param name="documentIntelligenceService">The document intelligence service.</param>
 /// <param name="toolSkillsService">The tools skill service.</param>
+/// <param name="agentsDataService">The agents data service.</param>
 /// <seealso cref="IAgentsService" />
-public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration configuration, ICorrelationContext correlationContext, IMongoDatabaseService mongoDatabaseService,
-    IDocumentIntelligenceService documentIntelligenceService, IToolSkillsService toolSkillsService) : IAgentsService
+public sealed class AgentsService(
+    ILogger<AgentsService> logger,
+    IConfiguration configuration,
+    ICorrelationContext correlationContext,
+    IAgentsDataManager agentsDataService,
+    IDocumentIntelligenceService documentIntelligenceService,
+    IToolSkillsService toolSkillsService,
+    INotificationsService notificationsService) : IAgentsService
 {
-    /// <summary>
-    /// The mongo database name configuration value.
-    /// </summary>
-    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
-
-    /// <summary>
-    /// The agents data collection name configuration value.
-    /// </summary>
-    private readonly string AgentsDataCollectionName = configuration[MongoDbCollectionConstants.AgentsCollectionName] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
-
     /// <summary>
     /// The is knowledge base service allowed.
     /// </summary>
@@ -50,33 +45,46 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     /// </summary>
     /// <param name="agentData">The agent data.</param>
     /// <param name="userEmail">The user email address.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The boolean for success/failure.
     /// </returns>
-    public async Task<bool> CreateNewAgentAsync(AgentDataDomain agentData, string userEmail)
+    public async Task<bool> CreateNewAgentAsync(AgentDataDomain agentData, string userEmail, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(agentData);
         ArgumentException.ThrowIfNullOrWhiteSpace(userEmail);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, agentData.AgentName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, agentData.AgentName }));
 
             agentData.AgentId = Guid.NewGuid().ToString();
             if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Any() && this.IsKnowledgeBaseServiceAllowed)
-                await documentIntelligenceService.CreateAndProcessKnowledgeBaseDocumentAsync(agentData).ConfigureAwait(false);
+                await documentIntelligenceService.CreateAndProcessKnowledgeBaseDocumentAsync(
+                    agentData,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
             if (agentData.VisionImages is not null && agentData.VisionImages.Any() && this.IsAiVisionServiceAllowed)
-                await documentIntelligenceService.CreateAndProcessAiVisionImagesKeywordsAsync(agentData).ConfigureAwait(false);
+                await documentIntelligenceService.CreateAndProcessAiVisionImagesKeywordsAsync(
+                    agentData,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
             if (agentData.AssociatedSkillGuids.Any())
                 await this.UpdateSkillsWithAssociatedAgentsDataAsync(
-                    agentData, currentUserEmail: userEmail).ConfigureAwait(false);
+                    agentData,
+                    currentUserEmail: userEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
             agentData.PrepareAuditEntityData(userEmail);
-            return await mongoDatabaseService.SaveDataAsync(
-                data: agentData,
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.AgentsDataCollectionName).ConfigureAwait(false);
+            return await agentsDataService.CreateNewAgentAsync(
+                agentData,
+                userEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -85,7 +93,8 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, agentData.AgentName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewAgentAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, agentData.AgentName }));
         }
     }
 
@@ -93,39 +102,24 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     /// Gets the agent data by identifier asynchronous.
     /// </summary>
     /// <param name="agentId">The agent identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// The agent data dto.
     /// </returns>
-    public async Task<AgentDataDomain> GetAgentDataByIdAsync(string agentId, string userEmail)
+    public async Task<AgentDataDomain> GetAgentDataByIdAsync(string agentId, string userEmail, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId, userEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentDataByIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId, userEmail }));
 
-            var filter = Builders<AgentDataDomain>.Filter.And(
-                Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
-                Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, agentId));
-
-            if (!string.IsNullOrEmpty(userEmail))
-                filter = Builders<AgentDataDomain>.Filter.And(
-                    filter,
-                    Builders<AgentDataDomain>.Filter.Or(
-                        Builders<AgentDataDomain>.Filter.Eq(x => x.IsPrivate, false),
-                        Builders<AgentDataDomain>.Filter.And(
-                            Builders<AgentDataDomain>.Filter.Eq(x => x.IsPrivate, true),
-                            Builders<AgentDataDomain>.Filter.Eq(x => x.CreatedBy, userEmail)
-                        )
-                    )
-                );
-
-            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.AgentsDataCollectionName,
-                filter).ConfigureAwait(false);
-
-            var agentData = allData.First() ?? throw new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
+            var agentData = await agentsDataService.GetAgentDataByIdAsync(
+                agentId,
+                userEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
             if (agentData.StoredKnowledgeBase is not null && agentData.StoredKnowledgeBase.Any())
                 agentData.ConvertKnowledgebaseBinaryDataToFile();
 
@@ -138,7 +132,8 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId, userEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentDataByIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId, userEmail }));
         }
     }
 
@@ -146,29 +141,20 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     /// Gets all agents data asynchronous.
     /// </summary>
     /// <param name="userEmail">The current logged in user email.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of <see cref="AgentDataDomain"/></returns>
-    public async Task<IEnumerable<AgentDataDomain>> GetAllAgentsDataAsync(string userEmail)
+    public async Task<IEnumerable<AgentDataDomain>> GetAllAgentsDataAsync(string userEmail, CancellationToken cancellationToken = default)
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllAgentsDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail }));
 
-            var filter = Builders<AgentDataDomain>.Filter.And(
-                Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
-                Builders<AgentDataDomain>.Filter.Eq(x => x.IsDefaultChatbot, false),
-                Builders<AgentDataDomain>.Filter.Or(
-                    Builders<AgentDataDomain>.Filter.Eq(x => x.IsPrivate, false),
-                    Builders<AgentDataDomain>.Filter.And(
-                        Builders<AgentDataDomain>.Filter.Eq(x => x.IsPrivate, true),
-                        Builders<AgentDataDomain>.Filter.Eq(x => x.CreatedBy, userEmail)
-                    )
-                )
-            );
+            var agents = await agentsDataService.GetAllAgentsDataAsync(
+                userEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
 
-            var agents = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.AgentsDataCollectionName,
-                filter).ConfigureAwait(false);
             // Process stored knowledge base data if available
             foreach (var agent in from agent in agents where agent.StoredKnowledgeBase is not null && agent.StoredKnowledgeBase.Any() select agent)
                 agent.ConvertKnowledgebaseBinaryDataToFile();
@@ -182,7 +168,8 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllAgentsDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail }));
         }
     }
 
@@ -191,53 +178,62 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     /// </summary>
     /// <param name="updateDataDomain">The update agent data DTO model.</param>
     /// <param name="userEmail">The current logged in user email address.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain, string userEmail)
+    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain, string userEmail, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(updateDataDomain);
         ArgumentException.ThrowIfNullOrWhiteSpace(updateDataDomain.AgentId);
         ArgumentException.ThrowIfNullOrWhiteSpace(userEmail);
 
+        bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId, updateDataDomain.ModifiedBy }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId, updateDataDomain.ModifiedBy }));
 
-            var filter = Builders<AgentDataDomain>.Filter.And(Builders<AgentDataDomain>.Filter.Eq(x => x.IsActive, true),
-                Builders<AgentDataDomain>.Filter.Eq(x => x.AgentId, updateDataDomain.AgentId));
-            var agentsData = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.AgentsDataCollectionName,
-                filter).ConfigureAwait(false);
-            var existingAgent = agentsData.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
-
-            var updates = new List<UpdateDefinition<AgentDataDomain>>
-            {
-                Builders<AgentDataDomain>.Update.Set(x => x.AgentMetaPrompt, updateDataDomain.AgentMetaPrompt),
-                Builders<AgentDataDomain>.Update.Set(x => x.AgentName, updateDataDomain.AgentName),
-                Builders<AgentDataDomain>.Update.Set(x => x.ApplicationId, updateDataDomain.ApplicationId),
-                Builders<AgentDataDomain>.Update.Set(x => x.IsPrivate, updateDataDomain.IsPrivate),
-                Builders<AgentDataDomain>.Update.Set(x => x.AgentDescription, updateDataDomain.AgentDescription),
-                Builders<AgentDataDomain>.Update.Set(x => x.DateModified, DateTime.UtcNow),
-                Builders<AgentDataDomain>.Update.Set(x => x.AssociatedSkillGuids, updateDataDomain.AssociatedSkillGuids),
-                Builders<AgentDataDomain>.Update.Set(x => x.ModifiedBy, userEmail)
-            };
+            var existingAgent = await agentsDataService.GetAgentDataByIdAsync(
+               updateDataDomain.AgentId,
+                userEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             if (this.IsKnowledgeBaseServiceAllowed)
-                await documentIntelligenceService.HandleKnowledgeBaseDataUpdateAsync(updateDataDomain, updates, existingAgent).ConfigureAwait(false);
+                await documentIntelligenceService.HandleKnowledgeBaseDataUpdateAsync(
+                    updateDataDomain,
+                    existingAgent,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
             if (this.IsAiVisionServiceAllowed)
-                await documentIntelligenceService.HandleAiVisionImagesDataUpdateAsync(updateDataDomain, updates, existingAgent).ConfigureAwait(false);
+                await documentIntelligenceService.HandleAiVisionImagesDataUpdateAsync(
+                    updateDataDomain,
+                    existingAgent,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
             if (updateDataDomain.AssociatedSkillGuids.Any())
                 await this.UpdateSkillsWithAssociatedAgentsDataAsync(
-                    agentData: updateDataDomain, currentUserEmail: userEmail).ConfigureAwait(false);
+                    agentData: updateDataDomain,
+                    currentUserEmail: userEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
-            var update = Builders<AgentDataDomain>.Update.Combine(updates);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter,
-                update,
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.AgentsDataCollectionName).ConfigureAwait(false);
+            response = await agentsDataService.UpdateExistingAgentDataAsync(
+                updateDataDomain,
+                userEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
+            if (response)
+                await this.SendAgentUpdateNotificationAsync(
+                    userToBeNotified: existingAgent.CreatedBy,
+                    currentUserEmail: userEmail,
+                    agentName: updateDataDomain.AgentName,
+                    agentGuid: updateDataDomain.AgentId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+            return response;
         }
         catch (Exception ex)
         {
@@ -246,7 +242,8 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId, updateDataDomain.ModifiedBy }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId, updateDataDomain.ModifiedBy, response }));
         }
     }
 
@@ -255,38 +252,39 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     /// </summary>
     /// <param name="agentId">The agent id.</param>
     /// <param name="currentUserEmail">The current logged in user email</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail)
+    public async Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
+        bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, agentId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, agentId }));
 
-            var filter = Builders<AgentDataDomain>.Filter.Where(x => x.IsActive && x.AgentId == agentId);
-            var allAgents = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.AgentsDataCollectionName,
-                filter: filter).ConfigureAwait(false);
-            var updateAgent = allAgents.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
+            await documentIntelligenceService.DeleteKnowledgebaseAndImagesDataAsync(
+                agentId,
+                cancellationToken
+            ).ConfigureAwait(false);
 
-            if (updateAgent.CreatedBy != currentUserEmail)
-                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
+            response = await agentsDataService.DeleteExistingAgentDataAsync(
+                agentId,
+                currentUserEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
+            if (response)
+                await this.SendAgentUpdateNotificationAsync(
+                    userToBeNotified: currentUserEmail,
+                    currentUserEmail,
+                    agentName: string.Empty,
+                    agentGuid: agentId,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
-            var updates = new List<UpdateDefinition<AgentDataDomain>>
-            {
-                Builders<AgentDataDomain>.Update.Set(x => x.IsActive, false),
-                Builders<AgentDataDomain>.Update.Set(x => x.DateModified, DateTime.UtcNow)
-            };
-            var update = Builders<AgentDataDomain>.Update.Combine(updates);
-            await documentIntelligenceService.DeleteKnowledgebaseAndImagesDataAsync(agentId).ConfigureAwait(false);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter,
-                update,
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.AgentsDataCollectionName).ConfigureAwait(false);
+            return response;
         }
         catch (Exception ex)
         {
@@ -295,7 +293,8 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, agentId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, agentId, response }));
         }
     }
 
@@ -304,13 +303,19 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     /// </summary>
     /// <param name="agentGuid">The agent guid id.</param>
     /// <param name="fileName">The file name.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The downloaded file url</returns>
-    public async Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName)
+    public async Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName, CancellationToken cancellationToken = default)
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
-            return await documentIntelligenceService.DownloadKnowledgebaseFileAsync(agentGuid, fileName).ConfigureAwait(false);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
+            return await documentIntelligenceService.DownloadKnowledgebaseFileAsync(
+                agentGuid,
+                fileName,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -319,7 +324,8 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
         }
     }
 
@@ -330,8 +336,9 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
     /// </summary>
     /// <param name="agentData">The agent data domain model.</param>
     /// <param name="currentUserEmail">The current logged in user email.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task to wait on.</returns>
-    private async Task UpdateSkillsWithAssociatedAgentsDataAsync(AgentDataDomain agentData, string currentUserEmail)
+    private async Task UpdateSkillsWithAssociatedAgentsDataAsync(AgentDataDomain agentData, string currentUserEmail, CancellationToken cancellationToken = default)
     {
         var associatedAgentsData = new List<AssociatedAgentsSkillDataDomain>
         {
@@ -342,7 +349,42 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             }
         };
         await toolSkillsService.AssociateSkillAndAgentAsync(
-            agentData: associatedAgentsData, toolSkillId: agentData.AssociatedSkillGuids[0], currentUserEmail).ConfigureAwait(false);
+            agentData: associatedAgentsData,
+            toolSkillId: agentData.AssociatedSkillGuids[0],
+            currentUserEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Sends the agent update notification asynchronous.
+    /// </summary>
+    /// <param name="userToBeNotified">The user to be notified.</param>
+    /// <param name="currentUserEmail">The current user's email.</param>
+    /// <param name="agentName">The agent name.</param>
+    /// <param name="agentGuid">The agent GUID.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task to wait on.</returns>
+    private async Task SendAgentUpdateNotificationAsync(
+        string userToBeNotified,
+        string currentUserEmail,
+        string agentName, string agentGuid,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var notificationsDomainModel = new NotificationsDomain
+        {
+            RecipientUserName = userToBeNotified,
+            Title = string.Format(NotificationMessagesConstants.AgentDataUpdateTitleTemplate, agentName),
+            Message = string.Format(NotificationMessagesConstants.AgentDataHasBeenUpdatedMessageTemplate, agentName, agentGuid),
+            IsGlobal = false,
+            NotificationType = nameof(NotificationTypes.Push),
+            CreatedBy = currentUserEmail
+        };
+        await notificationsService.CreateNewNotificationAsync(
+            request: notificationsDomainModel,
+            cancellationToken: cancellationToken
+        ).ConfigureAwait(false);
     }
 
     #endregion

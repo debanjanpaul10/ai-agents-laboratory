@@ -111,6 +111,21 @@ internal static class Constants
         /// The invalid json format exception message.
         /// </summary>
         internal const string InvalidJsonDeserializeExceptionMessage = "Failed to deserialize the JSON";
+
+        /// <summary>
+        /// The no valid chunks generated
+        /// </summary>
+        internal const string NoValidChunksGenerated = "No valid chunks were generated from the content.";
+
+        /// <summary>
+        /// The number of embeddings mismatch
+        /// </summary>
+        internal const string NumberOfEmbeddingsMismatch = "The number of embeddings generated does not match the number of text chunks.";
+
+        /// <summary>
+        /// The unsupported file type message.
+        /// </summary>
+        internal const string UnsupportedFileTypeMessage = "The uploaded file type is not supported for knowledge base processing.";
     }
 
     /// <summary>
@@ -158,6 +173,16 @@ internal static class Constants
         /// The current ai service provider
         /// </summary>
         internal const string CurrentAiServiceProvider = "CurrentAiServiceProvider";
+
+        /// <summary>
+        /// Represents the configuration key used to retrieve the Azure AI Vision service API key from application settings.
+        /// </summary>
+        internal const string AzureAiVisionKey = "AzureAiVision:Key";
+
+        /// <summary>
+        /// Represents the configuration key for the Azure AI Vision service endpoint.
+        /// </summary>
+        internal const string AzureAiVisionEndpoint = "AzureAiVision:Endpoint";
     }
 
     /// <summary>
@@ -241,5 +266,89 @@ internal static class Constants
         /// The API endpoint
         /// </summary>
         internal const string ApiEndpoint = "ChatGpt:Endpoint";
+    }
+
+    /// <summary>
+    /// The OpenAI GPT constants.
+    /// </summary>
+    internal static class OpenAiGptConstants
+    {
+        /// <summary>
+        /// The service provider name.
+        /// </summary>
+        internal const string ServiceProviderName = "OpenAiGPT";
+
+        /// <summary>
+        /// The Model ID.
+        /// </summary>
+        internal const string ModelId = "OpenAiGPT:ModelId";
+
+        /// <summary>
+        /// The API Key.
+        /// </summary>
+        internal const string ApiKey = "OpenAiGPT:ApiKey";
+
+        /// <summary>
+        /// The API endpoint
+        /// </summary>
+        internal const string ApiEndpoint = "OpenAiGPT:Endpoint";
+    }
+
+    /// <summary>
+    /// The knowledge base constants.
+    /// </summary>
+    internal static class KnowledgeBaseConstants
+    {
+        /// <summary>
+        /// The chunk description template
+        /// </summary>
+        internal const string ChunkDescriptionTemplate = "Knowledge base chunk {0} of {1}";
+
+        /// <summary>
+        /// The comma separator.
+        /// </summary>
+        internal const char CommaSeparator = ',';
+
+        /// <summary>
+        /// The file content types.
+        /// </summary>
+        internal static class FileContentTypes
+        {
+            /// <summary>
+            /// The content type plain text.
+            /// </summary>
+            internal const string PlainTextFiles = ".txt";
+
+            /// <summary>
+            /// The pdf files.
+            /// </summary>
+            internal const string PdfFiles = ".pdf";
+
+            /// <summary>
+            /// The word files.
+            /// </summary>
+            internal const string WordFiles = ".docx, .doc, .docm";
+
+            /// <summary>
+            /// The excel files.
+            /// </summary>
+            internal const string ExcelFiles = ".xls, .xlsx, .xlsm";
+
+            /// <summary>
+            /// The JSON files.
+            /// </summary>
+            internal const string JsonFiles = ".json";
+        }
+    }
+
+    /// <summary>
+    /// Provides constant values used by the AI Vision components.
+    /// </summary>
+    internal static class AiVisionConstants
+    {
+        /// <summary>
+        /// Represents the number of characters in a standard operation identifier.
+        /// </summary>
+        internal const int NUMBER_OF_CHARACTERS_IN_OPERATION_ID = 36;
     }
 }

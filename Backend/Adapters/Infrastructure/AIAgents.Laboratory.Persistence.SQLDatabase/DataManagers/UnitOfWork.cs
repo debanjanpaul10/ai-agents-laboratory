@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using AIAgents.Laboratory.Domain.DrivenPorts;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Context;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -46,40 +46,55 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
     /// <summary>
     /// This method begins a new transaction asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
     /// <returns>A task to wait on.</returns>
-    public async Task BeginTransactionAsync()
+    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
-        this._transaction = await dbContext.Database.BeginTransactionAsync().ConfigureAwait(false);
+        this._transaction = await dbContext.Database
+            .BeginTransactionAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>
     /// Commits all changes made in this context to the database asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
     /// <returns>A task to wait on.</returns>
-    public async Task CommitAsync()
+    public async Task CommitAsync(CancellationToken cancellationToken = default)
     {
-        await dbContext.SaveChangesAsync();
+        await dbContext
+            .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
+
         if (this._transaction is not null)
-            await this._transaction.CommitAsync().ConfigureAwait(false);
+            await this._transaction
+                .CommitAsync(cancellationToken)
+                .ConfigureAwait(false);
     }
 
     /// <summary>
     /// Rollbacks all changes made in this context to the database asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
     /// <returns>A task to wait on.</returns>
-    public async Task RollbackAsync()
+    public async Task RollbackAsync(CancellationToken cancellationToken = default)
     {
         if (this._transaction is not null)
-            await this._transaction.RollbackAsync().ConfigureAwait(false);
+            await this._transaction
+                .RollbackAsync(cancellationToken)
+                .ConfigureAwait(false);
     }
 
     /// <summary>
     /// This method saves all changes made in this context to the database asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
     /// <returns>The save changes count.</returns>
-    public async Task<int> SaveChangesAsync()
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await dbContext.SaveChangesAsync().ConfigureAwait(false);
+        return await dbContext
+            .SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>

@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Used for MongoDB ID", Scope = "member", Target = "~P:AIAgents.Laboratory.Domain.DomainEntities.RegisteredApplication._id")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Used for MongoDB ID", Scope = "member", Target = "~P:AIAgents.Laboratory.Domain.DomainEntities.RegisteredApplicationDomain._id")]

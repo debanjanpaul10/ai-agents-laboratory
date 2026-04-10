@@ -1,5 +1,8 @@
-﻿using AIAgents.Laboratory.Domain.DrivenPorts;
+﻿using AIAgents.Laboratory.Domain.Ports.Out;
+using AIAgents.Laboratory.Persistence.MongoDatabase.Contracts;
 using AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
+using AIAgents.Laboratory.Persistence.MongoDatabase.Mapper;
+using AIAgents.Laboratory.Persistence.MongoDatabase.Repository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -19,7 +22,10 @@ public static class DIContainer
     /// <param name="configuration">The configuration.</param>
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddMongoDbAdapterDependencies(this IServiceCollection services, IConfiguration configuration) =>
-        services.ConfigureMongoDbServer(configuration).AddScoped<IMongoDatabaseService, MongoDatabaseManager>();
+        services.ConfigureMongoDbServer(configuration)
+        .AddDataManagers()
+        .AddDataRepositories()
+        .AddAutoMapper(config => config.AddProfile<MongoDataMapperProfile>());
 
     /// <summary>
     /// Configures the mongo database server.
@@ -51,4 +57,25 @@ public static class DIContainer
 
         return services;
     }
+
+    /// <summary>
+    /// Adds the data managers.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The updated service collection.</returns>
+    private static IServiceCollection AddDataManagers(this IServiceCollection services) =>
+        services.AddScoped<IAgentsDataManager, AgentsDataManager>()
+        .AddScoped<IConversationHistoryDataManager, ConversationHistoryDataManager>()
+        .AddScoped<IRegisteredApplicationDataManager, RegisteredApplicationDataManager>()
+        .AddScoped<IWorkspacesDataManager, WorkspacesDataManager>()
+        .AddScoped<IToolSkillsDataManager, ToolSkillsDataManager>()
+        .AddScoped<INotificationsDataManager, NotificationsDataManager>();
+
+    /// <summary>
+    /// Adds the data repositories.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The updated service collection.</returns>
+    private static IServiceCollection AddDataRepositories(this IServiceCollection services) =>
+        services.AddScoped<IMongoDatabaseRepository, MongoDatabaseRepository>();
 }

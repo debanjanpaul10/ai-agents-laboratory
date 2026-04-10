@@ -62,6 +62,67 @@ internal static class Constants
         /// The exception message for failure to configure MongoDB client.
         /// </summary>
         internal const string FailedToConfigureMongoDbClientExceptionMessage = "Failed to configure MongoDB client. Connection string format may be incorrect. Error: {0}";
+
+        /// <summary>
+        /// The configuration key does not exists exception message.
+        /// </summary>
+        internal const string ConfigurationKeyNotFoundExceptionMessage = "The configuration key does not exists!";
+
+        /// <summary>
+        /// The agent not found exception message
+        /// </summary>
+        internal const string AgentNotFoundExceptionMessage = "Oops! It seems the AI agent you are looking for does not exists!";
+
+        /// <summary>
+        /// The unauthorized user exception message constant.
+        /// </summary>
+        internal const string UnauthorizedUserExceptionMessage = "The user does not have sufficient permissions to do this action!";
+
+        /// <summary>
+        /// The data not found exception message constant.
+        /// </summary>
+        internal const string DataNotFoundExceptionMessage = "Oops! The requested data could not be found!";
+    }
+
+    /// <summary>
+    /// The MongoDB collection constants class.
+    /// </summary>
+    internal static class MongoDbCollectionConstants
+    {
+        /// <summary>
+        /// The skills database name
+        /// </summary>
+        internal const string AiAgentsPrimaryDatabase = "AiAgentsPrimaryDatabase";
+
+        /// <summary>
+        /// The agents collection name
+        /// </summary>
+        internal const string AgentsCollectionName = "AgentsCollection";
+
+        /// <summary>
+        /// The conversation history collection name.
+        /// </summary>
+        internal const string ConversationHistoryCollectionName = "ConversationHistoryCollection";
+
+        /// <summary>
+        /// The tool skills collection name.
+        /// </summary>
+        internal const string ToolSkillsCollectionName = "ToolSkillsCollection";
+
+        /// <summary>
+        /// The agents workspace collection name.
+        /// </summary>
+        internal const string WorkspaceCollectionName = "WorkspaceCollection";
+
+        /// <summary>
+        /// The registered applications collection name.
+        /// </summary>
+        internal const string RegisteredApplicationsCollectionName = "RegisteredApplicationsCollection";
+
+        /// <summary>
+        /// The notifications collection name key.
+        /// </summary>
+        internal const string NotificationsCollectionName = "NotificationsCollection";
     }
 
 }

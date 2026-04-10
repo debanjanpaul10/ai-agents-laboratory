@@ -1,45 +1,44 @@
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DrivenPorts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
-using Microsoft.Extensions.Configuration;
+using AIAgents.Laboratory.Domain.Ports.In;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Client;
-using MongoDB.Driver;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
 
 /// <summary>
-/// The tool skills service business class.
+/// The <c>ToolSkillsService</c> class provides methods to manage tool skills, including adding new tool skills, associating skills with agents, deleting tool skills, and retrieving tool skill information. 
+/// It interacts with the data manager for tool skills and the MCP client services to perform these operations. The service also includes logging for method execution and error handling to ensure robust operation.
 /// </summary>
-/// <param name="logger">The logger service.</param>
-/// <param name="configuration">The configuration service.</param>
-/// <param name="correlationContext">The correlation context used for logging.</param>
-/// <param name="mongoDatabaseService">The mongo database service.</param>
+/// <param name="logger">The logger instance.</param>
+/// <param name="correlationContext">The correlation context.</param>
+/// <param name="toolSkillsDataManager">The tool skills data manager.</param>
 /// <param name="mcpClientServices">The MCP client services.</param>
+/// <param name="notificationsService">The notifications service.</param>
 /// <seealso cref="IToolSkillsService"/>
-public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfiguration configuration, ICorrelationContext correlationContext, IMongoDatabaseService mongoDatabaseService, IMcpClientServices mcpClientServices) : IToolSkillsService
+public sealed class ToolSkillsService(
+    ILogger<ToolSkillsService> logger,
+    ICorrelationContext correlationContext,
+    IToolSkillsDataManager toolSkillsDataManager,
+    IMcpClientServices mcpClientServices,
+    INotificationsService notificationsService) : IToolSkillsService
 {
-    /// <summary>
-    /// The mongo database name configuration value.
-    /// </summary>
-    private readonly string MongoDatabaseName = configuration[MongoDbCollectionConstants.AiAgentsPrimaryDatabase] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
-
-    /// <summary>
-    /// The tool skills collection name configuration value.
-    /// </summary>
-    private readonly string ToolSkillsCollectionName = configuration[MongoDbCollectionConstants.ToolSkillsCollectionName] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
-
     /// <summary>
     /// Adds a new tool skill asynchronously.
     /// </summary>
     /// <param name="toolSkillData">The tool skill data domain model.</param>
     /// <param name="userEmail">The user email.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for <c>success/failure</c></returns>
-    public async Task<bool> AddNewToolSkillAsync(ToolSkillDomain toolSkillData, string userEmail)
+    public async Task<bool> AddNewToolSkillAsync(
+        ToolSkillDomain toolSkillData,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
@@ -47,10 +46,11 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
 
             toolSkillData.ToolSkillGuid = Guid.NewGuid().ToString();
             toolSkillData.PrepareAuditEntityData(userEmail);
-            return await mongoDatabaseService.SaveDataAsync(
-                data: toolSkillData,
-                databaseName: this.MongoDatabaseName,
-                collectionName: this.ToolSkillsCollectionName).ConfigureAwait(false);
+            return await toolSkillsDataManager.AddNewToolSkillAsync(
+                toolSkillData,
+                userEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -69,8 +69,14 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
     /// <param name="agentData">The agent data containing agent name and agent guid.</param>
     /// <param name="toolSkillId">The tool skill guid id.</param>
     /// <param name="currentUserEmail">The current user email.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> AssociateSkillAndAgentAsync(IList<AssociatedAgentsSkillDataDomain> agentData, string toolSkillId, string currentUserEmail)
+    public async Task<bool> AssociateSkillAndAgentAsync(
+        IList<AssociatedAgentsSkillDataDomain> agentData,
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(agentData);
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
@@ -78,14 +84,23 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, toolSkillId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, toolSkillId, currentUserEmail }));
 
-            var toolData = await this.GetToolSkillBySkillIdAsync(toolSkillId, currentUserEmail).ConfigureAwait(false);
-            if (toolData is null) return false;
+            var toolData = await this.GetToolSkillBySkillIdAsync(
+                toolSkillId,
+                currentUserEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
+            if (toolData is null)
+                return false;
 
             toolData.AssociatedAgents = agentData;
             return await this.UpdateExistingToolSkillDataAsync(
-                updateToolSkillData: toolData, currentUserEmail).ConfigureAwait(false);
+                updateToolSkillData: toolData,
+                currentUserEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -94,7 +109,8 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, toolSkillId, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, toolSkillId, currentUserEmail }));
         }
     }
 
@@ -103,33 +119,38 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
     /// </summary>
     /// <param name="toolSkillId">The tool skill id to delete.</param>
     /// <param name="currentUserEmail">The current logged in user email.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail)
+    public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
+        bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId }));
 
-            var filter = Builders<ToolSkillDomain>.Filter.Where(tsd => tsd.IsActive && tsd.ToolSkillGuid == toolSkillId);
-            var allToolSkills = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName, filter).ConfigureAwait(false);
+            response = await toolSkillsDataManager.DeleteExistingToolSkillBySkillIdAsync(
+                toolSkillId,
+                currentUserEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
+            if (response)
+                await this.SendToolSkillUpdateNotificationAsync(
+                    userToBeNotified: currentUserEmail,
+                    currentUserEmail,
+                    toolSkillName: string.Empty,
+                    toolSkillGuid: toolSkillId,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
-            var updateToolSkill = allToolSkills.FirstOrDefault() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
-            if (updateToolSkill.CreatedBy != currentUserEmail)
-                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
-
-            var updates = new List<UpdateDefinition<ToolSkillDomain>>
-            {
-                Builders<ToolSkillDomain>.Update.Set(x => x.IsActive, false),
-                Builders<ToolSkillDomain>.Update.Set(x => x.DateModified, DateTime.UtcNow),
-                Builders<ToolSkillDomain>.Update.Set(x => x.ModifiedBy, currentUserEmail)
-            };
-            var update = Builders<ToolSkillDomain>.Update.Combine(updates);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter, update, databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName).ConfigureAwait(false);
+            return response;
         }
         catch (Exception ex)
         {
@@ -138,7 +159,8 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId, response }));
         }
     }
 
@@ -147,16 +169,26 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
     /// </summary>
     /// <param name="serverUrl">The MCP server url.</param>
     /// <param name="currentUserEmail">The current user email.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="McpClientTool"/></returns>
-    public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail)
+    public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAvailableAsync(
+        string serverUrl,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(serverUrl);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, serverUrl, currentUserEmail }));
-            return await mcpClientServices.GetAllMcpToolsAsync(mcpServerUrl: serverUrl).ConfigureAwait(false);
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, serverUrl, currentUserEmail }));
+
+            return await mcpClientServices.GetAllMcpToolsAsync(
+                mcpServerUrl: serverUrl,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -165,7 +197,8 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, serverUrl, currentUserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, serverUrl, currentUserEmail }));
         }
     }
 
@@ -173,16 +206,24 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
     /// Gets all the tool skill data asynchronously.
     /// </summary>
     /// <param name="userEmail">The current logged in user email.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="ToolSkillDomain"/></returns>
-    public async Task<IEnumerable<ToolSkillDomain>> GetAllToolSkillsAsync(string userEmail)
+    public async Task<IEnumerable<ToolSkillDomain>> GetAllToolSkillsAsync(
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
+        IEnumerable<ToolSkillDomain>? result = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllToolSkillsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllToolSkillsAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail }));
 
-            var filter = Builders<ToolSkillDomain>.Filter.And(Builders<ToolSkillDomain>.Filter.Eq(x => x.IsActive, true));
-            return await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName, filter).ConfigureAwait(false);
+            result = await toolSkillsDataManager.GetAllToolSkillsAsync(
+                userEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
+            return result;
         }
         catch (Exception ex)
         {
@@ -191,7 +232,8 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllToolSkillsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllToolSkillsAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, result }));
         }
     }
 
@@ -200,21 +242,27 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
     /// </summary>
     /// <param name="toolSkillId">The tool skill id to be fetched.</param>
     /// <param name="currentUserEmail">The current logged in user email.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The tool skill domain model.</returns>
-    public async Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail)
+    public async Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
-
+        ToolSkillDomain? result = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId }));
 
-            var filter = Builders<ToolSkillDomain>.Filter.And(
-                Builders<ToolSkillDomain>.Filter.Eq(x => x.IsActive, true), Builders<ToolSkillDomain>.Filter.Eq(x => x.ToolSkillGuid, toolSkillId));
-            var allData = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName, filter).ConfigureAwait(false);
-
-            return allData?.First() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
+            result = await toolSkillsDataManager.GetToolSkillBySkillIdAsync(
+                toolSkillId,
+                currentUserEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
+            return result;
         }
         catch (Exception ex)
         {
@@ -223,7 +271,8 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId, result }));
         }
     }
 
@@ -232,39 +281,38 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
     /// </summary>
     /// <param name="updateToolSkillData">The tool skill data domain model.</param>
     /// <param name="currentUserEmail">The user email.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for <c>success/failure</c></returns>
-    public async Task<bool> UpdateExistingToolSkillDataAsync(ToolSkillDomain updateToolSkillData, string currentUserEmail)
+    public async Task<bool> UpdateExistingToolSkillDataAsync(
+        ToolSkillDomain updateToolSkillData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(updateToolSkillData);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
+        bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, updateToolSkillData.ToolSkillGuid }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, updateToolSkillData.ToolSkillGuid }));
 
-            var filter = Builders<ToolSkillDomain>.Filter.And(
-                Builders<ToolSkillDomain>.Filter.Eq(x => x.IsActive, true),
-                Builders<ToolSkillDomain>.Filter.Eq(x => x.ToolSkillGuid, updateToolSkillData.ToolSkillGuid));
-            var toolSkillsData = await mongoDatabaseService.GetDataFromCollectionAsync(
-                databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName, filter).ConfigureAwait(false);
-            var existingToolSkill = toolSkillsData.FirstOrDefault() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
+            response = await toolSkillsDataManager.UpdateExistingToolSkillDataAsync(
+                updateToolSkillData,
+                currentUserEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
+            if (response)
+                await this.SendToolSkillUpdateNotificationAsync(
+                    userToBeNotified: currentUserEmail,
+                    currentUserEmail,
+                    toolSkillName: updateToolSkillData.ToolSkillDisplayName,
+                    toolSkillGuid: updateToolSkillData.ToolSkillGuid,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
-            if (existingToolSkill.CreatedBy != currentUserEmail)
-                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
-
-            var updates = new List<UpdateDefinition<ToolSkillDomain>>
-            {
-                Builders<ToolSkillDomain>.Update.Set(x => x.AssociatedAgents, updateToolSkillData.AssociatedAgents),
-                Builders<ToolSkillDomain>.Update.Set(x => x.ToolSkillDisplayName, updateToolSkillData.ToolSkillDisplayName),
-                Builders<ToolSkillDomain>.Update.Set(x => x.ToolSkillMcpServerUrl, updateToolSkillData.ToolSkillMcpServerUrl),
-                Builders<ToolSkillDomain>.Update.Set(x => x.ToolSkillTechnicalName, updateToolSkillData.ToolSkillTechnicalName),
-                Builders<ToolSkillDomain>.Update.Set(x => x.DateModified, DateTime.UtcNow),
-                Builders<ToolSkillDomain>.Update.Set(x => x.ModifiedBy, currentUserEmail),
-            };
-
-            var update = Builders<ToolSkillDomain>.Update.Combine(updates);
-            return await mongoDatabaseService.UpdateDataInCollectionAsync(
-                filter, update, databaseName: this.MongoDatabaseName, collectionName: this.ToolSkillsCollectionName).ConfigureAwait(false);
+            return response;
         }
         catch (Exception ex)
         {
@@ -273,7 +321,44 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, IConfig
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, updateToolSkillData.ToolSkillGuid }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, updateToolSkillData.ToolSkillGuid, response }));
         }
     }
+
+    #region PRIVATE METHODS
+
+    /// <summary>
+    /// Sends the tool skill update notification asynchronously.
+    /// </summary>
+    /// <param name="userToBeNotified">The user to be notified.</param>
+    /// <param name="currentUserEmail">The current user's email.</param>
+    /// <param name="toolSkillName">The tool skill name.</param>
+    /// <param name="toolSkillGuid">The tool skill GUID.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The task representing the asynchronous operation.</returns>
+    private async Task SendToolSkillUpdateNotificationAsync(
+        string userToBeNotified,
+        string currentUserEmail,
+        string toolSkillName,
+        string toolSkillGuid,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var notificationsDomainModel = new NotificationsDomain
+        {
+            RecipientUserName = userToBeNotified,
+            Title = string.Format(NotificationMessagesConstants.ToolSkillDataUpdateTitleTemplate, toolSkillName),
+            Message = string.Format(NotificationMessagesConstants.ToolSkillDataHasBeenUpdatedMessageTemplate, toolSkillName, toolSkillGuid),
+            IsGlobal = false,
+            NotificationType = nameof(NotificationTypes.Push),
+            CreatedBy = currentUserEmail
+        };
+        await notificationsService.CreateNewNotificationAsync(
+            request: notificationsDomainModel,
+            cancellationToken: cancellationToken
+        ).ConfigureAwait(false);
+    }
+
+    #endregion
 }

@@ -58,7 +58,9 @@ public sealed class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, Req
             [HeaderLoggingConstants.StatusCode] = statusCode
         }))
         {
-            logger.LogAppError(ex, UnhandledExceptionMessage,
+            logger.LogAppError(
+                ex,
+                UnhandledExceptionMessage,
                 correlationId, httpContext.Request.Path, httpContext.Request.Method);
         }
 

@@ -1,7 +1,7 @@
 ﻿using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
-using AIAgents.Laboratory.Domain.DrivingPorts;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Ports.In;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
@@ -22,15 +22,19 @@ public sealed class ApplicationAdminService(ILogger<ApplicationAdminService> log
     /// Gets all bug reports data asynchronous.
     /// </summary>
     /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A list of <see cref="BugReportData"/></returns>
-    public async Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(string currentLoggedinUser)
+    public async Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(string currentLoggedinUser, CancellationToken cancellationToken = default)
     {
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
 
             ArgumentException.ThrowIfNullOrWhiteSpace(currentLoggedinUser);
-            return await feedbackService.GetAllBugReportsDataAsync(currentLoggedinUser).ConfigureAwait(false);
+            return await feedbackService.GetAllBugReportsDataAsync(
+                currentLoggedinUser,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -43,20 +47,23 @@ public sealed class ApplicationAdminService(ILogger<ApplicationAdminService> log
         }
     }
 
-
     /// <summary>
     /// Gets all submitted feature requests asynchronous.
     /// </summary>
     /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A list of <see cref="NewFeatureRequestData"/></returns>
-    public async Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser)
+    public async Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser, CancellationToken cancellationToken = default)
     {
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
 
             ArgumentException.ThrowIfNullOrWhiteSpace(currentLoggedinUser);
-            return await feedbackService.GetAllSubmittedFeatureRequestsAsync(currentLoggedinUser).ConfigureAwait(false);
+            return await feedbackService.GetAllSubmittedFeatureRequestsAsync(
+                currentLoggedinUser,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -81,8 +88,9 @@ public sealed class ApplicationAdminService(ILogger<ApplicationAdminService> log
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(IsAdminAccessEnabledAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser }));
 
             ArgumentException.ThrowIfNullOrWhiteSpace(currentLoggedInUser);
-            var keyValue = commonAiService.GetConfigurationByKeyName(AzureAppConfigurationConstants.AdminEmailAddressConstant).Values.First()
-                ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+            var keyValue = commonAiService.GetConfigurationByKeyName(
+                key: AzureAppConfigurationConstants.AdminEmailAddressConstant
+            ).Values.First() ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
             return keyValue == currentLoggedInUser;
         }

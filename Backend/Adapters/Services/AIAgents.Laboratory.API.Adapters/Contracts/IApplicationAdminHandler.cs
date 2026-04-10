@@ -11,15 +11,17 @@ public interface IApplicationAdminHandler
     /// Gets all bug reports data asynchronous.
     /// </summary>
     /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A list of <see cref="BugReportDataDto"/></returns>
-    Task<IEnumerable<BugReportDataDto>> GetAllBugReportsDataAsync(string currentLoggedinUser);
+    Task<IEnumerable<BugReportDataDto>> GetAllBugReportsDataAsync(string currentLoggedinUser, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets all submitted feature requests asynchronous.
     /// </summary>
     /// <param name="currentLoggedinUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A list of <see cref="NewFeatureRequestDataDto"/></returns>
-    Task<IEnumerable<NewFeatureRequestDataDto>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser);
+    Task<IEnumerable<NewFeatureRequestDataDto>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Checks if the admin access is enabled for the current logged in user asynchronous.

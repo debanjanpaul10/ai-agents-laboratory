@@ -252,4 +252,25 @@ public static class RouteConstants
         /// </summary>
         internal const string UpdateExistingRegisteredApplication_Route = "updateregisteredapplication";
     }
+
+    /// <summary>
+    /// The route constants for Notifications Controller.
+    /// </summary>
+    internal static class NotificationsRoutes
+    {
+        /// <summary>
+        /// The route constant for creating a new notification.
+        /// </summary>
+        internal const string CreateNewNotification_Route = "createnewnotification";
+
+        /// <summary>
+        /// The route constant for polling notifications for a user.
+        /// </summary>
+        internal const string PollNotificationsForUser_Route = "pollnotifications";
+
+        /// <summary>
+        /// The route constant for marking an existing notification as read.
+        /// </summary>
+        internal const string MarkExistingNotificationAsRead_Route = "marknotificationasread";
+    }
 }

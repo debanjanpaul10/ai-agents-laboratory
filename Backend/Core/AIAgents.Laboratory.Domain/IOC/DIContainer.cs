@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DrivingPorts;
+using AIAgents.Laboratory.Domain.Ports.In;
 using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,5 +29,6 @@ public static class DIContainer
         .AddScoped<IWorkspacesService, WorkspacesService>()
         .AddScoped<IOrchestratorService, OrchestratorService>()
         .AddScoped<IApplicationAdminService, ApplicationAdminService>()
-        .AddScoped<IRegisteredApplicationService, RegisteredApplicationService>();
+        .AddScoped<IRegisteredApplicationService, RegisteredApplicationService>()
+        .AddScoped<INotificationsService, NotificationsService>();
 }

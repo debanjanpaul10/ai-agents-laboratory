@@ -189,42 +189,6 @@ internal static class Constants
     }
 
     /// <summary>
-    /// The MongoDB collection constants class.
-    /// </summary>
-    internal static class MongoDbCollectionConstants
-    {
-        /// <summary>
-        /// The skills database name
-        /// </summary>
-        internal const string AiAgentsPrimaryDatabase = "AiAgentsPrimaryDatabase";
-
-        /// <summary>
-        /// The agents collection name
-        /// </summary>
-        internal const string AgentsCollectionName = "AgentsCollection";
-
-        /// <summary>
-        /// The conversation history collection name.
-        /// </summary>
-        internal const string ConversationHistoryCollectionName = "ConversationHistoryCollection";
-
-        /// <summary>
-        /// The tool skills collection name.
-        /// </summary>
-        internal const string ToolSkillsCollectionName = "ToolSkillsCollection";
-
-        /// <summary>
-        /// The agents workspace collection name.
-        /// </summary>
-        internal const string WorkspaceCollectionName = "WorkspaceCollection";
-
-        /// <summary>
-        /// The registered applications collection name.
-        /// </summary>
-        internal const string RegisteredApplicationsCollectionName = "RegisteredApplicationsCollection";
-    }
-
-    /// <summary>
     /// The chatbot helper constants.
     /// </summary>
     internal static class ChatbotHelperConstants
@@ -254,5 +218,71 @@ internal static class Constants
         /// The file name for email template.
         /// </summary>
         internal const string FileName = "Templates/FeedbackEmail.html";
+    }
+
+    /// <summary>
+    /// The notification messages constants.
+    /// </summary>
+    internal static class NotificationMessagesConstants
+    {
+        /// <summary>
+        /// The agent data update title template.
+        /// </summary>
+        internal const string AgentDataUpdateTitleTemplate = "Agent '{0}' Data Updated";
+
+        /// <summary>
+        /// The agent data has been updated message template.
+        /// </summary>
+        internal const string AgentDataHasBeenUpdatedMessageTemplate = "The data for agent '{0}' with agent id: '{1}' has been updated.";
+
+        /// <summary>
+        /// The tool skill data update title template.
+        /// </summary>
+        internal const string ToolSkillDataUpdateTitleTemplate = "Tool Skill '{0}' Data Updated";
+
+        /// <summary>
+        /// The tool skill data has been updated message template.
+        /// </summary>
+        internal const string ToolSkillDataHasBeenUpdatedMessageTemplate = "The data for tool skill '{0}' with id: '{1}' has been updated.";
+
+        /// <summary>
+        /// The bug report submitted title template.
+        /// </summary>
+        internal const string BugReportSubmittedTitleTemplate = "New Bug Report Submitted: {0}";
+
+        /// <summary>
+        /// The bug report submitted message template.
+        /// </summary>
+        internal const string BugReportSubmittedMessageTemplate = "A new bug report has been submitted by user '{0}' : '{1}'";
+
+        /// <summary>
+        /// The feature request submitted title template.
+        /// </summary>
+        internal const string FeatureRequestSubmittedTitleTemplate = "New Feature Request Submitted: {0}";
+
+        /// <summary>
+        /// The feature request submitted message template.
+        /// </summary>
+        internal const string FeatureRequestSubmittedMessageTemplate = "A new feature request has been submitted by user '{0}' : '{1}'";
+
+        /// <summary>
+        /// The workspace data update title template.
+        /// </summary>
+        internal const string WorkspaceDataUpdateTitleTemplate = "Workspace '{0}' Data Updated";
+
+        /// <summary>
+        /// The workspace data has been updated message template.
+        /// </summary>
+        internal const string WorkspaceDataHasBeenUpdatedMessageTemplate = "The data for workspace '{0}' with id: '{1}' has been updated.";
+
+        /// <summary>
+        /// The registered application data update title template.
+        /// </summary>
+        internal const string RegisteredApplicationDataUpdateTitleTemplate = "Registered Application '{0}' Data Updated";
+
+        /// <summary>
+        /// The registered application data has been updated message template.
+        /// </summary>
+        internal const string RegisteredApplicationDataHasBeenUpdatedMessageTemplate = "The data for registered application '{0}' with id: '{1}' has been updated.";
     }
 }

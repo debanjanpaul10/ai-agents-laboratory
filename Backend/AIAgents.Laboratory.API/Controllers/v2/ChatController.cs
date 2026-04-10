@@ -28,12 +28,14 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public sealed class ChatController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ILogger<ChatController> logger, ICorrelationContext correlationContext, IChatHandler chatHandler) : BaseController(httpContextAccessor, configuration)
+public sealed class ChatController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration,
+    ILogger<ChatController> logger, ICorrelationContext correlationContext, IChatHandler chatHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Invokes the chat agent asynchronous.
     /// </summary>
     /// <param name="chatRequestDTO">The chat request dto.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The AI response.</returns>
     /// <exception cref="System.ArgumentNullException"></exception>
     [HttpPost(ChatRoutes.InvokeAgent_Route)]
@@ -47,16 +49,24 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
         string result = string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(InvokeChatAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, chatRequestDTO }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(InvokeChatAgentAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, chatRequestDTO }));
 
             ArgumentNullException.ThrowIfNull(chatRequestDTO);
             if (base.IsAuthorized(UserBased))
             {
-                result = await chatHandler.InvokeChatAgentAsync(chatRequestDTO, cancellationToken).ConfigureAwait(false);
+                result = await chatHandler.InvokeChatAgentAsync(
+                    chatRequestDTO,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (!string.IsNullOrEmpty(result))
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -68,7 +78,8 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(InvokeChatAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(InvokeChatAgentAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
@@ -76,6 +87,7 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
     /// Gets the direct chat response from chatbot async.
     /// </summary>
     /// <param name="userChatMessage">The user chat request dto model.</param>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The AI response string.</returns>
     [HttpPost(ChatRoutes.GetDirectChatResponse_Route)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
@@ -88,7 +100,8 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
         string result = string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, userChatMessage }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, userChatMessage }));
 
             ArgumentNullException.ThrowIfNull(userChatMessage);
             ArgumentException.ThrowIfNullOrEmpty(userChatMessage.UserMessage);
@@ -97,12 +110,16 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
                 result = await chatHandler.GetDirectChatResponseAsync(
                     userQuery: userChatMessage.UserMessage,
                     userEmail: base.UserEmail,
-                    cancellationToken: cancellationToken).ConfigureAwait(false);
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
 
                 if (!string.IsNullOrEmpty(result))
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.SomethingWentWrongDefaultMessage);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -114,13 +131,15 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
     /// <summary>
     /// Clears the conversation history data for user.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for success/failure.</returns>
     [HttpPost(ChatRoutes.ClearConversationHistory_Route)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
@@ -128,19 +147,28 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = ClearConversationHistoryForUserAction.Summary, Description = ClearConversationHistoryForUserAction.Description, OperationId = ClearConversationHistoryForUserAction.OperationId)]
-    public async Task<ResponseDto> ClearConversationHistoryForUserAsync()
+    public async Task<ResponseDto> ClearConversationHistoryForUserAsync(CancellationToken cancellationToken = default)
     {
         bool result = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+
             if (base.IsAuthorized(UserBased))
             {
-                result = await chatHandler.ClearConversationHistoryForUserAsync(base.UserEmail).ConfigureAwait(false);
+                result = await chatHandler.ClearConversationHistoryForUserAsync(
+                    userName: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeClearedMessageConstant);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.ConversationHistoryCannotBeClearedMessageConstant);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -152,13 +180,15 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 
     /// <summary>
     /// Gets the conversation history data for user.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The conversation history data for user.</returns>
     [HttpGet(ChatRoutes.GetConversationHistoryUser_Route)]
     [ProducesResponseType(typeof(ConversationHistoryDTO), StatusCodes.Status200OK)]
@@ -166,19 +196,28 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = GetConversationHistoryDataForUserAction.Summary, Description = GetConversationHistoryDataForUserAction.Description, OperationId = GetConversationHistoryDataForUserAction.OperationId)]
-    public async Task<ResponseDto> GetConversationHistoryDataForUserAsync()
+    public async Task<ResponseDto> GetConversationHistoryDataForUserAsync(CancellationToken cancellationToken = default)
     {
         ConversationHistoryDTO result = new();
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+
             if (base.IsAuthorized(UserBased))
             {
-                result = await chatHandler.GetConversationHistoryDataAsync(base.UserEmail).ConfigureAwait(false);
+                result = await chatHandler.GetConversationHistoryDataAsync(
+                    userName: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 if (result is not null)
-                    return HandleSuccessRequestResponse(result);
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
                 else
-                    return HandleBadRequestResponse(StatusCodes.Status400BadRequest, ExceptionConstants.ConversationHistoryCannotBeFetchedMessageConstant);
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.ConversationHistoryCannotBeFetchedMessageConstant);
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -190,7 +229,8 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
         }
     }
 }

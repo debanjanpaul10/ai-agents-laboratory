@@ -4,6 +4,7 @@ env:
     API_PROJECT_PATH: Backend/AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj
     WEB_UI_PROJECT_PATH: UI/web
     DATABASE_PROJECT_PATH: Backend/AIAgents.Laboratory.Database
+    FUNCTIONS_PROJECT_PATH: Functions/AI.Agents.Laboratory.Functions/AI.Agents.Laboratory.Functions.csproj
 
 on:
     push:
@@ -26,6 +27,12 @@ on:
 
             deploy_db:
                 description: "AIAgents.Laboratory.Database"
+                required: false
+                default: true
+                type: boolean
+
+            deploy_functions:
+                description: "AI.Agents.Laboratory.Functions"
                 required: false
                 default: true
                 type: boolean
@@ -182,3 +189,35 @@ jobs:
                   path: "./publish-db/AIAgents.Laboratory.Database.dacpac"
                   action: "publish"
                   arguments: "/p:DropObjectsNotInSource=true /p:BlockOnPossibleDataLoss=false /p:IgnoreUserSettingsObjects=true /p:IgnoreLoginSids=true /p:IgnorePermissions=true /p:IgnoreRoleMembership=true"
+
+    build-and-deploy-function:
+        name: Build Azure Functions project
+        if: ${{ github.event_name == 'push' || inputs.deploy_functions }}
+        runs-on: ubuntu-latest
+        environment: Production
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup .NET 10
+              uses: actions/setup-dotnet@v3
+              with:
+                  dotnet-version: "10.0.x"
+
+            - name: Install dependencies and build Functions solution
+              run: |
+                  dotnet restore ${{ env.FUNCTIONS_PROJECT_PATH }}
+                  dotnet build ${{ env.FUNCTIONS_PROJECT_PATH }} --configuration Release --no-restore
+
+            - name: Publish the Functions project
+              run: |
+                  dotnet publish ${{ env.FUNCTIONS_PROJECT_PATH }} --configuration Release --output ./publish-functions
+
+            - name: Run Azure Functions action
+              uses: Azure/functions-action@v1
+              with:
+                  app-name: ${{ vars.AZURE_FUNCTIONS_NAME }}
+                  package: ./publish-functions
+                  sku: "flexconsumption"
+                  publish-profile: ${{ secrets.AZURE_FUNCTIONS_PUBLISH_PROFILE }}

@@ -1,11 +1,9 @@
-﻿using AIAgents.Laboratory.Domain.Contracts;
+using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using AIAgents.Laboratory.Domain.DrivenPorts;
 using AIAgents.Laboratory.Domain.Helpers;
-using AIAgents.Laboratory.Processor.Contracts;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
@@ -23,18 +21,25 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="blobStorageManager">The storage manager used to upload and manage images in cloud storage. Cannot be null.</param>
 /// <param name="visionProcessor">The processor used to analyze images and extract keywords using AI vision capabilities. Cannot be null.</param>
 /// <seealso cref="IDocumentIntelligenceService"/>
-public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceService> logger, IConfiguration configuration, ICorrelationContext correlationContext,
-    IKnowledgeBaseProcessor knowledgeBaseProcessor, IBlobStorageManager blobStorageManager, IVisionProcessor visionProcessor) : IDocumentIntelligenceService
+public sealed class DocumentIntelligenceService(
+    ILogger<DocumentIntelligenceService> logger,
+    IConfiguration configuration,
+    ICorrelationContext correlationContext,
+    IKnowledgeBaseProcessor knowledgeBaseProcessor,
+    IBlobStorageManager blobStorageManager,
+    IVisionProcessor visionProcessor) : IDocumentIntelligenceService
 {
     /// <summary>
     /// The configuration value for allowed knowledge base file formats.
     /// </summary>
-    private readonly string AllowedKnowledgebaseFileFormats = configuration[AzureAppConfigurationConstants.AllowedKbFileFormatsConstant] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string AllowedKnowledgebaseFileFormats = configuration[AzureAppConfigurationConstants.AllowedKbFileFormatsConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The configuration value for allowed ai vision images file formats.
     /// </summary>
-    private readonly string AllowedAiVisionImagesFileFormats = configuration[AzureAppConfigurationConstants.AllowedVisionImageFileFormatsConstant] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+    private readonly string AllowedAiVisionImagesFileFormats = configuration[AzureAppConfigurationConstants.AllowedVisionImageFileFormatsConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// Deletes the knowledge base documents and AI Vision images data associated with a specific agent from the storage.
@@ -44,23 +49,46 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
     /// It logs the start and end of the operation, as well as any errors that occur during the process.
     /// </remarks>
     /// <param name="agentId">The unique identifier of the agent whose data is to be deleted. Cannot be null or empty.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous delete operation.</returns>
     /// <exception cref="Exception">Thrown when an error occurs during the deletion process.</exception>
-    public async Task DeleteKnowledgebaseAndImagesDataAsync(string agentId)
+    public async Task DeleteKnowledgebaseAndImagesDataAsync(
+        string agentId,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteKnowledgebaseAndImagesDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
-            await blobStorageManager.DeleteDocumentsFolderAndDataAsync(agentId).ConfigureAwait(false);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(DeleteKnowledgebaseAndImagesDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId })
+            );
+
+            await blobStorageManager.DeleteDocumentsFolderAndDataAsync(
+                agentId,
+                cancellationToken
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteKnowledgebaseAndImagesDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(DeleteKnowledgebaseAndImagesDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteKnowledgebaseAndImagesDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(DeleteKnowledgebaseAndImagesDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentId })
+            );
         }
     }
 
@@ -72,41 +100,74 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
     /// <remarks>This method validates the uploaded files, processes the knowledge base document data, and
     /// then processes each stored knowledge base file for the agent. If no files are present, the method completes without processing any documents.</remarks>
     /// <param name="agentData">The agent data domain object containing information and files to be processed for the knowledge base. Cannot be null.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task CreateAndProcessKnowledgeBaseDocumentAsync(AgentDataDomain agentData)
+    public async Task CreateAndProcessKnowledgeBaseDocumentAsync(
+        AgentDataDomain agentData,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentData.AgentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentData.AgentId })
+            );
 
-            if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any() || string.IsNullOrEmpty(this.AllowedKnowledgebaseFileFormats)) return;
-            DocumentHandlerService.ValidateUploadedFiles(agentData.KnowledgeBaseDocument, this.AllowedKnowledgebaseFileFormats);
+            if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any() || string.IsNullOrEmpty(this.AllowedKnowledgebaseFileFormats))
+                return;
+
+            DocumentHandlerService.ValidateUploadedFiles(
+                uploadedFiles: agentData.KnowledgeBaseDocument,
+                allowedFileFormats: this.AllowedKnowledgebaseFileFormats
+            );
 
             foreach (var uploadedDocument in agentData.KnowledgeBaseDocument)
                 await blobStorageManager.UploadDocumentsToStorageAsync(
                     documentFile: uploadedDocument,
                     agentGuid: agentData.AgentId,
-                    fileType: UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
+                    fileType: UploadedFileType.KnowledgeBaseDocument,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
-            await agentData.ProcessKnowledgebaseDocumentDataAsync();
+            await agentData.ProcessKnowledgebaseDocumentDataAsync(
+                cancellationToken
+            ).ConfigureAwait(false);
             if (agentData.StoredKnowledgeBase is not null && agentData.StoredKnowledgeBase.Any())
             {
                 foreach (var file in agentData.StoredKnowledgeBase)
                 {
-                    var content = knowledgeBaseProcessor.DetectAndReadFileContent(file);
+                    var content = knowledgeBaseProcessor.DetectAndReadFileContent(
+                        knowledgeBaseDocumentDomain: file
+                    );
                     await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(
-                        content, agentId: agentData.AgentId).ConfigureAwait(false);
+                        content,
+                        agentId: agentData.AgentId,
+                        cancellationToken
+                    ).ConfigureAwait(false);
                 }
             }
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentData.AgentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(CreateAndProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentData.AgentId })
+            );
         }
     }
 
@@ -118,12 +179,21 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
     /// <param name="updateDataDomain">The domain object containing the knowledge base update information, including any new or removed documents. Cannot be null.</param>
     /// <param name="updates">A list to which update definitions for the agent's knowledge base will be added if changes are detected. Cannot be null.</param>
     /// <param name="existingAgent">The current state of the agent's data, used as the baseline for applying knowledge base updates. Cannot be null.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task HandleKnowledgeBaseDataUpdateAsync(AgentDataDomain updateDataDomain, List<UpdateDefinition<AgentDataDomain>> updates, AgentDataDomain existingAgent)
+    public async Task HandleKnowledgeBaseDataUpdateAsync(
+        AgentDataDomain updateDataDomain,
+        AgentDataDomain existingAgent,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId })
+            );
 
             // Start from existing stored knowledge base
             var updatedStoredKnowledgeBase = existingAgent.StoredKnowledgeBase?.ToList() ?? [];
@@ -140,21 +210,32 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             // 2. Process any newly uploaded knowledge base documents
             if (updateDataDomain.KnowledgeBaseDocument?.Count > 0 && !string.IsNullOrEmpty(this.AllowedKnowledgebaseFileFormats))
             {
-                DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.KnowledgeBaseDocument, this.AllowedKnowledgebaseFileFormats);
+                DocumentHandlerService.ValidateUploadedFiles(
+                    uploadedFiles: updateDataDomain.KnowledgeBaseDocument,
+                    allowedFileFormats: this.AllowedKnowledgebaseFileFormats
+                );
                 foreach (var uploadedFile in updateDataDomain.KnowledgeBaseDocument)
                     await blobStorageManager.UploadDocumentsToStorageAsync(
                         documentFile: uploadedFile,
                         agentGuid: updateDataDomain.AgentId,
-                        fileType: UploadedFileType.KnowledgeBaseDocument).ConfigureAwait(false);
+                        fileType: UploadedFileType.KnowledgeBaseDocument,
+                        cancellationToken
+                    ).ConfigureAwait(false);
 
-                await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync();
+                await updateDataDomain.ProcessKnowledgebaseDocumentDataAsync(
+                    cancellationToken
+                ).ConfigureAwait(false);
                 if (updateDataDomain.StoredKnowledgeBase is not null && updateDataDomain.StoredKnowledgeBase.Any())
                 {
                     foreach (var file in updateDataDomain.StoredKnowledgeBase)
                     {
-                        var content = knowledgeBaseProcessor.DetectAndReadFileContent(knowledgeBaseDocumentDomain: file);
+                        var content = knowledgeBaseProcessor.DetectAndReadFileContent(
+                            knowledgeBaseDocumentDomain: file
+                        );
                         await knowledgeBaseProcessor.ProcessKnowledgeBaseDocumentAsync(
-                            content, agentId: updateDataDomain.AgentId).ConfigureAwait(false);
+                            content, agentId: updateDataDomain.AgentId,
+                            cancellationToken
+                        ).ConfigureAwait(false);
                     }
 
                     updatedStoredKnowledgeBase.AddRange(updateDataDomain.StoredKnowledgeBase);
@@ -165,16 +246,27 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             // 3. Only persist changes if something actually changed
             if (hasChanges)
                 // If all documents were removed, set StoredKnowledgeBase to null, otherwise save the updated list
-                updates.Add(Builders<AgentDataDomain>.Update.Set(x => x.StoredKnowledgeBase, updatedStoredKnowledgeBase.Count != 0 ? updatedStoredKnowledgeBase : null));
+                updateDataDomain.StoredKnowledgeBase = updatedStoredKnowledgeBase.Count != 0 ? updatedStoredKnowledgeBase : [];
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(HandleKnowledgeBaseDataUpdateAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId })
+            );
         }
     }
 
@@ -183,24 +275,49 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
     /// </summary>
     /// <param name="agentGuid">The agent guid id.</param>
     /// <param name="fileName">The file name.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>The downloaded file url</returns>
-    public async Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName)
+    public async Task<string> DownloadKnowledgebaseFileAsync(
+        string agentGuid,
+        string fileName,
+        CancellationToken cancellationToken = default
+    )
     {
         string response = string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName }));
-            response = await blobStorageManager.DownloadFileFromBlobStorageAsync(agentGuid, fileName).ConfigureAwait(false);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName })
+            );
+
+            response = await blobStorageManager.DownloadFileFromBlobStorageAsync(
+                agentGuid,
+                fileName,
+                cancellationToken
+            ).ConfigureAwait(false);
             return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentGuid, fileName, response })
+            );
         }
     }
 
@@ -214,29 +331,50 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
     /// <remarks>This method uploads each image in the agent's vision images collection to cloud storage, analyzes the image to extract keywords using computer vision, and adds the resulting keywords and image
     /// information to the agent's data. The method logs progress and errors for monitoring purposes. If any image in the collection is null, it is skipped.</remarks>
     /// <param name="agentData">The agent data containing the vision images to process. Must not be null and must contain valid uploaded images.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task CreateAndProcessAiVisionImagesKeywordsAsync(AgentDataDomain agentData)
+    public async Task CreateAndProcessAiVisionImagesKeywordsAsync(
+        AgentDataDomain agentData,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentData.AgentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentData.AgentId })
+            );
 
-            if (agentData.VisionImages is null || !agentData.VisionImages.Any() || string.IsNullOrEmpty(this.AllowedAiVisionImagesFileFormats)) return;
-            DocumentHandlerService.ValidateUploadedFiles(agentData.VisionImages, this.AllowedAiVisionImagesFileFormats);
+            if (agentData.VisionImages is null || !agentData.VisionImages.Any() || string.IsNullOrEmpty(this.AllowedAiVisionImagesFileFormats))
+                return;
+
+            DocumentHandlerService.ValidateUploadedFiles(
+                uploadedFiles: agentData.VisionImages,
+                allowedFileFormats: this.AllowedAiVisionImagesFileFormats
+            );
+
             foreach (var image in agentData.VisionImages)
             {
-                if (image is null) continue;
+                if (image is null)
+                    continue;
 
                 // Upload to BLOB STORAGE
                 var imageUrl = await blobStorageManager.UploadDocumentsToStorageAsync(
                     documentFile: image,
                     agentGuid: agentData.AgentId,
-                    fileType: UploadedFileType.AiVisionImageDocument).ConfigureAwait(false);
+                    fileType: UploadedFileType.AiVisionImageDocument,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
-                if (string.IsNullOrEmpty(imageUrl)) continue;
+                if (string.IsNullOrEmpty(imageUrl))
+                    continue;
 
                 // Process the image to generate keywords data
-                var processedImageKeywords = await visionProcessor.ReadDataFromImageWithComputerVisionAsync(imageUrl).ConfigureAwait(false);
+                var processedImageKeywords = await visionProcessor.ReadDataFromImageWithComputerVisionAsync(
+                    imageUrl,
+                    cancellationToken
+                ).ConfigureAwait(false);
 
                 // Save the keywords to data object
                 agentData.AiVisionImagesData.Add(new()
@@ -249,12 +387,23 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentData.AgentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(CreateAndProcessAiVisionImagesKeywordsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, agentData.AgentId })
+            );
         }
     }
 
@@ -266,12 +415,21 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
     /// <param name="updateDataDomain">The domain object containing the images update information, including any new or removed images. Cannot be null.</param>
     /// <param name="updates">A list to which update definitions for the agent's AI Vision images will be added if changes are detected. Cannot be null.</param>
     /// <param name="existingAgent">The current state of the agent's data, used as the baseline for applying AI Vision images updates. Cannot be null.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task HandleAiVisionImagesDataUpdateAsync(AgentDataDomain updateDataDomain, List<UpdateDefinition<AgentDataDomain>> updates, AgentDataDomain existingAgent)
+    public async Task HandleAiVisionImagesDataUpdateAsync(
+        AgentDataDomain updateDataDomain,
+        AgentDataDomain existingAgent,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId })
+            );
 
             // Start from existing stored image keywords
             var updatedStoredImagesKeywords = existingAgent.AiVisionImagesData?.ToList() ?? [];
@@ -288,19 +446,28 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
             // Step 2: Process newly updated ai vision images
             if (updateDataDomain.VisionImages is not null && updateDataDomain.VisionImages.Any() && !string.IsNullOrEmpty(this.AllowedAiVisionImagesFileFormats))
             {
-                DocumentHandlerService.ValidateUploadedFiles(updateDataDomain.VisionImages, this.AllowedAiVisionImagesFileFormats);
+                DocumentHandlerService.ValidateUploadedFiles(
+                    uploadedFiles: updateDataDomain.VisionImages,
+                    allowedFileFormats: this.AllowedAiVisionImagesFileFormats
+                );
                 foreach (var image in updateDataDomain.VisionImages)
                 {
-                    if (image is null) continue;
+                    if (image is null)
+                        continue;
 
                     // Upload to BLOB STORAGE
                     var imageUrl = await blobStorageManager.UploadDocumentsToStorageAsync(
                         documentFile: image,
                         agentGuid: updateDataDomain.AgentId,
-                        fileType: UploadedFileType.AiVisionImageDocument).ConfigureAwait(false);
+                        fileType: UploadedFileType.AiVisionImageDocument,
+                        cancellationToken
+                    ).ConfigureAwait(false);
 
                     // Process the image to generate keywords data
-                    var processedImageKeywords = await visionProcessor.ReadDataFromImageWithComputerVisionAsync(imageUrl).ConfigureAwait(false);
+                    var processedImageKeywords = await visionProcessor.ReadDataFromImageWithComputerVisionAsync(
+                        imageUrl,
+                        cancellationToken
+                    ).ConfigureAwait(false);
 
                     // Save the keywords to data object
                     updatedStoredImagesKeywords.Add(new()
@@ -315,19 +482,28 @@ public sealed class DocumentIntelligenceService(ILogger<DocumentIntelligenceServ
 
             // Step 3: Only persist changes if something actually changed
             if (hasChanges)
-                // If all images were removed, set to AiVisionImagesData null, otherwise save the updated list
-                updates.Add(Builders<AgentDataDomain>.Update.Set(
-                    x => x.AiVisionImagesData,
-                    updatedStoredImagesKeywords.Count != 0 ? updatedStoredImagesKeywords : null));
+                // If all images were removed, set to AiVisionImagesData empty list, otherwise save the updated list
+                updateDataDomain.AiVisionImagesData = updatedStoredImagesKeywords.Count != 0 ? updatedStoredImagesKeywords : [];
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(HandleAiVisionImagesDataUpdateAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId })
+            );
         }
     }
 
