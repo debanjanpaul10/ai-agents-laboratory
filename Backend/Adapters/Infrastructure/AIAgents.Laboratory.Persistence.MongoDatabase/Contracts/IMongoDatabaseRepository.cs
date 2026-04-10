@@ -42,6 +42,9 @@ public interface IMongoDatabaseRepository
 
     /// <summary>
     /// Updates the data in collection asynchronous using filter and update definitions.
+    /// Note: Implementations perform multi-document updates (UpdateMany semantics) so all
+    /// documents matching the provided filter will be updated. Callers that filter by a
+    /// specific identifier will still result in a single-document update.
     /// </summary>
     /// <typeparam name="TDocument">The type of the document.</typeparam>
     /// <param name="filter">The filter definition to identify documents to update.</param>
