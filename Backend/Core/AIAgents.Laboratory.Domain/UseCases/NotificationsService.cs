@@ -56,6 +56,8 @@ public sealed class NotificationsService(
 
             request.Id = request.Id == Guid.Empty ? Guid.NewGuid() : request.Id;
             request.IsRead = false;
+            request.DateCreated = DateTime.UtcNow;
+            request.IsActive = true;
 
             response = await notificationsService.SendNotificationAsync(
                 notificationRequest: request,
