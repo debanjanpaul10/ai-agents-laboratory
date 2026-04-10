@@ -243,3 +243,4 @@ jobs:
                   app-name: ${{ vars.AZURE_FUNCTIONS_NAME }}
                   publish-profile: ${{ secrets.AZURE_FUNCTIONS_PUBLISH_PROFILE }}
                   package: ./publish-functions
+                  sku: "flexconsumption"
