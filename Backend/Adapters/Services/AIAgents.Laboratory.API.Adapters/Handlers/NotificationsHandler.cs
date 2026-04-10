@@ -37,6 +37,26 @@ public sealed class NotificationsHandler(
     }
 
     /// <summary>
+    /// Deletes all notifications for user asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedInUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>
+    /// A boolean value indicating whether the operation was successful (true) or not (false).
+    /// </returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<bool> DeleteAllNotificationsForUserAsync(
+        string currentLoggedInUser,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await notificationsService.DeleteAllNotificationsForUserAsync(
+            currentLoggedInUser,
+            cancellationToken
+        ).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Retrieves a list of notifications for a specific user based on their username. 
     /// This method allows clients to fetch all notifications that are relevant to a particular user
     /// </summary>
@@ -49,8 +69,8 @@ public sealed class NotificationsHandler(
     )
     {
         var domainResponse = await notificationsService.GetNotificationsForUserAsync(
-            recipientUserName: recipientUserName,
-            cancellationToken: cancellationToken
+            recipientUserName,
+            cancellationToken
         ).ConfigureAwait(false);
         return mapper.Map<IEnumerable<NotificationsResponseDto>>(domainResponse);
     }
@@ -61,20 +81,20 @@ public sealed class NotificationsHandler(
     /// <remarks>
     /// Marking a notification as read typically involves updating the status of the notification in the data store to indicate that it has been acknowledged or viewed by the recipient user.
     /// </remarks>
-    /// <param name="recipientUserName">The username of the user for whom to mark the notification as read.</param>
+    /// <param name="currentLoggedInUser">The username of the user for whom to mark the notification as read.</param>
     /// <param name="notificationId">The identifier of the notification to be marked as read.</param>
     /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
     /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
     public async Task<bool> MarkExistingNotificationAsReadAsync(
-        string recipientUserName,
+        string currentLoggedInUser,
         Guid notificationId,
         CancellationToken cancellationToken = default
     )
     {
         return await notificationsService.MarkExistingNotificationAsReadAsync(
-            recipientUserName: recipientUserName,
-            notificationId: notificationId,
-            cancellationToken: cancellationToken
+            currentLoggedInUser,
+            notificationId,
+            cancellationToken
         ).ConfigureAwait(false);
     }
 
@@ -94,10 +114,10 @@ public sealed class NotificationsHandler(
     )
     {
         await notificationsService.StreamNotificationsForUserAsync(
-            recipientUserName: recipientUserName,
-            response: response,
-            cancellationToken: cancellationToken,
-            requestAborted: requestAborted
+            recipientUserName,
+            response,
+            cancellationToken,
+            requestAborted
         ).ConfigureAwait(false);
     }
 }

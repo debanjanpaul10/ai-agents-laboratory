@@ -277,5 +277,10 @@ public static class RouteConstants
         /// The route constant for marking an existing notification as read.
         /// </summary>
         internal const string MarkExistingNotificationAsRead_Route = "marknotificationasread";
+
+        /// <summary>
+        /// The delete all notifications for user route
+        /// </summary>
+        internal const string DeleteAllNotificationsForUser_Route = "deleteallnotifications";
     }
 }

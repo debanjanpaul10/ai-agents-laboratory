@@ -441,5 +441,15 @@ internal static class SwaggerConstants
             internal const string Description = "Streams the notifications for user based on the user id passed.";
             internal const string OperationId = nameof(StreamNotificationsForUserAction);
         }
+
+        /// <summary>
+        /// Swagger documentation for DeleteAllNotificationsForUserAsync.
+        /// </summary>
+        internal static class DeleteAllNotificationsForUserAction
+        {
+            internal const string Summary = "Deletes all notifications for a user.";
+            internal const string Description = "Deletes all the read and unread notifications for a user based on the user email.";
+            internal const string OperationId = nameof(DeleteAllNotificationsForUserAction);
+        }
     }
 }

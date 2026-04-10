@@ -92,6 +92,54 @@ public sealed class NotificationsService(
     }
 
     /// <summary>
+    /// Deletes all notifications for user asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedInUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>
+    /// A boolean value indicating whether the operation was successful (true) or not (false).
+    /// </returns>
+    public async Task<bool> DeleteAllNotificationsForUserAsync(
+        string currentLoggedInUser,
+        CancellationToken cancellationToken = default
+    )
+    {
+        bool response = false;
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(DeleteAllNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser })
+            );
+
+            response = await notificationsDataManager.DeleteAllNotificationsForUserAsync(
+                currentLoggedInUser,
+                cancellationToken
+            ).ConfigureAwait(false);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(DeleteAllNotificationsForUserAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(DeleteAllNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, response })
+            );
+        }
+    }
+
+    /// <summary>
     /// Retrieves a list of notifications for a specific user based on their username. 
     /// This method allows clients to fetch all notifications that are relevant to a particular user
     /// </summary>
@@ -144,12 +192,12 @@ public sealed class NotificationsService(
     /// <remarks>
     /// Marking a notification as read typically involves updating the status of the notification in the data store to indicate that it has been acknowledged or viewed by the recipient user.
     /// </remarks>
-    /// <param name="recipientUserName">The username of the user for whom to mark the notification as read.</param>
+    /// <param name="currentLoggedInUser">The username of the user for whom to mark the notification as read.</param>
     /// <param name="notificationId">The identifier of the notification to be marked as read.</param>
     /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
     /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
     public async Task<bool> MarkExistingNotificationAsReadAsync(
-        string recipientUserName,
+        string currentLoggedInUser,
         Guid notificationId,
         CancellationToken cancellationToken = default
     )
@@ -159,11 +207,11 @@ public sealed class NotificationsService(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodStart,
-                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName, notificationId })
+                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, notificationId })
             );
 
             response = await notificationsDataManager.MarkExistingNotificationAsReadAsync(
-                recipientUserName: recipientUserName,
+                currentLoggedInUser,
                 notificationId: notificationId,
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
@@ -185,7 +233,7 @@ public sealed class NotificationsService(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
-                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName, notificationId, response })
+                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, notificationId, response })
             );
         }
     }
