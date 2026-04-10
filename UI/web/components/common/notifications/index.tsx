@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Bell, Check, Loader2, X } from "lucide-react";
+import { Tooltip } from "@heroui/react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import {
@@ -7,7 +8,6 @@ import {
 	ToggleNotificationsPanel,
 } from "@store/notifications/actions";
 import { NotificationsResponseDTO } from "@models/response/notifications-response-dto.model";
-import { Tooltip } from "@heroui/react";
 
 export default function NotificationsDrawerComponent() {
 	const dispatch = useAppDispatch();
