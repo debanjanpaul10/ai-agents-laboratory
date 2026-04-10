@@ -189,7 +189,7 @@ public sealed class NotificationsDataManager(
             );
             var updates = new List<UpdateDefinition<NotificationsModel>>
             {
-                Builders<NotificationsModel>.Update.Set(field => field.IsRead, false),
+                Builders<NotificationsModel>.Update.Set(field => field.IsRead, true),
                 Builders<NotificationsModel>.Update.Set(field =>field.DateModified, DateTime.UtcNow),
                 Builders<NotificationsModel>.Update.Set(field => field.ModifiedBy, currentLoggedInUser)
             };

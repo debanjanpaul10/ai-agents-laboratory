@@ -95,7 +95,7 @@ export default function NotificationsDrawerComponent() {
 					new Date(a.dateCreated).getTime(),
 			)
 			.map((notification) => {
-				const isUnread = notification.isRead;
+				const isUnread = !notification.isRead;
 
 				return (
 					<div
@@ -129,12 +129,14 @@ export default function NotificationsDrawerComponent() {
 								)}
 								<span
 									className={`font-semibold text-sm truncate ${isUnread ? "text-white" : "text-white/80"}`}
+									title={notification.title}
 								>
 									{notification.title}
 								</span>
 							</div>
 							<p
 								className={`text-xs leading-relaxed ${isUnread ? "text-white/60" : "text-white/70"}`}
+								title={notification.message}
 							>
 								{notification.message}
 							</p>
@@ -185,7 +187,7 @@ export default function NotificationsDrawerComponent() {
 								</h2>
 								<p className="text-white/40 text-xs">
 									{
-										notifications.filter((n) => n.isRead)
+										notifications.filter((n) => !n.isRead)
 											.length
 									}{" "}
 									unread

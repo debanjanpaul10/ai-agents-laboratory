@@ -40,7 +40,7 @@ export default function SidebarComponent() {
 		(state) => state.NotificationsReducer.notifications,
 	);
 	const unreadCount = useMemo(
-		() => (notifications ?? []).filter((n: any) => n?.isActive).length,
+		() => (notifications ?? []).filter((n: any) => !n?.isRead).length,
 		[notifications],
 	);
 
