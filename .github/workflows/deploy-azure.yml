@@ -4,7 +4,7 @@ env:
     API_PROJECT_PATH: Backend/AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj
     WEB_UI_PROJECT_PATH: UI/web
     DATABASE_PROJECT_PATH: Backend/AIAgents.Laboratory.Database
-    FUNCTIONS_PROJECT_PATH: Functions/AI.Agents.Laboratory.Functions
+    FUNCTIONS_PROJECT_PATH: Functions/AI.Agents.Laboratory.Functions/AI.Agents.Laboratory.Functions.csproj
 
 on:
     push:
@@ -208,12 +208,12 @@ jobs:
 
             - name: Install dependencies and build Functions solution
               run: |
-                  dotnet restore "${{ env.FUNCTIONS_PROJECT_PATH }}/AI.Agents.Laboratory.Functions.csproj"
-                  dotnet build "${{ env.FUNCTIONS_PROJECT_PATH }}/AI.Agents.Laboratory.Functions.csproj" --configuration Release --no-restore
+                  dotnet restore "${{ env.FUNCTIONS_PROJECT_PATH }}"
+                  dotnet build "${{ env.FUNCTIONS_PROJECT_PATH }}" --configuration Release --no-restore
 
             - name: Publish the Functions project
               run: |
-                  dotnet publish "${{ env.FUNCTIONS_PROJECT_PATH }}/AI.Agents.Laboratory.Functions.csproj" --configuration Release --output ./publish-functions
+                  dotnet publish "${{ env.FUNCTIONS_PROJECT_PATH }}" --configuration Release --output ./publish-functions --self-contained true --runtime linux-x64
 
             - name: Set functions artifact path
               id: set-artifact-path
@@ -241,6 +241,6 @@ jobs:
               uses: Azure/functions-action@v1
               with:
                   app-name: ${{ vars.AZURE_FUNCTIONS_NAME }}
-                  publish-profile: ${{ secrets.AZURE_FUNCTIONS_PUBLISH_PROFILE }}
                   package: ./publish-functions
                   sku: "flexconsumption"
+                  publish-profile: ${{ secrets.AZURE_FUNCTIONS_PUBLISH_PROFILE }}
