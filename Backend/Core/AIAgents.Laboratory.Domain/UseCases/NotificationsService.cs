@@ -12,10 +12,10 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <summary>
 /// Provides an implementation of the INotificationsService interface, responsible for handling notification-related operations by interacting with the IApplicationNotificationsService.
 /// </summary>
-/// <param name="logger">The ILogger instance is used for logging information, warnings, and errors that occur within the service's methods. This helps in monitoring the application's behavior and diagnosing issues when they arise.</param>
-/// <param name="correlationContext">The ICorrelationContext is used to manage correlation IDs for requests, which helps in tracing and correlating logs across different components of the application, especially in distributed systems.</param>
-/// <param name="notificationsService">The IApplicationNotificationsService is an abstraction that encapsulates the business logic for handling notifications.</param>
-/// <param name="notificationsDataManager">The INotificationsDataManager is an abstraction for data access operations related to notifications, allowing the service to interact with the underlying data storage without being tightly coupled to a specific implementation.</param>
+/// <param name="logger">The <c>ILogger</c> instance is used for logging information, warnings, and errors that occur within the service's methods. This helps in monitoring the application's behavior and diagnosing issues when they arise.</param>
+/// <param name="correlationContext">The <c>ICorrelationContext</c> is used to manage correlation IDs for requests, which helps in tracing and correlating logs across different components of the application, especially in distributed systems.</param>
+/// <param name="notificationsService">The <c>IApplicationNotificationsService</c> is an abstraction that encapsulates the business logic for handling notifications.</param>
+/// <param name="notificationsDataManager">The <c>INotificationsDataManager</c> is an abstraction for data access operations related to notifications, allowing the service to interact with the underlying data storage without being tightly coupled to a specific implementation.</param>
 /// <seealso cref="INotificationsService"/>
 public sealed class NotificationsService(
     ILogger<NotificationsService> logger,

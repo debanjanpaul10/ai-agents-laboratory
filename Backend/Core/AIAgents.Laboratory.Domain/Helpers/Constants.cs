@@ -244,5 +244,25 @@ internal static class Constants
         /// The tool skill data has been updated message template.
         /// </summary>
         internal const string ToolSkillDataHasBeenUpdatedMessageTemplate = "The data for tool skill '{0}' with id: '{1}' has been updated.";
+
+        /// <summary>
+        /// The bug report submitted title template.
+        /// </summary>
+        internal const string BugReportSubmittedTitleTemplate = "New Bug Report Submitted: {0}";
+
+        /// <summary>
+        /// The bug report submitted message template.
+        /// </summary>
+        internal const string BugReportSubmittedMessageTemplate = "A new bug report has been submitted by user '{0}' : '{1}'";
+
+        /// <summary>
+        /// The feature request submitted title template.
+        /// </summary>
+        internal const string FeatureRequestSubmittedTitleTemplate = "New Feature Request Submitted: {0}";
+
+        /// <summary>
+        /// The feature request submitted message template.
+        /// </summary>
+        internal const string FeatureRequestSubmittedMessageTemplate = "A new feature request has been submitted by user '{0}' : '{1}'";
     }
 }

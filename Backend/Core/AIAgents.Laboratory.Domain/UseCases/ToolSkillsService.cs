@@ -314,7 +314,8 @@ public sealed class ToolSkillsService(
         string currentUserEmail,
         string toolSkillName,
         string toolSkillGuid,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var notificationsDomainModel = new NotificationsDomain
         {
@@ -322,7 +323,7 @@ public sealed class ToolSkillsService(
             Title = string.Format(NotificationMessagesConstants.ToolSkillDataUpdateTitleTemplate, toolSkillName),
             Message = string.Format(NotificationMessagesConstants.ToolSkillDataHasBeenUpdatedMessageTemplate, toolSkillName, toolSkillGuid),
             IsGlobal = false,
-            NotificationType = "Push",
+            NotificationType = nameof(NotificationTypes.Push),
             CreatedBy = currentUserEmail
         };
         await notificationsService.CreateNewNotificationAsync(

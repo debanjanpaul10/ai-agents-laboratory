@@ -369,7 +369,8 @@ public sealed class AgentsService(
         string userToBeNotified,
         string currentUserEmail,
         string agentName, string agentGuid,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var notificationsDomainModel = new NotificationsDomain
         {
@@ -377,7 +378,7 @@ public sealed class AgentsService(
             Title = string.Format(NotificationMessagesConstants.AgentDataUpdateTitleTemplate, agentName),
             Message = string.Format(NotificationMessagesConstants.AgentDataHasBeenUpdatedMessageTemplate, agentName, agentGuid),
             IsGlobal = false,
-            NotificationType = "Push",
+            NotificationType = nameof(NotificationTypes.Push),
             CreatedBy = currentUserEmail
         };
         await notificationsService.CreateNewNotificationAsync(

@@ -47,7 +47,10 @@ public sealed class PushNotificationsFunction(
         var notificationMessageBody = JsonConvert.DeserializeObject<NotificationRequest>(messageBody.ToString());
         if (notificationMessageBody is null)
         {
-            logger.LogError("Message {MessageId} has null payload - moving to dead-letter queue", message.MessageId);
+            logger.LogError(
+                "Message {MessageId} has null payload - moving to dead-letter queue",
+                message.MessageId
+            );
             await messageActions.DeadLetterMessageAsync(
                 message,
                 deadLetterReason: FunctionsDomainConstants.DeadLetterConstants.InvalidPayloadReason,
