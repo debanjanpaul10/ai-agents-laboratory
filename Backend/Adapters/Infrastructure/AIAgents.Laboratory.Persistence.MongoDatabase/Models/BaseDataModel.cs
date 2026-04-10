@@ -1,5 +1,8 @@
 ﻿namespace AIAgents.Laboratory.Persistence.MongoDatabase.Models;
 
+/// <summary>
+/// The BaseDataModel class serves as a base class for all data models in the AIAgents Laboratory application, providing common properties for tracking the state and history of documents stored in the MongoDB database.
+/// </summary>
 public record BaseDataModel
 {
     /// <summary>

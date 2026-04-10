@@ -21,7 +21,12 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="agentChatService">The agents chat service.</param>
 /// <param name="aiServices">The ai services.</param>
 /// <seealso cref="IOrchestratorService"/>
-public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICorrelationContext correlationContext, IAgentsService agentsService, IAgentChatService agentChatService, IAiServices aiServices) : IOrchestratorService
+public sealed class OrchestratorService(
+    ILogger<OrchestratorService> logger,
+    ICorrelationContext correlationContext,
+    IAgentsService agentsService,
+    IAgentChatService agentChatService,
+    IAiServices aiServices) : IOrchestratorService
 {
     /// <summary>
     /// Get the orchestrator agent response for each agent asynchronously.
@@ -30,13 +35,20 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
     /// <param name="workspaceDetails">The workspace details domain model.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The final consolidated orchestrator response domain model.</returns>
-    public async Task<OrchestratorFinalResponseDomain> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails, CancellationToken cancellationToken = default)
+    public async Task<OrchestratorFinalResponseDomain> GetOrchestratorAgentResponseAsync(
+        WorkspaceAgentChatRequestDomain chatRequest,
+        AgentsWorkspaceDomain workspaceDetails,
+        CancellationToken cancellationToken = default
+    )
     {
         OrchestratorFinalResponseDomain? response = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest })
+            );
 
             var agentsData = await this.GetActiveAgentsDataAsync(
                 workspaceDetails,
@@ -91,25 +103,37 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
                 {
                     response = OrchestratorHelpers.PrepareOrchestratorFinalResponse(
                         finalResponse: ExceptionConstants.OrchestratorResponseFormatInvalidExceptionMessage,
-                        groupChatResponses: groupChatAgentsResponses);
+                        groupChatResponses: groupChatAgentsResponses
+                    );
                     return response;
                 }
             }
 
             response = OrchestratorHelpers.PrepareOrchestratorFinalResponse(
                 finalResponse: ExceptionConstants.OrchestratorLoopLimitReachedExceptionMessage,
-                groupChatResponses: groupChatAgentsResponses);
+                groupChatResponses: groupChatAgentsResponses
+            );
             return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetOrchestratorAgentResponseAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest })
+            );
         }
     }
 
@@ -123,7 +147,12 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
     /// <param name="orchestratorSystemPrompt">The orchestrator system prompt.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The orchestrator response content.</returns>
-    private async Task<string> InvokeOrchestratorIterationAsync(ConversationHistoryDomain conversationHistory, string userMessage, string orchestratorSystemPrompt, CancellationToken cancellationToken = default)
+    private async Task<string> InvokeOrchestratorIterationAsync(
+        ConversationHistoryDomain conversationHistory,
+        string userMessage,
+        string orchestratorSystemPrompt,
+        CancellationToken cancellationToken = default
+    )
     {
         var orchestratorResponse = await aiServices.GetChatbotResponseAsync(
             conversationDataDomain: conversationHistory,
@@ -176,16 +205,26 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
     /// <param name="parsedResponse">The parsed response.</param>
     /// <param name="agentsInvoked">The list of agents invoked.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    private async Task<string> DelegateToAgentAsync(IList<AgentDataDomain> agentsData, WorkspaceAgentChatRequestDomain chatRequest, ConversationHistoryDomain conversationHistory,
-        OrchestratorAgentResponseDomain parsedResponse, IList<string> agentsInvoked, CancellationToken cancellationToken = default)
+    private async Task<string> DelegateToAgentAsync(
+        IList<AgentDataDomain> agentsData,
+        WorkspaceAgentChatRequestDomain chatRequest,
+        ConversationHistoryDomain conversationHistory,
+        OrchestratorAgentResponseDomain parsedResponse,
+        IList<string> agentsInvoked,
+        CancellationToken cancellationToken = default
+    )
     {
         string response = string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DelegateToAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(DelegateToAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest })
+            );
 
             var targetAgentName = parsedResponse.AgentName;
-            var targetAgent = agentsData.FirstOrDefault(a => a.AgentName.Equals(targetAgentName, StringComparison.OrdinalIgnoreCase));
+            var targetAgent = agentsData
+                .FirstOrDefault(a => a.AgentName.Equals(targetAgentName, StringComparison.OrdinalIgnoreCase));
             if (targetAgent is null)
             {
                 // Agent not found, let orchestrator know
@@ -227,12 +266,22 @@ public sealed class OrchestratorService(ILogger<OrchestratorService> logger, ICo
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DelegateToAgentAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(DelegateToAgentAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DelegateToAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(DelegateToAgentAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response })
+            );
         }
     }
 

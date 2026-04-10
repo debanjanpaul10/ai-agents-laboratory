@@ -17,12 +17,18 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="logger">The logger service.</param>
 /// <param name="configuration">The configuration service.</param>
 /// <param name="correlationContext">The correlation context for logging.</param>
-/// <param name="mongoDatabaseService">The mongo db database service.</param>
 /// <param name="documentIntelligenceService">The document intelligence service.</param>
 /// <param name="toolSkillsService">The tools skill service.</param>
+/// <param name="agentsDataService">The agents data service.</param>
 /// <seealso cref="IAgentsService" />
-public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration configuration, ICorrelationContext correlationContext, IAgentsDataManager agentsDataService,
-    IDocumentIntelligenceService documentIntelligenceService, IToolSkillsService toolSkillsService) : IAgentsService
+public sealed class AgentsService(
+    ILogger<AgentsService> logger,
+    IConfiguration configuration,
+    ICorrelationContext correlationContext,
+    IAgentsDataManager agentsDataService,
+    IDocumentIntelligenceService documentIntelligenceService,
+    IToolSkillsService toolSkillsService,
+    INotificationsService notificationsService) : IAgentsService
 {
     /// <summary>
     /// The is knowledge base service allowed.
@@ -180,6 +186,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         ArgumentException.ThrowIfNullOrWhiteSpace(updateDataDomain.AgentId);
         ArgumentException.ThrowIfNullOrWhiteSpace(userEmail);
 
+        bool response = false;
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow,
@@ -212,11 +219,21 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                     cancellationToken
                 ).ConfigureAwait(false);
 
-            return await agentsDataService.UpdateExistingAgentDataAsync(
+            response = await agentsDataService.UpdateExistingAgentDataAsync(
                 updateDataDomain,
                 userEmail,
                 cancellationToken
             ).ConfigureAwait(false);
+            if (response)
+                await this.SendAgentUpdateNotificationAsync(
+                    userToBeNotified: existingAgent.CreatedBy,
+                    currentUserEmail: userEmail,
+                    agentName: updateDataDomain.AgentName,
+                    agentGuid: updateDataDomain.AgentId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+            return response;
         }
         catch (Exception ex)
         {
@@ -226,7 +243,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         finally
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId, updateDataDomain.ModifiedBy }));
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, updateDataDomain.AgentId, updateDataDomain.ModifiedBy, response }));
         }
     }
 
@@ -242,6 +259,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
+        bool response = false;
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow,
@@ -252,11 +270,21 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
                 cancellationToken
             ).ConfigureAwait(false);
 
-            return await agentsDataService.DeleteExistingAgentDataAsync(
+            response = await agentsDataService.DeleteExistingAgentDataAsync(
                 agentId,
                 currentUserEmail,
                 cancellationToken
             ).ConfigureAwait(false);
+            if (response)
+                await this.SendAgentUpdateNotificationAsync(
+                    userToBeNotified: currentUserEmail,
+                    currentUserEmail,
+                    agentName: string.Empty,
+                    agentGuid: agentId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+            return response;
         }
         catch (Exception ex)
         {
@@ -266,7 +294,7 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
         finally
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, agentId }));
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, agentId, response }));
         }
     }
 
@@ -325,6 +353,37 @@ public sealed class AgentsService(ILogger<AgentsService> logger, IConfiguration 
             toolSkillId: agentData.AssociatedSkillGuids[0],
             currentUserEmail,
             cancellationToken
+        ).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Sends the agent update notification asynchronous.
+    /// </summary>
+    /// <param name="userToBeNotified">The user to be notified.</param>
+    /// <param name="currentUserEmail">The current user's email.</param>
+    /// <param name="agentName">The agent name.</param>
+    /// <param name="agentGuid">The agent GUID.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task to wait on.</returns>
+    private async Task SendAgentUpdateNotificationAsync(
+        string userToBeNotified,
+        string currentUserEmail,
+        string agentName, string agentGuid,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var notificationsDomainModel = new NotificationsDomain
+        {
+            RecipientUserName = userToBeNotified,
+            Title = string.Format(NotificationMessagesConstants.AgentDataUpdateTitleTemplate, agentName),
+            Message = string.Format(NotificationMessagesConstants.AgentDataHasBeenUpdatedMessageTemplate, agentName, agentGuid),
+            IsGlobal = false,
+            NotificationType = nameof(NotificationTypes.Push),
+            CreatedBy = currentUserEmail
+        };
+        await notificationsService.CreateNewNotificationAsync(
+            request: notificationsDomainModel,
+            cancellationToken: cancellationToken
         ).ConfigureAwait(false);
     }
 

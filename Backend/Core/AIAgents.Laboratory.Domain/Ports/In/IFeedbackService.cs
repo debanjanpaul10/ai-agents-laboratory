@@ -13,7 +13,10 @@ public interface IFeedbackService
     /// <param name="bugReportData">The bug report data.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> AddNewBugReportDataAsync(BugReportData bugReportData, CancellationToken cancellationToken = default);
+    Task<bool> AddNewBugReportDataAsync(
+        BugReportData bugReportData,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Adds the new feature request data asynchronous.
@@ -21,7 +24,10 @@ public interface IFeedbackService
     /// <param name="featureRequestData">The feature request data.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> AddNewFeatureRequestDataAsync(NewFeatureRequestData featureRequestData, CancellationToken cancellationToken = default);
+    Task<bool> AddNewFeatureRequestDataAsync(
+        NewFeatureRequestData featureRequestData,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets all bug reports data asynchronous.
@@ -29,7 +35,10 @@ public interface IFeedbackService
     /// <param name="currentLoggedinUser">The current logged in user.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A list of <see cref="BugReportData"/></returns>
-    Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(string currentLoggedinUser, CancellationToken cancellationToken = default);
+    Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(
+        string currentLoggedinUser,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets all submitted feature requests asynchronous.
@@ -37,6 +46,9 @@ public interface IFeedbackService
     /// <param name="currentLoggedinUser">The current logged in user.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A list of <see cref="NewFeatureRequestData"/></returns>
-    Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser, CancellationToken cancellationToken = default);
+    Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(
+        string currentLoggedinUser,
+        CancellationToken cancellationToken = default
+    );
 
 }

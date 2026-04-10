@@ -11,17 +11,22 @@ using static AIAgents.Laboratory.Domain.Helpers.Constants;
 namespace AIAgents.Laboratory.Domain.UseCases;
 
 /// <summary>
-/// The tool skills service business class.
+/// The <c>ToolSkillsService</c> class provides methods to manage tool skills, including adding new tool skills, associating skills with agents, deleting tool skills, and retrieving tool skill information. 
+/// It interacts with the data manager for tool skills and the MCP client services to perform these operations. The service also includes logging for method execution and error handling to ensure robust operation.
 /// </summary>
-/// <param name="logger">The logger service.</param>
-/// <param name="configuration">The configuration service.</param>
-/// <param name="correlationContext">The correlation context used for logging.</param>
-/// <param name="mongoDatabaseService">The mongo database service.</param>
+/// <param name="logger">The logger instance.</param>
+/// <param name="correlationContext">The correlation context.</param>
+/// <param name="toolSkillsDataManager">The tool skills data manager.</param>
 /// <param name="mcpClientServices">The MCP client services.</param>
+/// <param name="notificationsService">The notifications service.</param>
 /// <seealso cref="IToolSkillsService"/>
-public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, ICorrelationContext correlationContext, IToolSkillsDataManager toolSkillsDataManager, IMcpClientServices mcpClientServices) : IToolSkillsService
+public sealed class ToolSkillsService(
+    ILogger<ToolSkillsService> logger,
+    ICorrelationContext correlationContext,
+    IToolSkillsDataManager toolSkillsDataManager,
+    IMcpClientServices mcpClientServices,
+    INotificationsService notificationsService) : IToolSkillsService
 {
-
     /// <summary>
     /// Adds a new tool skill asynchronously.
     /// </summary>
@@ -29,7 +34,11 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, ICorrel
     /// <param name="userEmail">The user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for <c>success/failure</c></returns>
-    public async Task<bool> AddNewToolSkillAsync(ToolSkillDomain toolSkillData, string userEmail, CancellationToken cancellationToken = default)
+    public async Task<bool> AddNewToolSkillAsync(
+        ToolSkillDomain toolSkillData,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
@@ -37,7 +46,6 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, ICorrel
 
             toolSkillData.ToolSkillGuid = Guid.NewGuid().ToString();
             toolSkillData.PrepareAuditEntityData(userEmail);
-
             return await toolSkillsDataManager.AddNewToolSkillAsync(
                 toolSkillData,
                 userEmail,
@@ -63,7 +71,12 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, ICorrel
     /// <param name="currentUserEmail">The current user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> AssociateSkillAndAgentAsync(IList<AssociatedAgentsSkillDataDomain> agentData, string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<bool> AssociateSkillAndAgentAsync(
+        IList<AssociatedAgentsSkillDataDomain> agentData,
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(agentData);
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
@@ -108,21 +121,36 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, ICorrel
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
+        bool response = false;
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId }));
 
-            return await toolSkillsDataManager.DeleteExistingToolSkillBySkillIdAsync(
+            response = await toolSkillsDataManager.DeleteExistingToolSkillBySkillIdAsync(
                 toolSkillId,
                 currentUserEmail,
                 cancellationToken
             ).ConfigureAwait(false);
+            if (response)
+                await this.SendToolSkillUpdateNotificationAsync(
+                    userToBeNotified: currentUserEmail,
+                    currentUserEmail,
+                    toolSkillName: string.Empty,
+                    toolSkillGuid: toolSkillId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+            return response;
         }
         catch (Exception ex)
         {
@@ -132,7 +160,7 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, ICorrel
         finally
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId }));
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId, response }));
         }
     }
 
@@ -143,7 +171,11 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, ICorrel
     /// <param name="currentUserEmail">The current user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="McpClientTool"/></returns>
-    public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAvailableAsync(
+        string serverUrl,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(serverUrl);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
@@ -176,7 +208,10 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, ICorrel
     /// <param name="userEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="ToolSkillDomain"/></returns>
-    public async Task<IEnumerable<ToolSkillDomain>> GetAllToolSkillsAsync(string userEmail, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ToolSkillDomain>> GetAllToolSkillsAsync(
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<ToolSkillDomain>? result = null;
         try
@@ -209,7 +244,11 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, ICorrel
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The tool skill domain model.</returns>
-    public async Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
         ToolSkillDomain? result = null;
@@ -244,21 +283,36 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, ICorrel
     /// <param name="currentUserEmail">The user email.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The boolean for <c>success/failure</c></returns>
-    public async Task<bool> UpdateExistingToolSkillDataAsync(ToolSkillDomain updateToolSkillData, string currentUserEmail, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateExistingToolSkillDataAsync(
+        ToolSkillDomain updateToolSkillData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(updateToolSkillData);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
+        bool response = false;
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, updateToolSkillData.ToolSkillGuid }));
 
-            return await toolSkillsDataManager.UpdateExistingToolSkillDataAsync(
+            response = await toolSkillsDataManager.UpdateExistingToolSkillDataAsync(
                 updateToolSkillData,
                 currentUserEmail,
                 cancellationToken
             ).ConfigureAwait(false);
+            if (response)
+                await this.SendToolSkillUpdateNotificationAsync(
+                    userToBeNotified: currentUserEmail,
+                    currentUserEmail,
+                    toolSkillName: updateToolSkillData.ToolSkillDisplayName,
+                    toolSkillGuid: updateToolSkillData.ToolSkillGuid,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+            return response;
         }
         catch (Exception ex)
         {
@@ -268,7 +322,43 @@ public sealed class ToolSkillsService(ILogger<ToolSkillsService> logger, ICorrel
         finally
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, updateToolSkillData.ToolSkillGuid }));
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, updateToolSkillData.ToolSkillGuid, response }));
         }
     }
+
+    #region PRIVATE METHODS
+
+    /// <summary>
+    /// Sends the tool skill update notification asynchronously.
+    /// </summary>
+    /// <param name="userToBeNotified">The user to be notified.</param>
+    /// <param name="currentUserEmail">The current user's email.</param>
+    /// <param name="toolSkillName">The tool skill name.</param>
+    /// <param name="toolSkillGuid">The tool skill GUID.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The task representing the asynchronous operation.</returns>
+    private async Task SendToolSkillUpdateNotificationAsync(
+        string userToBeNotified,
+        string currentUserEmail,
+        string toolSkillName,
+        string toolSkillGuid,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var notificationsDomainModel = new NotificationsDomain
+        {
+            RecipientUserName = userToBeNotified,
+            Title = string.Format(NotificationMessagesConstants.ToolSkillDataUpdateTitleTemplate, toolSkillName),
+            Message = string.Format(NotificationMessagesConstants.ToolSkillDataHasBeenUpdatedMessageTemplate, toolSkillName, toolSkillGuid),
+            IsGlobal = false,
+            NotificationType = nameof(NotificationTypes.Push),
+            CreatedBy = currentUserEmail
+        };
+        await notificationsService.CreateNewNotificationAsync(
+            request: notificationsDomainModel,
+            cancellationToken: cancellationToken
+        ).ConfigureAwait(false);
+    }
+
+    #endregion
 }

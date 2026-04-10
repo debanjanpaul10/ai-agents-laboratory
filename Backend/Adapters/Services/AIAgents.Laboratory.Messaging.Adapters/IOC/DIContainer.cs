@@ -1,6 +1,8 @@
-﻿using AIAgents.Laboratory.Domain.Ports.Out;
+using AIAgents.Laboratory.Domain.Ports.Out;
+using AIAgents.Laboratory.Messaging.Adapters.Contracts;
 using AIAgents.Laboratory.Messaging.Adapters.Services;
 using Azure.Communication.Email;
+using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using static AIAgents.Laboratory.Messaging.Adapters.Helpers.Constants;
@@ -22,7 +24,14 @@ public static class DIContainer
         var emailNotificationConnectionString = configuration[AzureAppConfigurationConstants.EmailNotificationServiceConnectionString];
         ArgumentException.ThrowIfNullOrWhiteSpace(emailNotificationConnectionString);
 
-        return services.AddSingleton(new EmailClient(emailNotificationConnectionString)).AddScoped<IEmailNotificationService, EmailNotificationService>();
+        var serviceBusConnectionString = configuration[AzureAppConfigurationConstants.ServiceBusConnectionString];
+        ArgumentException.ThrowIfNullOrWhiteSpace(serviceBusConnectionString);
+
+        return services.AddSingleton(new EmailClient(emailNotificationConnectionString))
+            .AddSingleton(new ServiceBusClient(serviceBusConnectionString))
+            .AddScoped<IServiceBusManager, ServiceBusManager>()
+            .AddScoped<IEmailNotificationService, EmailNotificationService>()
+            .AddScoped<IApplicationNotificationsService, AppPushNotificationService>();
     }
 
 }

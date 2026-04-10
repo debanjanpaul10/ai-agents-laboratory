@@ -15,7 +15,11 @@ public interface IToolSkillsService
     /// <param name="userEmail">The user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for <c>success/failure</c></returns>
-    Task<bool> AddNewToolSkillAsync(ToolSkillDomain toolSkillData, string userEmail, CancellationToken cancellationToken = default);
+    Task<bool> AddNewToolSkillAsync(
+        ToolSkillDomain toolSkillData,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Updates an existing tool skill data asynchronously.
@@ -24,7 +28,11 @@ public interface IToolSkillsService
     /// <param name="currentUserEmail">The user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for <c>success/failure</c></returns>
-    Task<bool> UpdateExistingToolSkillDataAsync(ToolSkillDomain updateToolSkillData, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> UpdateExistingToolSkillDataAsync(
+        ToolSkillDomain updateToolSkillData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets all the tool skill data asynchronously.
@@ -32,7 +40,10 @@ public interface IToolSkillsService
     /// <param name="userEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of <see cref="ToolSkillDomain"/></returns>
-    Task<IEnumerable<ToolSkillDomain>> GetAllToolSkillsAsync(string userEmail, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ToolSkillDomain>> GetAllToolSkillsAsync(
+        string userEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets a single tool skill data by its skill id asynchronously.
@@ -41,7 +52,11 @@ public interface IToolSkillsService
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The tool skill domain model.</returns>
-    Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Deletes an existing tool by tool skill id asynchronously.
@@ -50,7 +65,11 @@ public interface IToolSkillsService
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for success/failure.</returns>
-    Task<bool> DeleteExistingToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> DeleteExistingToolSkillBySkillIdAsync(
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets all MCP tools available asynchronously.
@@ -59,7 +78,11 @@ public interface IToolSkillsService
     /// <param name="currentUserEmail">The current user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of <see cref="McpClientTool"/></returns>
-    Task<IEnumerable<McpClientTool>> GetAllMcpToolsAvailableAsync(string serverUrl, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<IEnumerable<McpClientTool>> GetAllMcpToolsAvailableAsync(
+        string serverUrl,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Associates a skill and an agent asynchronously.
@@ -69,5 +92,10 @@ public interface IToolSkillsService
     /// <param name="currentUserEmail">The current user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    Task<bool> AssociateSkillAndAgentAsync(IList<AssociatedAgentsSkillDataDomain> agentData, string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> AssociateSkillAndAgentAsync(
+        IList<AssociatedAgentsSkillDataDomain> agentData,
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 }

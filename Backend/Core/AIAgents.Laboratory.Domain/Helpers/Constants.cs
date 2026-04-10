@@ -219,4 +219,70 @@ internal static class Constants
         /// </summary>
         internal const string FileName = "Templates/FeedbackEmail.html";
     }
+
+    /// <summary>
+    /// The notification messages constants.
+    /// </summary>
+    internal static class NotificationMessagesConstants
+    {
+        /// <summary>
+        /// The agent data update title template.
+        /// </summary>
+        internal const string AgentDataUpdateTitleTemplate = "Agent '{0}' Data Updated";
+
+        /// <summary>
+        /// The agent data has been updated message template.
+        /// </summary>
+        internal const string AgentDataHasBeenUpdatedMessageTemplate = "The data for agent '{0}' with agent id: '{1}' has been updated.";
+
+        /// <summary>
+        /// The tool skill data update title template.
+        /// </summary>
+        internal const string ToolSkillDataUpdateTitleTemplate = "Tool Skill '{0}' Data Updated";
+
+        /// <summary>
+        /// The tool skill data has been updated message template.
+        /// </summary>
+        internal const string ToolSkillDataHasBeenUpdatedMessageTemplate = "The data for tool skill '{0}' with id: '{1}' has been updated.";
+
+        /// <summary>
+        /// The bug report submitted title template.
+        /// </summary>
+        internal const string BugReportSubmittedTitleTemplate = "New Bug Report Submitted: {0}";
+
+        /// <summary>
+        /// The bug report submitted message template.
+        /// </summary>
+        internal const string BugReportSubmittedMessageTemplate = "A new bug report has been submitted by user '{0}' : '{1}'";
+
+        /// <summary>
+        /// The feature request submitted title template.
+        /// </summary>
+        internal const string FeatureRequestSubmittedTitleTemplate = "New Feature Request Submitted: {0}";
+
+        /// <summary>
+        /// The feature request submitted message template.
+        /// </summary>
+        internal const string FeatureRequestSubmittedMessageTemplate = "A new feature request has been submitted by user '{0}' : '{1}'";
+
+        /// <summary>
+        /// The workspace data update title template.
+        /// </summary>
+        internal const string WorkspaceDataUpdateTitleTemplate = "Workspace '{0}' Data Updated";
+
+        /// <summary>
+        /// The workspace data has been updated message template.
+        /// </summary>
+        internal const string WorkspaceDataHasBeenUpdatedMessageTemplate = "The data for workspace '{0}' with id: '{1}' has been updated.";
+
+        /// <summary>
+        /// The registered application data update title template.
+        /// </summary>
+        internal const string RegisteredApplicationDataUpdateTitleTemplate = "Registered Application '{0}' Data Updated";
+
+        /// <summary>
+        /// The registered application data has been updated message template.
+        /// </summary>
+        internal const string RegisteredApplicationDataHasBeenUpdatedMessageTemplate = "The data for registered application '{0}' with id: '{1}' has been updated.";
+    }
 }

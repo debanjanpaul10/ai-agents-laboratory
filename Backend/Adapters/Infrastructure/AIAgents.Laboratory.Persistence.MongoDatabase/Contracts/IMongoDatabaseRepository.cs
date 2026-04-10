@@ -17,7 +17,12 @@ public interface IMongoDatabaseRepository
     /// <param name="collectionName">Name of the collection.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> SaveDataAsync<TInput>(TInput data, string databaseName, string collectionName, CancellationToken cancellationToken = default);
+    Task<bool> SaveDataAsync<TInput>(
+        TInput data,
+        string databaseName,
+        string collectionName,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets the data from collection asynchronous with a filter condition.
@@ -28,7 +33,12 @@ public interface IMongoDatabaseRepository
     /// <param name="filter">The filter definition to apply when querying the collection.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The filtered mongo db collection results.</returns>
-    Task<IEnumerable<TResult>> GetDataFromCollectionAsync<TResult>(string databaseName, string collectionName, FilterDefinition<TResult> filter, CancellationToken cancellationToken = default);
+    Task<IEnumerable<TResult>> GetDataFromCollectionAsync<TResult>(
+        string databaseName,
+        string collectionName,
+        FilterDefinition<TResult> filter,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Updates the data in collection asynchronous using filter and update definitions.
@@ -40,7 +50,13 @@ public interface IMongoDatabaseRepository
     /// <param name="collectionName">Name of the collection.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> UpdateDataInCollectionAsync<TDocument>(FilterDefinition<TDocument> filter, UpdateDefinition<TDocument> update, string databaseName, string collectionName, CancellationToken cancellationToken = default);
+    Task<bool> UpdateDataInCollectionAsync<TDocument>(
+        FilterDefinition<TDocument> filter,
+        UpdateDefinition<TDocument> update,
+        string databaseName,
+        string collectionName,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Deletes the data from mongo db collection using filter.
@@ -51,5 +67,10 @@ public interface IMongoDatabaseRepository
     /// <param name="collectionName">The collection name.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> DeleteDataFromCollectionAsync<TDocument>(FilterDefinition<TDocument> filter, string databaseName, string collectionName, CancellationToken cancellationToken = default);
+    Task<bool> DeleteDataFromCollectionAsync<TDocument>(
+        FilterDefinition<TDocument> filter,
+        string databaseName,
+        string collectionName,
+        CancellationToken cancellationToken = default
+    );
 }

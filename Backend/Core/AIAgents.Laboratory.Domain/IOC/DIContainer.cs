@@ -29,5 +29,6 @@ public static class DIContainer
         .AddScoped<IWorkspacesService, WorkspacesService>()
         .AddScoped<IOrchestratorService, OrchestratorService>()
         .AddScoped<IApplicationAdminService, ApplicationAdminService>()
-        .AddScoped<IRegisteredApplicationService, RegisteredApplicationService>();
+        .AddScoped<IRegisteredApplicationService, RegisteredApplicationService>()
+        .AddScoped<INotificationsService, NotificationsService>();
 }

@@ -15,5 +15,9 @@ public interface IOrchestratorService
     /// <param name="workspaceDetails">The workspace details domain model.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The orchestrator agent response.</returns>
-    Task<OrchestratorFinalResponseDomain> GetOrchestratorAgentResponseAsync(WorkspaceAgentChatRequestDomain chatRequest, AgentsWorkspaceDomain workspaceDetails, CancellationToken cancellationToken = default);
+    Task<OrchestratorFinalResponseDomain> GetOrchestratorAgentResponseAsync(
+        WorkspaceAgentChatRequestDomain chatRequest,
+        AgentsWorkspaceDomain workspaceDetails,
+        CancellationToken cancellationToken = default
+    );
 }
