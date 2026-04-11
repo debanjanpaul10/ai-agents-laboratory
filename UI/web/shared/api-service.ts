@@ -253,4 +253,8 @@ export async function MarkNotificationAsReadApiAsync(notificationId: string) {
 	);
 }
 
+export async function DeleteAllNotificationsForUserApiAsync() {
+	return await DeleteAsync("notifications/deleteallnotifications");
+}
+
 // #endregion

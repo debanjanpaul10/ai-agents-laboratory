@@ -179,6 +179,72 @@ public sealed class NotificationsController(
     }
 
     /// <summary>
+    /// Streams notifications for a specific user in real-time using Server-Sent Events (SSE).
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
+    /// <returns>A stream of notifications relevant to the specified user, sent in real-time as they are created or updated.</returns>
+    [HttpGet(NotificationsRoutes.StreamNotificationsForUser_Route)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+        Summary = StreamNotificationsForUserAction.Summary,
+        Description = StreamNotificationsForUserAction.Description,
+        OperationId = StreamNotificationsForUserAction.OperationId)]
+    public async Task StreamNotificationsForUserAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(StreamNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail })
+            );
+
+            ArgumentException.ThrowIfNullOrWhiteSpace(base.UserEmail);
+            if (base.IsAuthorized(authorizationType: UserBased))
+            {
+                Response.Headers.CacheControl = "no-cache";
+                Response.Headers.Connection = "keep-alive";
+                Response.ContentType = "text/event-stream";
+
+                await notificationsHandler.StreamNotificationsForUserAsync(
+                    recipientUserName: base.UserEmail,
+                    response: Response,
+                    cancellationToken: cancellationToken,
+                    requestAborted: HttpContext.RequestAborted
+                ).ConfigureAwait(false);
+            }
+            else
+            {
+                Response.StatusCode = StatusCodes.Status401Unauthorized;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(StreamNotificationsForUserAsync), DateTime.UtcNow, "Notification stream cancelled."
+            );
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(StreamNotificationsForUserAsync), DateTime.UtcNow, ex.Message
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(StreamNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail })
+            );
+        }
+    }
+
+    /// <summary>
     /// Marks an existing notification as read for a specific user based on the notification identifier.
     /// </summary>
     /// <param name="notificationId">The identifier of the notification to be marked as read.</param>
@@ -210,9 +276,9 @@ public sealed class NotificationsController(
             if (base.IsAuthorized(authorizationType: UserBased))
             {
                 response = await notificationsHandler.MarkExistingNotificationAsReadAsync(
-                    recipientUserName: base.UserEmail,
-                    notificationId: notificationId,
-                    cancellationToken: cancellationToken
+                    currentLoggedInUser: base.UserEmail,
+                    notificationId,
+                    cancellationToken
                 ).ConfigureAwait(false);
 
                 if (response)
@@ -244,6 +310,73 @@ public sealed class NotificationsController(
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
                 nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, notificationId, response })
+            );
+        }
+    }
+
+    /// <summary>
+    /// Deletes all notifications for user asynchronous.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
+    [HttpDelete(NotificationsRoutes.DeleteAllNotificationsForUser_Route)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+        Summary = DeleteAllNotificationsForUserAction.Summary,
+        Description = DeleteAllNotificationsForUserAction.Description,
+        OperationId = DeleteAllNotificationsForUserAction.OperationId)]
+    public async Task<ResponseDto> DeleteAllNotificationsForUserAsync(
+        CancellationToken cancellationToken = default
+    )
+    {
+        bool response = false;
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(DeleteAllNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail })
+            );
+
+            ArgumentException.ThrowIfNullOrWhiteSpace(base.UserEmail);
+            if (base.IsAuthorized(authorizationType: UserBased))
+            {
+                response = await notificationsHandler.DeleteAllNotificationsForUserAsync(
+                    currentLoggedInUser: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+                if (response)
+                    return HandleSuccessRequestResponse(
+                        responseData: response
+                    );
+                else
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
+            }
+
+            return HandleUnAuthorizedRequestResponse();
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed, nameof(DeleteAllNotificationsForUserAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(DeleteAllNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, response })
             );
         }
     }

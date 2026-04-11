@@ -42,6 +42,69 @@ public sealed class NotificationsDataManager(
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
+    /// Deletes all notifications for user asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedInUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>
+    /// A boolean value indicating whether the operation was successful (true) or not (false).
+    /// </returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<bool> DeleteAllNotificationsForUserAsync(
+        string currentLoggedInUser,
+        CancellationToken cancellationToken = default
+    )
+    {
+        bool response = false;
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.MethodStartedMessageConstant,
+                nameof(DeleteAllNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser })
+            );
+
+            var filter = Builders<NotificationsModel>.Filter.And(
+                Builders<NotificationsModel>.Filter.Eq(n => n.RecipientUserName, currentLoggedInUser),
+                Builders<NotificationsModel>.Filter.Eq(n => n.IsActive, true)
+            );
+            var updates = new List<UpdateDefinition<NotificationsModel>>
+            {
+                Builders<NotificationsModel>.Update.Set(field => field.IsActive, false),
+                Builders<NotificationsModel>.Update.Set(field =>field.DateModified, DateTime.UtcNow),
+                Builders<NotificationsModel>.Update.Set(field => field.ModifiedBy, currentLoggedInUser)
+            };
+            var update = Builders<NotificationsModel>.Update.Combine(updates);
+            response = await mongoDatabaseRepository.UpdateDataInCollectionAsync(
+                databaseName: MongoDatabaseName,
+                collectionName: NotificationsCollectionName,
+                filter: filter,
+                update: update,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.MethodFailedWithMessageConstant,
+                nameof(DeleteAllNotificationsForUserAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.MethodEndedMessageConstant,
+                nameof(DeleteAllNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, response })
+            );
+        }
+    }
+
+    /// <summary>
     /// Retrieves a list of notifications for a specific user based on their username. 
     /// This method allows clients to fetch all notifications that are relevant to a particular user
     /// </summary>
@@ -62,7 +125,8 @@ public sealed class NotificationsDataManager(
             );
 
             var filter = Builders<NotificationsModel>.Filter.And(
-                Builders<NotificationsModel>.Filter.Eq(n => n.RecipientUserName, recipientUserName)
+                Builders<NotificationsModel>.Filter.Eq(n => n.RecipientUserName, recipientUserName),
+                Builders<NotificationsModel>.Filter.Eq(n => n.IsActive, true)
             );
 
             var allData = await mongoDatabaseRepository.GetDataFromCollectionAsync(
@@ -100,12 +164,12 @@ public sealed class NotificationsDataManager(
     /// <remarks>
     /// Marking a notification as read typically involves updating the status of the notification in the data store to indicate that it has been acknowledged or viewed by the recipient user.
     /// </remarks>
-    /// <param name="recipientUserName">The username of the user for whom to mark the notification as read.</param>
+    /// <param name="currentLoggedInUser">The username of the user for whom to mark the notification as read.</param>
     /// <param name="notificationId">The identifier of the notification to be marked as read.</param>
     /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
     /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
     public async Task<bool> MarkExistingNotificationAsReadAsync(
-        string recipientUserName,
+        string currentLoggedInUser,
         Guid notificationId,
         CancellationToken cancellationToken = default
     )
@@ -115,18 +179,19 @@ public sealed class NotificationsDataManager(
         {
             logger.LogAppInformation(
                 LoggingConstants.MethodStartedMessageConstant,
-                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName, notificationId })
+                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, notificationId })
             );
 
             var filter = Builders<NotificationsModel>.Filter.And(
-                Builders<NotificationsModel>.Filter.Eq(n => n.RecipientUserName, recipientUserName),
+                Builders<NotificationsModel>.Filter.Eq(n => n.RecipientUserName, currentLoggedInUser),
                 Builders<NotificationsModel>.Filter.Eq(n => n.Id, notificationId),
                 Builders<NotificationsModel>.Filter.Eq(n => n.IsActive, true)
             );
             var updates = new List<UpdateDefinition<NotificationsModel>>
             {
-                Builders<NotificationsModel>.Update.Set(field => field.IsActive, false),
-                Builders<NotificationsModel>.Update.Set(field =>field.DateModified, DateTime.UtcNow)
+                Builders<NotificationsModel>.Update.Set(field => field.IsRead, true),
+                Builders<NotificationsModel>.Update.Set(field =>field.DateModified, DateTime.UtcNow),
+                Builders<NotificationsModel>.Update.Set(field => field.ModifiedBy, currentLoggedInUser)
             };
             var update = Builders<NotificationsModel>.Update.Combine(updates);
             response = await mongoDatabaseRepository.UpdateDataInCollectionAsync(
@@ -154,7 +219,7 @@ public sealed class NotificationsDataManager(
         {
             logger.LogAppInformation(
                 LoggingConstants.MethodEndedMessageConstant,
-                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName, notificationId, response })
+                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, notificationId, response })
             );
         }
     }

@@ -1,5 +1,6 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
+using Microsoft.AspNetCore.Http;
 
 namespace AIAgents.Laboratory.API.Adapters.Contracts;
 
@@ -38,13 +39,39 @@ public interface INotificationsHandler
     /// <remarks>
     /// Marking a notification as read typically involves updating the status of the notification in the data store to indicate that it has been acknowledged or viewed by the recipient user.
     /// </remarks>
-    /// <param name="recipientUserName">The username of the user for whom to mark the notification as read.</param>
+    /// <param name="currentLoggedInUser">The username of the user for whom to mark the notification as read.</param>
     /// <param name="notificationId">The identifier of the notification to be marked as read.</param>
     /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
     /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
     Task<bool> MarkExistingNotificationAsReadAsync(
-        string recipientUserName,
+        string currentLoggedInUser,
         Guid notificationId,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
+    /// Streams notifications for a specific user in real-time using Server-Sent Events (SSE).
+    /// </summary>
+    /// <param name="recipientUserName">The username of the user for whom to stream notifications.</param>
+    /// <param name="response">The HttpResponse object used to send the streamed notifications to the client.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
+    /// <param name="requestAborted">The cancellation token to handle request abortion.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task StreamNotificationsForUserAsync(
+        string recipientUserName,
+        HttpResponse response,
+        CancellationToken cancellationToken = default,
+        CancellationToken requestAborted = default
+    );
+
+    /// <summary>
+    /// Deletes all notifications for user asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedInUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
+    Task<bool> DeleteAllNotificationsForUserAsync(
+        string currentLoggedInUser,
         CancellationToken cancellationToken = default
     );
 }

@@ -25,9 +25,7 @@ public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<Reque
 
         try
         {
-            await next(
-                httpContext
-            ).ConfigureAwait(false);
+            await next(httpContext).ConfigureAwait(false);
         }
         finally
         {

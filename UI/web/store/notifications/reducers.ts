@@ -1,6 +1,7 @@
 import {
     MARK_NOTIFICATION_AS_READ,
     POLL_NOTIFICATIONS,
+    RECEIVE_NOTIFICATION,
     TOGGLE_NOTIFICATIONS_LOADER,
     TOGGLE_NOTIFICATIONS_PANEL,
 } from "./actionTypes";
@@ -25,6 +26,25 @@ export function NotificationsReducer(state = initialState, action: any) {
             return {
                 ...state,
                 notifications: action.payload,
+            };
+        }
+
+        case RECEIVE_NOTIFICATION: {
+            const incoming = action.payload;
+            const existing = state.notifications ?? [];
+            const index = existing.findIndex((n: any) => n?.id === incoming?.id);
+            const next =
+                index >= 0
+                    ? [
+                            incoming,
+                            ...existing.slice(0, index),
+                            ...existing.slice(index + 1),
+                        ]
+                    : [incoming, ...existing];
+
+            return {
+                ...state,
+                notifications: next,
             };
         }
         case MARK_NOTIFICATION_AS_READ: {

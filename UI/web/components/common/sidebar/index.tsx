@@ -20,14 +20,18 @@ import { useAppDispatch, useAppSelector } from "@store/index";
 import { metadata } from "@helpers/constants";
 import {
 	PollNotificationsAsync,
+	ReceiveNotification,
 	ToggleNotificationsPanel,
 } from "@store/notifications/actions";
 import NotificationsDrawerComponent from "@components/common/notifications";
+import { startNotificationsStream } from "@shared/notifications-stream";
+import { useEffect, useMemo, useRef } from "react";
 
 export default function SidebarComponent() {
 	const router = useRouter();
 	const { instance } = useMsal();
 	const dispatch = useAppDispatch();
+	const abortRef = useRef<AbortController | null>(null);
 
 	const ConfigurationsStoreData = useAppSelector(
 		(state) => state.CommonReducer.configurations,
@@ -35,6 +39,50 @@ export default function SidebarComponent() {
 	const notifications = useAppSelector(
 		(state) => state.NotificationsReducer.notifications,
 	);
+	const unreadCount = useMemo(
+		() => (notifications ?? []).filter((n: any) => !n?.isRead).length,
+		[notifications],
+	);
+
+	useEffect(() => {
+		// Initial sync so badge/drawer has data immediately.
+		dispatch(PollNotificationsAsync() as any);
+
+		abortRef.current?.abort();
+		const controller = new AbortController();
+		abortRef.current = controller;
+
+		let isMounted = true;
+		let backoffMs = 500;
+
+		const loop = async () => {
+			while (isMounted && !controller.signal.aborted) {
+				try {
+					await startNotificationsStream({
+						signal: controller.signal,
+						onNotification: (n) =>
+							dispatch(ReceiveNotification(n) as any),
+					});
+					// Stream ended unexpectedly; reconnect.
+				} catch {
+					// ignore; reconnect with backoff
+				}
+
+				await new Promise((r) => setTimeout(r, backoffMs));
+				backoffMs = Math.min(backoffMs * 2, 10_000);
+			}
+		};
+
+		const timeoutId = setTimeout(() => {
+			loop();
+		}, 100);
+
+		return () => {
+			clearTimeout(timeoutId);
+			isMounted = false;
+			controller.abort();
+		};
+	}, [dispatch]);
 
 	const isActive = (path: string) => router.pathname === path;
 
@@ -122,6 +170,11 @@ export default function SidebarComponent() {
 						>
 							<Bell className="h-5 w-5 mr-3" />
 							Notifications
+							{unreadCount > 0 && (
+								<span className="absolute right-3 top-1/2 -translate-y-1/2 min-w-5 h-5 px-1.5 rounded-full bg-pink-500/90 text-white text-xs leading-5 text-center">
+									{unreadCount}
+								</span>
+							)}
 						</Button>
 
 						<Button

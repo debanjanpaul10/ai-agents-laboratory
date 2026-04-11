@@ -6,6 +6,7 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.Models;
 /// <summary>
 /// The NotificationsModel class represents the structure of a notification document stored in the MongoDB database for the AIAgents Laboratory application.
 /// </summary>
+/// <seealso cref="BaseDataModel"/>
 [BsonIgnoreExtraElements]
 public sealed record NotificationsModel : BaseDataModel
 {
@@ -61,4 +62,12 @@ public sealed record NotificationsModel : BaseDataModel
     /// Gets or sets a value indicating whether this notification is global (visible to all users) or user-specific.
     /// </summary>
     public bool IsGlobal { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether this instance is read.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if this instance is read; otherwise, <c>false</c>.
+    /// </value>
+    public bool IsRead { get; set; }
 }

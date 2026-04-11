@@ -177,21 +177,30 @@ public sealed class OrchestratorService(
     /// <param name="workspaceDetails">The workspace details.</param>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
     /// <returns>The list of <see cref="AgentDataDomain"/></returns>
-    private async Task<IList<AgentDataDomain>> GetActiveAgentsDataAsync(AgentsWorkspaceDomain workspaceDetails, CancellationToken cancellationToken = default)
+    private async Task<IList<AgentDataDomain>> GetActiveAgentsDataAsync(
+        AgentsWorkspaceDomain workspaceDetails,
+        CancellationToken cancellationToken = default
+    )
     {
         IList<AgentDataDomain> agentsData = [];
-        await Parallel.ForEachAsync(workspaceDetails.ActiveAgentsListInWorkspace, cancellationToken, async (agent, ct) =>
-        {
-            var agentData = await agentsService.GetAgentDataByIdAsync(
-                agentId: agent.AgentGuid,
-                userEmail: string.Empty,
-                cancellationToken
-            ).ConfigureAwait(false);
-
-            if (agentData is not null)
-                lock (agentsData)
-                    agentsData.Add(agentData);
-        }).ConfigureAwait(false);
+        await Parallel.ForEachAsync(
+            workspaceDetails.ActiveAgentsListInWorkspace, cancellationToken,
+            async (agent, ct) =>
+            {
+                var agentData = await agentsService.GetAgentDataByIdAsync(
+                    agentId: agent.AgentGuid,
+                    userEmail: string.Empty,
+                    cancellationToken
+                ).ConfigureAwait(false);
+                if (agentData is not null)
+                {
+                    lock (agentsData)
+                    {
+                        agentsData.Add(agentData);
+                    }
+                }
+            }
+        ).ConfigureAwait(false);
 
         return agentsData;
     }

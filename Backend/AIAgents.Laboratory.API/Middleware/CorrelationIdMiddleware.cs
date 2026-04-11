@@ -8,7 +8,9 @@ namespace AIAgents.Laboratory.API.Middleware;
 /// </summary>
 /// <param name="next">The next RequestDelegate in the pipeline.</param>
 /// <param name="logger">The ILogger instance for logging.</param>
-public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger)
+public sealed class CorrelationIdMiddleware(
+    RequestDelegate next,
+    ILogger<CorrelationIdMiddleware> logger)
 {
     /// <summary>
     /// Invokes the middleware to process the HTTP context.
@@ -38,7 +40,7 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
                 [HeaderLoggingConstants.RequestMethod] = httpContext.Request.Method
             }))
             {
-                await next(httpContext);
+                await next(httpContext).ConfigureAwait(false);
             }
         }
         finally
