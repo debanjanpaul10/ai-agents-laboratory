@@ -158,7 +158,8 @@ public sealed class NotificationsService(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodStart,
-                nameof(GetNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName })
+                nameof(GetNotificationsForUserAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName })
             );
 
             response = await notificationsDataManager.GetNotificationsForUserAsync(
@@ -183,7 +184,8 @@ public sealed class NotificationsService(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
-                nameof(GetNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName, response })
+                nameof(GetNotificationsForUserAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName, response })
             );
         }
     }
@@ -209,7 +211,8 @@ public sealed class NotificationsService(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodStart,
-                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, notificationId })
+                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, notificationId })
             );
 
             response = await notificationsDataManager.MarkExistingNotificationAsReadAsync(
@@ -235,7 +238,8 @@ public sealed class NotificationsService(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
-                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, notificationId, response })
+                nameof(MarkExistingNotificationAsReadAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedInUser, notificationId, response })
             );
         }
     }
@@ -265,7 +269,8 @@ public sealed class NotificationsService(
                 nameof(StreamNotificationsForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, recipientUserName })
             );
 
-            var reader = notificationsStream.Subscribe(recipientUserName);
+            using var subscription = notificationsStream.Subscribe(recipientUserName);
+            var reader = subscription.Reader;
 
             using var heartbeat = new PeriodicTimer(TimeSpan.FromSeconds(HEART_BEAT_TIME_DELAY_IN_SECONDS));
             var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
@@ -281,10 +286,11 @@ public sealed class NotificationsService(
             ).ConfigureAwait(false);
             await response.Body.FlushAsync(cancellationToken: ct).ConfigureAwait(false);
 
+            Task<bool>? tick = null;
             while (!ct.IsCancellationRequested)
             {
                 var waitForData = reader.WaitToReadAsync(cancellationToken: ct).AsTask();
-                var tick = heartbeat.WaitForNextTickAsync(cancellationToken: ct).AsTask();
+                tick ??= heartbeat.WaitForNextTickAsync(cancellationToken: ct).AsTask();
 
                 var completed = await Task.WhenAny(
                     waitForData, tick
@@ -295,6 +301,7 @@ public sealed class NotificationsService(
 
                 if (completed == tick)
                 {
+                    tick = null;
                     // Heartbeat keeps proxies/load balancers from buffering/closing the stream.
                     await response.WriteAsync(
                         text: HeartbeatNotficationConstants.EventHeartbeatDataMessageConstant,
@@ -325,7 +332,7 @@ public sealed class NotificationsService(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
-                nameof(StreamNotificationsForUserAsync), DateTime.UtcNow, "Notification stream cancelled."
+                nameof(StreamNotificationsForUserAsync), DateTime.UtcNow, ExceptionConstants.NotificationsStreamCancelledExceptionMessage
             );
         }
         catch (Exception ex)

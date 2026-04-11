@@ -105,6 +105,11 @@ internal static class Constants
         /// The requested workspace not found exception message.
         /// </summary>
         internal const string WorkspaceNotFoundExceptionMessage = "The requested workspace with id '{0}' is not found!";
+
+        /// <summary>
+        /// The notifications stream cancelled exception message.
+        /// </summary>
+        internal const string NotificationsStreamCancelledExceptionMessage = "Notification stream was cancelled.";
     }
 
     /// <summary>
