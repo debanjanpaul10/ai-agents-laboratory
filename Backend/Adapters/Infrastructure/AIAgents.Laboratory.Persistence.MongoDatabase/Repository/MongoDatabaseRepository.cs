@@ -44,7 +44,8 @@ public sealed class MongoDatabaseRepository(
         {
             logger.LogAppInformation(
                 LoggingConstants.MethodStartedMessageConstant,
-                nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName })
+                nameof(GetDataFromCollectionAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName })
             );
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
@@ -76,7 +77,8 @@ public sealed class MongoDatabaseRepository(
         {
             logger.LogAppInformation(
                 LoggingConstants.MethodEndedMessageConstant,
-                nameof(GetDataFromCollectionAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName, response })
+                nameof(GetDataFromCollectionAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName, response })
             );
         }
     }
@@ -165,7 +167,7 @@ public sealed class MongoDatabaseRepository(
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TDocument>(collectionName) ?? throw new FileNotFoundException(ExceptionConstants.CollectionDoesNotExistsMessage);
-            var result = await collectionData.UpdateOneAsync(
+            var result = await collectionData.UpdateManyAsync(
                 filter,
                 update,
                 cancellationToken: cancellationToken

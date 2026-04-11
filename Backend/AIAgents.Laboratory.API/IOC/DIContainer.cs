@@ -7,6 +7,7 @@ using AIAgents.Laboratory.API.Helpers;
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Domain.IOC;
+using AIAgents.Laboratory.Domain.UseCases;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.IOC;
 using AIAgents.Laboratory.Messaging.Adapters.IOC;
 using AIAgents.Laboratory.Persistence.Caching.IOC;
@@ -33,7 +34,10 @@ public static class DIContainer
     /// <param name="builder">The builder.</param>
     /// <param name="credentials">The credentials.</param>
     /// <exception cref="InvalidOperationException">InvalidOperationException error.</exception>
-    internal static void ConfigureAzureAppConfiguration(this WebApplicationBuilder builder, DefaultAzureCredential credentials)
+    internal static void ConfigureAzureAppConfiguration(
+        this WebApplicationBuilder builder,
+        DefaultAzureCredential credentials
+    )
     {
         var configuration = builder.Configuration;
         var appConfigurationEndpoint = configuration[EnvironmentConfigurationConstants.AppConfigurationEndpointKeyConstant];
@@ -58,12 +62,16 @@ public static class DIContainer
     /// <param name="services">The services.</param>
     /// <param name="configuration">The configuration.</param>
     /// <param name="isDevelopmentMode">The development mode.</param>
-    internal static void ConfigureApplicationDependencies(this IServiceCollection services, IConfiguration configuration, bool isDevelopmentMode)
+    internal static void ConfigureApplicationDependencies(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        bool isDevelopmentMode
+    )
     {
         services.ConfigureAuthenticationServices(configuration);
 
-        // Register correlation context service for cross-layer correlation ID access
         services.AddScoped<ICorrelationContext, CorrelationContext>();
+        services.AddSingleton<INotificationsStream, NotificationsStream>();
 
         services.AddAPIAdapterDependencies().AddMessagingDependencies(configuration).AddMemoryCache().AddCacheDependencies();
         services.AddAgentsFrameworkDependencies(configuration).AddMongoDbAdapterDependencies(configuration)
@@ -93,7 +101,10 @@ public static class DIContainer
     /// </summary>
     /// <param name="services">The services.</param>
     /// <param name="configuration">The configuration.</param>
-    private static void ConfigureAuthenticationServices(this IServiceCollection services, IConfiguration configuration)
+    private static void ConfigureAuthenticationServices(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         services.AddAuthentication(options =>
         {

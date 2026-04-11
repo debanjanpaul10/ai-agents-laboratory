@@ -1,13 +1,15 @@
 import { useEffect } from "react";
-import { Bell, Check, Loader2, X } from "lucide-react";
-import { Tooltip } from "@heroui/react";
+import { Bell, Check, Loader2, Trash, X } from "lucide-react";
+import { Button, Tooltip } from "@heroui/react";
 
 import { useAppDispatch, useAppSelector } from "@store/index";
 import {
+	DeleteAllNotificationsForUserAsync,
 	MarkNotificationAsReadAsync,
 	ToggleNotificationsPanel,
 } from "@store/notifications/actions";
 import { NotificationsResponseDTO } from "@models/response/notifications-response-dto.model";
+import { NotificationsConstants } from "@helpers/constants";
 
 export default function NotificationsDrawerComponent() {
 	const dispatch = useAppDispatch();
@@ -33,6 +35,9 @@ export default function NotificationsDrawerComponent() {
 
 	const handleMarkAsRead = (id: string) =>
 		dispatch(MarkNotificationAsReadAsync(id));
+
+	const handleClearAllNotifications = () =>
+		dispatch(DeleteAllNotificationsForUserAsync());
 
 	const getNotificationTypeColor = (type: string) => {
 		switch (type?.toLowerCase()) {
@@ -65,7 +70,9 @@ export default function NotificationsDrawerComponent() {
 			return (
 				<div className="flex flex-col items-center justify-center h-full space-y-3 text-white/40">
 					<Loader2 className="w-8 h-8 animate-spin text-purple-400" />
-					<span className="text-sm">Loading notifications...</span>
+					<span className="text-sm">
+						{NotificationsConstants.MainLoader}
+					</span>
 				</div>
 			);
 		}
@@ -74,73 +81,83 @@ export default function NotificationsDrawerComponent() {
 			return (
 				<div className="flex flex-col items-center justify-center h-full space-y-3 text-white/30">
 					<Bell className="w-12 h-12 opacity-20" />
-					<p className="text-sm">No notifications</p>
+					<p className="text-sm">
+						{NotificationsConstants.NoNotifications}
+					</p>
 				</div>
 			);
 		}
 
-		return notifications.map((notification) => {
-			const isUnread = notification.isActive;
+		return [...notifications]
+			.sort(
+				(a, b) =>
+					new Date(b.dateCreated).getTime() -
+					new Date(a.dateCreated).getTime(),
+			)
+			.map((notification) => {
+				const isUnread = !notification.isRead;
 
-			return (
-				<div
-					key={notification.id}
-					className={`relative bg-gradient-to-br ${getNotificationTypeColor(notification.notificationType)} border rounded-xl p-4 transition-all duration-200 hover:bg-white/[0.07] ${isUnread ? "" : "opacity-75 grayscale-[30%]"}`}
-				>
-					{isUnread ? (
-						<Tooltip content="Mark as read" placement="top">
-							<button
-								onClick={() =>
-									handleMarkAsRead(notification.id)
-								}
-								aria-label="Mark as read"
-								className="absolute top-3 right-3 p-1.5 rounded-lg bg-white/5 hover:bg-green-500/20 border border-white/10 hover:border-green-500/30 transition-all duration-200 text-white/30 hover:text-green-400 group"
-							>
-								<Check className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-							</button>
-						</Tooltip>
-					) : (
-						<span className="absolute top-3 right-3 text-white/50 text-[10px] uppercase tracking-wider">
-							Read
-						</span>
-					)}
-
-					<div className="pr-12 space-y-1.5">
-						<div className="flex items-center space-x-2">
-							{isUnread && (
-								<span
-									className={`w-2 h-2 rounded-full flex-shrink-0 ${getNotificationTypeDot(notification.notificationType)}`}
-								/>
-							)}
-							<span
-								className={`font-semibold text-sm truncate ${isUnread ? "text-white" : "text-white/80"}`}
-							>
-								{notification.title}
-							</span>
-						</div>
-						<p
-							className={`text-xs leading-relaxed ${isUnread ? "text-white/60" : "text-white/70"}`}
-						>
-							{notification.message}
-						</p>
-						<div className="flex items-center justify-between pt-1">
-							<span
-								className={`text-[10px] uppercase tracking-wider ${isUnread ? "text-white/30" : "text-white/50"}`}
-							>
-								{notification.notificationType || "Info"}
-							</span>
-							{notification.createdBy && (
-								<span
-									className={`text-[10px] ${isUnread ? "text-white/25" : "text-white/45"}`}
+				return (
+					<div
+						key={notification.id}
+						className={`relative bg-gradient-to-br ${getNotificationTypeColor(notification.notificationType)} border rounded-xl p-4 transition-all duration-200 hover:bg-white/[0.07] ${isUnread ? "" : "opacity-75 grayscale-[30%]"}`}
+					>
+						{isUnread ? (
+							<Tooltip content="Mark as read" placement="top">
+								<button
+									onClick={() =>
+										handleMarkAsRead(notification.id)
+									}
+									aria-label="Mark as read"
+									className="absolute top-3 right-3 p-1.5 rounded-lg bg-white/5 hover:bg-green-500/20 border border-white/10 hover:border-green-500/30 transition-all duration-200 text-white/30 hover:text-green-400 group"
 								>
-									{notification.createdBy}
+									<Check className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+								</button>
+							</Tooltip>
+						) : (
+							<span className="absolute top-3 right-3 text-white/50 text-[10px] uppercase tracking-wider">
+								{NotificationsConstants.ReadTooltip}
+							</span>
+						)}
+
+						<div className="pr-12 space-y-1.5">
+							<div className="flex items-center space-x-2">
+								{isUnread && (
+									<span
+										className={`w-2 h-2 rounded-full flex-shrink-0 ${getNotificationTypeDot(notification.notificationType)}`}
+									/>
+								)}
+								<span
+									className={`font-semibold text-sm truncate ${isUnread ? "text-white" : "text-white/80"}`}
+									title={notification.title}
+								>
+									{notification.title}
 								</span>
-							)}
+							</div>
+							<p
+								className={`text-xs leading-relaxed ${isUnread ? "text-white/60" : "text-white/70"}`}
+								title={notification.message}
+							>
+								{notification.message}
+							</p>
+							<div className="flex items-center justify-between pt-1">
+								<span
+									className={`text-[10px] uppercase tracking-wider ${isUnread ? "text-white/30" : "text-white/50"}`}
+								>
+									{notification.notificationType || "Info"}
+								</span>
+								{notification.createdBy && (
+									<span
+										className={`text-[10px] ${isUnread ? "text-white/25" : "text-white/45"}`}
+									>
+										{notification.createdBy}
+									</span>
+								)}
+							</div>
 						</div>
 					</div>
-				</div>
-			);
-		});
+				);
+			});
 	};
 
 	if (!isOpen) return null;
@@ -166,24 +183,38 @@ export default function NotificationsDrawerComponent() {
 							</div>
 							<div>
 								<h2 className="text-xl font-bold bg-gradient-to-r from-white via-indigo-100 to-purple-100 bg-clip-text text-transparent">
-									Notifications
+									{NotificationsConstants.Header}
 								</h2>
 								<p className="text-white/40 text-xs">
 									{
-										notifications.filter((n) => n.isActive)
+										notifications.filter((n) => !n.isRead)
 											.length
 									}{" "}
 									unread
 								</p>
 							</div>
 						</div>
-						<button
-							onClick={handleClose}
-							aria-label="Close notifications"
-							className="p-2.5 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 transition-all duration-300 text-white/50 hover:text-red-400 group"
-						>
-							<X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-						</button>
+						<div className="flex items-center space-x-3">
+							<Button
+								onPress={handleClearAllNotifications}
+								aria-label="Clear Notifications"
+								tabIndex={0}
+								className="p-2.5 rounded-xl bg-red-400 border border-red-400  transition-all duration-300 text-white group"
+								title="Clear Notifications"
+							>
+								<Trash className="w-5 h-5" />
+							</Button>
+
+							<Button
+								onPress={handleClose}
+								aria-label="Close Notifications"
+								tabIndex={0}
+								className="p-2.5 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/20 transition-all duration-300 text-white/50 hover:text-red-400 group"
+								title="Close Notifications"
+							>
+								<X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+							</Button>
+						</div>
 					</div>
 
 					{/* Content */}

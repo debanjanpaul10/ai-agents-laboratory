@@ -4,6 +4,7 @@ using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Ports.In;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
@@ -36,6 +37,26 @@ public sealed class NotificationsHandler(
     }
 
     /// <summary>
+    /// Deletes all notifications for user asynchronous.
+    /// </summary>
+    /// <param name="currentLoggedInUser">The current logged in user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>
+    /// A boolean value indicating whether the operation was successful (true) or not (false).
+    /// </returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<bool> DeleteAllNotificationsForUserAsync(
+        string currentLoggedInUser,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await notificationsService.DeleteAllNotificationsForUserAsync(
+            currentLoggedInUser,
+            cancellationToken
+        ).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Retrieves a list of notifications for a specific user based on their username. 
     /// This method allows clients to fetch all notifications that are relevant to a particular user
     /// </summary>
@@ -48,8 +69,8 @@ public sealed class NotificationsHandler(
     )
     {
         var domainResponse = await notificationsService.GetNotificationsForUserAsync(
-            recipientUserName: recipientUserName,
-            cancellationToken: cancellationToken
+            recipientUserName,
+            cancellationToken
         ).ConfigureAwait(false);
         return mapper.Map<IEnumerable<NotificationsResponseDto>>(domainResponse);
     }
@@ -60,20 +81,43 @@ public sealed class NotificationsHandler(
     /// <remarks>
     /// Marking a notification as read typically involves updating the status of the notification in the data store to indicate that it has been acknowledged or viewed by the recipient user.
     /// </remarks>
-    /// <param name="recipientUserName">The username of the user for whom to mark the notification as read.</param>
+    /// <param name="currentLoggedInUser">The username of the user for whom to mark the notification as read.</param>
     /// <param name="notificationId">The identifier of the notification to be marked as read.</param>
     /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
     /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
     public async Task<bool> MarkExistingNotificationAsReadAsync(
-        string recipientUserName,
+        string currentLoggedInUser,
         Guid notificationId,
         CancellationToken cancellationToken = default
     )
     {
         return await notificationsService.MarkExistingNotificationAsReadAsync(
-            recipientUserName: recipientUserName,
-            notificationId: notificationId,
-            cancellationToken: cancellationToken
+            currentLoggedInUser,
+            notificationId,
+            cancellationToken
+        ).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Streams notifications for a specific user in real-time using Server-Sent Events (SSE).
+    /// </summary>
+    /// <param name="recipientUserName">The username of the user for whom to stream notifications.</param>
+    /// <param name="response">The HttpResponse object used to send the streamed notifications to the client.</param>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
+    /// <param name="requestAborted">The cancellation token to handle request abortion.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public async Task StreamNotificationsForUserAsync(
+        string recipientUserName,
+        HttpResponse response,
+        CancellationToken cancellationToken = default,
+        CancellationToken requestAborted = default
+    )
+    {
+        await notificationsService.StreamNotificationsForUserAsync(
+            recipientUserName,
+            response,
+            cancellationToken,
+            requestAborted
         ).ConfigureAwait(false);
     }
 }

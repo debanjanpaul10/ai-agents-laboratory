@@ -161,6 +161,17 @@ internal static class SwaggerConstants
             internal const string Description = "Creates a new feature request documentation by user/member to be reviewed by devs and implemented.";
             internal const string OperationId = nameof(SubmitFeatureRequestDataAction);
         }
+
+        /// <summary>
+        /// Swagger documentation for GetTopActiveAgentsDataAsync.
+        /// </summary>
+        internal static class GetTopActiveAgentsDataAction
+        {
+            internal const string Summary = "Gets the top active agents.";
+            internal const string Description = "Gets the list of top active agents being used by users in the current application.";
+            internal const string OperationId = nameof(GetTopActiveAgentsDataAction);
+        }
+
     }
 
     /// <summary>
@@ -430,6 +441,26 @@ internal static class SwaggerConstants
             internal const string Summary = "Marks an existing notification as read.";
             internal const string Description = "Marks an existing notification as read in the system based on the notification guid id passed.";
             internal const string OperationId = nameof(MarkExistingNotificationAsReadAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for StreamNotificationsForUserAsync.
+        /// </summary>
+        internal static class StreamNotificationsForUserAction
+        {
+            internal const string Summary = "Streams the notifications for user.";
+            internal const string Description = "Streams the notifications for user based on the user id passed.";
+            internal const string OperationId = nameof(StreamNotificationsForUserAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for DeleteAllNotificationsForUserAsync.
+        /// </summary>
+        internal static class DeleteAllNotificationsForUserAction
+        {
+            internal const string Summary = "Deletes all notifications for a user.";
+            internal const string Description = "Deletes all the read and unread notifications for a user based on the user email.";
+            internal const string OperationId = nameof(DeleteAllNotificationsForUserAction);
         }
     }
 }

@@ -14,7 +14,10 @@ public interface IMcpClientServices
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see
     /// cref="McpClientTool"/> objects representing the available client tools. The collection will be empty if no tools are found.</returns>
-    Task<IEnumerable<McpClientTool>> GetAllMcpToolsAsync(string mcpServerUrl, CancellationToken cancellationToken = default);
+    Task<IEnumerable<McpClientTool>> GetAllMcpToolsAsync(
+        string mcpServerUrl,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets the MCP tool response asynchronous.
@@ -24,5 +27,10 @@ public interface IMcpClientServices
     /// <param name="toolArguments">The tool arguments.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The MCP Tool Response.</returns>
-    Task<string> GetMcpToolResponseAsync(string mcpServerUrl, string toolName, Dictionary<string, object?> toolArguments, CancellationToken cancellationToken = default);
+    Task<string> GetMcpToolResponseAsync(
+        string mcpServerUrl,
+        string toolName,
+        Dictionary<string, object?> toolArguments,
+        CancellationToken cancellationToken = default
+    );
 }
