@@ -161,6 +161,17 @@ internal static class SwaggerConstants
             internal const string Description = "Creates a new feature request documentation by user/member to be reviewed by devs and implemented.";
             internal const string OperationId = nameof(SubmitFeatureRequestDataAction);
         }
+
+        /// <summary>
+        /// Swagger documentation for GetTopActiveAgentsDataAsync.
+        /// </summary>
+        internal static class GetTopActiveAgentsDataAction
+        {
+            internal const string Summary = "Gets the top active agents.";
+            internal const string Description = "Gets the list of top active agents being used by users in the current application.";
+            internal const string OperationId = nameof(GetTopActiveAgentsDataAction);
+        }
+
     }
 
     /// <summary>

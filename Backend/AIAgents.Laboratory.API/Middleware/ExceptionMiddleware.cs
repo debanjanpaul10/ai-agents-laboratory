@@ -20,19 +20,37 @@ public sealed class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, Req
     {
         try
         {
-            await next(httpContext);
+            await next(httpContext).ConfigureAwait(false);
         }
         catch (UnauthorizedAccessException ex)
         {
-            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status401Unauthorized, ex.Message.ToString(), ex.Message);
+            await this.HandleExceptionAsync(
+                httpContext,
+                ex,
+                StatusCodes.Status401Unauthorized,
+                ex.Message.ToString(),
+                ex.Message
+            ).ConfigureAwait(false);
         }
         catch (BadHttpRequestException ex)
         {
-            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status400BadRequest, ex.Message.ToString(), ex.Message);
+            await this.HandleExceptionAsync(
+                httpContext,
+                ex,
+                StatusCodes.Status400BadRequest,
+                ex.Message.ToString(),
+                ex.Message
+            ).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            await this.HandleExceptionAsync(httpContext, ex, StatusCodes.Status500InternalServerError, ex.Message.ToString(), ex.Message);
+            await this.HandleExceptionAsync(
+                httpContext,
+                ex,
+                StatusCodes.Status500InternalServerError,
+                ex.Message.ToString(),
+                ex.Message
+            ).ConfigureAwait(false);
         }
     }
 
@@ -67,7 +85,7 @@ public sealed class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, Req
         httpContext.Response.ContentType = EnvironmentConfigurationConstants.ApplicationJsonConstant;
         httpContext.Response.StatusCode = statusCode;
         var errorResponse = new AIAgentsBusinessException(message, statusCode, error, correlationId);
-        await httpContext.Response.WriteAsJsonAsync(errorResponse);
+        await httpContext.Response.WriteAsJsonAsync(errorResponse).ConfigureAwait(false);
     }
 }
 
