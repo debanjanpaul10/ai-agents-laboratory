@@ -1,0 +1,31 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Adapters/" />
+  <Folder Name="/Adapters/Infrastructure/">
+    <Project Path="Adapters/Infrastructure/AIAgents.Laboratory.Infrastructure.AgentsFramework/AIAgents.Laboratory.Infrastructure.AgentsFramework.csproj" />
+    <Project Path="Adapters/Infrastructure/AIAgents.Laboratory.Persistence.MongoDatabase/AIAgents.Laboratory.Persistence.MongoDatabase.csproj" />
+    <Project Path="Adapters/Infrastructure/AIAgents.Laboratory.Persistence.SQLDatabase/AIAgents.Laboratory.Persistence.SQLDatabase.csproj" />
+    <Project Path="Adapters/Infrastructure/AIAgents.Laboratory.Storage.Blobs/AIAgents.Laboratory.Storage.Blobs.csproj" />
+  </Folder>
+  <Folder Name="/Adapters/Services/">
+    <Project Path="Adapters/Services/AIAgents.Laboratory.API.Adapters/AIAgents.Laboratory.API.Adapters.csproj" />
+    <Project Path="Adapters/Services/AIAgents.Laboratory.Messaging.Adapters/AIAgents.Laboratory.Messaging.Adapters.csproj" />
+    <Project Path="Adapters/Services/AIAgents.Laboratory.Persistence.Caching/AIAgents.Laboratory.Persistence.Caching.csproj" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="Core/AIAgents.Laboratory.Domain/AIAgents.Laboratory.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="../.github/workflows/deploy-azure.yml" />
+    <File Path="../.gitignore" />
+    <File Path="../README.md" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/AIAgents.Laboratory.Domain.UnitTests/AIAgents.Laboratory.Domain.UnitTests.csproj" />
+  </Folder>
+  <Project Path="AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj" />
+</Solution>
