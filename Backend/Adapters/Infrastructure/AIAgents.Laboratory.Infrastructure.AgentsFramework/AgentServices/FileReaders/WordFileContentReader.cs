@@ -16,7 +16,9 @@ namespace AIAgents.Laboratory.Infrastructure.AgentsFramework.AgentServices.FileR
 /// <param name="logger">The logger service.</param>
 /// <param name="correlationContext">The correlation context for logging and exception handling.</param>
 /// <seealso cref="IFileContentReader"/>
-internal sealed class WordFileContentReader(ILogger<WordFileContentReader> logger, ICorrelationContext correlationContext) : IFileContentReader
+internal sealed class WordFileContentReader(
+    ILogger<WordFileContentReader> logger,
+    ICorrelationContext correlationContext) : IFileContentReader
 {
     /// <summary>
     /// The file extensions supported by this reader. In this case, it supports Word documents with the extensions ".doc" and ".docx".
@@ -36,7 +38,10 @@ internal sealed class WordFileContentReader(ILogger<WordFileContentReader> logge
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(Read), DateTime.UtcNow, knowledgeBaseDocument.FileName);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(Read), DateTime.UtcNow, knowledgeBaseDocument.FileName
+            );
 
             if (knowledgeBaseDocument.FileContent is null || knowledgeBaseDocument.FileContent.Length == 0)
                 return string.Empty;
@@ -56,12 +61,22 @@ internal sealed class WordFileContentReader(ILogger<WordFileContentReader> logge
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(Read), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(Read), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(Read), DateTime.UtcNow, knowledgeBaseDocument.FileName);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(Read), DateTime.UtcNow, knowledgeBaseDocument.FileName
+            );
         }
     }
 }

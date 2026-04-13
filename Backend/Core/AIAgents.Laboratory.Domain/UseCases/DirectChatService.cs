@@ -35,7 +35,11 @@ public sealed class DirectChatService(
     /// <param name="userEmail">The user email address.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The AI response.</returns>
-    public async Task<string> GetDirectChatResponseAsync(string userQuery, string userEmail, CancellationToken cancellationToken = default)
+    public async Task<string> GetDirectChatResponseAsync(
+        string userQuery,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userQuery);
         ArgumentException.ThrowIfNullOrWhiteSpace(userEmail);
@@ -43,17 +47,22 @@ public sealed class DirectChatService(
         string aiResponse = string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, userQuery }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetDirectChatResponseAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, userQuery })
+            );
 
             var chatbotAgentGuid = configuration[AzureAppConfigurationConstants.AIChatbotAgentId] ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
             var agentDataTask = agentsService.GetAgentDataByIdAsync(
                 agentId: chatbotAgentGuid,
                 userEmail,
-                cancellationToken);
+                cancellationToken
+            );
             var conversationHistoryTask = conversationHistoryService.GetConversationHistoryAsync(
                 userName: userEmail,
-                cancellationToken);
+                cancellationToken
+            );
             await Task.WhenAll(agentDataTask, conversationHistoryTask)
                 .WaitAsync(cancellationToken).ConfigureAwait(false);
 
@@ -83,13 +92,23 @@ public sealed class DirectChatService(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, aiResponse }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetDirectChatResponseAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, aiResponse })
+            );
         }
     }
 
@@ -99,26 +118,45 @@ public sealed class DirectChatService(
     /// <param name="userName">The user name for user.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> ClearConversationHistoryForUserAsync(string userName, CancellationToken cancellationToken = default)
+    public async Task<bool> ClearConversationHistoryForUserAsync(
+        string userName,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName);
+
+        bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName })
+            );
 
-            return await conversationHistoryService.ClearConversationHistoryForUserAsync(
+            response = await conversationHistoryService.ClearConversationHistoryForUserAsync(
                 userName,
                 cancellationToken
             ).ConfigureAwait(false);
+            return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName, response })
+            );
         }
     }
 
@@ -128,13 +166,20 @@ public sealed class DirectChatService(
     /// <param name="userName">The current user name.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The conversation history data domain model.</returns>
-    public async Task<ConversationHistoryDomain> GetConversationHistoryDataAsync(string userName, CancellationToken cancellationToken = default)
+    public async Task<ConversationHistoryDomain> GetConversationHistoryDataAsync(
+        string userName,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName);
+
         ConversationHistoryDomain? result = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName })
+            );
 
             result = await conversationHistoryService.GetConversationHistoryAsync(
                 userName,
@@ -144,12 +189,22 @@ public sealed class DirectChatService(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetConversationHistoryDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName, result })
+            );
         }
     }
 }

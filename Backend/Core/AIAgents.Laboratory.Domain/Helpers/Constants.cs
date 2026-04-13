@@ -3,7 +3,7 @@
 /// <summary>
 /// The Constants Class.
 /// </summary>
-internal static class Constants
+public static class Constants
 {
     /// <summary>
     /// Logging constants.
@@ -115,7 +115,7 @@ internal static class Constants
     /// <summary>
     /// The Azure App Configuration Constants Class.
     /// </summary>
-    internal static class AzureAppConfigurationConstants
+    public static class AzureAppConfigurationConstants
     {
         /// <summary>
         /// The gemini pro model
@@ -180,12 +180,12 @@ internal static class Constants
         /// <summary>
         /// The allowed kb file formats constant.
         /// </summary>
-        internal const string AllowedKbFileFormatsConstant = "AllowedKbFileFormats";
+        public const string AllowedKbFileFormatsConstant = "AllowedKbFileFormats";
 
         /// <summary>
         /// The allowed vision images file formats constant.
         /// </summary>
-        internal const string AllowedVisionImageFileFormatsConstant = "AllowedVisionImageFileFormats";
+        public const string AllowedVisionImageFileFormatsConstant = "AllowedVisionImageFileFormats";
 
         /// <summary>
         /// The admin user email address constant.
