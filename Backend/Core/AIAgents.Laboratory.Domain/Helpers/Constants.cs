@@ -140,12 +140,12 @@ public static class Constants
         /// <summary>
         /// The is knowledge base service enabled constant
         /// </summary>
-        internal const string IsKnowledgeBaseServiceEnabledConstant = "IsKnowledgeBaseServiceEnabled";
+        public const string IsKnowledgeBaseServiceEnabledConstant = "IsKnowledgeBaseServiceEnabled";
 
         /// <summary>
         /// The boolean flag for AI vision service constant.
         /// </summary>
-        internal const string IsAiVisionServiceEnabledConstant = "IsAiVisionServiceEnabled";
+        public const string IsAiVisionServiceEnabledConstant = "IsAiVisionServiceEnabled";
 
         /// <summary>
         /// The current ai service provider

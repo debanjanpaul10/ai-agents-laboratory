@@ -23,18 +23,26 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="aiServices">The AI services used to generate responses based on chat context and agent configuration.</param>
 /// <param name="toolSkillsService">The tool skills service used to manage and invoke external tools or skills associated with agents.</param>
 /// <seealso cref="IAgentChatService"/>
-public sealed class AgentChatService(IConfiguration configuration, ILogger<AgentChatService> logger, ICorrelationContext correlationContext,
-    IAgentsService agentsService, IKnowledgeBaseProcessor knowledgeBaseProcessor, IAiServices aiServices, IToolSkillsService toolSkillsService) : IAgentChatService
+public sealed class AgentChatService(
+    IConfiguration configuration,
+    ILogger<AgentChatService> logger,
+    ICorrelationContext correlationContext,
+    IAgentsService agentsService,
+    IKnowledgeBaseProcessor knowledgeBaseProcessor,
+    IAiServices aiServices,
+    IToolSkillsService toolSkillsService) : IAgentChatService
 {
     /// <summary>
     /// The feature flag for knowledge base service.
     /// </summary>
-    private readonly bool IsKnowledgeBaseServiceAllowed = bool.TryParse(configuration[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant], out var kbAllowed) && kbAllowed;
+    private readonly string IsKnowledgeBaseServiceAllowed = configuration[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The feature flag for AI vision service.
     /// </summary>
-    private readonly bool IsAiVisionServiceAllowed = bool.TryParse(configuration[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant], out var aivisionAllowed) && aivisionAllowed;
+    private readonly string IsAiVisionServiceAllowed = configuration[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// Gets the agent chat response asynchronous.
@@ -42,23 +50,32 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
     /// <param name="chatRequest">The chat request.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The AI response.</returns>
-    public async Task<string> GetAgentChatResponseAsync(ChatRequestDomain chatRequest, CancellationToken cancellationToken = default)
+    public async Task<string> GetAgentChatResponseAsync(
+        ChatRequestDomain chatRequest,
+        CancellationToken cancellationToken = default
+    )
     {
         string response = string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetAgentChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest })
+            );
 
             var agentData = await agentsService.GetAgentDataByIdAsync(
                 agentId: chatRequest.AgentId,
                 userEmail: string.Empty,
                 cancellationToken
             ).ConfigureAwait(false);
-
             if (agentData is null || string.IsNullOrEmpty(agentData.AgentMetaPrompt))
             {
                 var ex = new FileNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
-                logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message);
+                logger.LogAppError(
+                    ex,
+                    LoggingConstants.LogHelperMethodFailed,
+                    nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message
+                );
                 throw ex;
             }
 
@@ -70,14 +87,17 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
             };
 
             // Get data from Knowledge Base if configured
-            if (IsKnowledgeBaseServiceAllowed && agentData.HasKnowledgeBaseContent())
+            var isKnowledgeBaseServiceAllowedFlag = bool.TryParse(IsKnowledgeBaseServiceAllowed, out var isKbAllowed) && isKbAllowed;
+            if (isKnowledgeBaseServiceAllowedFlag && agentData.HasKnowledgeBaseContent())
                 chatMessage.KnowledgeBase = await knowledgeBaseProcessor.GetRelevantKnowledgeAsync(
                     query: chatRequest.UserMessage,
-                    agentId: agentData.AgentId
+                    agentId: agentData.AgentId,
+                    cancellationToken
                 ).ConfigureAwait(false);
 
             // Use AI Vision services if configured
-            if (IsAiVisionServiceAllowed && agentData.AiVisionImagesData is not null && agentData.AiVisionImagesData.Any())
+            bool isAiVisionServiceAllowedFlag = bool.TryParse(IsAiVisionServiceAllowed, out var isVisionAllowed) && isVisionAllowed;
+            if (isAiVisionServiceAllowedFlag && agentData.AiVisionImagesData is not null && agentData.AiVisionImagesData.Any())
                 chatMessage.ImageKeyWords = agentData.AiVisionImagesData;
 
             // Handle integrated skills if configured
@@ -99,12 +119,22 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetAgentChatResponseAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetAgentChatResponseAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response })
+            );
         }
     }
 
@@ -115,12 +145,19 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
     /// <param name="associatedSkillGuids">The associated skill guids list</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The AI agent response string.</returns>
-    private async Task<string> GetResponseWithIntegratedSkillAsync(ChatMessageDomain chatMessage, IList<string> associatedSkillGuids, CancellationToken cancellationToken = default)
+    private async Task<string> GetResponseWithIntegratedSkillAsync(
+        ChatMessageDomain chatMessage,
+        IList<string> associatedSkillGuids,
+        CancellationToken cancellationToken = default
+    )
     {
         string response = string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatMessage }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatMessage })
+            );
 
             var associatedSkill = await toolSkillsService.GetToolSkillBySkillIdAsync(
                 toolSkillId: associatedSkillGuids[0],
@@ -139,16 +176,25 @@ public sealed class AgentChatService(IConfiguration configuration, ILogger<Agent
                 cancellationToken
             ).ConfigureAwait(false);
             return response;
-
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetResponseWithIntegratedSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, response })
+            );
         }
     }
 }
