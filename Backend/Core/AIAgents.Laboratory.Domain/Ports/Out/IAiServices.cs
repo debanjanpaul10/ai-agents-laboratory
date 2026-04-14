@@ -33,7 +33,13 @@ public interface IAiServices
     /// <param name="functionName">Name of the function.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The AI response.</returns>
-    Task<string> GetAiFunctionResponseAsync<TInput>(TInput input, string mcpServerUrl, string pluginName, string functionName, CancellationToken cancellationToken = default);
+    Task<string> GetAiFunctionResponseAsync<TInput>(
+        TInput input,
+        string mcpServerUrl,
+        string pluginName,
+        string functionName,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets the chatbot response.
@@ -43,5 +49,10 @@ public interface IAiServices
     /// <param name="agentMetaPrompt">The agent meta prompt value.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The AI chatbot response.</returns>
-    Task<string> GetChatbotResponseAsync(ConversationHistoryDomain conversationDataDomain, string userMessage, string agentMetaPrompt, CancellationToken cancellationToken = default);
+    Task<string> GetChatbotResponseAsync(
+        ConversationHistoryDomain conversationDataDomain,
+        string userMessage,
+        string agentMetaPrompt,
+        CancellationToken cancellationToken = default
+    );
 }

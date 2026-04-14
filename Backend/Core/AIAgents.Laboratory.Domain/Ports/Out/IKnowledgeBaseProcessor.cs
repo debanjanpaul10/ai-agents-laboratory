@@ -16,7 +16,11 @@ public interface IKnowledgeBaseProcessor
     /// <param name="agentId">The unique identifier of the agent whose knowledge base will be updated. Cannot be null or empty.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task ProcessKnowledgeBaseDocumentAsync(string content, string agentId, CancellationToken cancellationToken = default);
+    Task ProcessKnowledgeBaseDocumentAsync(
+        string content,
+        string agentId,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Asynchronously retrieves relevant knowledge entries for a given query and agent identifier.
@@ -27,7 +31,11 @@ public interface IKnowledgeBaseProcessor
     /// <param name="agentId">The unique identifier of the agent whose knowledge base is searched. Cannot be null or empty.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A string containing the most relevant knowledge entries separated by double newlines, or an empty string if no relevant entries are found.</returns>
-    Task<string> GetRelevantKnowledgeAsync(string query, string agentId, CancellationToken cancellationToken = default);
+    Task<string> GetRelevantKnowledgeAsync(
+        string query,
+        string agentId,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Detects the file type of the specified knowledge base document and reads its content accordingly.

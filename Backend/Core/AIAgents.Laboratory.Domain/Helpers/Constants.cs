@@ -227,7 +227,8 @@ public static class Constants
         /// <summary>
         /// The file name for email template.
         /// </summary>
-        internal const string FileName = "Templates/FeedbackEmail.html";
+        internal static readonly string FileName = Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory, "Templates", "FeedbackEmail.html");
     }
 
     /// <summary>

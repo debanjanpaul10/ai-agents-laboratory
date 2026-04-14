@@ -54,4 +54,14 @@ public static class ExceptionConstants
     /// The requested data not found exception message constant.
     /// </summary>
     public const string DataCannotBeFoundExceptionMessage = "Oops! The requested data not exist!";
+
+    /// <summary>
+    /// The null payload exception message.
+    /// </summary>
+    public const string NullPayloadExceptionMessage = "Message {MessageId} has null payload - moving to dead-letter queue";
+
+    /// <summary>
+    /// The configuration missing exception message constant.
+    /// </summary>
+    public const string ConfigurationMissingExceptionMessage = "The requested configuration was not found!";
 }

@@ -62,6 +62,10 @@ public static class DIContainer
         if (string.IsNullOrEmpty(openaiModelId) || string.IsNullOrEmpty(openAiApiKey) || string.IsNullOrEmpty(openAiApiEndpoint))
             throw new InvalidOperationException(ExceptionConstants.AiAPIKeyMissingMessage);
 
-        services.AddAzureOpenAIEmbeddingGenerator(openaiModelId, openAiApiEndpoint, openAiApiKey);
+        services.AddAzureOpenAIEmbeddingGenerator(
+            deploymentName: openaiModelId,
+            endpoint: openAiApiEndpoint,
+            apiKey: openAiApiKey
+        );
     }
 }

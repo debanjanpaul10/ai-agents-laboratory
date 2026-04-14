@@ -126,6 +126,16 @@ internal static class Constants
         /// The unsupported file type message.
         /// </summary>
         internal const string UnsupportedFileTypeMessage = "The uploaded file type is not supported for knowledge base processing.";
+
+        /// <summary>
+        /// The failed to deserialize MCP tool list message.
+        /// </summary>
+        internal const string FailedToDeserializeMcpToolListMessage = "Failed to deserialize the MCP tools list for plugin: '{Plugin}', function: '{FunctionName}' and Server: '{McpServerUrl}'.";
+
+        /// <summary>
+        /// The invalid json format message.
+        /// </summary>
+        internal const string InvalidJsonFormatMessage = "Invalid JSON structure for plugin: '{Plugin}', function: '{FunctionName}' and Server: '{McpServerUrl}'";
     }
 
     /// <summary>

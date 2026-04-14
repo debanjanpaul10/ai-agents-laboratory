@@ -308,6 +308,7 @@ public sealed class FeedbackService(
         var bodyTemplate = isBugReport ? NotificationMessagesConstants.BugReportSubmittedMessageTemplate : NotificationMessagesConstants.FeatureRequestSubmittedMessageTemplate;
         var notificationsDomainModel = new NotificationsDomain
         {
+            Id = Guid.NewGuid(),
             RecipientUserName = userToBeNotified,
             Title = string.Format(titleTemplate, feedbackId),
             Message = string.Format(bodyTemplate, feedbackId, feedbackTitle),

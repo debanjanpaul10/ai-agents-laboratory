@@ -49,4 +49,14 @@ public static class AzureAppConfigurationConstants
     /// The azure service bus connection string constant.
     /// </summary>
     public const string AzureServiceBusConnectionString = "AzureServiceBusConnectionString";
+
+    /// <summary>
+    /// The email notification service connection string.
+    /// </summary>
+    public const string EmailNotificationServiceConnectionString = "EmailNotification:ConnectionString";
+
+    /// <summary>
+    /// The email notification service sender address.
+    /// </summary>
+    public const string EmailNotificationServiceSenderAddress = "EmailNotification:SenderAddress";
 }

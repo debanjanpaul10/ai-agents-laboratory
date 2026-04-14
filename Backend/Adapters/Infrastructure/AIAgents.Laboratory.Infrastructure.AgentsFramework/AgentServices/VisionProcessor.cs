@@ -18,7 +18,10 @@ namespace AIAgents.Laboratory.Infrastructure.AgentsFramework.AgentServices;
 /// <param name="logger">The logger instance used to record diagnostic and operational information for the vision processing operations.</param>
 /// <param name="correlationContext">The correlation context used to track and correlate logs and exceptions across different components of the application.</param>
 /// <seealso cref="IVisionProcessor"/>
-public sealed class VisionProcessor(IConfiguration configuration, ILogger<VisionProcessor> logger, ICorrelationContext correlationContext) : IVisionProcessor
+public sealed class VisionProcessor(
+    IConfiguration configuration,
+    ILogger<VisionProcessor> logger,
+    ICorrelationContext correlationContext) : IVisionProcessor
 {
     /// <summary>
     /// Asynchronously extracts text data from an image located at the specified URL using a computer vision service.
@@ -28,11 +31,17 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
     /// <param name="imageUrl">The URL of the image to analyze. Must be a valid, accessible image URL.</param>
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation. Optional.</param>
     /// <returns>A collection of strings containing the lines of text recognized in the image. The collection is empty if no text is found.</returns>
-    public async Task<IEnumerable<string>> ReadDataFromImageWithComputerVisionAsync(string imageUrl, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<string>> ReadDataFromImageWithComputerVisionAsync(
+        string imageUrl,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl
+            );
 
             IList<string> imageTextData = [];
 
@@ -71,12 +80,22 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl
+            );
         }
     }
 
@@ -92,8 +111,7 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
         var aiVisionKey = configuration[AzureAppConfigurationConstants.AzureAiVisionKey];
         var aiVisionEndpoint = configuration[AzureAppConfigurationConstants.AzureAiVisionEndpoint];
 
-        var aiVisionClient = new ComputerVisionClient(new ApiKeyServiceClientCredentials(aiVisionKey)) { Endpoint = aiVisionEndpoint };
-        return aiVisionClient;
+        return new ComputerVisionClient(credentials: new ApiKeyServiceClientCredentials(subscriptionKey: aiVisionKey)) { Endpoint = aiVisionEndpoint };
     }
 
     #endregion

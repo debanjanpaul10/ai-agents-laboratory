@@ -11,10 +11,11 @@ public interface IServiceBusManager
     /// </summary>
     /// <typeparam name="T">The payload type.</typeparam>
     /// <param name="payload">The payload to serialize and send.</param>
-    /// <param name="queueName">Optional queue override; if null/empty default queue is used.</param>
+    /// <param name="queueName">The queue name where message is to be published.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     Task SendQueueMessageAsync<T>(
         T payload,
-        string? queueName = null,
-        CancellationToken cancellationToken = default);
+        string queueName,
+        CancellationToken cancellationToken = default
+    );
 }

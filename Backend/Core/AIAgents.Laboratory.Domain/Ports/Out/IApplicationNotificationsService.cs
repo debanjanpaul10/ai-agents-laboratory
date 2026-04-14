@@ -15,5 +15,6 @@ public interface IApplicationNotificationsService
     /// <returns>The boolean for success/failure.</returns>
     Task<bool> SendNotificationAsync(
         NotificationsDomain notificationRequest,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }
