@@ -16,7 +16,12 @@ public interface IAiServices
     /// <param name="functionName">Name of the function.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The AI response.</returns>
-    Task<string> GetAiFunctionResponseAsync<TInput>(TInput input, string pluginName, string functionName, CancellationToken cancellationToken = default);
+    Task<string> GetAiFunctionResponseAsync<TInput>(
+        TInput input,
+        string pluginName,
+        string functionName,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets the ai function response with MCP integration asynchronous.

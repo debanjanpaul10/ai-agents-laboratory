@@ -64,10 +64,10 @@ public sealed class AgentChatServiceTests
     {
         _mockConfiguration
             .Setup(c => c[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant])
-            .Returns("true");
+            .Returns(Convert.ToString(false));
         _mockConfiguration
             .Setup(c => c[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant])
-            .Returns("true");
+            .Returns(Convert.ToString(false));
         _mockCorrelationContext
             .Setup(c => c.CorrelationId)
             .Returns(Guid.NewGuid().ToString());
@@ -83,7 +83,6 @@ public sealed class AgentChatServiceTests
         );
     }
 
-
     /// <summary>
     /// Constructor missing knowledge base configuration key throws key not found exception.
     /// </summary>
@@ -92,8 +91,12 @@ public sealed class AgentChatServiceTests
     {
         // Arrange
         var config = new Mock<IConfiguration>();
-        config.Setup(c => c[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant]).Returns((string)null!);
-        config.Setup(c => c[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant]).Returns("false");
+        config
+            .Setup(c => c[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant])
+            .Returns((string)null!);
+        config
+            .Setup(c => c[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant])
+            .Returns(Convert.ToString(false));
 
         // Act & Assert
         Assert.Throws<KeyNotFoundException>(() => new AgentChatService(
@@ -110,8 +113,12 @@ public sealed class AgentChatServiceTests
     {
         // Arrange
         var config = new Mock<IConfiguration>();
-        config.Setup(c => c[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant]).Returns("false");
-        config.Setup(c => c[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant]).Returns((string)null!);
+        config
+            .Setup(c => c[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant])
+            .Returns(Convert.ToString(false));
+        config
+            .Setup(c => c[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant])
+            .Returns((string)null!);
 
         // Act & Assert
         Assert.Throws<KeyNotFoundException>(() => new AgentChatService(
@@ -253,6 +260,10 @@ public sealed class AgentChatServiceTests
     public async Task GetAgentChatResponseAsync_KnowledgeBaseEnabledAndAgentHasKbContent_EnrichesChatMessage()
     {
         // Arrange
+        _mockConfiguration
+            .Setup(c => c[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant])
+            .Returns(Convert.ToString(true));
+
         var service = new AgentChatService(
             _mockConfiguration.Object, _mockLogger.Object, _mockCorrelationContext.Object,
             _mockAgentsService.Object, _mockKnowledgeBaseProcessor.Object, _mockAiServices.Object, _mockToolSkillService.Object);
@@ -285,7 +296,7 @@ public sealed class AgentChatServiceTests
     {
         _mockConfiguration
             .Setup(c => c[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant])
-            .Returns("false");
+            .Returns(Convert.ToString(false));
         var agent = TestsHelpers.BuildAgentData(withKnowledgeBase: true);
         _mockAgentsService
             .Setup(s => s.GetAgentDataByIdAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -321,6 +332,9 @@ public sealed class AgentChatServiceTests
         _mockAiServices
             .Setup(s => s.GetAiFunctionResponseAsync(It.IsAny<ChatMessageDomain>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync("response");
+        _mockConfiguration
+            .Setup(c => c[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant])
+            .Returns(Convert.ToString(true));
 
         // Act
         await service.GetAgentChatResponseAsync(TestsHelpers.BuildChatRequest());
@@ -338,9 +352,13 @@ public sealed class AgentChatServiceTests
     public async Task GetAgentChatResponseAsync_VisionEnabledAndAgentHasImages_IncludesImageKeywordsInChatMessage()
     {
         // Arrange
+        _mockConfiguration
+            .Setup(c => c[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant])
+            .Returns(Convert.ToString(true));
         var service = new AgentChatService(
             _mockConfiguration.Object, _mockLogger.Object, _mockCorrelationContext.Object,
-            _mockAgentsService.Object, _mockKnowledgeBaseProcessor.Object, _mockAiServices.Object, _mockToolSkillService.Object);
+            _mockAgentsService.Object, _mockKnowledgeBaseProcessor.Object, _mockAiServices.Object, _mockToolSkillService.Object
+        );
 
         var agent = TestsHelpers.BuildAgentData(withVisionImages: true);
         _mockAgentsService
@@ -369,7 +387,8 @@ public sealed class AgentChatServiceTests
     {
         _mockConfiguration
             .Setup(c => c[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant])
-            .Returns("false");
+            .Returns(Convert.ToString(false));
+
         var agent = TestsHelpers.BuildAgentData(withVisionImages: true);
         _mockAgentsService
             .Setup(s => s.GetAgentDataByIdAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -398,7 +417,12 @@ public sealed class AgentChatServiceTests
         // Arrange
         var service = new AgentChatService(
             _mockConfiguration.Object, _mockLogger.Object, _mockCorrelationContext.Object,
-            _mockAgentsService.Object, _mockKnowledgeBaseProcessor.Object, _mockAiServices.Object, _mockToolSkillService.Object);
+            _mockAgentsService.Object, _mockKnowledgeBaseProcessor.Object, _mockAiServices.Object, _mockToolSkillService.Object
+        );
+
+        _mockConfiguration
+            .Setup(c => c[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant])
+            .Returns(Convert.ToString(true));
 
         var agent = TestsHelpers.BuildAgentData(withVisionImages: false);
         _mockAgentsService
