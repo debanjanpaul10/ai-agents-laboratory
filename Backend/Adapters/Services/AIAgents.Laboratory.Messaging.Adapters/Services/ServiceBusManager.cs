@@ -47,7 +47,8 @@ public sealed class ServiceBusManager(
             var message = new ServiceBusMessage(body)
             {
                 ContentType = AzureAppConfigurationConstants.ApplicationJsonConstant,
-                CorrelationId = correlationContext.CorrelationId
+                CorrelationId = correlationContext.CorrelationId,
+                MessageId = correlationContext.CorrelationId
             };
 
             await sender.SendMessageAsync(
