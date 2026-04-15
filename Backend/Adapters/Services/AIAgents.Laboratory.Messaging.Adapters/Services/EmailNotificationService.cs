@@ -32,7 +32,8 @@ public sealed class EmailNotificationService(
     /// <returns>The boolean for success/failure.</returns>
     public async Task<bool> SendNotificationAsync(
         NotificationsDomain notificationRequest,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         bool response = false;
         try
