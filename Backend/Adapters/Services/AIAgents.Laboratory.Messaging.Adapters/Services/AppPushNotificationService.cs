@@ -17,12 +17,12 @@ namespace AIAgents.Laboratory.Messaging.Adapters.Services;
 /// <param name="correlationContext">The correlation context used to track and correlate notification operations across system boundaries.</param>
 /// <param name="configuration">The configuration service.</param>
 /// <param name="serviceBusManager">The service bus manager used to send messages to the appropriate Azure Service Bus queue for processing push notifications.</param>
-/// <seealso cref="IApplicationNotificationsService"/>
+/// <seealso cref="IServiceBusNotificationService"/>
 public sealed class AppPushNotificationService(
     ILogger<AppPushNotificationService> logger,
     ICorrelationContext correlationContext,
     IConfiguration configuration,
-    IServiceBusManager serviceBusManager) : IApplicationNotificationsService
+    IServiceBusManager serviceBusManager) : IServiceBusNotificationService
 {
     /// <summary>
     /// Sends a notification asynchronously based on the provided notification request domain entity.

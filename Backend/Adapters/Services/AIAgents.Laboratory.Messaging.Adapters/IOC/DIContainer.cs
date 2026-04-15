@@ -25,8 +25,8 @@ public static class DIContainer
 
         return services.AddSingleton(new ServiceBusClient(serviceBusConnectionString))
             .AddScoped<IServiceBusManager, ServiceBusManager>()
-            .AddScoped<IEmailNotificationService, EmailNotificationService>()
-            .AddScoped<IApplicationNotificationsService, AppPushNotificationService>();
+            .AddScoped<IServiceBusNotificationService, EmailNotificationService>()
+            .AddScoped<IServiceBusNotificationService, AppPushNotificationService>();
     }
 
 }

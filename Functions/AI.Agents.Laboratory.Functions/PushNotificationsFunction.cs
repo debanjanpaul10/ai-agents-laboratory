@@ -7,6 +7,7 @@ using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+
 namespace AI.Agents.Laboratory.Functions;
 
 /// <summary>

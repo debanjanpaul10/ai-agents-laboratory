@@ -20,7 +20,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="configuration">The configuration.</param>
 /// <param name="correlationContext">The correlation context for logging.</param>
 /// <param name="feedbackDataManager">The feedback data manager.</param>
-/// <param name="emailNotificationService">The email notification service.</param>
+/// <param name="serviceBusNotificationService">The service bus notification service.</param>
 /// <param name="notificationsService">The notifications service for sending in-app or push notifications.</param>
 /// <seealso cref="IFeedbackService"/>
 public sealed class FeedbackService(
@@ -28,7 +28,7 @@ public sealed class FeedbackService(
     IConfiguration configuration,
     ICorrelationContext correlationContext,
     IFeedbackDataManager feedbackDataManager,
-    IEmailNotificationService emailNotificationService,
+    IServiceBusNotificationService serviceBusNotificationService,
     INotificationsService notificationsService) : IFeedbackService
 {
     /// <summary>
@@ -69,7 +69,7 @@ public sealed class FeedbackService(
                 cancellationToken
             ).ConfigureAwait(false);
 
-            var emailSendResult = await emailNotificationService.SendNotificationAsync(
+            var emailSendResult = await serviceBusNotificationService.SendNotificationAsync(
                 notificationRequest: new NotificationsDomain
                 {
                     Title = bugReportData.Title,
@@ -147,7 +147,7 @@ public sealed class FeedbackService(
                 cancellationToken
             ).ConfigureAwait(false);
 
-            var emailSendResult = await emailNotificationService.SendNotificationAsync(
+            var emailSendResult = await serviceBusNotificationService.SendNotificationAsync(
                 notificationRequest: new NotificationsDomain
                 {
                     Title = featureRequestData.Title,

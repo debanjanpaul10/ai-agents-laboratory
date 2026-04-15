@@ -11,18 +11,18 @@ using static AIAgents.Laboratory.Messaging.Adapters.Helpers.Constants;
 namespace AIAgents.Laboratory.Messaging.Adapters.Services;
 
 /// <summary>
-/// The email notification service.
+/// Provides functionality for sending email notifications using the specified configuration and logging context.
 /// </summary>
 /// <param name="logger">The logger service.</param>
 /// <param name="configuration">The configuration service.</param>
 /// <param name="correlationContext">The correlation context for logging.</param>
 /// <param name="serviceBusManager">The service bus manager service.</param>
-/// <seealso cref="IEmailNotificationService"/>
+/// <seealso cref="IServiceBusNotificationService"/>
 public sealed class EmailNotificationService(
     ILogger<EmailNotificationService> logger,
     IConfiguration configuration,
     ICorrelationContext correlationContext,
-    IServiceBusManager serviceBusManager) : IEmailNotificationService
+    IServiceBusManager serviceBusManager) : IServiceBusNotificationService
 {
     /// <summary>
     /// Sends a notification asynchronously based on the provided notification request domain entity.

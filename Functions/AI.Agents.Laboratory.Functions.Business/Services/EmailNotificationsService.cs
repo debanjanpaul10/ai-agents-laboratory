@@ -49,7 +49,7 @@ public sealed class EmailNotificationsService(
                 nameof(SendEmailNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, emailNotificationModel })
             );
 
-            EmailSendOperation emailSendingOperation = await emailClient.SendAsync(
+            var emailSendingOperation = await emailClient.SendAsync(
                 wait: Azure.WaitUntil.Completed,
                 senderAddress: EMAIL_COMMUNICATION_SENDER,
                 recipientAddress: emailNotificationModel.RecipientUserName,

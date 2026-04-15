@@ -3,9 +3,9 @@
 namespace AIAgents.Laboratory.Domain.Ports.Out;
 
 /// <summary>
-/// The Application Notification Service interface.
+/// Provides contracts for service bus notifications service.
 /// </summary>
-public interface IApplicationNotificationsService
+public interface IServiceBusNotificationService
 {
     /// <summary>
     /// Sends a notification asynchronously based on the provided notification request domain entity.

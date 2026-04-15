@@ -13,12 +13,12 @@ using static AIAgents.Laboratory.Domain.Helpers.Constants.NotificationMessagesCo
 namespace AIAgents.Laboratory.Domain.UseCases;
 
 /// <summary>
-/// Provides an implementation of the INotificationsService interface, responsible for handling notification-related operations by interacting with the IApplicationNotificationsService.
+/// Provides an implementation of the INotificationsService interface, responsible for handling notification-related operations by interacting with the IServiceBusNotificationService.
 /// </summary>
 /// <param name="logger">The <c>ILogger</c> instance is used for logging information, warnings, and errors that occur within the service's methods.</param>
 /// <param name="correlationContext">The <c>ICorrelationContext</c> is used to manage correlation IDs for requests, which helps in tracing and correlating logs across different components of the application, especially in distributed systems.</param>
 /// <param name="configuration">The configuration service to retrieve the configuration values from environment or application configuration.</param>
-/// <param name="notificationsService">The <c>IApplicationNotificationsService</c> is an abstraction that encapsulates the business logic for handling notifications.</param>
+/// <param name="serviceBusNotificationsService">The <c>IServiceBusNotificationService</c> is an abstraction that encapsulates the business logic for handling service bus notifications.</param>
 /// <param name="notificationsDataManager">The <c>INotificationsDataManager</c> is an abstraction for data access operations related to notifications, allowing the service to interact with the underlying data storage without being tightly coupled to a specific implementation.</param>
 /// <param name="notificationsStream">The <c>INotificationsStream</c> is an abstraction for managing real-time streaming of notifications, enabling the service to publish notifications to subscribers as they are created or updated.</param>
 /// <seealso cref="INotificationsService"/>
@@ -26,7 +26,7 @@ public sealed class NotificationsService(
     ILogger<NotificationsService> logger,
     ICorrelationContext correlationContext,
     IConfiguration configuration,
-    IApplicationNotificationsService notificationsService,
+    IServiceBusNotificationService serviceBusNotificationsService,
     INotificationsDataManager notificationsDataManager,
     INotificationsStream notificationsStream) : INotificationsService
 {
@@ -59,7 +59,7 @@ public sealed class NotificationsService(
             request.DateCreated = DateTime.UtcNow;
             request.IsActive = true;
 
-            response = await notificationsService.SendNotificationAsync(
+            response = await serviceBusNotificationsService.SendNotificationAsync(
                 notificationRequest: request,
                 cancellationToken
             ).ConfigureAwait(false);
@@ -330,12 +330,12 @@ public sealed class NotificationsService(
         }
         catch (OperationCanceledException)
         {
-            logger.LogAppInformation(
+            logger.LogAppWarning(
                 LoggingConstants.LogHelperMethodEnd,
                 nameof(StreamNotificationsForUserAsync), DateTime.UtcNow, ExceptionConstants.NotificationsStreamCancelledExceptionMessage
             );
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             logger.LogAppError(
                 ex,
