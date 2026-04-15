@@ -1,6 +1,6 @@
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.Helpers;
-using AIAgents.Laboratory.Messaging.Adapters.Contracts;
+using AIAgents.Laboratory.Domain.Ports.Out;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -26,20 +26,22 @@ public sealed class ServiceBusManager(
     /// </summary>
     /// <typeparam name="T">The payload type.</typeparam>
     /// <param name="payload">The payload to serialize and send.</param>
-    /// <param name="queueName">Optional queue override; if null/empty default queue is used.</param>
+    /// <param name="queueName">The queue name where message is to be published.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public async Task SendQueueMessageAsync<T>(
+    /// <returns>A boolean response for success/failure.</returns>
+    public async Task<bool> SendQueueMessageAsync<T>(
         T payload,
         string queueName,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(payload);
-
+        bool response = false;
         try
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodStart,
-                nameof(SendQueueMessageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, queueName })
+                nameof(SendQueueMessageAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, queueName })
             );
 
             var sender = serviceBusClient.CreateSender(queueName);
@@ -55,6 +57,8 @@ public sealed class ServiceBusManager(
                 message,
                 cancellationToken
             ).ConfigureAwait(false);
+            response = true;
+            return response;
         }
         catch (Exception ex)
         {
@@ -72,7 +76,8 @@ public sealed class ServiceBusManager(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
-                nameof(SendQueueMessageAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, queueName })
+                nameof(SendQueueMessageAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, queueName, response })
             );
         }
     }

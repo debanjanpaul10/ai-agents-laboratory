@@ -1,5 +1,4 @@
 using AIAgents.Laboratory.Domain.Ports.Out;
-using AIAgents.Laboratory.Messaging.Adapters.Contracts;
 using AIAgents.Laboratory.Messaging.Adapters.Services;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Configuration;
@@ -23,10 +22,9 @@ public static class DIContainer
         var serviceBusConnectionString = configuration[AzureAppConfigurationConstants.ServiceBusConnectionString];
         ArgumentException.ThrowIfNullOrWhiteSpace(serviceBusConnectionString);
 
-        return services.AddSingleton(new ServiceBusClient(serviceBusConnectionString))
-            .AddScoped<IServiceBusManager, ServiceBusManager>()
-            .AddScoped<IServiceBusNotificationService, EmailNotificationService>()
-            .AddScoped<IServiceBusNotificationService, AppPushNotificationService>();
+        return services
+            .AddSingleton(new ServiceBusClient(serviceBusConnectionString))
+            .AddScoped<IServiceBusManager, ServiceBusManager>();
     }
 
 }

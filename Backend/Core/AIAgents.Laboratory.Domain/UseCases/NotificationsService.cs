@@ -18,7 +18,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="logger">The <c>ILogger</c> instance is used for logging information, warnings, and errors that occur within the service's methods.</param>
 /// <param name="correlationContext">The <c>ICorrelationContext</c> is used to manage correlation IDs for requests, which helps in tracing and correlating logs across different components of the application, especially in distributed systems.</param>
 /// <param name="configuration">The configuration service to retrieve the configuration values from environment or application configuration.</param>
-/// <param name="serviceBusNotificationsService">The <c>IServiceBusNotificationService</c> is an abstraction that encapsulates the business logic for handling service bus notifications.</param>
+/// <param name="serviceBusManager">The <c>IServiceBusManager</c> is an abstraction that encapsulates the business logic for handling service bus notifications.</param>
 /// <param name="notificationsDataManager">The <c>INotificationsDataManager</c> is an abstraction for data access operations related to notifications, allowing the service to interact with the underlying data storage without being tightly coupled to a specific implementation.</param>
 /// <param name="notificationsStream">The <c>INotificationsStream</c> is an abstraction for managing real-time streaming of notifications, enabling the service to publish notifications to subscribers as they are created or updated.</param>
 /// <seealso cref="INotificationsService"/>
@@ -26,7 +26,7 @@ public sealed class NotificationsService(
     ILogger<NotificationsService> logger,
     ICorrelationContext correlationContext,
     IConfiguration configuration,
-    IServiceBusNotificationService serviceBusNotificationsService,
+    IServiceBusManager serviceBusManager,
     INotificationsDataManager notificationsDataManager,
     INotificationsStream notificationsStream) : INotificationsService
 {
@@ -34,6 +34,8 @@ public sealed class NotificationsService(
     /// The heart beat time delay in seconds.
     /// </summary>
     private readonly int HEART_BEAT_TIME_DELAY_IN_SECONDS = Convert.ToInt32(configuration[AzureAppConfigurationConstants.HeartbeatTimeDelayInSecondsConfig]);
+
+
 
     /// <summary>
     /// Creates a new notification based on the provided request data.
@@ -59,17 +61,19 @@ public sealed class NotificationsService(
             request.DateCreated = DateTime.UtcNow;
             request.IsActive = true;
 
-            response = await serviceBusNotificationsService.SendNotificationAsync(
-                notificationRequest: request,
+            var pushNotificationsQueue = configuration[AzureAppConfigurationConstants.PushNotificationsQueueName]
+                ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+            response = await serviceBusManager.SendQueueMessageAsync(
+                payload: request,
+                queueName: pushNotificationsQueue,
                 cancellationToken
             ).ConfigureAwait(false);
             if (response)
-            {
                 notificationsStream.Publish(
                     recipientUserName: request.RecipientUserName,
                     notification: request
                 );
-            }
+
             return response;
         }
         catch (Exception ex)
