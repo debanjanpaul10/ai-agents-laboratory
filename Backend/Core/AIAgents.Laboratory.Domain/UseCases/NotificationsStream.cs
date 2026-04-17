@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.DomainEntities;
@@ -9,6 +10,7 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// Provides services for managing a notifications stream, allowing clients to subscribe to receive notifications for specific users and publish new notifications to the stream.
 /// </summary>
 /// <seealso cref="AIAgents.Laboratory.Domain.Contracts.INotificationsStream" />
+[ExcludeFromCodeCoverage]
 public sealed class NotificationsStream : INotificationsStream
 {
     /// <summary>
@@ -41,7 +43,8 @@ public sealed class NotificationsStream : INotificationsStream
         var id = Guid.NewGuid();
         var userChannels = this._subscribers.GetOrAdd(
             recipientUserName,
-            _ => new ConcurrentDictionary<Guid, Channel<NotificationsDomain>>());
+            _ => new ConcurrentDictionary<Guid, Channel<NotificationsDomain>>()
+        );
         userChannels[id] = channel;
 
         return new NotificationsSubscription(channel.Reader, () =>
@@ -61,7 +64,10 @@ public sealed class NotificationsStream : INotificationsStream
     /// <returns>
     /// True if the notification was successfully published to at least one subscriber; otherwise, false.
     /// </returns>
-    public bool Publish(string recipientUserName, NotificationsDomain notification)
+    public bool Publish(
+        string recipientUserName,
+        NotificationsDomain notification
+    )
     {
         if (string.IsNullOrWhiteSpace(recipientUserName))
             return false;

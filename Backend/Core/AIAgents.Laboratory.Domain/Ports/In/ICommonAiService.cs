@@ -34,5 +34,7 @@ public interface ICommonAiService
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A tupple containing the list of agents and the top 3 active ai agents.</returns>
     Task<(int ActiveAgentsCount, IEnumerable<AgentDataDomain> TopActiveAgentsList)> GetTopActiveAgentsDataAsync(
-        string userName, CancellationToken cancellationToken = default);
+        string userName,
+        CancellationToken cancellationToken = default
+    );
 }

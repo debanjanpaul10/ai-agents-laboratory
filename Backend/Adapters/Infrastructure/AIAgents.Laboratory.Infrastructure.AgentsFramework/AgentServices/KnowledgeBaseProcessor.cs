@@ -25,8 +25,12 @@ namespace AIAgents.Laboratory.Infrastructure.AgentsFramework.AgentServices;
 /// <seealso cref="IKnowledgeBaseProcessor"/>
 #pragma warning disable SKEXP0050
 #pragma warning disable SKEXP0001
-public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logger, ICorrelationContext correlationContext,
-    IMemoryStore memoryStore, IEmbeddingGenerator<string, Embedding<float>> embeddingGeneratorService, FileContentReaderFactory fileContentReaderFactory) : IKnowledgeBaseProcessor
+public sealed class KnowledgeBaseProcessor(
+    ILogger<KnowledgeBaseProcessor> logger,
+    ICorrelationContext correlationContext,
+    IMemoryStore memoryStore,
+    IEmbeddingGenerator<string, Embedding<float>> embeddingGeneratorService,
+    FileContentReaderFactory fileContentReaderFactory) : IKnowledgeBaseProcessor
 {
     /// <summary>
     /// Detects the file type of the specified knowledge base document and reads its content accordingly.
@@ -40,7 +44,10 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DetectAndReadFileContent), DateTime.UtcNow, knowledgeBaseDocumentDomain.FileName);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(DetectAndReadFileContent), DateTime.UtcNow, knowledgeBaseDocumentDomain.FileName
+            );
 
             var fileExtension = Path.GetExtension(knowledgeBaseDocumentDomain.FileName);
             var reader = fileContentReaderFactory.Resolve(fileExtension);
@@ -48,12 +55,22 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DetectAndReadFileContent), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(DetectAndReadFileContent), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DetectAndReadFileContent), DateTime.UtcNow, knowledgeBaseDocumentDomain.FileName);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(DetectAndReadFileContent), DateTime.UtcNow, knowledgeBaseDocumentDomain.FileName
+            );
         }
     }
 
@@ -66,14 +83,21 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
     /// <param name="agentId">The unique identifier of the agent whose knowledge base is searched. Cannot be null or empty.</param>
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation. Optional.</param>
     /// <returns>A string containing the most relevant knowledge entries separated by double newlines, or an empty string if no relevant entries are found.</returns>
-    public async Task<string> GetRelevantKnowledgeAsync(string query, string agentId, CancellationToken cancellationToken = default)
+    public async Task<string> GetRelevantKnowledgeAsync(
+        string query,
+        string agentId,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrEmpty(query);
         ArgumentException.ThrowIfNullOrEmpty(agentId);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { query, agentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { query, agentId })
+            );
 
             var queryEmbeddingResult = await embeddingGeneratorService.GenerateAsync(
                 value: query,
@@ -96,16 +120,26 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
             if (relevantChunks.Count == 0)
                 return string.Empty;
 
-            return string.Join("\n\n", relevantChunks.Where(c => !string.IsNullOrEmpty(c.Record.Metadata.Text)).Select(c => c.Record.Metadata.Text));
+            return string.Join(
+                "\n\n",
+                relevantChunks.Where(c => !string.IsNullOrEmpty(c.Record.Metadata.Text)).Select(c => c.Record.Metadata.Text)
+            );
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, ex.Message);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, ex.Message
+            );
             return string.Empty;
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { query, agentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetRelevantKnowledgeAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { query, agentId })
+            );
         }
     }
 
@@ -119,14 +153,21 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the document content cannot be split into valid chunks, or if the number of generated embeddings does not match the number of chunks.</exception>
-    public async Task ProcessKnowledgeBaseDocumentAsync(string content, string agentId, CancellationToken cancellationToken = default)
+    public async Task ProcessKnowledgeBaseDocumentAsync(
+        string content,
+        string agentId,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrEmpty(content);
         ArgumentException.ThrowIfNullOrEmpty(agentId);
 
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId
+            );
 
             // Ensure the collection exists before upserting records
             var collections = new List<string>();
@@ -165,13 +206,14 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
                     text: chunks[i],
                     description: chunkDescription,
                     externalSourceName: string.Empty,
-                    additionalMetadata: string.Empty);
-
+                    additionalMetadata: string.Empty
+                );
                 var record = new MemoryRecord(
                     metadata,
                     embedding: embeddings[i],
                     key: null,
-                    timestamp: null);
+                    timestamp: null
+                );
 
                 await memoryStore.UpsertAsync(
                     collectionName: agentId,
@@ -182,12 +224,22 @@ public sealed class KnowledgeBaseProcessor(ILogger<KnowledgeBaseProcessor> logge
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(ProcessKnowledgeBaseDocumentAsync), DateTime.UtcNow, agentId
+            );
         }
     }
 }

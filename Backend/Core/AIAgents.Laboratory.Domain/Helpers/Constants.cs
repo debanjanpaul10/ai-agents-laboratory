@@ -3,7 +3,7 @@
 /// <summary>
 /// The Constants Class.
 /// </summary>
-internal static class Constants
+public static class Constants
 {
     /// <summary>
     /// Logging constants.
@@ -115,7 +115,7 @@ internal static class Constants
     /// <summary>
     /// The Azure App Configuration Constants Class.
     /// </summary>
-    internal static class AzureAppConfigurationConstants
+    public static class AzureAppConfigurationConstants
     {
         /// <summary>
         /// The gemini pro model
@@ -140,12 +140,12 @@ internal static class Constants
         /// <summary>
         /// The is knowledge base service enabled constant
         /// </summary>
-        internal const string IsKnowledgeBaseServiceEnabledConstant = "IsKnowledgeBaseServiceEnabled";
+        public const string IsKnowledgeBaseServiceEnabledConstant = "IsKnowledgeBaseServiceEnabled";
 
         /// <summary>
         /// The boolean flag for AI vision service constant.
         /// </summary>
-        internal const string IsAiVisionServiceEnabledConstant = "IsAiVisionServiceEnabled";
+        public const string IsAiVisionServiceEnabledConstant = "IsAiVisionServiceEnabled";
 
         /// <summary>
         /// The current ai service provider
@@ -180,12 +180,12 @@ internal static class Constants
         /// <summary>
         /// The allowed kb file formats constant.
         /// </summary>
-        internal const string AllowedKbFileFormatsConstant = "AllowedKbFileFormats";
+        public const string AllowedKbFileFormatsConstant = "AllowedKbFileFormats";
 
         /// <summary>
         /// The allowed vision images file formats constant.
         /// </summary>
-        internal const string AllowedVisionImageFileFormatsConstant = "AllowedVisionImageFileFormats";
+        public const string AllowedVisionImageFileFormatsConstant = "AllowedVisionImageFileFormats";
 
         /// <summary>
         /// The admin user email address constant.
@@ -196,6 +196,16 @@ internal static class Constants
         /// The heartbeat time delay in seconds configuration
         /// </summary>
         internal const string HeartbeatTimeDelayInSecondsConfig = "HeartbeatTimeDelayInSeconds";
+
+        /// <summary>
+        /// The push notifications service bus queue name.
+        /// </summary>
+        internal const string PushNotificationsQueueName = "ServiceBus:PushNotificationsQueue";
+
+        /// <summary>
+        /// The email notification service bus queue name.
+        /// </summary>
+        internal const string EmailNotificationsQueueName = "ServiceBus:EmailNotificationsQueue";
     }
 
     /// <summary>
@@ -220,14 +230,15 @@ internal static class Constants
     internal static class FeedbackTemplateConstants
     {
         /// <summary>
-        /// The email template html.
-        /// </summary>
-        internal const string EmailTemplateHtml = "<html><body><h1>{0}</h1><br/><h4>{1}</h4><p>{2}</p></body></html>";
-
-        /// <summary>
         /// The file name for email template.
         /// </summary>
-        internal const string FileName = "Templates/FeedbackEmail.html";
+        internal static readonly string FileName = Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory, "Templates", "FeedbackEmail.html");
+
+        /// <summary>
+        /// The current application name.
+        /// </summary>
+        internal const string CurrentApplicationName = "AI Agents Laboratory";
     }
 
     /// <summary>

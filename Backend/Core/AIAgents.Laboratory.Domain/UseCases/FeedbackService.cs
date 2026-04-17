@@ -20,21 +20,25 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="configuration">The configuration.</param>
 /// <param name="correlationContext">The correlation context for logging.</param>
 /// <param name="feedbackDataManager">The feedback data manager.</param>
-/// <param name="emailNotificationService">The email notification service.</param>
-/// <param name="notificationsService">The notifications service for sending in-app or push notifications.</param>
+/// <param name="serviceBusManager">The service bus manager service.</param>
 /// <seealso cref="IFeedbackService"/>
 public sealed class FeedbackService(
     ILogger<FeedbackService> logger,
     IConfiguration configuration,
     ICorrelationContext correlationContext,
     IFeedbackDataManager feedbackDataManager,
-    IEmailNotificationService emailNotificationService,
-    INotificationsService notificationsService) : IFeedbackService
+    IServiceBusManager serviceBusManager) : IFeedbackService
 {
     /// <summary>
     /// The admin email address from configuration.
     /// </summary>
     private readonly string ADMIN_EMAIL_ADDRESS = configuration[AzureAppConfigurationConstants.AdminEmailAddressConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+
+    /// <summary>
+    /// The email notifications queue.
+    /// </summary>
+    private readonly string EmailNotificationsQueue = configuration[AzureAppConfigurationConstants.EmailNotificationsQueueName]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
@@ -58,40 +62,27 @@ public sealed class FeedbackService(
                 nameof(AddNewBugReportDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, bugReportData })
             );
 
-            bugReportData.PrepareAuditEntityData(currentUser: bugReportData.CreatedBy);
+            bugReportData.PrepareAuditEntityData(
+                currentUser: bugReportData.CreatedBy
+            );
             var feedbackSaveResult = await feedbackDataManager.AddNewBugReportDataAsync(
                 bugReportData,
                 cancellationToken
             ).ConfigureAwait(false);
 
-            var template = await File.ReadAllTextAsync(
-                path: FeedbackTemplateConstants.FileName,
+            var emailNotificationMessage = await this.PrepareEmailNotificationData(
+                subject: bugReportData.Title,
+                content: bugReportData.Description,
+                senderName: bugReportData.CreatedBy,
                 cancellationToken
             ).ConfigureAwait(false);
-
-            var emailSendResult = await emailNotificationService.SendNotificationAsync(
-                notificationRequest: new NotificationsDomain
-                {
-                    Title = bugReportData.Title,
-                    Message = string.Format(template, bugReportData.Title, bugReportData.Description, bugReportData.CreatedBy),
-                    RecipientUserName = ADMIN_EMAIL_ADDRESS,
-                    NotificationType = nameof(NotificationTypes.Email),
-                    CreatedBy = bugReportData.CreatedBy
-                },
+            var emailSendResult = await serviceBusManager.SendQueueMessageAsync(
+                payload: emailNotificationMessage,
+                queueName: EmailNotificationsQueue,
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
 
             response = feedbackSaveResult && emailSendResult;
-            if (response)
-                await this.SendFeedbackServiceNotificationAsync(
-                    userToBeNotified: ADMIN_EMAIL_ADDRESS,
-                    currentUserEmail: bugReportData.CreatedBy,
-                    feedbackId: bugReportData.Id,
-                    feedbackTitle: bugReportData.Title,
-                    isBugReport: true,
-                    cancellationToken
-                ).ConfigureAwait(false);
-
             return response;
         }
         catch (Exception ex)
@@ -136,40 +127,27 @@ public sealed class FeedbackService(
                 nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, featureRequestData })
             );
 
-            featureRequestData.PrepareAuditEntityData(currentUser: featureRequestData.CreatedBy);
+            featureRequestData.PrepareAuditEntityData(
+                currentUser: featureRequestData.CreatedBy
+            );
             var feedbackSaveResult = await feedbackDataManager.AddNewFeatureRequestDataAsync(
                 featureRequestData,
                 cancellationToken
             ).ConfigureAwait(false);
 
-            var template = await File.ReadAllTextAsync(
-                path: FeedbackTemplateConstants.FileName,
+            var emailNotificationMessage = await this.PrepareEmailNotificationData(
+                subject: featureRequestData.Title,
+                content: featureRequestData.Description,
+                senderName: featureRequestData.CreatedBy,
                 cancellationToken
             ).ConfigureAwait(false);
-
-            var emailSendResult = await emailNotificationService.SendNotificationAsync(
-                notificationRequest: new NotificationsDomain
-                {
-                    Title = featureRequestData.Title,
-                    Message = string.Format(template, featureRequestData.Title, featureRequestData.Description, featureRequestData.CreatedBy),
-                    RecipientUserName = ADMIN_EMAIL_ADDRESS,
-                    NotificationType = nameof(NotificationTypes.Email),
-                    CreatedBy = featureRequestData.CreatedBy
-                },
+            var emailSendResult = await serviceBusManager.SendQueueMessageAsync(
+                payload: emailNotificationMessage,
+                queueName: EmailNotificationsQueue,
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
 
             response = feedbackSaveResult && emailSendResult;
-            if (response)
-                await this.SendFeedbackServiceNotificationAsync(
-                    userToBeNotified: ADMIN_EMAIL_ADDRESS,
-                    currentUserEmail: featureRequestData.CreatedBy,
-                    feedbackId: featureRequestData.Id,
-                    feedbackTitle: featureRequestData.Title,
-                    isBugReport: false,
-                    cancellationToken
-                ).ConfigureAwait(false);
-
             return response;
         }
         catch (Exception ex)
@@ -285,39 +263,66 @@ public sealed class FeedbackService(
         }
     }
 
+    #region PRIVATE METHODS
+
     /// <summary>
-    /// Sends the feedback service notification asynchronous.
+    /// Prepares the email notification data.
     /// </summary>
-    /// <param name="userToBeNotified">The user to be notified.</param>
-    /// <param name="currentUserEmail">The current user email who submitted the feedback.</param>
-    /// <param name="feedbackId">The feedback id.</param>
-    /// <param name="feedbackTitle">The feedback title.</param>
-    /// <param name="isBugReport">A boolean value indicating whether the feedback is a bug report or a feature request. Default is false (feature request).</param>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation. Optional.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    private async Task SendFeedbackServiceNotificationAsync(
-        string userToBeNotified,
-        string currentUserEmail,
-        int feedbackId,
-        string feedbackTitle,
-        bool isBugReport = false,
+    /// <param name="subject">The subject.</param>
+    /// <param name="content">The content.</param>
+    /// <param name="senderName">Name of the sender.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The notifications domain model.</returns>
+    private async Task<NotificationsDomain> PrepareEmailNotificationData(
+        string subject,
+        string content,
+        string senderName,
         CancellationToken cancellationToken = default
     )
     {
-        var titleTemplate = isBugReport ? NotificationMessagesConstants.BugReportSubmittedTitleTemplate : NotificationMessagesConstants.FeatureRequestSubmittedTitleTemplate;
-        var bodyTemplate = isBugReport ? NotificationMessagesConstants.BugReportSubmittedMessageTemplate : NotificationMessagesConstants.FeatureRequestSubmittedMessageTemplate;
-        var notificationsDomainModel = new NotificationsDomain
+        try
         {
-            RecipientUserName = userToBeNotified,
-            Title = string.Format(titleTemplate, feedbackId),
-            Message = string.Format(bodyTemplate, feedbackId, feedbackTitle),
-            IsGlobal = false,
-            NotificationType = nameof(NotificationTypes.Push),
-            CreatedBy = currentUserEmail
-        };
-        await notificationsService.CreateNewNotificationAsync(
-            request: notificationsDomainModel,
-            cancellationToken: cancellationToken
-        ).ConfigureAwait(false);
+            var template = await File.ReadAllTextAsync(
+                path: FeedbackTemplateConstants.FileName,
+                cancellationToken
+            ).ConfigureAwait(false);
+
+            var subs = new Dictionary<string, string>
+            {
+                { "{{ApplicationName}}", FeedbackTemplateConstants.CurrentApplicationName },
+                { "{{Subject}}", subject },
+                { "{{Message}}", content },
+                { "{{SenderAddress}}", senderName }
+            };
+
+            // Replace placeholders with the actual values
+            var emailMessage = template;
+            foreach (var kvp in subs)
+                emailMessage = emailMessage.Replace(kvp.Key, kvp.Value);
+
+            return new NotificationsDomain
+            {
+                Title = subject,
+                Message = emailMessage,
+                RecipientUserName = ADMIN_EMAIL_ADDRESS,
+                NotificationType = nameof(NotificationTypes.Email),
+                CreatedBy = senderName
+            };
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(PrepareEmailNotificationData), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
     }
+
+    #endregion
+
 }

@@ -20,7 +20,11 @@ public static class LoggerExtensions
     /// <param name="logger">The logger instance used to write the informational message. Cannot be null.</param>
     /// <param name="message">The message template to log. May include placeholders for formatting with the provided arguments.</param>
     /// <param name="args">An array of objects to format into the message template.</param>
-    public static void LogAppInformation(this ILogger logger, string message, params object[] args)
+    public static void LogAppInformation(
+        this ILogger logger,
+        string message,
+        params object[] args
+    )
     {
         if (logger.IsEnabled(LogLevel.Information))
             logger.LogInformation(message, args);
@@ -35,9 +39,32 @@ public static class LoggerExtensions
     /// <param name="exception">The exception to log. Provides details about the error that occurred. Cannot be null.</param>
     /// <param name="message">The message template describing the error. May include format placeholders for additional arguments.</param>
     /// <param name="args">An array of objects to format into the message template. Optional; can be empty.</param>
-    public static void LogAppError(this ILogger logger, Exception exception, string message, params object[] args)
+    public static void LogAppError(
+        this ILogger logger,
+        Exception exception,
+        string message,
+        params object[] args
+    )
     {
         if (logger.IsEnabled(LogLevel.Error))
             logger.LogError(exception, message, args);
+    }
+
+    /// <summary>
+    /// Writes an warning log entry using the specified logger, message, and formatting arguments.
+    /// </summary>
+    /// <remarks>This method logs the message only if the logger is enabled for the Warning log level. 
+    /// Placeholders in the message template are replaced with the corresponding values from the arguments array.</remarks>
+    /// <param name="logger">The logger instance used to write the warning message. Cannot be null.</param>
+    /// <param name="message">The message template to log. May include placeholders for formatting with the provided arguments.</param>
+    /// <param name="args">An array of objects to format into the message template.</param>
+    public static void LogAppWarning(
+        this ILogger logger,
+        string message,
+        params object[] args
+    )
+    {
+        if (logger.IsEnabled(LogLevel.Warning))
+            logger.LogWarning(message, args);
     }
 }

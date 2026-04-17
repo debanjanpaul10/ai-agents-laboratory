@@ -4,6 +4,7 @@
 		"AzureWebJobsStorage": "UseDevelopmentStorage=true",
 		"AzureServiceBusConnectionString": "",
 		"FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-		"PushNotificationsQueue": "pushnotificationsqueue"
+		"PushNotificationsQueue": "pushnotificationsqueue",
+		"EmailNotificationsQueue": "emailnotificationsqueue"
 	}
 }
