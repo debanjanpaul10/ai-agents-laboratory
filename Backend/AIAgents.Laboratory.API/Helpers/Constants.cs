@@ -239,7 +239,7 @@ internal static class Constants
         /// <summary>
         /// The token format url.
         /// </summary>
-        internal const string TokenFormatUrl = "Configurations:TokenFormatUrl";
+        internal const string TokenFormatUrlConstant = "TokenFormatUrl";
 
         /// <summary>
         /// The ai agents client identifier constant

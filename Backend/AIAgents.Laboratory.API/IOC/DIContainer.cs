@@ -112,7 +112,7 @@ public static class DIContainer
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
-            var tokenFormatUrl = configuration[AzureAppConfigurationConstants.TokenFormatUrl] ?? throw new KeyNotFoundException(ExceptionConstants.MissingConfigurationMessage);
+            var tokenFormatUrl = configuration[AzureAppConfigurationConstants.TokenFormatUrlConstant] ?? throw new KeyNotFoundException(ExceptionConstants.MissingConfigurationMessage);
             options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
             {
                 ValidateLifetime = true,
