@@ -35,8 +35,6 @@ public sealed class NotificationsService(
     /// </summary>
     private readonly int HEART_BEAT_TIME_DELAY_IN_SECONDS = Convert.ToInt32(configuration[AzureAppConfigurationConstants.HeartbeatTimeDelayInSecondsConfig]);
 
-
-
     /// <summary>
     /// Creates a new notification based on the provided request data.
     /// </summary>

@@ -41,17 +41,7 @@ public sealed class DocumentIntelligenceService(
     private readonly string AllowedAiVisionImagesFileFormats = configuration[AzureAppConfigurationConstants.AllowedVisionImageFileFormatsConstant]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
-    /// <summary>
-    /// Deletes the knowledge base documents and AI Vision images data associated with a specific agent from the storage.
-    /// </summary>
-    /// <remarks>
-    /// This method invokes the blob storage manager to remove all folders and data related to the agent's documents.
-    /// It logs the start and end of the operation, as well as any errors that occur during the process.
-    /// </remarks>
-    /// <param name="agentId">The unique identifier of the agent whose data is to be deleted. Cannot be null or empty.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
-    /// <returns>A task that represents the asynchronous delete operation.</returns>
-    /// <exception cref="Exception">Thrown when an error occurs during the deletion process.</exception>
+    /// <inheritdoc />
     public async Task DeleteKnowledgebaseAndImagesDataAsync(
         string agentId,
         CancellationToken cancellationToken = default
@@ -94,14 +84,7 @@ public sealed class DocumentIntelligenceService(
 
     #region KNOWLEDGE BASE
 
-    /// <summary>
-    /// Creates and processes a knowledge base document for the specified agent asynchronously.
-    /// </summary>
-    /// <remarks>This method validates the uploaded files, processes the knowledge base document data, and
-    /// then processes each stored knowledge base file for the agent. If no files are present, the method completes without processing any documents.</remarks>
-    /// <param name="agentData">The agent data domain object containing information and files to be processed for the knowledge base. Cannot be null.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <inheritdoc />
     public async Task CreateAndProcessKnowledgeBaseDocumentAsync(
         AgentDataDomain agentData,
         CancellationToken cancellationToken = default
@@ -171,16 +154,7 @@ public sealed class DocumentIntelligenceService(
         }
     }
 
-    /// <summary>
-    /// Processes updates to an agent's knowledge base documents, including adding new documents and removing specified ones, and prepares the corresponding update definitions for persistence.
-    /// </summary>
-    /// <remarks>This method only adds update definitions to the provided list if changes to the knowledge base are detected. It validates and processes any newly uploaded documents and ensures that removed documents
-    /// are excluded from the persisted knowledge base. The caller is responsible for applying the accumulated updates to the data store.</remarks>
-    /// <param name="updateDataDomain">The domain object containing the knowledge base update information, including any new or removed documents. Cannot be null.</param>
-    /// <param name="updates">A list to which update definitions for the agent's knowledge base will be added if changes are detected. Cannot be null.</param>
-    /// <param name="existingAgent">The current state of the agent's data, used as the baseline for applying knowledge base updates. Cannot be null.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <inheritdoc />
     public async Task HandleKnowledgeBaseDataUpdateAsync(
         AgentDataDomain updateDataDomain,
         AgentDataDomain existingAgent,
@@ -270,13 +244,7 @@ public sealed class DocumentIntelligenceService(
         }
     }
 
-    /// <summary>
-    /// Downloads the knowledgebase file asynchronous.
-    /// </summary>
-    /// <param name="agentGuid">The agent guid id.</param>
-    /// <param name="fileName">The file name.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
-    /// <returns>The downloaded file url</returns>
+    /// <inheritdoc />
     public async Task<string> DownloadKnowledgebaseFileAsync(
         string agentGuid,
         string fileName,
@@ -325,14 +293,7 @@ public sealed class DocumentIntelligenceService(
 
     #region VISION IMAGES
 
-    /// <summary>
-    /// Processes the vision images associated with the specified agent by uploading them to cloud storage, extracting keywords using AI vision processing, and updating the agent's data with the results.
-    /// </summary>
-    /// <remarks>This method uploads each image in the agent's vision images collection to cloud storage, analyzes the image to extract keywords using computer vision, and adds the resulting keywords and image
-    /// information to the agent's data. The method logs progress and errors for monitoring purposes. If any image in the collection is null, it is skipped.</remarks>
-    /// <param name="agentData">The agent data containing the vision images to process. Must not be null and must contain valid uploaded images.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <inheritdoc />
     public async Task CreateAndProcessAiVisionImagesKeywordsAsync(
         AgentDataDomain agentData,
         CancellationToken cancellationToken = default
@@ -407,16 +368,7 @@ public sealed class DocumentIntelligenceService(
         }
     }
 
-    /// <summary>
-    /// Processes updates to an agent's AI Vision images, including adding new images and removing specified ones, and prepares the corresponding update definitions for persistence.
-    /// </summary>
-    /// <remarks>This method only adds update definitions to the provided list if changes to the images are detected. It validates and processes any newly uploaded images and ensures that removed images
-    /// are excluded from the persisted AI Vision images store. The caller is responsible for applying the accumulated updates to the data store.</remarks>
-    /// <param name="updateDataDomain">The domain object containing the images update information, including any new or removed images. Cannot be null.</param>
-    /// <param name="updates">A list to which update definitions for the agent's AI Vision images will be added if changes are detected. Cannot be null.</param>
-    /// <param name="existingAgent">The current state of the agent's data, used as the baseline for applying AI Vision images updates. Cannot be null.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <inheritdoc />
     public async Task HandleAiVisionImagesDataUpdateAsync(
         AgentDataDomain updateDataDomain,
         AgentDataDomain existingAgent,

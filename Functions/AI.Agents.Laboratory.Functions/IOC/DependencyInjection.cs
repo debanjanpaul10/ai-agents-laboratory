@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
+using static AI.Agents.Laboratory.Functions.Shared.Constants.EnvironmentConfigurationConstants;
 
 namespace AI.Agents.Laboratory.Functions.IOC;
 
@@ -88,10 +89,9 @@ public static class DependencyInjection
     /// <param name="configuration">The configuration services.</param>
     /// <returns>The updated IServiceCollection with the registered business dependencies.</returns>
     public static IServiceCollection AddBusinessDependencies(this IServiceCollection services, IConfiguration configuration) =>
-        services
-        .ConfigureEmailClientServices(configuration)
-        .AddScoped<IEmailNotificationsService, EmailNotificationsService>()
-        .AddScoped<IPushNotificationsService, PushNotificationsService>();
+        services.ConfigureEmailClientServices(configuration)
+            .AddKeyedScoped<INotificationService, EmailNotificationsService>(NotificationServices.EmailNotifications)
+            .AddKeyedScoped<INotificationService, PushNotificationsService>(NotificationServices.AppPushNotifications);
 
     /// <summary>
     /// Adds data layer dependencies to the service collection, allowing for dependency injection of data services throughout the application.

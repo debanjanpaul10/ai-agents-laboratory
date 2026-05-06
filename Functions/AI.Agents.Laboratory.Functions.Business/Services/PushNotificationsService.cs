@@ -10,25 +10,25 @@ using Newtonsoft.Json;
 namespace AI.Agents.Laboratory.Functions.Business.Services;
 
 /// <summary>
-/// Implements the IPushNotificationsService to handle the processing of push notification requests.
+/// Implements the INotificationService to handle the processing of push notification requests.
 /// </summary>
 /// <param name="logger">The logger instance.</param>
 /// <param name="correlationContext">The correlation context.</param>
 /// <param name="notificationsDataManager">The notifications data manager.</param>
-/// <seealso cref="IPushNotificationsService"/>
+/// <seealso cref="INotificationService"/>
 public sealed class PushNotificationsService(
     ILogger<PushNotificationsService> logger,
     ICorrelationContext correlationContext,
-    INotificationsDataManager notificationsDataManager) : IPushNotificationsService
+    INotificationsDataManager notificationsDataManager) : INotificationService
 {
     /// <summary>
     /// Processes an incoming push notification request and returns a boolean indicating the success of the operation.
     /// </summary>
-    /// <param name="request">The notification request to process.</param>
+    /// <param name="notificationModel">The notification request to process.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    public async Task<bool> ReceivePushNotificationAsync(
-        NotificationRequest request,
+    public async Task<bool> SendNotificationsAsync(
+        NotificationRequest notificationModel,
         CancellationToken cancellationToken = default
     )
     {
@@ -37,11 +37,12 @@ public sealed class PushNotificationsService(
         {
             logger.LogAppInformation(
                 LoggerConstants.LogHelperMethodStart,
-                nameof(ReceivePushNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request })
+                nameof(SendNotificationsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationModel })
             );
 
             response = await notificationsDataManager.SavePushNotificationsDataAsync(
-                request,
+                notificationModel,
                 cancellationToken
             ).ConfigureAwait(false);
             return response;
@@ -51,7 +52,7 @@ public sealed class PushNotificationsService(
             logger.LogAppError(
                 ex,
                 LoggerConstants.LogHelperMethodFailed,
-                nameof(ReceivePushNotificationAsync), DateTime.UtcNow, ex.Message
+                nameof(SendNotificationsAsync), DateTime.UtcNow, ex.Message
             );
             throw new AIAgentsBusinessException(
                 message: ex.Message,
@@ -62,7 +63,8 @@ public sealed class PushNotificationsService(
         {
             logger.LogAppInformation(
                 LoggerConstants.LogHelperMethodEnd,
-                nameof(ReceivePushNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request, response })
+                nameof(SendNotificationsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationModel, response })
             );
         }
     }

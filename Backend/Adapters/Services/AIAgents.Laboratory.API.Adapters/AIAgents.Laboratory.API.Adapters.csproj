@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="16.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
   </ItemGroup>
 

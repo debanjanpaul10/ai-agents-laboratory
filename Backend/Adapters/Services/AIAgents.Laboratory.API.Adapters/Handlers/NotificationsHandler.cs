@@ -1,9 +1,8 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Ports.In;
-using AutoMapper;
 using Microsoft.AspNetCore.Http;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
@@ -11,12 +10,9 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <summary>
 /// Provides an implementation of the INotificationsHandler interface, responsible for handling notification-related operations by interacting with the INotificationsService.
 /// </summary>
-/// <param name="mapper">The IMapper instance is used to map between the API request models and the domain entities, facilitating the transformation of data as it flows between different layers of the application.</param>
 /// <param name="notificationsService">The INotificationsService is an abstraction that encapsulates the business logic for handling notifications, allowing the handler to delegate the actual processing of notification creation to the service layer.</param>
 /// <seealso cref="INotificationsHandler"/>
-public sealed class NotificationsHandler(
-    IMapper mapper,
-    INotificationsService notificationsService) : INotificationsHandler
+public sealed class NotificationsHandler(INotificationsService notificationsService) : INotificationsHandler
 {
     /// <summary>
     /// Creates a new notification based on the provided request data.
@@ -29,7 +25,7 @@ public sealed class NotificationsHandler(
         CancellationToken cancellationToken = default
     )
     {
-        var domainInput = mapper.Map<NotificationsDomain>(request);
+        var domainInput = DomainMapperProfile.MapToDomain(request);
         return await notificationsService.CreateNewNotificationAsync(
             request: domainInput,
             cancellationToken
@@ -44,7 +40,6 @@ public sealed class NotificationsHandler(
     /// <returns>
     /// A boolean value indicating whether the operation was successful (true) or not (false).
     /// </returns>
-    /// <exception cref="NotImplementedException"></exception>
     public async Task<bool> DeleteAllNotificationsForUserAsync(
         string currentLoggedInUser,
         CancellationToken cancellationToken = default
@@ -58,7 +53,7 @@ public sealed class NotificationsHandler(
 
     /// <summary>
     /// Retrieves a list of notifications for a specific user based on their username. 
-    /// This method allows clients to fetch all notifications that are relevant to a particular user
+    /// This method allows clients to fetch all notifications that are relevant to a particular user.
     /// </summary>
     /// <param name="recipientUserName">The username of the user for whom to retrieve notifications.</param>
     /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
@@ -72,7 +67,7 @@ public sealed class NotificationsHandler(
             recipientUserName,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<IEnumerable<NotificationsResponseDto>>(domainResponse);
+        return [.. domainResponse.Select(DomainMapperProfile.MapToDto)];
     }
 
     /// <summary>

@@ -16,7 +16,10 @@ internal static class OrchestratorHelpers
     /// <param name="finalResponse">The final response.</param>
     /// <param name="groupChatResponses">The group chat response.</param>
     /// <returns>The group chat response domain model.</returns>
-    internal static OrchestratorFinalResponseDomain PrepareOrchestratorFinalResponse(string finalResponse, List<GroupChatAgentsResponseDomain> groupChatResponses) =>
+    internal static OrchestratorFinalResponseDomain PrepareOrchestratorFinalResponse(
+        string finalResponse,
+        List<GroupChatAgentsResponseDomain> groupChatResponses
+    ) =>
         new()
         {
             FinalResponse = finalResponse,
@@ -28,7 +31,8 @@ internal static class OrchestratorHelpers
     /// </summary>
     /// <param name="orchestratorResponse">The orchestrator response string.</param>
     /// <returns>The <see cref="OrchestratorAgentResponseDomain"/></returns>
-    internal static OrchestratorAgentResponseDomain? ParseOrchestratorResponse(string orchestratorResponse) => JsonConvert.DeserializeObject<OrchestratorAgentResponseDomain>(orchestratorResponse);
+    internal static OrchestratorAgentResponseDomain? ParseOrchestratorResponse(string orchestratorResponse)
+        => JsonConvert.DeserializeObject<OrchestratorAgentResponseDomain>(orchestratorResponse);
 
     /// <summary>
     /// Gets the orchestrator system prompt.

@@ -1,19 +1,18 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.Ports.In;
-using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
 /// <summary>
 /// The <c>ApplicationAdminHandler</c> class is responsible for handling application administration related operations, such as retrieving bug reports and feature requests. 
 /// <remarks>It implements the <see cref="IApplicationAdminHandler"/> interface and uses an instance of <see cref="IApplicationAdminService"/> to perform the necessary operations. 
-/// The results are then mapped to the appropriate DTOs using AutoMapper before being returned to the caller.</remarks>
+/// The results are then mapped to the appropriate DTOs using <see cref="DomainMapperProfile"/> before being returned to the caller.</remarks>
 /// </summary>
-/// <param name="mapper">The auto mapper service.</param>
 /// <param name="applicationAdminService">The application admin service.</param>
 /// <seealso cref="IApplicationAdminHandler"/>
-public sealed class ApplicationAdminHandler(IMapper mapper, IApplicationAdminService applicationAdminService) : IApplicationAdminHandler
+public sealed class ApplicationAdminHandler(IApplicationAdminService applicationAdminService) : IApplicationAdminHandler
 {
     /// <summary>
     /// Gets all bug reports data asynchronous.
@@ -27,7 +26,7 @@ public sealed class ApplicationAdminHandler(IMapper mapper, IApplicationAdminSer
             currentLoggedinUser,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<IEnumerable<BugReportDataDto>>(domainResult);
+        return [.. domainResult.Select(DomainMapperProfile.MapToDto)];
     }
 
     /// <summary>
@@ -42,7 +41,7 @@ public sealed class ApplicationAdminHandler(IMapper mapper, IApplicationAdminSer
             currentLoggedinUser,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<IEnumerable<NewFeatureRequestDataDto>>(domainResult);
+        return [.. domainResult.Select(DomainMapperProfile.MapToDto)];
     }
 
     /// <summary>

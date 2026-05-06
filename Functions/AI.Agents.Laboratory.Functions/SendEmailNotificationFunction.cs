@@ -5,8 +5,10 @@ using AI.Agents.Laboratory.Functions.Shared.Helpers;
 using AI.Agents.Laboratory.Functions.Shared.Models;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using static AI.Agents.Laboratory.Functions.Shared.Constants.EnvironmentConfigurationConstants;
 
 namespace AI.Agents.Laboratory.Functions;
 
@@ -24,7 +26,7 @@ namespace AI.Agents.Laboratory.Functions;
 public sealed class SendEmailNotificationFunction(
     ILogger<SendEmailNotificationFunction> logger,
     ICorrelationContext correlationContext,
-    IEmailNotificationsService emailNotificationsService)
+    [FromKeyedServices(NotificationServices.AppPushNotifications)] INotificationService emailNotificationsService)
 {
     /// <summary>
     /// Runs the function asynchronous.
@@ -61,11 +63,12 @@ public sealed class SendEmailNotificationFunction(
         {
             logger.LogAppInformation(
                 LoggerConstants.LogHelperMethodStart,
-                nameof(SendEmailNotificationFunction), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody })
+                nameof(SendEmailNotificationFunction), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody })
             );
 
-            response = await emailNotificationsService.SendEmailNotificationAsync(
-                emailNotificationModel: notificationMessageBody,
+            response = await emailNotificationsService.SendNotificationsAsync(
+                notificationModel: notificationMessageBody,
                 cancellationToken
             ).ConfigureAwait(false);
             await messageActions.CompleteMessageAsync(
@@ -89,7 +92,8 @@ public sealed class SendEmailNotificationFunction(
         {
             logger.LogAppInformation(
                 LoggerConstants.LogHelperMethodEnd,
-                nameof(SendEmailNotificationFunction), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody, response })
+                nameof(SendEmailNotificationFunction), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody, response })
             );
         }
     }

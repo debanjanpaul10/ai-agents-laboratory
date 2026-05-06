@@ -21,11 +21,6 @@ public static class ApplicationPluginsHelpers
         public const string FunctionName = nameof(GetChatMessageResponseFunction);
 
         /// <summary>
-        /// The function description
-        /// </summary>
-        public const string FunctionDescription = "Gets the response for user's query from the chat message.";
-
-        /// <summary>
         /// The function instructions
         /// </summary>
         public const string FunctionInstructions = @"""
@@ -49,11 +44,6 @@ public static class ApplicationPluginsHelpers
 
             +++++++++++
             """;
-
-        /// <summary>
-        /// The input description
-        /// </summary>
-        public const string InputDescription = "The chat request message that contains AgentName, UserMessage and AgentMetaprompt.";
     }
 
     /// <summary>
@@ -62,36 +52,28 @@ public static class ApplicationPluginsHelpers
     public static class DetermineToolToCallFunction
     {
         /// <summary>
-        /// The function name
-        /// </summary>
-        public const string FunctionName = nameof(DetermineToolToCallFunction);
-
-        /// <summary>
-        /// The function description
-        /// </summary>
-        public const string FunctionDescription = "Decides which tool to call based on the given list of tools.";
-
-        /// <summary>
         /// Gets the function instructions.
         /// </summary>
         /// <param name="toolDescriptions">The tool descriptions.</param>
         /// <param name="input">The input.</param>
         /// <returns>The Prompt response.</returns>
         public static string GetFunctionInstructions(string toolDescriptions, string input) =>
-           $@"""
+            $@"""
             # Role:
                 - You are a tool selection assistant. Based on the user's query, determine if any of the available tools should be called.
+
             # Available Tools: 
                 - {toolDescriptions}
+
             # User Query:
                 - {input}
                 
             # Instructions:
                 1. If a tool is needed, respond with EXACTLY this JSON format:
-                {{toolName: exact_tool_name, toolArguments: list_of_tool_arguments}}
+                    {{toolName: exact_tool_name, toolArguments: list_of_tool_arguments}}
                 
                 2. If NO tool is needed, respond with:
-                {{toolName: """", toolArguments: {{}}}}
+                    {{toolName: """", toolArguments: {{}}}}
                 
                 3. For toolArguments, provide a valid JSON object with the parameters the tool needs. If the tool requires no parameters, use {{}}.
 
@@ -105,22 +87,6 @@ public static class ApplicationPluginsHelpers
                     }}.
             - Make the JSON valid and parsable.
                 """;
-
-        /// <summary>
-        /// The input descriptions.
-        /// </summary>
-        public static class InputDescriptions
-        {
-            /// <summary>
-            /// The user input
-            /// </summary>
-            public const string UserInput = "The user input received from the front end";
-
-            /// <summary>
-            /// The list of tools
-            /// </summary>
-            public const string ListOfTools = "The list of available tools available in the MCP server";
-        }
     }
 
     /// <summary>
@@ -129,44 +95,18 @@ public static class ApplicationPluginsHelpers
     public static class GenerateFinalResponseWithToolResultFunction
     {
         /// <summary>
-        /// The function name
-        /// </summary>
-        public const string FunctionName = nameof(GenerateFinalResponseWithToolResultFunction);
-
-        /// <summary>
-        /// The function description
-        /// </summary>
-        public const string FunctionDescription = "Generates the final response using the tool result.";
-
-        /// <summary>
         /// Gets the function instructions.
         /// </summary>
         /// <param name="input">The input.</param>
         /// <param name="toolResult">The tool result.</param>
         /// <returns>The function instructions.</returns>
         public static string GetFunctionInstructions(string input, string? toolResult) =>
-             string.IsNullOrEmpty(toolResult)
-                ? $@"User Query: {input} 
-                    Please provide a helpful response to the user's query."
-                : $@"User Query: {input}
-                    Tool Result: {toolResult}
-                    Based on the tool result above, provide a clear and helpful response to the user's query. Format the information in a user-friendly way.";
-
-        /// <summary>
-        /// The input descriptions.
-        /// </summary>
-        public static class InputDescriptions
-        {
-            /// <summary>
-            /// The user input
-            /// </summary>
-            public const string UserInput = "The user input received from the front end";
-
-            /// <summary>
-            /// The list of tools
-            /// </summary>
-            public const string ToolResult = "The response received from executing the tool.";
-        }
+            string.IsNullOrEmpty(toolResult)
+            ? $@"User Query: {input} 
+                Please provide a helpful response to the user's query."
+            : $@"User Query: {input}
+                Tool Result: {toolResult}
+                Based on the tool result above, provide a clear and helpful response to the user's query. Format the information in a user-friendly way.";
     }
 
     /// <summary>
@@ -174,11 +114,6 @@ public static class ApplicationPluginsHelpers
     /// </summary>
     public static class SystemOrchestratorFunction
     {
-        /// <summary>
-        /// The function name
-        /// </summary>
-        public const string FunctionName = nameof(SystemOrchestratorFunction);
-
         /// <summary>
         /// The max orchestrator loops
         /// </summary>
@@ -211,8 +146,8 @@ public static class ApplicationPluginsHelpers
                     1. Analyze the user's request and the current conversation history.
                     2. Decide if you can answer the request directly (ONLY if it's a simple greeting or if the task is complete) or if you need to delegate to a specific agent.
                     3. If you need to delegate:
-                       - Choose the most appropriate agent from the list.
-                       - Provide clear instructions to that agent based on the user's request or previous agents' outputs.
+                        - Choose the most appropriate agent from the list.
+                        - Provide clear instructions to that agent based on the user's request or previous agents' outputs.
                     4. If the task is complete or you have the final answer, provide the final response to the user.
 
                 ### Response Format:

@@ -22,12 +22,7 @@ public sealed class ConversationHistoryService(
     ICorrelationContext correlationContext,
     IConversationHistoryDataManager conversationHistoryDataManager) : IConversationHistoryService
 {
-    /// <summary>
-    /// Gets the conversation history data for current chat.
-    /// </summary>
-    /// <param name="userName">The user name.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The conversation history domain.</returns>
+    /// <inheritdoc />
     public async Task<ConversationHistoryDomain> GetConversationHistoryAsync(
         string userName,
         CancellationToken cancellationToken = default
@@ -71,12 +66,7 @@ public sealed class ConversationHistoryService(
         }
     }
 
-    /// <summary>
-    /// Saves the current message data to conversation history.
-    /// </summary>
-    /// <param name="conversationHistory">The conversation history.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for success/failure.</returns>
+    /// <inheritdoc />
     public async Task<bool> SaveMessageToConversationHistoryAsync(
         ConversationHistoryDomain conversationHistory,
         CancellationToken cancellationToken = default
@@ -120,12 +110,7 @@ public sealed class ConversationHistoryService(
         }
     }
 
-    /// <summary>
-    /// Clears the conversation history data for the user.
-    /// </summary>
-    /// <param name="userName">The user name for user.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for success/failure.</returns>
+    /// <inheritdoc />
     public async Task<bool> ClearConversationHistoryForUserAsync(
         string userName,
         CancellationToken cancellationToken = default

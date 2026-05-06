@@ -28,13 +28,7 @@ public sealed class DirectChatService(
     IAiServices aiServices,
     IConversationHistoryService conversationHistoryService) : IDirectChatService
 {
-    /// <summary>
-    /// Gets the chatbot response.
-    /// </summary>
-    /// <param name="userQuery">The user query.</param>
-    /// <param name="userEmail">The user email address.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The AI response.</returns>
+    /// <inheritdoc />
     public async Task<string> GetDirectChatResponseAsync(
         string userQuery,
         string userEmail,
@@ -112,12 +106,7 @@ public sealed class DirectChatService(
         }
     }
 
-    /// <summary>
-    /// Clears the conversation history data for the user.
-    /// </summary>
-    /// <param name="userName">The user name for user.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for success/failure.</returns>
+    /// <inheritdoc />
     public async Task<bool> ClearConversationHistoryForUserAsync(
         string userName,
         CancellationToken cancellationToken = default
@@ -160,12 +149,7 @@ public sealed class DirectChatService(
         }
     }
 
-    /// <summary>
-    /// Gets the conversation history data for user.
-    /// </summary>
-    /// <param name="userName">The current user name.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The conversation history data domain model.</returns>
+    /// <inheritdoc />
     public async Task<ConversationHistoryDomain> GetConversationHistoryDataAsync(
         string userName,
         CancellationToken cancellationToken = default

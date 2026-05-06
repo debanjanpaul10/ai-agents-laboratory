@@ -3,18 +3,18 @@
 namespace AI.Agents.Laboratory.Functions.Business.Contracts;
 
 /// <summary>
-/// Defines contract for a service that processes the email notifications.
+/// Defines contract for a service that processes the notifications.
 /// </summary>
-public interface IEmailNotificationsService
+public interface INotificationService
 {
     /// <summary>
-    /// Sends the email notification asynchronous.
+    /// Sends the notifications asynchronously.
     /// </summary>
-    /// <param name="emailNotificationModel">The email notification model.</param>
+    /// <param name="notificationModel">The notification model.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for success/failure.</returns>
-    Task<bool> SendEmailNotificationAsync(
-        NotificationRequest emailNotificationModel,
+    Task<bool> SendNotificationsAsync(
+        NotificationRequest notificationModel,
         CancellationToken cancellationToken = default
     );
 }

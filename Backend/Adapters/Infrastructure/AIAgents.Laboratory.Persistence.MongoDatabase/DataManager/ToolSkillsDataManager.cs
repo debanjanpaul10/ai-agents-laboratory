@@ -1,8 +1,8 @@
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Contracts;
+using AIAgents.Laboratory.Persistence.MongoDatabase.Mapper;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Models;
-using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using static AIAgents.Laboratory.Persistence.MongoDatabase.Helpers.Constants;
@@ -14,13 +14,12 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
 /// </summary>
 /// <remarks>
 /// It implements the <see cref="IToolSkillsDataManager"/> interface, allowing for operations such as creating, retrieving, updating, and deleting tool skills.
-/// The class uses an instance of <see cref="IMongoDatabaseRepository"/> to interact with the MongoDB database and an <see cref="IMapper"/> for mapping between domain models and data models.
+/// The class uses an instance of <see cref="IMongoDatabaseRepository"/> to interact with the MongoDB database and <see cref="MongoDataMapperProfile"/> for mapping between domain models and data models.
 /// </remarks>
 /// <param name="configuration">The configuration service.</param>
-/// <param name="mapper">The mapper service.</param>
 /// <param name="mongoDatabaseRepository">The MongoDB database repository.</param>
 /// <seealso cref="IToolSkillsDataManager"/>
-public sealed class ToolSkillsDataManager(IConfiguration configuration, IMapper mapper, IMongoDatabaseRepository mongoDatabaseRepository) : IToolSkillsDataManager
+public sealed class ToolSkillsDataManager(IConfiguration configuration, IMongoDatabaseRepository mongoDatabaseRepository) : IToolSkillsDataManager
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -43,11 +42,12 @@ public sealed class ToolSkillsDataManager(IConfiguration configuration, IMapper 
     /// <returns>The boolean for <c>success/failure</c></returns>
     public async Task<bool> AddNewToolSkillAsync(ToolSkillDomain toolSkillData, string userEmail, CancellationToken cancellationToken = default)
     {
-        var dbInput = mapper.Map<ToolSkillModel>(toolSkillData);
+        var dbInput = MongoDataMapperProfile.MapToModel(domain: toolSkillData);
         return await mongoDatabaseRepository.SaveDataAsync(
             data: dbInput,
             databaseName: this.MongoDatabaseName,
             collectionName: this.ToolSkillsCollectionName,
+            bypassDocumentValidation: true,
             cancellationToken
         ).ConfigureAwait(false);
     }
@@ -74,11 +74,11 @@ public sealed class ToolSkillsDataManager(IConfiguration configuration, IMapper 
             throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
 
         var updates = new List<UpdateDefinition<ToolSkillModel>>
-            {
-                Builders<ToolSkillModel>.Update.Set(x => x.IsActive, false),
-                Builders<ToolSkillModel>.Update.Set(x => x.DateModified, DateTime.UtcNow),
-                Builders<ToolSkillModel>.Update.Set(x => x.ModifiedBy, currentUserEmail)
-            };
+        {
+            Builders<ToolSkillModel>.Update.Set(x => x.IsActive, false),
+            Builders<ToolSkillModel>.Update.Set(x => x.DateModified, DateTime.UtcNow),
+            Builders<ToolSkillModel>.Update.Set(x => x.ModifiedBy, currentUserEmail)
+        };
         var update = Builders<ToolSkillModel>.Update.Combine(updates);
         return await mongoDatabaseRepository.UpdateDataInCollectionAsync(
             filter,
@@ -104,7 +104,7 @@ public sealed class ToolSkillsDataManager(IConfiguration configuration, IMapper 
             filter,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<IEnumerable<ToolSkillDomain>>(result);
+        return [.. result.Select(MongoDataMapperProfile.MapToDomain)];
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public sealed class ToolSkillsDataManager(IConfiguration configuration, IMapper 
             cancellationToken
         ).ConfigureAwait(false);
 
-        return mapper.Map<ToolSkillDomain>(allData?.First() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage));
+        return MongoDataMapperProfile.MapToDomain(model: allData?.First() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage));
     }
 
     /// <summary>
@@ -137,7 +137,7 @@ public sealed class ToolSkillsDataManager(IConfiguration configuration, IMapper 
     /// <returns>The boolean for <c>success/failure</c></returns>
     public async Task<bool> UpdateExistingToolSkillDataAsync(ToolSkillDomain updateToolSkillData, string currentUserEmail, CancellationToken cancellationToken = default)
     {
-        var dbInput = mapper.Map<ToolSkillModel>(updateToolSkillData);
+        var dbInput = MongoDataMapperProfile.MapToModel(domain: updateToolSkillData);
         var filter = Builders<ToolSkillModel>.Filter.And(
             Builders<ToolSkillModel>.Filter.Eq(x => x.IsActive, true),
             Builders<ToolSkillModel>.Filter.Eq(x => x.ToolSkillGuid, dbInput.ToolSkillGuid));
@@ -154,14 +154,14 @@ public sealed class ToolSkillsDataManager(IConfiguration configuration, IMapper 
             throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
 
         var updates = new List<UpdateDefinition<ToolSkillModel>>
-            {
-                Builders<ToolSkillModel>.Update.Set(x => x.AssociatedAgents, dbInput.AssociatedAgents),
-                Builders<ToolSkillModel>.Update.Set(x => x.ToolSkillDisplayName, dbInput.ToolSkillDisplayName),
-                Builders<ToolSkillModel>.Update.Set(x => x.ToolSkillMcpServerUrl, dbInput.ToolSkillMcpServerUrl),
-                Builders<ToolSkillModel>.Update.Set(x => x.ToolSkillTechnicalName, dbInput.ToolSkillTechnicalName),
-                Builders<ToolSkillModel>.Update.Set(x => x.DateModified, DateTime.UtcNow),
-                Builders<ToolSkillModel>.Update.Set(x => x.ModifiedBy, currentUserEmail),
-            };
+        {
+            Builders<ToolSkillModel>.Update.Set(x => x.AssociatedAgents, dbInput.AssociatedAgents),
+            Builders<ToolSkillModel>.Update.Set(x => x.ToolSkillDisplayName, dbInput.ToolSkillDisplayName),
+            Builders<ToolSkillModel>.Update.Set(x => x.ToolSkillMcpServerUrl, dbInput.ToolSkillMcpServerUrl),
+            Builders<ToolSkillModel>.Update.Set(x => x.ToolSkillTechnicalName, dbInput.ToolSkillTechnicalName),
+            Builders<ToolSkillModel>.Update.Set(x => x.DateModified, DateTime.UtcNow),
+            Builders<ToolSkillModel>.Update.Set(x => x.ModifiedBy, currentUserEmail),
+        };
 
         var update = Builders<ToolSkillModel>.Update.Combine(updates);
         return await mongoDatabaseRepository.UpdateDataInCollectionAsync(

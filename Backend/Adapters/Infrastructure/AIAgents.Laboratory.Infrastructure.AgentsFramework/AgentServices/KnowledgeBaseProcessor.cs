@@ -32,12 +32,7 @@ public sealed class KnowledgeBaseProcessor(
     IEmbeddingGenerator<string, Embedding<float>> embeddingGeneratorService,
     FileContentReaderFactory fileContentReaderFactory) : IKnowledgeBaseProcessor
 {
-    /// <summary>
-    /// Detects the file type of the specified knowledge base document and reads its content accordingly.
-    /// </summary>
-    /// <remarks>Supported file types include plain text, PDF, Excel, and Word documents. If the file type is not supported, an exception is thrown.</remarks>
-    /// <param name="knowledgeBaseDocumentDomain">The knowledge base document to read. Must not be null and must have a valid file name with a supported extension.</param>
-    /// <returns>A string containing the content of the file. The format of the content depends on the file type.</returns>
+    /// <inheritdoc />
     public string DetectAndReadFileContent(KnowledgeBaseDocumentDomain knowledgeBaseDocumentDomain)
     {
         ArgumentNullException.ThrowIfNull(knowledgeBaseDocumentDomain);
@@ -74,15 +69,7 @@ public sealed class KnowledgeBaseProcessor(
         }
     }
 
-    /// <summary>
-    /// Asynchronously retrieves relevant knowledge entries for a given query and agent identifier.
-    /// </summary>
-    /// <remarks>The method uses semantic search to identify and return up to five of the most relevant knowledge entries for the specified agent. The returned string may contain multiple entries, each separated by
-    /// two newline characters. If no relevant knowledge is found, the method returns an empty string.</remarks>
-    /// <param name="query">The search query used to find relevant knowledge. Cannot be null or empty.</param>
-    /// <param name="agentId">The unique identifier of the agent whose knowledge base is searched. Cannot be null or empty.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation. Optional.</param>
-    /// <returns>A string containing the most relevant knowledge entries separated by double newlines, or an empty string if no relevant entries are found.</returns>
+    /// <inheritdoc />
     public async Task<string> GetRelevantKnowledgeAsync(
         string query,
         string agentId,
@@ -143,16 +130,7 @@ public sealed class KnowledgeBaseProcessor(
         }
     }
 
-    /// <summary>
-    /// Processes a knowledge base document by splitting its content into chunks, generating embeddings, and storing them in the memory store for the specified agent.
-    /// </summary>
-    /// <remarks>If the specified agent's collection does not exist in the memory store, it will be created automatically. Each chunk of the document is processed to generate an embedding and is then upserted into the
-    /// agent's collection.</remarks>
-    /// <param name="content">The plain text content of the knowledge base document to process. Cannot be null or empty.</param>
-    /// <param name="agentId">The unique identifier of the agent whose knowledge base will be updated. Cannot be null or empty.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation. Optional.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if the document content cannot be split into valid chunks, or if the number of generated embeddings does not match the number of chunks.</exception>
+    /// <inheritdoc />
     public async Task ProcessKnowledgeBaseDocumentAsync(
         string content,
         string agentId,

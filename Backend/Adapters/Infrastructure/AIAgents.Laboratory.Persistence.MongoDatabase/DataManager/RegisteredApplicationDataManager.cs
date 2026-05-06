@@ -1,8 +1,8 @@
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Contracts;
+using AIAgents.Laboratory.Persistence.MongoDatabase.Mapper;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Models;
-using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using static AIAgents.Laboratory.Persistence.MongoDatabase.Helpers.Constants;
@@ -12,12 +12,11 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
 /// <summary>
 /// Provides data management operations for registered applications, implementing the <see cref="IRegisteredApplicationDataManager"/> interface to interact with the MongoDB database for CRUD operations on registered application data.
 /// </summary>
-/// <remarks>This class serves as the concrete implementation of the data manager for registered applications, utilizing the MongoDB repository to perform database operations and AutoMapper for mapping between domain models and data models.</remarks>
+/// <remarks>This class serves as the concrete implementation of the data manager for registered applications, utilizing the MongoDB repository to perform database operations and <see cref="MongoDataMapperProfile"/> for mapping between domain models and data models.</remarks>
 /// <param name="configuration">The configuration service.</param>
-/// <param name="mapper">The AutoMapper service.</param>
 /// <param name="mongoDatabaseRepository">The MongoDB database repository.</param>
 /// <seealso cref="IRegisteredApplicationDataManager"/>
-public sealed class RegisteredApplicationDataManager(IConfiguration configuration, IMapper mapper, IMongoDatabaseRepository mongoDatabaseRepository) : IRegisteredApplicationDataManager
+public sealed class RegisteredApplicationDataManager(IConfiguration configuration, IMongoDatabaseRepository mongoDatabaseRepository) : IRegisteredApplicationDataManager
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -40,11 +39,12 @@ public sealed class RegisteredApplicationDataManager(IConfiguration configuratio
     /// <returns>A boolean for success/failure.</returns>
     public async Task<bool> CreateNewRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDomain newApplicationData, CancellationToken cancellationToken = default)
     {
-        var dbInput = mapper.Map<RegisteredApplicationDataModel>(newApplicationData);
+        var dbInput = MongoDataMapperProfile.MapToModel(domain: newApplicationData);
         return await mongoDatabaseRepository.SaveDataAsync(
             data: dbInput,
             databaseName: MongoDatabaseName,
             collectionName: RegisteredApplicationsCollectionName,
+            bypassDocumentValidation: true,
             cancellationToken
         ).ConfigureAwait(false);
     }
@@ -105,7 +105,7 @@ public sealed class RegisteredApplicationDataManager(IConfiguration configuratio
             filter,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<RegisteredApplicationDomain>(allData.FirstOrDefault()) ?? throw new KeyNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
+        return MongoDataMapperProfile.MapToDomain(model: allData.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage));
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public sealed class RegisteredApplicationDataManager(IConfiguration configuratio
             filter,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<IEnumerable<RegisteredApplicationDomain>>(result);
+        return [.. result.Select(MongoDataMapperProfile.MapToDomain)];
     }
 
     /// <summary>
@@ -137,7 +137,7 @@ public sealed class RegisteredApplicationDataManager(IConfiguration configuratio
     /// <returns>A boolean for success/failure.</returns>
     public async Task<bool> UpdateExistingRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDomain updateApplicationData, CancellationToken cancellationToken = default)
     {
-        var dbInput = mapper.Map<RegisteredApplicationDataModel>(updateApplicationData);
+        var dbInput = MongoDataMapperProfile.MapToModel(domain: updateApplicationData);
 
         var filter = Builders<RegisteredApplicationDataModel>.Filter.And(
             Builders<RegisteredApplicationDataModel>.Filter.Eq(x => x.IsActive, true),

@@ -28,8 +28,12 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public sealed class ChatController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration,
-    ILogger<ChatController> logger, ICorrelationContext correlationContext, IChatHandler chatHandler) : BaseController(httpContextAccessor, configuration)
+public sealed class ChatController(
+    IHttpContextAccessor httpContextAccessor,
+    IConfiguration configuration,
+    ILogger<ChatController> logger,
+    ICorrelationContext correlationContext,
+    IChatHandler chatHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Invokes the chat agent asynchronous.
@@ -43,8 +47,14 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = InvokeAgentAction.Summary, Description = InvokeAgentAction.Description, OperationId = InvokeAgentAction.OperationId)]
-    public async Task<ResponseDto> InvokeChatAgentAsync([FromBody] ChatRequestDTO chatRequestDTO, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = InvokeAgentAction.Summary,
+        Description = InvokeAgentAction.Description,
+        OperationId = InvokeAgentAction.OperationId)]
+    public async Task<ResponseDto> InvokeChatAgentAsync(
+        [FromBody] ChatRequestDTO chatRequestDTO,
+        CancellationToken cancellationToken = default
+    )
     {
         string result = string.Empty;
         try
@@ -94,8 +104,14 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetDirectChatResponseAction.Summary, Description = GetDirectChatResponseAction.Description, OperationId = GetDirectChatResponseAction.OperationId)]
-    public async Task<ResponseDto> GetDirectChatResponseAsync([FromBody] DirectChatRequestDTO userChatMessage, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetDirectChatResponseAction.Summary,
+        Description = GetDirectChatResponseAction.Description,
+        OperationId = GetDirectChatResponseAction.OperationId)]
+    public async Task<ResponseDto> GetDirectChatResponseAsync(
+        [FromBody] DirectChatRequestDTO userChatMessage,
+        CancellationToken cancellationToken = default
+    )
     {
         string result = string.Empty;
         try
@@ -146,8 +162,13 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = ClearConversationHistoryForUserAction.Summary, Description = ClearConversationHistoryForUserAction.Description, OperationId = ClearConversationHistoryForUserAction.OperationId)]
-    public async Task<ResponseDto> ClearConversationHistoryForUserAsync(CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = ClearConversationHistoryForUserAction.Summary,
+        Description = ClearConversationHistoryForUserAction.Description,
+        OperationId = ClearConversationHistoryForUserAction.OperationId)]
+    public async Task<ResponseDto> ClearConversationHistoryForUserAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         bool result = false;
         try
@@ -195,16 +216,24 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetConversationHistoryDataForUserAction.Summary, Description = GetConversationHistoryDataForUserAction.Description, OperationId = GetConversationHistoryDataForUserAction.OperationId)]
-    public async Task<ResponseDto> GetConversationHistoryDataForUserAsync(CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetConversationHistoryDataForUserAction.Summary,
+        Description = GetConversationHistoryDataForUserAction.Description,
+        OperationId = GetConversationHistoryDataForUserAction.OperationId)]
+    public async Task<ResponseDto> GetConversationHistoryDataForUserAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         ConversationHistoryDTO result = new();
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail })
+            );
 
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 result = await chatHandler.GetConversationHistoryDataAsync(
                     userName: base.UserEmail,
@@ -213,24 +242,36 @@ public sealed class ChatController(IHttpContextAccessor httpContextAccessor, ICo
 
                 if (result is not null)
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.ConversationHistoryCannotBeFetchedMessageConstant);
+                        message: ExceptionConstants.ConversationHistoryCannotBeFetchedMessageConstant
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetConversationHistoryDataForUserAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result })
+            );
         }
     }
 }

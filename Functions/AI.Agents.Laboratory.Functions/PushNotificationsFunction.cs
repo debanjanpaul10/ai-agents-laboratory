@@ -5,8 +5,10 @@ using AI.Agents.Laboratory.Functions.Shared.Helpers;
 using AI.Agents.Laboratory.Functions.Shared.Models;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using static AI.Agents.Laboratory.Functions.Shared.Constants.EnvironmentConfigurationConstants;
 
 namespace AI.Agents.Laboratory.Functions;
 
@@ -24,7 +26,7 @@ namespace AI.Agents.Laboratory.Functions;
 public sealed class PushNotificationsFunction(
     ILogger<PushNotificationsFunction> logger,
     ICorrelationContext correlationContext,
-    IPushNotificationsService pushNotificationsService)
+    [FromKeyedServices(NotificationServices.AppPushNotifications)] INotificationService pushNotificationsService)
 {
     /// <summary>
     /// This method is triggered when a new message arrives in the specified Service Bus queue. 
@@ -66,11 +68,12 @@ public sealed class PushNotificationsFunction(
         {
             logger.LogAppInformation(
                 LoggerConstants.LogHelperMethodStart,
-                nameof(PushNotificationsFunction), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody })
+                nameof(PushNotificationsFunction), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody })
             );
 
-            response = await pushNotificationsService.ReceivePushNotificationAsync(
-                request: notificationMessageBody,
+            response = await pushNotificationsService.SendNotificationsAsync(
+                notificationModel: notificationMessageBody,
                 cancellationToken
             ).ConfigureAwait(false);
             await messageActions.CompleteMessageAsync(
@@ -94,7 +97,8 @@ public sealed class PushNotificationsFunction(
         {
             logger.LogAppInformation(
                 LoggerConstants.LogHelperMethodEnd,
-                nameof(PushNotificationsFunction), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody, response })
+                nameof(PushNotificationsFunction), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody, response })
             );
         }
     }

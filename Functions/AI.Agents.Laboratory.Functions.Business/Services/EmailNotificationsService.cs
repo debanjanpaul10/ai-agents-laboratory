@@ -17,12 +17,12 @@ namespace AI.Agents.Laboratory.Functions.Business.Services;
 /// <param name="correlationContext">The correlation context used for telemetry logging and tracking.</param>
 /// <param name="emailClient">The Azure email sender client service.</param>
 /// <param name="logger">The logger service.</param>
-/// <seealso cref="AI.Agents.Laboratory.Functions.Business.Contracts.IEmailNotificationsService" />
+/// <seealso cref="INotificationService" />
 public sealed class EmailNotificationsService(
     ILogger<EmailNotificationsService> logger,
     IConfiguration configuration,
     ICorrelationContext correlationContext,
-    EmailClient emailClient) : IEmailNotificationsService
+    EmailClient emailClient) : INotificationService
 {
     /// <summary>
     /// The email communication service sender address.
@@ -33,11 +33,11 @@ public sealed class EmailNotificationsService(
     /// <summary>
     /// Sends the email notification asynchronous.
     /// </summary>
-    /// <param name="emailNotificationModel">The email notification model.</param>
+    /// <param name="notificationModel">The email notification model.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> SendEmailNotificationAsync(
-        NotificationRequest emailNotificationModel,
+    public async Task<bool> SendNotificationsAsync(
+        NotificationRequest notificationModel,
         CancellationToken cancellationToken = default
     )
     {
@@ -46,15 +46,16 @@ public sealed class EmailNotificationsService(
         {
             logger.LogAppInformation(
                 LoggerConstants.LogHelperMethodStart,
-                nameof(SendEmailNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, emailNotificationModel })
+                nameof(SendNotificationsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationModel })
             );
 
             var emailSendingOperation = await emailClient.SendAsync(
                 wait: Azure.WaitUntil.Completed,
                 senderAddress: EMAIL_COMMUNICATION_SENDER,
-                recipientAddress: emailNotificationModel.RecipientUserName,
-                subject: emailNotificationModel.Title,
-                htmlContent: emailNotificationModel.Message,
+                recipientAddress: notificationModel.RecipientUserName,
+                subject: notificationModel.Title,
+                htmlContent: notificationModel.Message,
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
 
@@ -66,7 +67,7 @@ public sealed class EmailNotificationsService(
             logger.LogAppError(
                 ex,
                 LoggerConstants.LogHelperMethodFailed,
-                nameof(SendEmailNotificationAsync), DateTime.UtcNow, ex.Message
+                nameof(SendNotificationsAsync), DateTime.UtcNow, ex.Message
             );
             throw new AIAgentsBusinessException(
                 message: ex.Message,
@@ -77,7 +78,8 @@ public sealed class EmailNotificationsService(
         {
             logger.LogAppInformation(
                 LoggerConstants.LogHelperMethodEnd,
-                nameof(SendEmailNotificationAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, emailNotificationModel, response })
+                nameof(SendNotificationsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationModel, response })
             );
         }
     }

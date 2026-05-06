@@ -13,6 +13,8 @@ namespace AIAgents.Laboratory.Infrastructure.AgentsFramework.AgentServices.FileR
 /// </summary>
 /// <remarks>This factory class maintains a mapping of supported file extensions to their corresponding content readers, allowing for flexible handling of various document formats when processing knowledge base documents. 
 /// If a requested file extension is not supported, the factory throws a FileFormatException with a message indicating that the file type is unsupported.</remarks>
+/// <param name="correlationContext">The correlation context used to track requests.</param>
+/// <param name="logger">The logger service.</param>
 /// <param name="readers">The collection of file content readers to be used by the factory. Each reader should specify the file extensions it supports through the SupportedExtensions property.</param>
 public sealed class FileContentReaderFactory(
     ILogger<FileContentReaderFactory> logger,

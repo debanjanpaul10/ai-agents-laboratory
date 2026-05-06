@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.AgentServices;

@@ -136,6 +136,11 @@ internal static class Constants
         /// The invalid json format message.
         /// </summary>
         internal const string InvalidJsonFormatMessage = "Invalid JSON structure for plugin: '{Plugin}', function: '{FunctionName}' and Server: '{McpServerUrl}'";
+
+        /// <summary>
+        /// The qdrant API configuration missing exception message.
+        /// </summary>
+        internal const string QdrantApiConfigurationMissingExceptionMessage = "The Qdrant vector storage configuration is missing.";
     }
 
     /// <summary>
