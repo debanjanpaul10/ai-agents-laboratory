@@ -57,7 +57,7 @@ public sealed class NotificationsController(
         Summary = CreateNewNotificationAction.Summary,
         Description = CreateNewNotificationAction.Description,
         OperationId = CreateNewNotificationAction.OperationId)]
-    public async Task<ResponseDto> CreateNewNotificationAsync(
+    public async Task<ActionResult<ResponseDto>> CreateNewNotificationAsync(
         [FromBody] CreateNotificationRequestDto request,
         CancellationToken cancellationToken = default
     )
@@ -127,7 +127,9 @@ public sealed class NotificationsController(
         Summary = PollNotificationsForUserAction.Summary,
         Description = PollNotificationsForUserAction.Description,
         OperationId = PollNotificationsForUserAction.OperationId)]
-    public async Task<ResponseDto> PollNotificationsForUserAsync(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<ResponseDto>> PollNotificationsForUserAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<NotificationsResponseDto> response = [];
         try
@@ -192,7 +194,9 @@ public sealed class NotificationsController(
         Summary = StreamNotificationsForUserAction.Summary,
         Description = StreamNotificationsForUserAction.Description,
         OperationId = StreamNotificationsForUserAction.OperationId)]
-    public async Task StreamNotificationsForUserAsync(CancellationToken cancellationToken = default)
+    public async Task StreamNotificationsForUserAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
@@ -204,9 +208,9 @@ public sealed class NotificationsController(
             ArgumentException.ThrowIfNullOrWhiteSpace(base.UserEmail);
             if (base.IsAuthorized(authorizationType: UserBased))
             {
-                Response.Headers.CacheControl = "no-cache";
-                Response.Headers.Connection = "keep-alive";
-                Response.ContentType = "text/event-stream";
+                Response.Headers.CacheControl = HeaderConstants.CacheControlHeader;
+                Response.Headers.Connection = HeaderConstants.ConnectionControlHeader;
+                Response.ContentType = HeaderConstants.ContentTypeControlHeader;
 
                 await notificationsHandler.StreamNotificationsForUserAsync(
                     recipientUserName: base.UserEmail,
@@ -224,7 +228,7 @@ public sealed class NotificationsController(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
-                nameof(StreamNotificationsForUserAsync), DateTime.UtcNow, "Notification stream cancelled."
+                nameof(StreamNotificationsForUserAsync), DateTime.UtcNow, LoggingConstants.NotificationStreamCancelledMessage
             );
         }
         catch (Exception ex)
@@ -259,7 +263,7 @@ public sealed class NotificationsController(
         Summary = MarkExistingNotificationAsReadAction.Summary,
         Description = MarkExistingNotificationAsReadAction.Description,
         OperationId = MarkExistingNotificationAsReadAction.OperationId)]
-    public async Task<ResponseDto> MarkExistingNotificationAsReadAsync(
+    public async Task<ActionResult<ResponseDto>> MarkExistingNotificationAsReadAsync(
         [FromQuery] Guid notificationId,
         CancellationToken cancellationToken = default
     )
@@ -328,7 +332,7 @@ public sealed class NotificationsController(
         Summary = DeleteAllNotificationsForUserAction.Summary,
         Description = DeleteAllNotificationsForUserAction.Description,
         OperationId = DeleteAllNotificationsForUserAction.OperationId)]
-    public async Task<ResponseDto> DeleteAllNotificationsForUserAsync(
+    public async Task<ActionResult<ResponseDto>> DeleteAllNotificationsForUserAsync(
         CancellationToken cancellationToken = default
     )
     {

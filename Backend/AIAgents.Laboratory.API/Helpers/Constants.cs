@@ -93,6 +93,11 @@ internal static class Constants
         internal const string UnhandledExceptionMessage = "Unhandled exception occurred. CorrelationId: {CorrelationId}, Path: {Path}, Method: {Method}";
 
         /// <summary>
+        /// The notification stream cancelled message.
+        /// </summary>
+        internal const string NotificationStreamCancelledMessage = "Notification stream cancelled.";
+
+        /// <summary>
         /// The header logging constants class.
         /// </summary>
         internal static class HeaderLoggingConstants
@@ -234,7 +239,7 @@ internal static class Constants
         /// <summary>
         /// The token format url.
         /// </summary>
-        internal const string TokenFormatUrl = "https://login.microsoftonline.com/{0}/v2.0";
+        internal const string TokenFormatUrl = "Configurations:TokenFormatUrl";
 
         /// <summary>
         /// The ai agents client identifier constant
@@ -266,5 +271,20 @@ internal static class Constants
         /// The client id claim constant.
         /// </summary>
         public const string ClientIdClaimConstant = "aud";
+
+        /// <summary>
+        /// The cache control header
+        /// </summary>
+        internal const string CacheControlHeader = "no-cache";
+
+        /// <summary>
+        /// The connection control header
+        /// </summary>
+        internal const string ConnectionControlHeader = "keep-alive";
+
+        /// <summary>
+        /// The content type control header
+        /// </summary>
+        internal const string ContentTypeControlHeader = "text/event-stream";
     }
 }

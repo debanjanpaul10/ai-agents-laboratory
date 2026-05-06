@@ -27,8 +27,12 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public sealed class ApplicationAdminController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration,
-    ILogger<ApplicationAdminController> logger, ICorrelationContext correlationContext, IApplicationAdminHandler applicationAdminHandler) : BaseController(httpContextAccessor, configuration)
+public sealed class ApplicationAdminController(
+    IHttpContextAccessor httpContextAccessor,
+    IConfiguration configuration,
+    ILogger<ApplicationAdminController> logger,
+    ICorrelationContext correlationContext,
+    IApplicationAdminHandler applicationAdminHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Gets all submitted feature requests asynchronous.
@@ -40,8 +44,13 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetAllSubmittedFeatureRequestsAction.Summary, Description = GetAllSubmittedFeatureRequestsAction.Description, OperationId = GetAllSubmittedFeatureRequestsAction.OperationId)]
-    public async Task<ResponseDto> GetAllSubmittedFeatureRequestsAsync(CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetAllSubmittedFeatureRequestsAction.Summary,
+        Description = GetAllSubmittedFeatureRequestsAction.Description,
+        OperationId = GetAllSubmittedFeatureRequestsAction.OperationId)]
+    public async Task<ResponseDto> GetAllSubmittedFeatureRequestsAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<NewFeatureRequestDataDto> response = [];
         try
@@ -89,8 +98,13 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetAllBugReportsDataAction.Summary, Description = GetAllBugReportsDataAction.Description, OperationId = GetAllBugReportsDataAction.OperationId)]
-    public async Task<ResponseDto> GetAllBugReportsDataAsync(CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetAllBugReportsDataAction.Summary,
+        Description = GetAllBugReportsDataAction.Description,
+        OperationId = GetAllBugReportsDataAction.OperationId)]
+    public async Task<ResponseDto> GetAllBugReportsDataAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<BugReportDataDto> response = [];
         try
@@ -137,7 +151,10 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = IsAdminAccessEnabledAction.Summary, Description = IsAdminAccessEnabledAction.Description, OperationId = IsAdminAccessEnabledAction.OperationId)]
+    [SwaggerOperation(
+        Summary = IsAdminAccessEnabledAction.Summary,
+        Description = IsAdminAccessEnabledAction.Description,
+        OperationId = IsAdminAccessEnabledAction.OperationId)]
     public ResponseDto IsAdminAccessEnabledAsync()
     {
         bool response = false;
