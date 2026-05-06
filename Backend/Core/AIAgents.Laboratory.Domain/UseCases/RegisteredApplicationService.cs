@@ -25,13 +25,7 @@ public sealed class RegisteredApplicationService(
     IRegisteredApplicationDataManager registeredApplicationDataManager,
     INotificationsService notificationsService) : IRegisteredApplicationService
 {
-    /// <summary>
-    /// Creates a new registered application for the current logged in user with the provided application data.
-    /// </summary>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="newApplicationData">The new application creation data model.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>A boolean for success/failure.</returns>
+    /// <inheritdoc />
     public async Task<bool> CreateNewRegisteredApplicationAsync(
         string currentLoggedInUser,
         RegisteredApplicationDomain newApplicationData,
@@ -78,14 +72,7 @@ public sealed class RegisteredApplicationService(
         }
     }
 
-    /// <summary>
-    /// Deletes a registered application by its ID for the current logged in user. 
-    /// </summary>
-    /// <remarks>The deletion is performed as a soft delete, where the IsActive property of the application is set to false instead of physically removing the record from the database.</remarks>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="applicationId">The application id for which data is to be deleted.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>A boolean for success/failure.</returns>
+    /// <inheritdoc />
     public async Task<bool> DeleteRegisteredApplicationByIdAsync(
         string currentLoggedInUser,
         int applicationId,
@@ -140,13 +127,7 @@ public sealed class RegisteredApplicationService(
         }
     }
 
-    /// <summary>
-    /// Gets the details of a specific registered application by its ID for the current logged in user.
-    /// </summary>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="applicationId">The application id to be searched for.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The registered application data model.</returns>
+    /// <inheritdoc />
     public async Task<RegisteredApplicationDomain> GetRegisteredApplicationByIdAsync(
         string currentLoggedInUser,
         int applicationId,
@@ -192,12 +173,7 @@ public sealed class RegisteredApplicationService(
         }
     }
 
-    /// <summary>
-    /// Gets the list of registered applications for the current logged in user.
-    /// </summary>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The list of <see cref="RegisteredApplicationDomain"/></returns>
+    /// <inheritdoc />
     public async Task<IEnumerable<RegisteredApplicationDomain>> GetRegisteredApplicationsAsync(
         string currentLoggedInUser,
         CancellationToken cancellationToken = default
@@ -240,14 +216,7 @@ public sealed class RegisteredApplicationService(
         }
     }
 
-    /// <summary>
-    /// Updates an existing registered application for the current logged in user with the provided application data. 
-    /// </summary>
-    /// <remarks>The application to be updated is identified by the Id property of the provided application data model.</remarks>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="updateApplicationData">The update application data model.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>A boolean for success/failure.</returns>
+    /// <inheritdoc />
     public async Task<bool> UpdateExistingRegisteredApplicationAsync(
         string currentLoggedInUser,
         RegisteredApplicationDomain updateApplicationData,
@@ -301,6 +270,8 @@ public sealed class RegisteredApplicationService(
         }
     }
 
+    #region PRIVATE METHODS
+
     /// <summary>
     /// Sends a notification to a user about the update of a registered application's data. The notification includes the name and ID of the updated application, and is sent as a push notification.
     /// </summary>
@@ -332,4 +303,6 @@ public sealed class RegisteredApplicationService(
             cancellationToken: cancellationToken
         ).ConfigureAwait(false);
     }
+
+    #endregion
 }

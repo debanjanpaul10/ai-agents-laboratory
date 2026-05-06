@@ -36,12 +36,17 @@ public abstract class BaseController(
         {
             // User Authentication
             if (authorizationType == AuthorizationTypes.UserBased && !string.IsNullOrWhiteSpace(this.UserEmail)
-            && !this.UserEmail.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
+                && !this.UserEmail.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase)
+            )
+            {
                 return this.CheckApplicationLevelAuthorization();
+            }
 
             // Application Authentication
             if (authorizationType == AuthorizationTypes.ApplicationBased)
+            {
                 return this.CheckApplicationLevelAuthorization();
+            }
         }
 
         return false;

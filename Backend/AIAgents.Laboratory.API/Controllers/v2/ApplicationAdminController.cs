@@ -14,8 +14,7 @@ using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ApplicationAdminCo
 namespace AIAgents.Laboratory.API.Controllers.v2;
 
 /// <summary>
-/// The <c>ApplicationAdminController</c> class is an API controller responsible for handling application administration related endpoints,
-/// such as retrieving submitted feature requests. 
+/// The <c>ApplicationAdminController</c> class is an API controller responsible for handling application administration related endpoints, such as retrieving submitted feature requests. 
 /// </summary>
 /// <remarks>It utilizes the <see cref="IApplicationAdminHandler"/> to perform the necessary operations and returns appropriate HTTP responses based on the outcome of the requests.</remarks>
 /// <param name="httpContextAccessor">The http context accessor.</param>

@@ -84,7 +84,9 @@ public static class DIContainer
     /// Adds API versioning to the service collection.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    internal static void AddApiVersions(this IServiceCollection services)
+    internal static void AddApiVersions(
+        this IServiceCollection services
+    )
     {
         services.AddApiVersioning(configuration =>
         {
@@ -141,7 +143,9 @@ public static class DIContainer
     /// Handles the authentication token validation success asynchronous.
     /// </summary>
     /// <param name="context">The context.</param>
-    private static async Task HandleAuthTokenValidationSuccessAsync(this TokenValidatedContext context)
+    private static async Task HandleAuthTokenValidationSuccessAsync(
+        this TokenValidatedContext context
+    )
     {
         var claimsPrincipal = context.Principal;
         if (claimsPrincipal?.Identity is not ClaimsIdentity claimsIdentity || !claimsIdentity.IsAuthenticated)
@@ -160,7 +164,9 @@ public static class DIContainer
     /// Handles the authentication token validation failed asynchronous.
     /// </summary>
     /// <param name="context">The context.</param>
-    private static async Task HandleAuthTokenValidationFailedAsync(this AuthenticationFailedContext context)
+    private static async Task HandleAuthTokenValidationFailedAsync(
+        this AuthenticationFailedContext context
+    )
     {
         var authenticationFailedException = new UnauthorizedAccessException(ExceptionConstants.InvalidTokenExceptionConstant);
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();

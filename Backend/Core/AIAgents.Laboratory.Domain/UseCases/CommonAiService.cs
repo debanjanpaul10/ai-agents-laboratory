@@ -28,10 +28,7 @@ public sealed class CommonAiService(
     ICacheService cacheService,
     IAgentsService agentsService) : ICommonAiService
 {
-    /// <summary>
-    /// Gets the current model identifier.
-    /// </summary>
-    /// <returns>The current model identifier.</returns>
+    /// <inheritdoc />
     public string GetCurrentModelId()
     {
         var isProModelEnabled = bool.TryParse(configuration[AzureAppConfigurationConstants.IsProModelEnabledFlag], out bool parsedValue) && parsedValue;
@@ -39,11 +36,7 @@ public sealed class CommonAiService(
         return configuration[geminiAiModel] ?? throw new KeyNotFoundException(ExceptionConstants.ModelNameNotFoundExceptionConstant);
     }
 
-    /// <summary>
-    /// Gets the configurations data for application.
-    /// </summary>
-    /// <param name="userName">The current logged in user.</param>
-    /// <returns>The dictionary containing the key-value pair.</returns>
+    /// <inheritdoc />
     public Dictionary<string, string> GetConfigurationsData(string userName)
     {
         try
@@ -98,11 +91,7 @@ public sealed class CommonAiService(
         }
     }
 
-    /// <summary>
-    /// Retrieves a collection of configuration settings associated with the specified key name.
-    /// </summary>
-    /// <param name="key">The key name used to identify the configuration group. Cannot be null or empty.</param>
-    /// <returns>A dictionary containing configuration key-value pairs for the specified key name.</returns>
+    /// <inheritdoc />
     public Dictionary<string, string> GetConfigurationByKeyName(string key)
     {
         try
@@ -148,12 +137,7 @@ public sealed class CommonAiService(
         }
     }
 
-    /// <summary>
-    /// Gets the top active agents data list and the agents count asynchronously.
-    /// </summary>
-    /// <param name="userName">The current logged in user.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A tupple containing the list of agents and the top 3 active ai agents.</returns>
+    /// <inheritdoc />
     public async Task<(int ActiveAgentsCount, IEnumerable<AgentDataDomain> TopActiveAgentsList)> GetTopActiveAgentsDataAsync(
         string userName,
         CancellationToken cancellationToken = default

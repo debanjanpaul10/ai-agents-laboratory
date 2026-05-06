@@ -32,13 +32,7 @@ public sealed class WorkspacesService(
     IOrchestratorService orchestratorService,
     INotificationsService notificationsService) : IWorkspacesService
 {
-    /// <summary>
-    /// Creates a new workspace.
-    /// </summary>
-    /// <param name="agentsWorkspaceData">The agents workspace data.</param>
-    /// <param name="currentUserEmail">The current user email address.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>A boolean for <c>success/failure.</c></returns>
+    /// <inheritdoc />
     public async Task<bool> CreateNewWorkspaceAsync(
         AgentsWorkspaceDomain agentsWorkspaceData,
         string currentUserEmail,
@@ -86,13 +80,7 @@ public sealed class WorkspacesService(
         }
     }
 
-    /// <summary>
-    /// Deletes the existing workspace by workspace guid id.
-    /// </summary>
-    /// <param name="workspaceGuidId">The workspace guid id.</param>
-    /// <param name="currentUserEmail">The current logged in user email address.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>A boolean for <c>success/failure.</c></returns>
+    /// <inheritdoc />
     public async Task<bool> DeleteExistingWorkspaceAsync(
         string workspaceGuidId,
         string currentUserEmail,
@@ -148,12 +136,7 @@ public sealed class WorkspacesService(
         }
     }
 
-    /// <summary>
-    /// Gets the collection of all available workspaces.
-    /// </summary>
-    /// <param name="currentUserEmail">The current logged in user name.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The list of <see cref="AgentsWorkspaceDomain"/></returns>
+    /// <inheritdoc />
     public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(
         string currentUserEmail,
         CancellationToken cancellationToken = default
@@ -193,13 +176,7 @@ public sealed class WorkspacesService(
         }
     }
 
-    /// <summary>
-    /// Gets the workspace by workspace id.
-    /// </summary>
-    /// <param name="workspaceId">The workspace id.</param>
-    /// <param name="currentUserEmail">The current logged in user email</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The agent workspace domain model.</returns>
+    /// <inheritdoc />
     public async Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(
         string workspaceId,
         string currentUserEmail,
@@ -245,12 +222,7 @@ public sealed class WorkspacesService(
         }
     }
 
-    /// <summary>
-    /// Gets the workspace group chat response.
-    /// </summary>
-    /// <param name="chatRequest">The workspace agent chat request dto model.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The group chat response.</returns>
+    /// <inheritdoc />
     public async Task<GroupChatResponseDomain> GetWorkspaceGroupChatResponseAsync(
         WorkspaceAgentChatRequestDomain chatRequest,
         CancellationToken cancellationToken = default
@@ -317,12 +289,7 @@ public sealed class WorkspacesService(
         }
     }
 
-    /// <summary>
-    /// Invoke the workspace agent with user message and get the response.
-    /// </summary>
-    /// <param name="chatRequest">The chat request domain model.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The string response from AI.</returns>
+    /// <inheritdoc />
     public async Task<string> InvokeWorkspaceAgentAsync(
         WorkspaceAgentChatRequestDomain chatRequest,
         CancellationToken cancellationToken = default
@@ -388,13 +355,7 @@ public sealed class WorkspacesService(
         }
     }
 
-    /// <summary>
-    /// Updates the existing workspace data.
-    /// </summary>
-    /// <param name="agentsWorkspaceData">The agents workspace data domain model.</param>
-    /// <param name="currentUserEmail">The current logged in user email.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>A boolean for <c>success/failure.</c></returns>
+    /// <inheritdoc />
     public async Task<bool> UpdateExistingWorkspaceDataAsync(
         AgentsWorkspaceDomain agentsWorkspaceData,
         string currentUserEmail,

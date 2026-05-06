@@ -41,12 +41,7 @@ public sealed class FeedbackService(
     private readonly string EmailNotificationsQueue = configuration[AzureAppConfigurationConstants.EmailNotificationsQueueName]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
-    /// <summary>
-    /// Adds the new bug report data asynchronous.
-    /// </summary>
-    /// <param name="bugReportData">The bug report data.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The boolean for success/failure.</returns>
+    /// <inheritdoc />
     public async Task<bool> AddNewBugReportDataAsync(
         BugReportData bugReportData,
         CancellationToken cancellationToken = default
@@ -106,12 +101,7 @@ public sealed class FeedbackService(
         }
     }
 
-    /// <summary>
-    /// Adds the new feature request data asynchronous.
-    /// </summary>
-    /// <param name="featureRequestData">The feature request data.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The boolean for success/failure.</returns>
+    /// <inheritdoc />
     public async Task<bool> AddNewFeatureRequestDataAsync(
         NewFeatureRequestData featureRequestData,
         CancellationToken cancellationToken = default
@@ -171,12 +161,7 @@ public sealed class FeedbackService(
         }
     }
 
-    /// <summary>
-    /// Gets all bug reports data asynchronous.
-    /// </summary>
-    /// <param name="currentLoggedinUser">The current logged in user.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>A list of <see cref="BugReportData"/></returns>
+    /// <inheritdoc />
     public async Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(
         string currentLoggedinUser,
         CancellationToken cancellationToken = default
@@ -217,12 +202,7 @@ public sealed class FeedbackService(
         }
     }
 
-    /// <summary>
-    /// Gets all submitted feature requests asynchronous.
-    /// </summary>
-    /// <param name="currentLoggedinUser">The current logged in user.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation. Optional.</param>
-    /// <returns>A list of <see cref="NewFeatureRequestData"/></returns>
+    /// <inheritdoc />
     public async Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(
         string currentLoggedinUser,
         CancellationToken cancellationToken = default
@@ -241,7 +221,9 @@ public sealed class FeedbackService(
                     cancellationToken
                 ).ConfigureAwait(false);
             else
-                throw new UnauthorizedAccessException(ExceptionConstants.UnauthorizedUserExceptionMessage);
+                throw new UnauthorizedAccessException(
+                    ExceptionConstants.UnauthorizedUserExceptionMessage
+                );
         }
         catch (Exception ex)
         {

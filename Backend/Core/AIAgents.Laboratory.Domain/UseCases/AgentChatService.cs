@@ -44,12 +44,7 @@ public sealed class AgentChatService(
     private readonly string IsAiVisionServiceAllowed = configuration[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
-    /// <summary>
-    /// Gets the agent chat response asynchronous.
-    /// </summary>
-    /// <param name="chatRequest">The chat request.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The AI response.</returns>
+    /// <inheritdoc />
     public async Task<string> GetAgentChatResponseAsync(
         ChatRequestDomain chatRequest,
         CancellationToken cancellationToken = default
@@ -138,13 +133,7 @@ public sealed class AgentChatService(
         }
     }
 
-    /// <summary>
-    /// Gets the response with integrated skill asynchronous.
-    /// </summary>
-    /// <param name="chatMessage">The chat message request domain model.</param>
-    /// <param name="associatedSkillGuids">The associated skill guids list</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The AI agent response string.</returns>
+    /// <inheritdoc />
     private async Task<string> GetResponseWithIntegratedSkillAsync(
         ChatMessageDomain chatMessage,
         IList<string> associatedSkillGuids,
