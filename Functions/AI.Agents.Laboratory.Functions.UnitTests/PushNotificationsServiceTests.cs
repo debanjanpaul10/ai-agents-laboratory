@@ -67,7 +67,9 @@ public class PushNotificationsServiceTests
             .ReturnsAsync(true);
 
         // Act
-        var result = await this._pushNotificationsService.ReceivePushNotificationAsync(request);
+        var result = await this._pushNotificationsService.SendNotificationsAsync(
+            notificationModel: request
+        );
 
         // Assert
         Assert.True(result);
@@ -92,7 +94,9 @@ public class PushNotificationsServiceTests
             .ReturnsAsync(false);
 
         // Act
-        var result = await this._pushNotificationsService.ReceivePushNotificationAsync(request);
+        var result = await this._pushNotificationsService.SendNotificationsAsync(
+            notificationModel: request
+        );
 
         // Assert
         Assert.False(result);
@@ -109,19 +113,21 @@ public class PushNotificationsServiceTests
     {
         // Arrange
         var request = new NotificationRequest();
-        var expectedMessage = "Test exception message";
         this._mockCorrelationContext
             .Setup(c => c.CorrelationId)
             .Returns(CorrelationGuid.ToString());
         this._mockNotificationsDataManager
             .Setup(m => m.SavePushNotificationsDataAsync(request, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception(expectedMessage));
+            .ThrowsAsync(new Exception(TestsHelper.TestExceptionMessage));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<AIAgentsBusinessException>(() =>
-            this._pushNotificationsService.ReceivePushNotificationAsync(request));
+        var exception = await Assert.ThrowsAsync<AIAgentsBusinessException>(testCode: () =>
+            this._pushNotificationsService.SendNotificationsAsync(
+                notificationModel: request
+            )
+        );
 
-        Assert.Equal(expectedMessage, exception.Message);
+        Assert.Equal(TestsHelper.TestExceptionMessage, exception.Message);
         this._mockNotificationsDataManager
             .Verify(m => m.SavePushNotificationsDataAsync(request, It.IsAny<CancellationToken>()), Times.Once);
     }
