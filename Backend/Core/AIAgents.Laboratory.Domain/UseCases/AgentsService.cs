@@ -31,14 +31,16 @@ public sealed class AgentsService(
     INotificationsService notificationsService) : IAgentsService
 {
     /// <summary>
-    /// The is knowledge base service allowed.
+    /// The feature flag for knowledge base service.
     /// </summary>
-    private readonly bool IsKnowledgeBaseServiceAllowed = bool.TryParse(configuration[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant], out var value) && value;
+    private readonly string IsKnowledgeBaseServiceAllowed = configuration[AzureAppConfigurationConstants.IsKnowledgeBaseServiceEnabledConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <summary>
     /// The feature flag for AI vision service.
     /// </summary>
-    private readonly bool IsAiVisionServiceAllowed = bool.TryParse(configuration[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant], out var aivisionAllowed) && aivisionAllowed;
+    private readonly string IsAiVisionServiceAllowed = configuration[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant]
+        ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <inheritdoc />
     public async Task<bool> CreateNewAgentAsync(
@@ -56,13 +58,18 @@ public sealed class AgentsService(
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, agentData.AgentName }));
 
             agentData.AgentId = Guid.NewGuid().ToString();
-            if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Any() && this.IsKnowledgeBaseServiceAllowed)
+
+            // Get data from Knowledge Base if configured
+            var isKnowledgeBaseServiceAllowedFlag = bool.TryParse(IsKnowledgeBaseServiceAllowed, out var isKbAllowed) && isKbAllowed;
+            if (agentData.KnowledgeBaseDocument is not null && agentData.KnowledgeBaseDocument.Any() && isKnowledgeBaseServiceAllowedFlag)
                 await documentIntelligenceService.CreateAndProcessKnowledgeBaseDocumentAsync(
                     agentData,
                     cancellationToken
                 ).ConfigureAwait(false);
 
-            if (agentData.VisionImages is not null && agentData.VisionImages.Any() && this.IsAiVisionServiceAllowed)
+            // Use AI Vision services if configured
+            bool isAiVisionServiceAllowedFlag = bool.TryParse(IsAiVisionServiceAllowed, out var isVisionAllowed) && isVisionAllowed;
+            if (agentData.VisionImages is not null && agentData.VisionImages.Any() && isAiVisionServiceAllowedFlag)
                 await documentIntelligenceService.CreateAndProcessAiVisionImagesKeywordsAsync(
                     agentData,
                     cancellationToken
@@ -187,14 +194,18 @@ public sealed class AgentsService(
                 cancellationToken
             ).ConfigureAwait(false);
 
-            if (this.IsKnowledgeBaseServiceAllowed)
+            // Get data from Knowledge Base if configured
+            var isKnowledgeBaseServiceAllowedFlag = bool.TryParse(IsKnowledgeBaseServiceAllowed, out var isKbAllowed) && isKbAllowed;
+            if (isKnowledgeBaseServiceAllowedFlag)
                 await documentIntelligenceService.HandleKnowledgeBaseDataUpdateAsync(
                     updateDataDomain,
                     existingAgent,
                     cancellationToken
                 ).ConfigureAwait(false);
 
-            if (this.IsAiVisionServiceAllowed)
+            // Use AI Vision services if configured
+            bool isAiVisionServiceAllowedFlag = bool.TryParse(IsAiVisionServiceAllowed, out var isVisionAllowed) && isVisionAllowed;
+            if (isAiVisionServiceAllowedFlag)
                 await documentIntelligenceService.HandleAiVisionImagesDataUpdateAsync(
                     updateDataDomain,
                     existingAgent,
