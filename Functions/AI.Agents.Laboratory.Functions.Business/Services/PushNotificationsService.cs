@@ -42,7 +42,7 @@ public sealed class PushNotificationsService(
             );
 
             response = await notificationsDataManager.SavePushNotificationsDataAsync(
-                notificationModel,
+                request: notificationModel,
                 cancellationToken
             ).ConfigureAwait(false);
             return response;

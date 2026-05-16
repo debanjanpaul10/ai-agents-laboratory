@@ -21,18 +21,12 @@ public sealed class ServiceBusManager(
     ILogger<ServiceBusManager> logger,
     ICorrelationContext correlationContext) : IServiceBusManager
 {
-    /// <summary>
-    /// Sends a message to an Azure Service Bus queue.
-    /// </summary>
-    /// <typeparam name="T">The payload type.</typeparam>
-    /// <param name="payload">The payload to serialize and send.</param>
-    /// <param name="queueName">The queue name where message is to be published.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A boolean response for success/failure.</returns>
+    /// <inheritdoc />
     public async Task<bool> SendQueueMessageAsync<T>(
         T payload,
         string queueName,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(payload);
         bool response = false;

@@ -1,5 +1,5 @@
 ﻿using AI.Agents.Laboratory.Functions.Data.Contracts;
-using AI.Agents.Laboratory.Functions.Data.Models;
+using AI.Agents.Laboratory.Functions.Data.Helpers;
 using AI.Agents.Laboratory.Functions.Shared.Constants;
 using AI.Agents.Laboratory.Functions.Shared.Exceptions;
 using AI.Agents.Laboratory.Functions.Shared.Helpers;
@@ -65,7 +65,9 @@ public sealed class NotificationsDataManager(
                 nameof(SavePushNotificationsDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, request })
             );
 
-            var document = PrepareNotificationDataModel(request);
+            var document = DatabaseUtilities.PrepareNotificationDataModel(
+                request
+            );
             response = await mongoDatabaseRepository.SaveDataAsync(
                 data: document,
                 databaseName: MongoDatabaseName,
@@ -94,30 +96,4 @@ public sealed class NotificationsDataManager(
             );
         }
     }
-
-    #region PRIVATE METHODS
-
-    /// <summary>
-    /// Prepares a <c>NotificationModel</c> from a given NotificationRequest, mapping the relevant properties and setting the creation and modification timestamps. 
-    /// This method is used to transform the incoming request data into a format suitable for persistence in the MongoDB database. 
-    /// </summary>
-    /// <param name="request">The notification request containing the details to be transformed into a NotificationModel.</param>
-    /// <returns>A <c>NotificationModel</c> object populated with data from the request and additional metadata such as timestamps.</returns>
-    private static NotificationModel PrepareNotificationDataModel(NotificationRequest request) =>
-        new()
-        {
-            Id = request.Id,
-            Title = request.Title,
-            Message = request.Message,
-            RecipientUserName = request.RecipientUserName,
-            NotificationType = request.NotificationType,
-            CreatedBy = request.CreatedBy,
-            IsGlobal = request.IsGlobal,
-            DateCreated = DateTime.UtcNow,
-            DateModified = DateTime.UtcNow,
-            ModifiedBy = request.CreatedBy,
-            IsActive = true,
-        };
-
-    #endregion
 }
