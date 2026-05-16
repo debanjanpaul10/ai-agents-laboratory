@@ -38,12 +38,11 @@ public sealed class ServiceBusManager(
                     JsonConvert.SerializeObject(new { correlationContext.CorrelationId, queueName })
             );
 
-            var sender = serviceBusClient.CreateSender(queueName);
+            await using var sender = serviceBusClient.CreateSender(queueOrTopicName: queueName);
             var body = JsonConvert.SerializeObject(payload);
             var message = new ServiceBusMessage(body)
             {
                 ContentType = AzureAppConfigurationConstants.ApplicationJsonConstant,
-                CorrelationId = correlationContext.CorrelationId,
                 MessageId = correlationContext.CorrelationId
             };
 
@@ -51,6 +50,7 @@ public sealed class ServiceBusManager(
                 message,
                 cancellationToken
             ).ConfigureAwait(false);
+
             response = true;
             return response;
         }
