@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static AI.Agents.Laboratory.Functions.Shared.Constants.EnvironmentConfigurationConstants;
+using static AI.Agents.Laboratory.Functions.Shared.Constants.FunctionsDomainConstants;
 
 namespace AI.Agents.Laboratory.Functions;
 
@@ -47,7 +48,30 @@ public sealed class PushNotificationsFunction(
     )
     {
         var messageBody = Encoding.UTF8.GetString(message.Body);
-        var notificationMessageBody = JsonConvert.DeserializeObject<NotificationRequest>(messageBody.ToString());
+        NotificationRequest? notificationMessageBody = null;
+        try
+        {
+            notificationMessageBody = await Task.Factory.StartNew(
+                function: () => JsonConvert.DeserializeObject<NotificationRequest>(messageBody.ToString()),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+        catch (JsonException ex)
+        {
+            logger.LogAppError(
+                ex,
+                DeadLetterConstants.JsonDeserializationExceptionReason,
+                message.MessageId
+            );
+            await messageActions.DeadLetterMessageAsync(
+               message,
+               deadLetterReason: DeadLetterConstants.JsonDeserializationExceptionReason,
+               deadLetterErrorDescription: DeadLetterConstants.JsonDeserializationExceptionDescription,
+               cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+            return;
+        }
+
         if (notificationMessageBody is null)
         {
             logger.LogError(
@@ -56,8 +80,8 @@ public sealed class PushNotificationsFunction(
             );
             await messageActions.DeadLetterMessageAsync(
                 message,
-                deadLetterReason: FunctionsDomainConstants.DeadLetterConstants.InvalidPayloadReason,
-                deadLetterErrorDescription: FunctionsDomainConstants.DeadLetterConstants.InvalidPayloadDescription,
+                deadLetterReason: DeadLetterConstants.InvalidPayloadReason,
+                deadLetterErrorDescription: DeadLetterConstants.InvalidPayloadDescription,
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
             return;
@@ -76,10 +100,31 @@ public sealed class PushNotificationsFunction(
                 notificationModel: notificationMessageBody,
                 cancellationToken
             ).ConfigureAwait(false);
-            await messageActions.CompleteMessageAsync(
-                message,
-                cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
+
+            if (response)
+            {
+                await messageActions.CompleteMessageAsync(
+                    message,
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
+            }
+            else
+            {
+                var exception = new Exception(
+                    DeadLetterConstants.ProcessingExceptionDescription
+                );
+                logger.LogAppError(
+                    exception,
+                    LoggerConstants.LogHelperMethodFailed,
+                    nameof(SendEmailNotificationFunction), DateTime.UtcNow, exception.Message
+                );
+                await messageActions.DeadLetterMessageAsync(
+                    message,
+                    deadLetterReason: DeadLetterConstants.ProcessingExceptionReason,
+                    deadLetterErrorDescription: DeadLetterConstants.ProcessingExceptionDescription,
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
+            }
         }
         catch (Exception ex)
         {
