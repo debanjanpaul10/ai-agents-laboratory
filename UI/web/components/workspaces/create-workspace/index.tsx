@@ -344,6 +344,7 @@ export default function CreateWorkspaceComponent({
 										>
 											<input
 												type="checkbox"
+												id="isGroupChatEnabled"
 												checked={
 													formData.isGroupChatEnabled
 												}
