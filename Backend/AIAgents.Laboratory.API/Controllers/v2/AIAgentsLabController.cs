@@ -28,9 +28,13 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration,
-    ILogger<AIAgentsLabController> logger, ICorrelationContext correlationContext,
-    ICommonAiHandler commonAiHandler, IFeedbackHandler feedbackHandler) : BaseController(httpContextAccessor, configuration)
+public sealed class AIAgentsLabController(
+    IHttpContextAccessor httpContextAccessor,
+    IConfiguration configuration,
+    ILogger<AIAgentsLabController> logger,
+    ICorrelationContext correlationContext,
+    ICommonAiHandler commonAiHandler,
+    IFeedbackHandler feedbackHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Gets the configurations data for application.
@@ -111,7 +115,9 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
         Summary = GetConfigurationsDataAction.Summary,
         Description = GetConfigurationsDataAction.Description,
         OperationId = GetConfigurationsDataAction.OperationId)]
-    public ResponseDto GetConfigurationByKeyName([FromQuery] string configKey)
+    public ResponseDto GetConfigurationByKeyName(
+        [FromQuery] string configKey
+    )
     {
         Dictionary<string, string> result = [];
         try
@@ -324,7 +330,9 @@ public sealed class AIAgentsLabController(IHttpContextAccessor httpContextAccess
         Summary = GetTopActiveAgentsDataAction.Summary,
         Description = GetTopActiveAgentsDataAction.Description,
         OperationId = GetTopActiveAgentsDataAction.OperationId)]
-    public async Task<ResponseDto> GetTopActiveAgentsDataAsync(CancellationToken cancellationToken = default)
+    public async Task<ResponseDto> GetTopActiveAgentsDataAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         TopActiveAgentsDTO result = new();
         try

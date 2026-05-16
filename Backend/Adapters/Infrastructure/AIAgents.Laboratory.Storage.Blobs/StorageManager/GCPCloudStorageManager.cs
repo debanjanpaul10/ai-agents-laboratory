@@ -18,7 +18,11 @@ namespace AIAgents.Laboratory.Storage.Blobs.StorageManager;
 /// <param name="correlationContext">The correlation context for logging.</param>
 /// <param name="storageClient">The Google Cloud Storage client instance.</param>
 /// <seealso cref="IBlobStorageManager"/>
-public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logger, IConfiguration configuration, ICorrelationContext correlationContext, StorageClient storageClient) : IBlobStorageManager
+public sealed class GcpCloudStorageManager(
+    ILogger<GcpCloudStorageManager> logger,
+    IConfiguration configuration,
+    ICorrelationContext correlationContext,
+    StorageClient storageClient) : IBlobStorageManager
 {
     /// <summary>
     /// The Google Cloud Platform storage bucket name.
@@ -46,6 +50,8 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
     /// <returns>A boolean for success/failure.</returns>
     public async Task<bool> DeleteDocumentsFolderAndDataAsync(string agentId, CancellationToken cancellationToken = default)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
+
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteDocumentsFolderAndDataAsync), DateTime.UtcNow,
@@ -169,7 +175,10 @@ public sealed class GcpCloudStorageManager(ILogger<GcpCloudStorageManager> logge
     /// <returns>The public URL for the document.</returns>
     public async Task<string> UploadDocumentsToStorageAsync(IFormFile documentFile, string agentGuid, UploadedFileType fileType, CancellationToken cancellationToken = default)
     {
-        if (documentFile.Length == 0) return string.Empty;
+        ArgumentException.ThrowIfNullOrWhiteSpace(agentGuid);
+        if (documentFile.Length == 0)
+            return string.Empty;
+
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UploadDocumentsToStorageAsync), DateTime.UtcNow,

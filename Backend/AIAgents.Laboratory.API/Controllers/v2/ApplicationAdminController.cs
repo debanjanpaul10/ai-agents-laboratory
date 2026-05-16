@@ -14,8 +14,7 @@ using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ApplicationAdminCo
 namespace AIAgents.Laboratory.API.Controllers.v2;
 
 /// <summary>
-/// The <c>ApplicationAdminController</c> class is an API controller responsible for handling application administration related endpoints,
-/// such as retrieving submitted feature requests. 
+/// The <c>ApplicationAdminController</c> class is an API controller responsible for handling application administration related endpoints, such as retrieving submitted feature requests. 
 /// </summary>
 /// <remarks>It utilizes the <see cref="IApplicationAdminHandler"/> to perform the necessary operations and returns appropriate HTTP responses based on the outcome of the requests.</remarks>
 /// <param name="httpContextAccessor">The http context accessor.</param>
@@ -27,8 +26,12 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public sealed class ApplicationAdminController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration,
-    ILogger<ApplicationAdminController> logger, ICorrelationContext correlationContext, IApplicationAdminHandler applicationAdminHandler) : BaseController(httpContextAccessor, configuration)
+public sealed class ApplicationAdminController(
+    IHttpContextAccessor httpContextAccessor,
+    IConfiguration configuration,
+    ILogger<ApplicationAdminController> logger,
+    ICorrelationContext correlationContext,
+    IApplicationAdminHandler applicationAdminHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Gets all submitted feature requests asynchronous.
@@ -40,16 +43,24 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetAllSubmittedFeatureRequestsAction.Summary, Description = GetAllSubmittedFeatureRequestsAction.Description, OperationId = GetAllSubmittedFeatureRequestsAction.OperationId)]
-    public async Task<ResponseDto> GetAllSubmittedFeatureRequestsAsync(CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetAllSubmittedFeatureRequestsAction.Summary,
+        Description = GetAllSubmittedFeatureRequestsAction.Description,
+        OperationId = GetAllSubmittedFeatureRequestsAction.OperationId)]
+    public async Task<ResponseDto> GetAllSubmittedFeatureRequestsAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<NewFeatureRequestDataDto> response = [];
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail })
+            );
 
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 response = await applicationAdminHandler.GetAllSubmittedFeatureRequestsAsync(
                     currentLoggedinUser: base.UserEmail,
@@ -58,24 +69,36 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
 
                 if (response is not null)
                     return HandleSuccessRequestResponse(
-                        responseData: response);
+                        responseData: response
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, response })
+            );
         }
     }
 
@@ -89,16 +112,24 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetAllBugReportsDataAction.Summary, Description = GetAllBugReportsDataAction.Description, OperationId = GetAllBugReportsDataAction.OperationId)]
-    public async Task<ResponseDto> GetAllBugReportsDataAsync(CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetAllBugReportsDataAction.Summary,
+        Description = GetAllBugReportsDataAction.Description,
+        OperationId = GetAllBugReportsDataAction.OperationId)]
+    public async Task<ResponseDto> GetAllBugReportsDataAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<BugReportDataDto> response = [];
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetAllBugReportsDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail })
+            );
 
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 response = await applicationAdminHandler.GetAllBugReportsDataAsync(
                     currentLoggedinUser: base.UserEmail,
@@ -107,24 +138,36 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
 
                 if (response is not null)
                     return HandleSuccessRequestResponse(
-                        responseData: response);
+                        responseData: response
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetAllBugReportsDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, response })
+            );
         }
     }
 
@@ -137,35 +180,53 @@ public sealed class ApplicationAdminController(IHttpContextAccessor httpContextA
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = IsAdminAccessEnabledAction.Summary, Description = IsAdminAccessEnabledAction.Description, OperationId = IsAdminAccessEnabledAction.OperationId)]
+    [SwaggerOperation(
+        Summary = IsAdminAccessEnabledAction.Summary,
+        Description = IsAdminAccessEnabledAction.Description,
+        OperationId = IsAdminAccessEnabledAction.OperationId)]
     public ResponseDto IsAdminAccessEnabledAsync()
     {
         bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(IsAdminAccessEnabledAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(IsAdminAccessEnabledAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail })
+            );
 
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 response = applicationAdminHandler.IsAdminAccessEnabledAsync(
-                    currentLoggedInUser: base.UserEmail);
+                    currentLoggedInUser: base.UserEmail
+                );
 
                 return HandleSuccessRequestResponse(
-                    responseData: response);
+                    responseData: response
+                );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(IsAdminAccessEnabledAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(IsAdminAccessEnabledAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(IsAdminAccessEnabledAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(IsAdminAccessEnabledAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, response })
+            );
         }
     }
 }

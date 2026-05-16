@@ -17,7 +17,9 @@ public sealed class CorrelationIdMiddleware(
     /// </summary>
     /// <param name="httpContext">The HttpContext to process.</param>
     /// <returns>A Task representing the asynchronous operation.</returns>
-    public async Task InvokeAsync(HttpContext httpContext)
+    public async Task InvokeAsync(
+        HttpContext httpContext
+    )
     {
         // Extract or generate correlation ID
         var correlationId = GetOrCreateCorrelationId(httpContext);
@@ -57,7 +59,9 @@ public sealed class CorrelationIdMiddleware(
     /// </summary>
     /// <param name="httpContext">The HttpContext to extract or generate the correlation ID from.</param>
     /// <returns>The correlation ID.</returns>
-    private static string GetOrCreateCorrelationId(HttpContext httpContext)
+    private static string GetOrCreateCorrelationId(
+        HttpContext httpContext
+    )
     {
         if (httpContext.Request.Headers.TryGetValue(CorrelationIdHeader, out StringValues correlationId) && !string.IsNullOrWhiteSpace(correlationId))
             return correlationId.ToString();

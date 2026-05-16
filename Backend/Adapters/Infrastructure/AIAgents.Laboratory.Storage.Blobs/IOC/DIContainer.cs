@@ -24,7 +24,8 @@ public static class DIContainer
     /// <returns>The updated services collection.</returns>
     public static IServiceCollection AddBlobStorageDependencies(this IServiceCollection services, IConfiguration configuration)
     {
-        var currentCloudStorageService = configuration[AzureAppConfigurationConstants.CloudStorageServiceConstant] ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
+        var currentCloudStorageService = configuration[AzureAppConfigurationConstants.CloudStorageServiceConstant]
+            ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
         return currentCloudStorageService switch
         {
             CloudinaryConstants.CloudinaryStorageService => services.AddCloudinaryDependencies(configuration),
@@ -71,7 +72,10 @@ public static class DIContainer
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(ExceptionConstants.FailedToInitialzeGCPExceptionMessage, ex);
+                throw new InvalidOperationException(
+                    ExceptionConstants.FailedToInitialzeGCPExceptionMessage,
+                    ex
+                );
             }
         }).AddScoped<IBlobStorageManager, GcpCloudStorageManager>();
 }

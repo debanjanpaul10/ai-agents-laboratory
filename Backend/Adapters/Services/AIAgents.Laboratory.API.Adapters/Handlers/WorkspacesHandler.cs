@@ -1,19 +1,17 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 using AIAgents.Laboratory.Domain.Ports.In;
-using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
 /// <summary>
 /// The agent workspaces api adapter handler implementation.
 /// </summary>
-/// <param name="mapper">The auto mapper service.</param>
 /// <param name="workspacesService">The workspace service.</param>
 /// <seealso cref="IWorkspacesHandler"/>
-public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspacesService) : IWorkspacesHandler
+public sealed class WorkspacesHandler(IWorkspacesService workspacesService) : IWorkspacesHandler
 {
     /// <summary>
     /// Creates a new workspace.
@@ -24,7 +22,7 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     /// <returns>A boolean for <c>success/failure.</c></returns>
     public async Task<bool> CreateNewWorkspaceAsync(AgentsWorkspaceDTO agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default)
     {
-        var domainModel = mapper.Map<AgentsWorkspaceDomain>(agentsWorkspaceData);
+        var domainModel = DomainMapperProfile.MapToDomain(agentsWorkspaceData);
         return await workspacesService.CreateNewWorkspaceAsync(
             agentsWorkspaceData: domainModel,
             currentUserEmail,
@@ -60,7 +58,7 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
             currentUserEmail: userName,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<IEnumerable<AgentsWorkspaceDTO>>(domainResult);
+        return [.. domainResult.Select(DomainMapperProfile.MapToDto)];
     }
 
     /// <summary>
@@ -71,12 +69,12 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     /// <returns>The group chat response.</returns>
     public async Task<GroupChatResponseDTO> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDTO chatRequest, CancellationToken cancellationToken = default)
     {
-        var domainInput = mapper.Map<WorkspaceAgentChatRequestDomain>(chatRequest);
+        var domainInput = DomainMapperProfile.MapToDomain(chatRequest);
         var domainResult = await workspacesService.GetWorkspaceGroupChatResponseAsync(
             chatRequest: domainInput,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<GroupChatResponseDTO>(domainResult);
+        return DomainMapperProfile.MapToDto(domainResult);
     }
 
     /// <summary>
@@ -93,7 +91,7 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
             currentUserEmail,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<AgentsWorkspaceDTO>(domainResult);
+        return DomainMapperProfile.MapToDto(domainResult);
     }
 
     /// <summary>
@@ -104,7 +102,7 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     /// <returns>The string response from AI.</returns>
     public async Task<string> InvokeWorkspaceAgentAsync(WorkspaceAgentChatRequestDTO chatRequestDTO, CancellationToken cancellationToken = default)
     {
-        var domainInput = mapper.Map<WorkspaceAgentChatRequestDomain>(chatRequestDTO);
+        var domainInput = DomainMapperProfile.MapToDomain(chatRequestDTO);
         return await workspacesService.InvokeWorkspaceAgentAsync(
             chatRequest: domainInput,
             cancellationToken
@@ -120,7 +118,7 @@ public sealed class WorkspacesHandler(IMapper mapper, IWorkspacesService workspa
     /// <returns>A boolean for <c>success/failure.</c></returns>
     public async Task<bool> UpdateExistingWorkspaceDataAsync(AgentsWorkspaceDTO agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default)
     {
-        var domainModel = mapper.Map<AgentsWorkspaceDomain>(agentsWorkspaceData);
+        var domainModel = DomainMapperProfile.MapToDomain(agentsWorkspaceData);
         return await workspacesService.UpdateExistingWorkspaceDataAsync(
             agentsWorkspaceData: domainModel,
             currentUserEmail,

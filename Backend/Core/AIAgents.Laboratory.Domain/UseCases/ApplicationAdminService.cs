@@ -16,15 +16,18 @@ namespace AIAgents.Laboratory.Domain.UseCases;
 /// <param name="correlationContext">The correlation context for logging.</param>
 /// <param name="feedbackService">The feedback service.</param>
 /// <param name="commonAiService">The common ai service.</param>
-public sealed class ApplicationAdminService(ILogger<ApplicationAdminService> logger, ICorrelationContext correlationContext, IFeedbackService feedbackService, ICommonAiService commonAiService) : IApplicationAdminService
+/// <seealso cref="IApplicationAdminService"/>
+public sealed class ApplicationAdminService(
+    ILogger<ApplicationAdminService> logger,
+    ICorrelationContext correlationContext,
+    IFeedbackService feedbackService,
+    ICommonAiService commonAiService) : IApplicationAdminService
 {
-    /// <summary>
-    /// Gets all bug reports data asynchronous.
-    /// </summary>
-    /// <param name="currentLoggedinUser">The current logged in user.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A list of <see cref="BugReportData"/></returns>
-    public async Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(string currentLoggedinUser, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(
+        string currentLoggedinUser,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
@@ -47,13 +50,11 @@ public sealed class ApplicationAdminService(ILogger<ApplicationAdminService> log
         }
     }
 
-    /// <summary>
-    /// Gets all submitted feature requests asynchronous.
-    /// </summary>
-    /// <param name="currentLoggedinUser">The current logged in user.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A list of <see cref="NewFeatureRequestData"/></returns>
-    public async Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(
+        string currentLoggedinUser,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
@@ -76,12 +77,10 @@ public sealed class ApplicationAdminService(ILogger<ApplicationAdminService> log
         }
     }
 
-    /// <summary>
-    /// Checks if the admin access is enabled for the current logged in user asynchronous.
-    /// </summary>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    public bool IsAdminAccessEnabledAsync(string currentLoggedInUser)
+    /// <inheritdoc />
+    public bool IsAdminAccessEnabledAsync(
+        string currentLoggedInUser
+    )
     {
         try
         {

@@ -17,7 +17,12 @@ public interface IBlobStorageManager
     /// <param name="fileType">The type of uploaded file.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The public URL for the document.</returns>
-    Task<string> UploadDocumentsToStorageAsync(IFormFile documentFile, string agentGuid, UploadedFileType fileType, CancellationToken cancellationToken = default);
+    Task<string> UploadDocumentsToStorageAsync(
+        IFormFile documentFile,
+        string agentGuid,
+        UploadedFileType fileType,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Deletes the documents data and folder from blob storage.
@@ -25,7 +30,10 @@ public interface IBlobStorageManager
     /// <param name="agentId">The agent id.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for success/failure.</returns>
-    Task<bool> DeleteDocumentsFolderAndDataAsync(string agentId, CancellationToken cancellationToken = default);
+    Task<bool> DeleteDocumentsFolderAndDataAsync(
+        string agentId,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Downloads a file from blob storage.
@@ -34,5 +42,9 @@ public interface IBlobStorageManager
     /// <param name="fileName">The file name.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The download file link.</returns>
-    Task<string> DownloadFileFromBlobStorageAsync(string agentGuid, string fileName, CancellationToken cancellationToken = default);
+    Task<string> DownloadFileFromBlobStorageAsync(
+        string agentGuid,
+        string fileName,
+        CancellationToken cancellationToken = default
+    );
 }

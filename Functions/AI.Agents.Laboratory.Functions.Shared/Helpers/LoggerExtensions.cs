@@ -20,10 +20,17 @@ public static class LoggerExtensions
     /// <param name="logger">The logger instance used to write the informational message. Cannot be null.</param>
     /// <param name="message">The message template to log. May include placeholders for formatting with the provided arguments.</param>
     /// <param name="args">An array of objects to format into the message template.</param>
-    public static void LogAppInformation(this ILogger logger, string message, params object[] args)
+    public static void LogAppInformation(
+        this ILogger logger,
+        string message,
+        params object[] args
+    )
     {
-        if (logger.IsEnabled(LogLevel.Information))
-            logger.LogInformation(message, args);
+        if (logger.IsEnabled(logLevel: LogLevel.Information))
+            logger.LogInformation(
+                message,
+                args
+            );
     }
 
     /// <summary>
@@ -35,9 +42,18 @@ public static class LoggerExtensions
     /// <param name="exception">The exception to log. Provides details about the error that occurred. Cannot be null.</param>
     /// <param name="message">The message template describing the error. May include format placeholders for additional arguments.</param>
     /// <param name="args">An array of objects to format into the message template. Optional; can be empty.</param>
-    public static void LogAppError(this ILogger logger, Exception exception, string message, params object[] args)
+    public static void LogAppError(
+        this ILogger logger,
+        Exception exception,
+        string message,
+        params object[] args
+    )
     {
-        if (logger.IsEnabled(LogLevel.Error))
-            logger.LogError(exception, message, args);
+        if (logger.IsEnabled(logLevel: LogLevel.Error))
+            logger.LogError(
+                exception,
+                message,
+                args
+            );
     }
 }

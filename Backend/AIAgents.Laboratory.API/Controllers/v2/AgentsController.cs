@@ -29,9 +29,15 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route(ApiBaseRoute)]
-public sealed class AgentsController(IHttpContextAccessor httpContext, IConfiguration configuration,
-    ILogger<AgentsController> logger, ICorrelationContext correlationContext, IAgentsHandler agentsHandler) : BaseController(httpContext, configuration)
+public sealed class AgentsController(
+    IHttpContextAccessor httpContext,
+    IConfiguration configuration,
+    ILogger<AgentsController> logger,
+    ICorrelationContext correlationContext,
+    IAgentsHandler agentsHandler) : BaseController(httpContext, configuration)
 {
+    #region AGENTS ACTIONS
+
     /// <summary>
     /// Creates the new agent asynchronous.
     /// </summary>
@@ -45,17 +51,26 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = CreateNewAgentAction.Summary, Description = CreateNewAgentAction.Description, OperationId = CreateNewAgentAction.OperationId)]
-    public async Task<ResponseDto> CreateNewAgentAsync([FromForm] CreateAgentDTO agentData, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = CreateNewAgentAction.Summary,
+        Description = CreateNewAgentAction.Description,
+        OperationId = CreateNewAgentAction.OperationId)]
+    public async Task<ResponseDto> CreateNewAgentAsync(
+        [FromForm] CreateAgentDTO agentData,
+        CancellationToken cancellationToken = default
+    )
     {
         bool result = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewAgentAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentData }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(CreateNewAgentAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentData })
+            );
 
             ArgumentNullException.ThrowIfNull(agentData);
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 result = await agentsHandler.CreateNewAgentAsync(
                     agentData,
@@ -65,24 +80,36 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
 
                 if (result)
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewAgentAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(CreateNewAgentAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewAgentAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(CreateNewAgentAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result })
+            );
         }
     }
 
@@ -96,16 +123,24 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetAllAgentsDataAction.Summary, Description = GetAllAgentsDataAction.Description, OperationId = GetAllAgentsDataAction.OperationId)]
-    public async Task<ResponseDto> GetAllAgentsDataAsync(CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetAllAgentsDataAction.Summary,
+        Description = GetAllAgentsDataAction.Description,
+        OperationId = GetAllAgentsDataAction.OperationId)]
+    public async Task<ResponseDto> GetAllAgentsDataAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<AgentDataDTO> result = [];
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllAgentsDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetAllAgentsDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail })
+            );
 
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 result = await agentsHandler.GetAllAgentsDataAsync(
                     userEmail: base.UserEmail,
@@ -114,24 +149,36 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
 
                 if (result is not null)
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllAgentsDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetAllAgentsDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllAgentsDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetAllAgentsDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result })
+            );
         }
     }
 
@@ -146,17 +193,26 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetAgentDataByIdAction.Summary, Description = GetAgentDataByIdAction.Description, OperationId = GetAgentDataByIdAction.OperationId)]
-    public async Task<ResponseDto> GetAgentDataByIdAsync([FromQuery] string agentId, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetAgentDataByIdAction.Summary,
+        Description = GetAgentDataByIdAction.Description,
+        OperationId = GetAgentDataByIdAction.OperationId)]
+    public async Task<ResponseDto> GetAgentDataByIdAsync(
+        [FromQuery] string agentId,
+        CancellationToken cancellationToken = default
+    )
     {
         AgentDataDTO result = new();
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAgentDataByIdAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetAgentDataByIdAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentId })
+            );
 
             ArgumentException.ThrowIfNullOrEmpty(agentId);
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 result = await agentsHandler.GetAgentDataByIdAsync(
                     agentId,
@@ -166,24 +222,36 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
 
                 if (result is not null)
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAgentDataByIdAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetAgentDataByIdAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAgentDataByIdAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentId, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetAgentDataByIdAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentId, result })
+            );
         }
     }
 
@@ -199,17 +267,26 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = UpdateExistingAgentDataAction.Summary, Description = UpdateExistingAgentDataAction.Description, OperationId = UpdateExistingAgentDataAction.OperationId)]
-    public async Task<ResponseDto> UpdateExistingAgentDataAsync([FromForm] AgentDataDTO updateAgentData, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = UpdateExistingAgentDataAction.Summary,
+        Description = UpdateExistingAgentDataAction.Description,
+        OperationId = UpdateExistingAgentDataAction.OperationId)]
+    public async Task<ResponseDto> UpdateExistingAgentDataAsync(
+        [FromForm] AgentDataDTO updateAgentData,
+        CancellationToken cancellationToken = default
+    )
     {
         bool result = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, updateAgentData.AgentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, updateAgentData.AgentId })
+            );
 
             ArgumentNullException.ThrowIfNull(updateAgentData);
-            if (IsAuthorized(UserBased))
+            if (IsAuthorized(authorizationType: UserBased))
             {
                 result = await agentsHandler.UpdateExistingAgentDataAsync(
                     updateAgentData,
@@ -219,24 +296,36 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
 
                 if (result)
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, updateAgentData.AgentId, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(UpdateExistingAgentDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, updateAgentData.AgentId, result })
+            );
         }
     }
 
@@ -251,17 +340,26 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = DeleteExistingAgentDataAction.Summary, Description = DeleteExistingAgentDataAction.Description, OperationId = DeleteExistingAgentDataAction.OperationId)]
-    public async Task<ResponseDto> DeleteExistingAgentDataAsync([FromQuery] string agentId, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = DeleteExistingAgentDataAction.Summary,
+        Description = DeleteExistingAgentDataAction.Description,
+        OperationId = DeleteExistingAgentDataAction.OperationId)]
+    public async Task<ResponseDto> DeleteExistingAgentDataAsync(
+        [FromQuery] string agentId,
+        CancellationToken cancellationToken = default
+    )
     {
         bool result = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentId })
+            );
 
             ArgumentException.ThrowIfNullOrEmpty(agentId);
-            if (IsAuthorized(UserBased))
+            if (IsAuthorized(authorizationType: UserBased))
             {
                 result = await agentsHandler.DeleteExistingAgentDataAsync(
                     agentId,
@@ -271,26 +369,42 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
 
                 if (result)
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentId, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(DeleteExistingAgentDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentId, result })
+            );
         }
     }
+
+    #endregion
+
+    #region KNOWLEDGE BASE ACTIONS
 
     /// <summary>
     /// Downloads the knowledgebase file asynchronous.
@@ -303,17 +417,26 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = DownloadKnowledgebaseFileAction.Summary, Description = DownloadKnowledgebaseFileAction.Description, OperationId = DownloadKnowledgebaseFileAction.OperationId)]
-    public async Task<ResponseDto> DownloadKnowledgebaseFileAsync([FromBody] DownloadFileDTO downloadFile, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = DownloadKnowledgebaseFileAction.Summary,
+        Description = DownloadKnowledgebaseFileAction.Description,
+        OperationId = DownloadKnowledgebaseFileAction.OperationId)]
+    public async Task<ResponseDto> DownloadKnowledgebaseFileAsync(
+        [FromBody] DownloadFileDTO downloadFile,
+        CancellationToken cancellationToken = default
+    )
     {
         string result = string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, downloadFile }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, downloadFile })
+            );
 
             ArgumentNullException.ThrowIfNull(downloadFile);
-            if (IsAuthorized(UserBased))
+            if (IsAuthorized(authorizationType: UserBased))
             {
                 result = await agentsHandler.DownloadKnowledgebaseFileAsync(
                     agentGuid: downloadFile.AgentGuid,
@@ -323,24 +446,38 @@ public sealed class AgentsController(IHttpContextAccessor httpContext, IConfigur
 
                 if (!string.IsNullOrWhiteSpace(result))
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(DownloadKnowledgebaseFileAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result })
+            );
         }
     }
+
+    #endregion
 }

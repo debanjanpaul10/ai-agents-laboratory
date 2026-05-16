@@ -2,7 +2,6 @@
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Context;
 using AIAgents.Laboratory.Persistence.SQLDatabase.DataManagers;
-using AIAgents.Laboratory.Persistence.SQLDatabase.Mapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +44,5 @@ public static class DIContainer
     /// <returns>The service collection.</returns>
     private static IServiceCollection AddDataManagerDependencies(this IServiceCollection services) =>
         services.AddScoped<IUnitOfWork, UnitOfWork>()
-        .AddScoped<IFeedbackDataManager, FeedbackDataManager>()
-        .AddAutoMapper(config => config.AddProfile<DataMapperProfile>());
+        .AddScoped<IFeedbackDataManager, FeedbackDataManager>();
 }

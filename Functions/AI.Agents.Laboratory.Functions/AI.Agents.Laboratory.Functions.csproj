@@ -9,16 +9,14 @@
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.51.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore"
-      Version="2.1.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus"
-      Version="5.22.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.52.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus" Version="5.24.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration"
-      Version="8.5.0" />
-    <PackageReference Include="MongoDB.Driver" Version="3.7.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.5.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.8.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="SharpCompress" Version="0.48.1" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.Development.json">
@@ -38,11 +36,8 @@
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference
-      Include="..\AI.Agents.Laboratory.Functions.Business\AI.Agents.Laboratory.Functions.Business.csproj" />
-    <ProjectReference
-      Include="..\AI.Agents.Laboratory.Functions.Data\AI.Agents.Laboratory.Functions.Data.csproj" />
-    <ProjectReference
-      Include="..\AI.Agents.Laboratory.Functions.Shared\AI.Agents.Laboratory.Functions.Shared.csproj" />
+    <ProjectReference Include="..\AI.Agents.Laboratory.Functions.Business\AI.Agents.Laboratory.Functions.Business.csproj" />
+    <ProjectReference Include="..\AI.Agents.Laboratory.Functions.Data\AI.Agents.Laboratory.Functions.Data.csproj" />
+    <ProjectReference Include="..\AI.Agents.Laboratory.Functions.Shared\AI.Agents.Laboratory.Functions.Shared.csproj" />
   </ItemGroup>
 </Project>

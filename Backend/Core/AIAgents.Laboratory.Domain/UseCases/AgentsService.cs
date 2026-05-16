@@ -40,16 +40,12 @@ public sealed class AgentsService(
     /// </summary>
     private readonly bool IsAiVisionServiceAllowed = bool.TryParse(configuration[AzureAppConfigurationConstants.IsAiVisionServiceEnabledConstant], out var aivisionAllowed) && aivisionAllowed;
 
-    /// <summary>
-    /// Creates the new agent asynchronous.
-    /// </summary>
-    /// <param name="agentData">The agent data.</param>
-    /// <param name="userEmail">The user email address.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>
-    /// The boolean for success/failure.
-    /// </returns>
-    public async Task<bool> CreateNewAgentAsync(AgentDataDomain agentData, string userEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<bool> CreateNewAgentAsync(
+        AgentDataDomain agentData,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(agentData);
         ArgumentException.ThrowIfNullOrWhiteSpace(userEmail);
@@ -98,15 +94,12 @@ public sealed class AgentsService(
         }
     }
 
-    /// <summary>
-    /// Gets the agent data by identifier asynchronous.
-    /// </summary>
-    /// <param name="agentId">The agent identifier.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>
-    /// The agent data dto.
-    /// </returns>
-    public async Task<AgentDataDomain> GetAgentDataByIdAsync(string agentId, string userEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<AgentDataDomain> GetAgentDataByIdAsync(
+        string agentId,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
 
@@ -137,13 +130,11 @@ public sealed class AgentsService(
         }
     }
 
-    /// <summary>
-    /// Gets all agents data asynchronous.
-    /// </summary>
-    /// <param name="userEmail">The current logged in user email.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The list of <see cref="AgentDataDomain"/></returns>
-    public async Task<IEnumerable<AgentDataDomain>> GetAllAgentsDataAsync(string userEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<IEnumerable<AgentDataDomain>> GetAllAgentsDataAsync(
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
@@ -173,14 +164,12 @@ public sealed class AgentsService(
         }
     }
 
-    /// <summary>
-    /// Updates the existing agent data.
-    /// </summary>
-    /// <param name="updateDataDomain">The update agent data DTO model.</param>
-    /// <param name="userEmail">The current logged in user email address.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain, string userEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<bool> UpdateExistingAgentDataAsync(
+        AgentDataDomain updateDataDomain,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(updateDataDomain);
         ArgumentException.ThrowIfNullOrWhiteSpace(updateDataDomain.AgentId);
@@ -247,14 +236,12 @@ public sealed class AgentsService(
         }
     }
 
-    /// <summary>
-    /// Deletes an existing agent data.
-    /// </summary>
-    /// <param name="agentId">The agent id.</param>
-    /// <param name="currentUserEmail">The current logged in user email</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<bool> DeleteExistingAgentDataAsync(
+        string agentId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
@@ -298,14 +285,12 @@ public sealed class AgentsService(
         }
     }
 
-    /// <summary>
-    /// Downloads the knowledgebase file asynchronous.
-    /// </summary>
-    /// <param name="agentGuid">The agent guid id.</param>
-    /// <param name="fileName">The file name.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The downloaded file url</returns>
-    public async Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<string> DownloadKnowledgebaseFileAsync(
+        string agentGuid,
+        string fileName,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
@@ -338,7 +323,11 @@ public sealed class AgentsService(
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task to wait on.</returns>
-    private async Task UpdateSkillsWithAssociatedAgentsDataAsync(AgentDataDomain agentData, string currentUserEmail, CancellationToken cancellationToken = default)
+    private async Task UpdateSkillsWithAssociatedAgentsDataAsync(
+        AgentDataDomain agentData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var associatedAgentsData = new List<AssociatedAgentsSkillDataDomain>
         {

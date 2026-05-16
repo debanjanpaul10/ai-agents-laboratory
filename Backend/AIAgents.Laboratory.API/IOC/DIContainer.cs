@@ -84,12 +84,14 @@ public static class DIContainer
     /// Adds API versioning to the service collection.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    internal static void AddApiVersions(this IServiceCollection services)
+    internal static void AddApiVersions(
+        this IServiceCollection services
+    )
     {
         services.AddApiVersioning(configuration =>
         {
             configuration.AssumeDefaultVersionWhenUnspecified = true;
-            configuration.DefaultApiVersion = new ApiVersion(2, 0);
+            configuration.DefaultApiVersion = new ApiVersion(majorVersion: 2, minorVersion: 0);
             configuration.ReportApiVersions = true;
         });
     }
@@ -112,6 +114,7 @@ public static class DIContainer
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
+            var tokenFormatUrl = configuration[AzureAppConfigurationConstants.TokenFormatUrlConstant] ?? throw new KeyNotFoundException(ExceptionConstants.MissingConfigurationMessage);
             options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
             {
                 ValidateLifetime = true,
@@ -120,10 +123,12 @@ public static class DIContainer
                 RequireExpirationTime = true,
                 RequireSignedTokens = true,
                 ValidAudience = configuration[AzureAppConfigurationConstants.AIAgentsClientIdConstant],
-                ValidIssuer = string.Format(CultureInfo.CurrentCulture,
-                    AzureAppConfigurationConstants.TokenFormatUrl,
-                    configuration[AzureAppConfigurationConstants.AzureAdTenantIdConstant]),
-                SignatureValidator = (token, _) => new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(token)
+                ValidIssuer = string.Format(
+                    CultureInfo.CurrentCulture,
+                    tokenFormatUrl,
+                    configuration[AzureAppConfigurationConstants.AzureAdTenantIdConstant]
+                ),
+                SignatureValidator = (token, _) => new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(jwtEncodedString: token)
             };
             options.Events = new JwtBearerEvents
             {
@@ -135,15 +140,17 @@ public static class DIContainer
     }
 
     /// <summary>
-    /// Handles auth token validation success async.
+    /// Handles the authentication token validation success asynchronous.
     /// </summary>
-    /// <param name="context">The token validation context.</param>
-    private static async Task HandleAuthTokenValidationSuccessAsync(this TokenValidatedContext context)
+    /// <param name="context">The context.</param>
+    private static async Task HandleAuthTokenValidationSuccessAsync(
+        this TokenValidatedContext context
+    )
     {
         var claimsPrincipal = context.Principal;
         if (claimsPrincipal?.Identity is not ClaimsIdentity claimsIdentity || !claimsIdentity.IsAuthenticated)
         {
-            context.Fail(ExceptionConstants.InvalidTokenExceptionConstant);
+            context.Fail(failureMessage: ExceptionConstants.InvalidTokenExceptionConstant);
             var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();
             logger.LogError(ExceptionConstants.InvalidTokenExceptionConstant);
             return;
@@ -154,10 +161,12 @@ public static class DIContainer
     }
 
     /// <summary>
-    /// Handles auth token validation failed async.
+    /// Handles the authentication token validation failed asynchronous.
     /// </summary>
-    /// <param name="context">The auth failed context.</param>
-    private static async Task HandleAuthTokenValidationFailedAsync(this AuthenticationFailedContext context)
+    /// <param name="context">The context.</param>
+    private static async Task HandleAuthTokenValidationFailedAsync(
+        this AuthenticationFailedContext context
+    )
     {
         var authenticationFailedException = new UnauthorizedAccessException(ExceptionConstants.InvalidTokenExceptionConstant);
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();

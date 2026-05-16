@@ -5,8 +5,12 @@ using AI.Agents.Laboratory.Functions.Shared.Helpers;
 using AI.Agents.Laboratory.Functions.Shared.Models;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using static AI.Agents.Laboratory.Functions.Shared.Constants.EnvironmentConfigurationConstants;
+using static AI.Agents.Laboratory.Functions.Shared.Constants.FunctionsDomainConstants;
+
 namespace AI.Agents.Laboratory.Functions;
 
 /// <summary>
@@ -23,7 +27,7 @@ namespace AI.Agents.Laboratory.Functions;
 public sealed class PushNotificationsFunction(
     ILogger<PushNotificationsFunction> logger,
     ICorrelationContext correlationContext,
-    IPushNotificationsService pushNotificationsService)
+    [FromKeyedServices(NotificationServices.AppPushNotifications)] INotificationService pushNotificationsService)
 {
     /// <summary>
     /// This method is triggered when a new message arrives in the specified Service Bus queue. 
@@ -44,17 +48,40 @@ public sealed class PushNotificationsFunction(
     )
     {
         var messageBody = Encoding.UTF8.GetString(message.Body);
-        var notificationMessageBody = JsonConvert.DeserializeObject<NotificationRequest>(messageBody.ToString());
+        NotificationRequest? notificationMessageBody = null;
+        try
+        {
+            notificationMessageBody = await Task.Factory.StartNew(
+                function: () => JsonConvert.DeserializeObject<NotificationRequest>(messageBody.ToString()),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+        catch (JsonException ex)
+        {
+            logger.LogAppError(
+                ex,
+                DeadLetterConstants.JsonDeserializationExceptionReason,
+                message.MessageId
+            );
+            await messageActions.DeadLetterMessageAsync(
+               message,
+               deadLetterReason: DeadLetterConstants.JsonDeserializationExceptionReason,
+               deadLetterErrorDescription: DeadLetterConstants.JsonDeserializationExceptionDescription,
+               cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+            return;
+        }
+
         if (notificationMessageBody is null)
         {
             logger.LogError(
-                "Message {MessageId} has null payload - moving to dead-letter queue",
+                ExceptionConstants.NullPayloadExceptionMessage,
                 message.MessageId
             );
             await messageActions.DeadLetterMessageAsync(
                 message,
-                deadLetterReason: FunctionsDomainConstants.DeadLetterConstants.InvalidPayloadReason,
-                deadLetterErrorDescription: FunctionsDomainConstants.DeadLetterConstants.InvalidPayloadDescription,
+                deadLetterReason: DeadLetterConstants.InvalidPayloadReason,
+                deadLetterErrorDescription: DeadLetterConstants.InvalidPayloadDescription,
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
             return;
@@ -65,17 +92,39 @@ public sealed class PushNotificationsFunction(
         {
             logger.LogAppInformation(
                 LoggerConstants.LogHelperMethodStart,
-                nameof(PushNotificationsFunction), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody })
+                nameof(PushNotificationsFunction), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody })
             );
 
-            response = await pushNotificationsService.ReceivePushNotificationAsync(
-                request: notificationMessageBody,
+            response = await pushNotificationsService.SendNotificationsAsync(
+                notificationModel: notificationMessageBody,
                 cancellationToken
             ).ConfigureAwait(false);
-            await messageActions.CompleteMessageAsync(
-                message,
-                cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
+
+            if (response)
+            {
+                await messageActions.CompleteMessageAsync(
+                    message,
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
+            }
+            else
+            {
+                var exception = new Exception(
+                    DeadLetterConstants.ProcessingExceptionDescription
+                );
+                logger.LogAppError(
+                    exception,
+                    LoggerConstants.LogHelperMethodFailed,
+                    nameof(SendEmailNotificationFunction), DateTime.UtcNow, exception.Message
+                );
+                await messageActions.DeadLetterMessageAsync(
+                    message,
+                    deadLetterReason: DeadLetterConstants.ProcessingExceptionReason,
+                    deadLetterErrorDescription: DeadLetterConstants.ProcessingExceptionDescription,
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
+            }
         }
         catch (Exception ex)
         {
@@ -93,7 +142,8 @@ public sealed class PushNotificationsFunction(
         {
             logger.LogAppInformation(
                 LoggerConstants.LogHelperMethodEnd,
-                nameof(PushNotificationsFunction), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody, response })
+                nameof(PushNotificationsFunction), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, notificationMessageBody, response })
             );
         }
     }

@@ -13,5 +13,8 @@ public interface IVisionProcessor
     /// <param name="imageUrl">The URL of the image to analyze. Must be a valid, accessible image URL.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. Optional.</param>
     /// <returns>A collection of strings containing the lines of text recognized in the image. The collection is empty if no text is found.</returns>
-    Task<IEnumerable<string>> ReadDataFromImageWithComputerVisionAsync(string imageUrl, CancellationToken cancellationToken = default);
+    Task<IEnumerable<string>> ReadDataFromImageWithComputerVisionAsync(
+        string imageUrl,
+        CancellationToken cancellationToken = default
+    );
 }

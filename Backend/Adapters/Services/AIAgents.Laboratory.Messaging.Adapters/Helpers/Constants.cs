@@ -67,9 +67,14 @@ internal static class Constants
         internal const string ServiceBusConnectionString = "ServiceBus:ConnectionString";
 
         /// <summary>
-        /// The default Azure Service Bus queue name.
+        /// The push notifications service bus queue name.
         /// </summary>
         internal const string PushNotificationsQueueName = "ServiceBus:PushNotificationsQueue";
+
+        /// <summary>
+        /// The email notification service bus queue name.
+        /// </summary>
+        internal const string EmailNotificationsQueueName = "ServiceBus:EmailNotificationsQueue";
 
         /// <summary>
         /// The application json constant.

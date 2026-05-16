@@ -15,12 +15,14 @@ public interface IMongoDatabaseRepository
     /// <param name="data">The data.</param>
     /// <param name="databaseName">Name of the database.</param>
     /// <param name="collectionName">Name of the collection.</param>
+    /// <param name="bypassDocumentValidation">if set to <c>true</c> [should bypass document validation].</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
     Task<bool> SaveDataAsync<TInput>(
         TInput data,
         string databaseName,
         string collectionName,
+        bool bypassDocumentValidation = false,
         CancellationToken cancellationToken = default
     );
 
