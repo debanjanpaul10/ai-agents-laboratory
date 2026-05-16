@@ -1,240 +1,486 @@
 # 🤖 AI Agents Laboratory
 
-[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/9.0)
+[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/10.0)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![API](https://img.shields.io/badge/API-REST-orange.svg)]()
-[![SignalR](https://img.shields.io/badge/SignalR-Real--time-red.svg)]()
 
-A comprehensive AI-powered laboratory platform built with .NET 9, Microsoft Semantic Kernel, and modern web technologies. This platform provides a robust foundation for developing and deploying AI agents with multi-agent orchestration, workspace management, MCP (Model Context Protocol) integration, and real-time communication capabilities. Build sophisticated AI solutions with workspace-based collaboration, tool extensibility, and enterprise-grade architecture.
+A full-stack AI agent platform built on **.NET 10** and **Next.js 16**. It lets you create, configure, and interact with custom AI agents backed by multiple LLM providers, manage workspaces for multi-agent collaboration, upload knowledge bases for RAG, and receive real-time notifications — all deployed on Azure.
 
-## 🌟 Features
+---
 
-### 🤖 AI Agent Framework
+## 📑 Table of Contents
 
-- **Semantic Kernel Integration**: Leverage Microsoft's Semantic Kernel for AI operations
-- **Google AI Connectors**: Built-in support for Google AI services
-- **Memory Management**: Advanced AI memory plugins for context retention
-- **Extensible Architecture**: Clean architecture pattern for easy extension and maintenance
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Project Structure](#-project-structure)
+- [Technology Stack](#-technology-stack)
+- [API Reference](#-api-reference)
+- [Configuration](#-configuration)
+- [Getting Started](#-getting-started)
+- [CI/CD & Deployment](#-cicd--deployment)
+- [Author](#-author)
 
-### 🧠 Available Skills & Plugins
+---
 
-The platform includes several pre-built AI skills and plugins organized into different categories:
+## ✨ Features
 
-#### 💬 Chatbot Skills
+### 🤖 AI Agent Management
 
-- **User Intent Detection**: Automatically determine user intentions from natural language input
-- **Greeting Handler**: Generate contextual greetings and responses for user interactions
-- **Natural Language to SQL**: Convert natural language queries into SQL statements with database schema awareness
-- **RAG Text Processing**: Retrieval-Augmented Generation for knowledge-based question answering
-- **SQL Response Formatting**: Convert SQL query results into readable markdown format
-- **Follow-up Questions**: Generate intelligent follow-up questions based on user queries and AI responses
+- Create, update, and delete custom AI agents
+- Attach knowledge base files (`.docx`, `.doc`, `.pdf`, `.xlsx`, `.xls`, `.txt`, `.json`) for RAG
+- Configure agents with custom system prompts and tool skills
+- Download knowledge base files associated with an agent
 
-#### 🔧 Utility Plugins
+### 💬 Chat & Conversation
 
-- **Bug Severity Analysis**: Intelligent classification and severity assessment of software bugs and issues
-- **Token Usage Tracking**: Monitor and report AI model token consumption for cost optimization
+- Invoke any configured agent via a conversational chat interface
+- Direct chatbot responses without workspace context
+- Persistent conversation history per user
+- Clear conversation history on demand
 
-#### ✍️ Content Processing
+### 🗂️ Workspaces
 
-- **Text Rewriting**: Advanced rewriting and enhancement of user stories and content
-- **Genre Tag Generation**: Automatic tag generation for stories and content categorization
-- **Content Moderation**: AI-powered content filtering and safety assessment with rating system
+- Group agents into workspaces for multi-agent collaboration
+- Invoke workspace-level agents through a unified chat interface
+- Full CRUD management for workspaces
 
-#### 🔍 Advanced Features
+### 🧠 Multi-Provider AI Support
 
-- **Knowledge Base Integration**: Support for custom knowledge bases in RAG operations
-- **Database Schema Awareness**: Context-aware SQL generation with schema validation
-- **Multi-format Output**: JSON responses with detailed token usage metrics
-- **Error Handling**: Robust exception handling with graceful degradation
+Switchable AI service providers via configuration:
 
-### 🔄 Real-time Communication
+- **OpenAI GPT** (Azure-hosted endpoint)
+- **Google Gemini** (Flash and Pro models via `Google.GenAI`)
+- **Perplexity AI** (Sonar model)
 
-- **SignalR Integration**: Live status updates and real-time agent communication
-- **Agent Status Monitoring**: Track AI agent performance and availability
-- **WebSocket Support**: Efficient bidirectional communication
+### 🔍 Vision & Document Processing
+
+- **Azure AI Vision** for image analysis
+- Multi-format document reading: PDF (`itext`), Word (`DocumentFormat.OpenXml`), Excel, plain text, JSON
+
+### 🛠️ Tool Skills & MCP
+
+- Register reusable tool skills that agents can invoke
+- **Model Context Protocol (MCP)** integration for extensible tool calling
+
+### 🔔 Notifications
+
+- Real-time push notifications via **Azure SignalR**
+- Email notifications via **Azure Communication Services**
+- Server-Sent Events (SSE) endpoint for notification streaming
+- Mark-as-read support
+
+### 🏪 Marketplace & Registered Applications
+
+- Browse and register external applications
+- Admin panel for feature requests and bug reports
+
+### 📊 Observability
+
+- **Azure Application Insights** telemetry
+- **OpenTelemetry** API integration
+- Structured logging with correlation ID tracking across all requests
+
+---
 
 ## 🏗️ Architecture
 
-This solution follows **Clean Architecture** principles with **Hexagonal Architecture** patterns:
+The solution follows **Clean Architecture** with a **Hexagonal (Ports & Adapters)** pattern.
 
 ```
-AIAgents.Laboratory/
-├── 🎯 Core/
-│   └── AIAgents.Laboratory.Domain/           # Domain entities & business logic
-├── 🔌 Adapters/
-│   ├── AIAgents.Laboratory.SemanticKernel.Adapters/  # AI service integrations
-│   ├── AIAgents.Laboratory.API.Adapters/             # API layer adapters
-│   └── AIAgents.Laboratory.Messaging.Adapters/       # SignalR & messaging
-└── 🌐 AIAgents.Laboratory.API/               # Web API & controllers
+┌─────────────────────────────────────────────────────────────┐
+│                        Clients                              │
+│              Next.js Web UI  │  External APIs               │
+└──────────────────┬──────────────────────────────────────────┘
+                   │ HTTPS / JWT
+┌──────────────────▼──────────────────────────────────────────┐
+│               AIAgents.Laboratory.API                       │
+│         Controllers (v2)  │  Middleware  │  DI Container    │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+        ┌──────────┴──────────┐
+        │                     │
+┌───────▼──────┐   ┌──────────▼──────────────────────────────┐
+│    Domain    │   │              Adapters                    │
+│  (Core)      │   │  API.Adapters  │  Messaging.Adapters     │
+│  Entities    │   │  Caching       │  AgentsFramework        │
+│  Use Cases   │   │  MongoDatabase │  SQLDatabase            │
+│  Contracts   │   │  Storage.Blobs                          │
+└──────────────┘   └─────────────────────────────────────────┘
+                                   │
+              ┌────────────────────┼────────────────────┐
+              │                    │                    │
+        ┌─────▼──────┐   ┌────────▼──────┐   ┌────────▼──────┐
+        │  MongoDB   │   │  SQL Server / │   │  GCP / Azure  │
+        │            │   │  PostgreSQL   │   │  Blob Storage │
+        └────────────┘   └───────────────┘   └───────────────┘
+
+Azure Functions (separate solution)
+  ├── PushNotificationsFunction   ← Service Bus trigger
+  └── SendEmailNotificationFunction ← Service Bus trigger
 ```
 
-### Key Components
+### Key Patterns
 
-- **Domain Layer**: Core business logic, entities, and domain services
-- **Semantic Kernel Adapters**: Microsoft Semantic Kernel integration with Google AI connectors
-- **API Adapters**: Request/response handling, validation, and API contracts
-- **Messaging Adapters**: Real-time communication via SignalR hubs
-- **Web API**: Controllers, middleware, and API endpoints
-- **Clean Separation**: Dependency inversion and fully testable architecture
+- **Repository Pattern** — generic data access abstraction over SQL and MongoDB
+- **Handler Pattern** — each API feature area has a dedicated handler (e.g., `IAgentsHandler`, `IChatHandler`)
+- **Correlation ID Middleware** — every request carries a correlation ID propagated through all logs
+- **Feature Flags** — AI service, caching, knowledge base, email notifications, and vision are individually toggleable
+- **JWT Bearer Authentication** — Azure AD tokens validated against tenant issuer and audience
 
-### Project Structure
+---
 
-The solution is organized into the following projects:
+## 📁 Project Structure
 
-- **AIAgents.Laboratory.API**: Main web API project with controllers and startup configuration
-- **AIAgents.Laboratory.Domain**: Core domain layer with business entities and logic
-- **AIAgents.Laboratory.SemanticKernel.Adapters**: AI service integrations using Semantic Kernel
-- **AIAgents.Laboratory.API.Adapters**: API layer adapters for request/response handling
-- **AIAgents.Laboratory.Messaging.Adapters**: SignalR hubs and real-time messaging
+```
+ai-agents-laboratory/
+├── Backend/                                    # .NET 10 backend solution
+│   ├── AIAgents.Laboratory.API/               # Web API — controllers, middleware, DI
+│   ├── Core/
+│   │   └── AIAgents.Laboratory.Domain/        # Entities, use cases, contracts
+│   ├── Adapters/
+│   │   ├── Infrastructure/
+│   │   │   ├── AIAgents.Laboratory.Infrastructure.AgentsFramework/  # Semantic Kernel, Gemini, MCP, Vision
+│   │   │   ├── AIAgents.Laboratory.Persistence.MongoDatabase/       # MongoDB repositories
+│   │   │   ├── AIAgents.Laboratory.Persistence.SQLDatabase/         # EF Core SQL repositories
+│   │   │   └── AIAgents.Laboratory.Storage.Blobs/                   # GCP & Cloudinary storage
+│   │   └── Services/
+│   │       ├── AIAgents.Laboratory.API.Adapters/                    # Request/response models & handlers
+│   │       ├── AIAgents.Laboratory.Messaging.Adapters/              # Azure Service Bus
+│   │       ├── AIAgents.Laboratory.Persistence.Caching/             # In-memory cache
+│   │       └── AIAgents.Laboratory.Logging/                         # Logging helpers
+│   ├── Database/
+│   │   └── AIAgents.Laboratory.Database/      # SQL Server DACPAC project
+│   └── Tests/
+│       └── AIAgents.Laboratory.Domain.UnitTests/
+│
+├── Functions/                                  # Azure Functions solution
+│   ├── AI.Agents.Laboratory.Functions/        # Function triggers
+│   ├── AI.Agents.Laboratory.Functions.Business/
+│   ├── AI.Agents.Laboratory.Functions.Data/
+│   ├── AI.Agents.Laboratory.Functions.Shared/
+│   └── AI.Agents.Laboratory.Functions.UnitTests/
+│
+└── UI/
+    └── web/                                    # Next.js 16 frontend
+        ├── pages/                              # App routes
+        │   ├── dashboard/
+        │   ├── manage-agents/
+        │   ├── workspaces/
+        │   ├── workspace/
+        │   ├── marketplace/
+        │   ├── register-applications/
+        │   ├── admin/
+        │   └── login/
+        ├── components/                         # UI components by feature
+        ├── store/                              # Redux Toolkit state
+        ├── auth/                               # MSAL Azure AD auth
+        ├── helpers/
+        └── models/
+```
+
+---
+
+## 🛠️ Technology Stack
+
+### Backend
+
+| Category         | Technology                         | Version         |
+| ---------------- | ---------------------------------- | --------------- |
+| Runtime          | .NET                               | 10.0            |
+| AI Orchestration | Microsoft Semantic Kernel          | 1.76.0          |
+| AI Memory        | Semantic Kernel Plugins.Memory     | 1.72.0-alpha    |
+| Google AI        | Google.GenAI                       | 1.6.2           |
+| MCP              | ModelContextProtocol               | 1.3.0           |
+| Computer Vision  | Azure Cognitive Services Vision    | 7.0.1           |
+| ORM              | Entity Framework Core (SQL Server) | 10.0.8          |
+| NoSQL            | MongoDB.Driver                     | 3.8.1           |
+| Messaging        | Azure.Messaging.ServiceBus         | 7.20.1          |
+| Email            | Azure.Communication.Email          | 1.1.0           |
+| Blob Storage     | Google.Cloud.Storage.V1            | 4.14.0          |
+| Image Storage    | CloudinaryDotNet                   | 1.29.1          |
+| Authentication   | Azure.Identity / JwtBearer         | 1.21.0 / 10.0.8 |
+| Configuration    | Azure App Configuration            | 8.5.0           |
+| Monitoring       | Application Insights               | 3.1.1           |
+| Observability    | OpenTelemetry.Api                  | 1.15.3          |
+| Object Mapping   | AutoMapper                         | 15.0.1          |
+| API Docs         | Swashbuckle (Swagger)              | 10.1.7          |
+| PDF Processing   | itext                              | 9.6.0           |
+| Word/Excel       | DocumentFormat.OpenXml             | 3.5.1           |
+| Serialization    | Newtonsoft.Json                    | 13.0.4          |
+
+### Frontend
+
+| Category         | Technology                  | Version  |
+| ---------------- | --------------------------- | -------- |
+| Framework        | Next.js                     | 16.2.3   |
+| UI Library       | React                       | 19.1.0   |
+| Language         | TypeScript                  | 5.x      |
+| State Management | Redux Toolkit               | 2.9.0    |
+| Authentication   | @azure/msal-react           | 3.0.19   |
+| UI Components    | @heroui/react               | 2.8.4    |
+| Styling          | Tailwind CSS                | 4.1.13   |
+| HTTP Client      | Axios                       | 1.15.0   |
+| Animations       | Framer Motion               | 12.23.15 |
+| Markdown         | react-markdown + remark-gfm | 10.1.0   |
+
+### Azure Services
+
+- **Azure App Service** — API hosting
+- **Azure Static Web Apps** — Frontend hosting
+- **Azure SQL Database** — Relational data
+- **Azure App Configuration** — Centralized configuration + Key Vault references
+- **Azure Service Bus** — Async messaging (email & push notification queues)
+- **Azure SignalR Service** — Real-time WebSocket communication
+- **Azure Communication Services** — Email delivery
+- **Azure AI Vision** — Image analysis
+- **Azure Application Insights** — Telemetry and monitoring
+- **Azure Functions (Flex Consumption)** — Serverless notification processing
+- **Azure Managed Identity** — Passwordless service authentication
+
+---
+
+## 📡 API Reference
+
+All endpoints are versioned under `/aiagentsapi/v2/`. Swagger UI is available at `/swaggerui` in development.
+
+### Chat — `/chat`
+
+| Method | Route                       | Description                                        |
+| ------ | --------------------------- | -------------------------------------------------- |
+| `POST` | `/InvokeAgent`              | Invoke a workspace AI agent                        |
+| `POST` | `/GetDirectChatResponse`    | Get a direct chatbot response                      |
+| `GET`  | `/GetConversationHistory`   | Retrieve conversation history for the current user |
+| `POST` | `/ClearConversationHistory` | Clear conversation history for the current user    |
+
+### Agents — `/agents`
+
+| Method   | Route                        | Description                                                       |
+| -------- | ---------------------------- | ----------------------------------------------------------------- |
+| `POST`   | `/CreateNewAgent`            | Create a new AI agent (multipart/form-data, supports file upload) |
+| `GET`    | `/GetAllAgents`              | List all agents for the current user                              |
+| `GET`    | `/GetAgentById/{id}`         | Get a specific agent by ID                                        |
+| `PUT`    | `/UpdateAgent`               | Update an existing agent                                          |
+| `DELETE` | `/DeleteAgent/{id}`          | Delete an agent                                                   |
+| `GET`    | `/DownloadKnowledgebaseFile` | Download a knowledge base file                                    |
+
+### Workspaces — `/workspaces`
+
+| Method   | Route                    | Description                              |
+| -------- | ------------------------ | ---------------------------------------- |
+| `GET`    | `/GetAllWorkspaces`      | List all workspaces for the current user |
+| `GET`    | `/GetWorkspaceById/{id}` | Get a workspace by ID                    |
+| `POST`   | `/AddNewWorkspace`       | Create a new workspace                   |
+| `DELETE` | `/DeleteWorkspace/{id}`  | Delete a workspace                       |
+
+### Notifications — `/notifications`
+
+| Method | Route                  | Description                    |
+| ------ | ---------------------- | ------------------------------ |
+| `POST` | `/CreateNotification`  | Create a new notification      |
+| `GET`  | `/PollNotifications`   | Poll for pending notifications |
+| `GET`  | `/StreamNotifications` | Stream notifications via SSE   |
+| `POST` | `/MarkAsRead`          | Mark a notification as read    |
+
+### Tool Skills — `/toolskills`
+
+| Method | Route                    | Description                     |
+| ------ | ------------------------ | ------------------------------- |
+| `GET`  | `/GetAllToolSkills`      | List all registered tool skills |
+| `GET`  | `/GetToolSkillById/{id}` | Get a tool skill by ID          |
+| `POST` | `/AddNewToolSkill`       | Register a new tool skill       |
+| `PUT`  | `/UpdateToolSkill`       | Update a tool skill             |
+
+### Registered Applications — `/registeredapplications`
+
+| Method | Route                      | Description                      |
+| ------ | -------------------------- | -------------------------------- |
+| `GET`  | `/GetAllApplications`      | List all registered applications |
+| `POST` | `/RegisterApplication`     | Register a new application       |
+| `GET`  | `/GetApplicationById/{id}` | Get an application by ID         |
+| `PUT`  | `/UpdateApplication`       | Update an application            |
+
+### Application Admin — `/applicationadmin`
+
+| Method | Route                             | Description                                           |
+| ------ | --------------------------------- | ----------------------------------------------------- |
+| `GET`  | `/GetAllSubmittedFeatureRequests` | List all submitted feature requests                   |
+| `GET`  | `/GetAllReportedBugs`             | List all reported bugs                                |
+| `GET`  | `/IsAdminAccessEnabled`           | Check if admin access is enabled for the current user |
+
+---
+
+## ⚙️ Configuration
+
+Configuration is loaded from **Azure App Configuration** in production and from `appsettings.Development.json` locally. Key Vault references are resolved automatically via Managed Identity.
+
+### Key Settings
+
+```json
+{
+	"AppConfigurationEndpoint": "https://<your-appconfig>.azconfig.io",
+	"ManagedIdentityClientId": "<managed-identity-client-id>",
+	"AiAgentsClientId": "<azure-ad-app-client-id>",
+	"TenantId": "<azure-ad-tenant-id>",
+
+	"CurrentAiServiceProvider": "OpenAiGpt",
+	"AvailableAiServiceProviders": "OpenAiGpt,PerplexityAi,GoogleGemini",
+
+	"ChatGpt": { "ApiKey": "", "Endpoint": "", "ModelId": "gpt-5-chat" },
+	"GeminiFlashModel": "gemini-2.0-flash",
+	"GeminiProModel": "gemini-2.5-pro",
+	"PerplexityAI": {
+		"ApiKey": "",
+		"Endpoint": "https://api.perplexity.ai",
+		"ModelId": "sonar"
+	},
+
+	"CurrentSQLProvider": "PostgreSQL",
+	"AzureSqlConnectionString": "",
+	"PostgreSQL": { "Connectionstring": "" },
+	"MongoDbConnectionString": "",
+	"AiAgentsPrimaryDatabase": "ai-agents-primary",
+
+	"CloudStorageService": "GCP",
+	"GCP": { "ProjectId": "", "BucketName": "", "ServiceAccountJson": "" },
+	"Cloudinary": { "CloudName": "", "APIKey": "", "APISecret": "" },
+
+	"ServiceBus": {
+		"ConnectionString": "",
+		"EmailNotificationsQueue": "emailnotificationsqueue",
+		"PushNotificationsQueue": "pushnotificationsqueue"
+	},
+	"AzureSignalRConnection": "",
+	"EmailNotification": { "ConnectionString": "", "SenderAddress": "" },
+
+	"IsAIServiceEnabled": true,
+	"IsAiVisionServiceEnabled": true,
+	"IsCacheServiceEnabled": true,
+	"IsKnowledgeBaseServiceEnabled": true,
+	"IsEmailNotificationEnabled": false,
+	"IsFeedbackFeatureEnabled": true,
+	"IsProModelEnabled": false,
+
+	"AllowedKbFileFormats": ".docx,.doc,.pdf,.xlsx,.xls,.txt,.json",
+	"AllowedVisionImageFileFormats": ".png,.jpeg,.jpg,.svg"
+}
+```
+
+### MongoDB Collections
+
+| Collection Key                     | Default Name              |
+| ---------------------------------- | ------------------------- |
+| `AgentsCollection`                 | `agents`                  |
+| `ConversationHistoryCollection`    | `conversation-history`    |
+| `NotificationsCollection`          | `notifications`           |
+| `OrchestratorPromptsCollection`    | `orchestrator-prompts`    |
+| `ToolSkillsCollection`             | `tool-skills`             |
+| `WorkspaceCollection`              | `agents-workspace`        |
+| `RegisteredApplicationsCollection` | `registered-applications` |
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- [Node.js 22.x](https://nodejs.org/)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) or [VS Code](https://code.visualstudio.com/)
-- Azure subscription (for Azure App Configuration and Managed Identity)
-- Google AI API access (for Semantic Kernel Google connectors)
+- Azure subscription (App Configuration, SQL, MongoDB, Service Bus, SignalR)
+- At least one AI provider API key (OpenAI, Gemini, or Perplexity)
 
-### Installation
+### Backend Setup
 
 1. **Clone the repository**
 
-   ```bash
-   git clone https://github.com/[username]/AIAgents.Laboratory.git
-   cd AIAgents.Laboratory
-   ```
+    ```bash
+    git clone https://github.com/debanjanpaul10/ai-agents-laboratory.git
+    cd ai-agents-laboratory
+    ```
 
-2. **Restore dependencies**
+2. **Configure local settings**
 
-   ```bash
-   dotnet restore
-   ```
+    Copy `Backend/AIAgents.Laboratory.API/appsettings.json` and create `appsettings.Development.json`. Fill in at minimum:
+    - `AppConfigurationEndpoint` — your Azure App Configuration URL
+    - `LocalSqlConnectionString` — local SQL Server connection string
+    - `MongoDbConnectionString` — MongoDB connection string
+    - AI provider keys
 
-3. **Configure settings**
+3. **Restore and build**
 
-   - Update `appsettings.json` with your Azure App Configuration connection
-   - Set up managed identity credentials for Azure services
-   - Configure Google AI API credentials for Semantic Kernel integration
+    ```bash
+    dotnet restore Backend/AIAgents.Laboratory.slnx
+    dotnet build Backend/AIAgents.Laboratory.slnx
+    ```
 
-4. **Build the solution**
+4. **Run the API**
 
-   ```bash
-   dotnet build
-   ```
+    ```bash
+    dotnet run --project Backend/AIAgents.Laboratory.API
+    ```
 
-5. **Run the application**
-   ```bash
-   dotnet run --project AIAgents.Laboratory.API
-   ```
+    The API starts at `https://localhost:8190`. Swagger UI is at `https://localhost:8190/swaggerui`.
 
-The API will be available at `https://localhost:8190`
+5. **Run tests**
+    ```bash
+    dotnet test Backend/AIAgents.Laboratory.slnx
+    ```
 
-## 📚 API Documentation
-
-### Swagger UI
-
-Access the interactive API documentation at: `https://localhost:8190/swaggerui`
-
-## 🔄 Real-time Features
-
-### SignalR Hub
-
-Connect to the agent status hub for real-time updates:
-
-```javascript
-const connection = new signalR.HubConnectionBuilder()
-  .withUrl("https://localhost:8190/hubs/agent-status")
-  .build();
-
-connection.on("ReceiveAgentStatus", function (status) {
-  console.log("Agent Status:", status);
-});
-```
-
-Test the SignalR functionality using the included `signalr-test.html` file.
-
-## 🛠️ Technology Stack
-
-- **Framework**: .NET 9.0
-- **AI Integration**: Microsoft Semantic Kernel with Google AI Connectors
-- **Real-time Communication**: SignalR Hubs
-- **API Documentation**: Swagger/OpenAPI with Annotations
-- **Configuration**: Azure App Configuration
-- **Authentication**: JWT Bearer tokens
-- **Identity Management**: Azure Identity & Managed Identity
-- **Object Mapping**: AutoMapper
-- **Architecture**: Clean Architecture + Hexagonal Pattern
-
-## 📦 Dependencies
-
-### Core Packages
-
-- `Microsoft.SemanticKernel.Connectors.Google` (v1.61.0-alpha) - Google AI integration
-- `Microsoft.SemanticKernel.Plugins.Memory` (v1.61.0-alpha) - Memory management for AI
-- `Microsoft.Extensions.Configuration.AzureAppConfiguration` (v8.3.0) - Cloud configuration
-- `Microsoft.AspNetCore.Authentication.JwtBearer` (v9.0.8) - JWT authentication
-
-### Development & Infrastructure
-
-- `Swashbuckle.AspNetCore.Annotations` (v9.0.3) - API documentation with annotations
-- `Swashbuckle.AspNetCore.SwaggerUI` (v9.0.3) - Interactive API documentation
-- `AutoMapper` (v15.0.1) - Object-to-object mapping
-- `Azure.Identity` (v1.15.0) - Azure authentication and identity management
-- `Azure.Core` (v1.47.3) - Azure SDK core functionality
-
-## 🔧 Configuration
-
-### Azure App Configuration
-
-The application uses Azure App Configuration for centralized settings management:
-
-```json
-{
-  "ConnectionStrings": {
-    "AppConfig": "your-azure-app-configuration-connection-string"
-  }
-}
-```
-
-### Environment Variables
-
-- `MANAGED_IDENTITY_CLIENT_ID`: Azure Managed Identity client ID
-- `ASPNETCORE_ENVIRONMENT`: Environment setting (Development/Production)
-- Google AI API credentials (configured through Azure App Configuration or local settings)
-
-## 🧪 Testing
-
-### Running Tests
+### Azure Functions Setup
 
 ```bash
-dotnet test
+dotnet restore Functions/AI.Agents.Laboratory.Functions.slnx
+dotnet build Functions/AI.Agents.Laboratory.Functions.slnx
 ```
 
-### SignalR Testing
+Set `AzureServiceBusConnectionString` in local settings before running locally.
 
-Open `signalr-test.html` in your browser to test real-time functionality.
+### Frontend Setup
 
-## 📈 Monitoring & Logging
+```bash
+cd UI/web
+npm install
+npm run dev        # development server (Turbopack)
+npm run build      # production build
+npm start          # serve production build
+```
 
-The application includes comprehensive logging using `ILogger<T>`:
+The frontend runs at `http://localhost:3000` by default.
 
-- Request/response logging
-- Error tracking and exception handling
-- Performance monitoring
-- Agent status tracking
+---
 
-## 🤝 Contributing
+## 🔄 CI/CD & Deployment
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+The GitHub Actions workflow (`.github/workflows/deploy-azure.yml`) triggers on push to `main` or `dev`, and supports manual dispatch with per-component toggles.
 
-## 📄 License
+| Job                                  | Runner         | Target                             |
+| ------------------------------------ | -------------- | ---------------------------------- |
+| `build-api` + `deploy-api`           | ubuntu-latest  | Azure App Service                  |
+| `build-and-deploy-web`               | ubuntu-latest  | Azure Static Web Apps              |
+| `build-database` + `deploy-database` | windows-latest | Azure SQL (DACPAC)                 |
+| `build-and-deploy-function`          | ubuntu-latest  | Azure Functions (Flex Consumption) |
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Required Secrets
+
+| Secret                            | Purpose                       |
+| --------------------------------- | ----------------------------- |
+| `AZURE_WEBAPI_PUBLISH_PROFILE`    | App Service deployment        |
+| `AZURE_FUNCTIONS_PUBLISH_PROFILE` | Functions deployment          |
+| `AZURE_STATIC_WEB_APPS_TOKEN`     | Static Web Apps deployment    |
+| `AZURE_CLIENT_ID`                 | Azure login for DB deployment |
+| `AZURE_TENANT_ID`                 | Azure login for DB deployment |
+| `AZURE_SUBSCRIPTION_ID`           | Azure login for DB deployment |
+| `AZURE_SQL_CONNECTION_STRING`     | Database schema deployment    |
+
+### Required Variables
+
+| Variable               | Purpose            |
+| ---------------------- | ------------------ |
+| `AZURE_WEBAPI_NAME`    | App Service name   |
+| `AZURE_FUNCTIONS_NAME` | Functions app name |
+
+---
 
 ## 👨‍💻 Author
 
@@ -243,12 +489,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Email: debanjanpaul10@gmail.com
 - GitHub: [@debanjanpaul10](https://github.com/debanjanpaul10)
 
-## 🙏 Acknowledgments
+---
 
-- Microsoft Semantic Kernel team for the AI framework
-- .NET community for excellent tooling and support
-- Azure team for cloud services integration
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
-⭐ **Star this repository if you find it helpful!**
+⭐ Star this repository if you find it useful!
