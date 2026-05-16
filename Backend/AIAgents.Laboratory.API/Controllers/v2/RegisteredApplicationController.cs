@@ -199,7 +199,7 @@ public sealed class RegisteredApplicationController(
         Description = GetRegisteredApplicationByIdAction.Description,
         OperationId = GetRegisteredApplicationByIdAction.OperationId)]
     public async Task<ActionResult<ResponseDto>> GetRegisteredApplicationByIdAsync(
-        [FromRoute] int applicationId,
+        [FromQuery] int applicationId,
         CancellationToken cancellationToken = default
     )
     {
@@ -348,7 +348,7 @@ public sealed class RegisteredApplicationController(
         Description = DeleteExistingRegisteredApplicationAction.Description,
         OperationId = DeleteExistingRegisteredApplicationAction.OperationId)]
     public async Task<ActionResult<ResponseDto>> DeleteRegisteredApplicationByIdAsync(
-        [FromRoute] int applicationId,
+        [FromQuery] int applicationId,
         CancellationToken cancellationToken = default
     )
     {
