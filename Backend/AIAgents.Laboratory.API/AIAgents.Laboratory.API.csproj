@@ -38,7 +38,6 @@
     <ProjectReference Include="..\Adapters\Infrastructure\AIAgents.Laboratory.Persistence.MongoDatabase\AIAgents.Laboratory.Persistence.MongoDatabase.csproj" />
     <ProjectReference Include="..\Adapters\Infrastructure\AIAgents.Laboratory.Persistence.SQLDatabase\AIAgents.Laboratory.Persistence.SQLDatabase.csproj" />
     <ProjectReference Include="..\Adapters\Infrastructure\AIAgents.Laboratory.Storage.Blobs\AIAgents.Laboratory.Storage.Blobs.csproj" />
-    <ProjectReference Include="..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
   </ItemGroup>
 
 </Project>
