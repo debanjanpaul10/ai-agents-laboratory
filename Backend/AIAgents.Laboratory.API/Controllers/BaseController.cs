@@ -1,4 +1,5 @@
-﻿using AIAgents.Laboratory.API.Adapters.Models.Base;
+﻿using System.Security.Claims;
+using AIAgents.Laboratory.API.Adapters.Models.Base;
 using AIAgents.Laboratory.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,21 +31,20 @@ public abstract class BaseController(
     /// <param name="authorizationType">The authorization type.</param>
     /// <returns>The boolean <c>true</c> if the request is authorized, otherwise <c>false</c>.</returns>
     /// <exception cref="Exception">Thrown when the configuration is missing.</exception>
-    protected bool IsAuthorized(AuthorizationTypes authorizationType)
+    protected bool IsAuthorized(
+        AuthorizationTypes authorizationType
+    )
     {
-        if (httpContextAccessor.HttpContext is not null && httpContextAccessor.HttpContext?.User is not null)
+        var user = httpContextAccessor.HttpContext?.User;
+        if (user is null)
+            return false;
+
+        return authorizationType switch
         {
-            // User Authentication
-            if (authorizationType == AuthorizationTypes.UserBased && !string.IsNullOrWhiteSpace(this.UserEmail)
-            && !this.UserEmail.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase))
-                return this.CheckApplicationLevelAuthorization();
-
-            // Application Authentication
-            if (authorizationType == AuthorizationTypes.ApplicationBased)
-                return this.CheckApplicationLevelAuthorization();
-        }
-
-        return false;
+            AuthorizationTypes.ApplicationBased => CheckApplicationLevelAuthorization(),
+            AuthorizationTypes.UserBased => HasValidUserEmail(user) && CheckApplicationLevelAuthorization(),
+            _ => false
+        };
     }
 
     /// <summary>
@@ -52,7 +52,9 @@ public abstract class BaseController(
     /// </summary>
     /// <param name="responseData">The response data.</param>
     /// <returns>The response DTO.</returns>
-    protected static ResponseDto HandleSuccessRequestResponse(object responseData) =>
+    protected static ResponseDto HandleSuccessRequestResponse(
+        object responseData
+    ) =>
         new()
         {
             IsSuccess = true,
@@ -66,7 +68,10 @@ public abstract class BaseController(
     /// <param name="statusCode">The status code.</param>
     /// <param name="message">The message.</param>
     /// <returns>The response DTO.</returns>
-    protected static ResponseDto HandleBadRequestResponse(int statusCode, string message) =>
+    protected static ResponseDto HandleBadRequestResponse(
+        int statusCode,
+        string message
+    ) =>
         new()
         {
             IsSuccess = false,
@@ -102,5 +107,21 @@ public abstract class BaseController(
             return currentClientId.Equals(aiAgentsClientIdFromConfig, StringComparison.OrdinalIgnoreCase);
 
         return false;
+    }
+
+    /// <summary>
+    /// Determines whether the user has a valid email claim.
+    /// </summary>
+    /// <param name="user">The user.</param>
+    /// <returns><c>true</c> if the user has a valid email claim, otherwise <c>false</c>.</returns>
+    private static bool HasValidUserEmail(
+        ClaimsPrincipal user
+    )
+    {
+        var userEmail = user.Claims
+            .FirstOrDefault(claim => claim.Type.Equals(HeaderConstants.UserEmailClaimConstant))?.Value;
+
+        return !string.IsNullOrWhiteSpace(userEmail)
+            && !userEmail.Equals(HeaderConstants.NotApplicableStringConstant, StringComparison.OrdinalIgnoreCase);
     }
 }

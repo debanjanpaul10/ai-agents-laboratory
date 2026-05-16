@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Handlers;
-using AIAgents.Laboratory.API.Adapters.Mapper;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AIAgents.Laboratory.API.Adapters.IOC;
@@ -26,6 +25,5 @@ public static class DIContainer
             .AddScoped<IWorkspacesHandler, WorkspacesHandler>()
             .AddScoped<IApplicationAdminHandler, ApplicationAdminHandler>()
             .AddScoped<IRegisteredApplicationHandler, RegisteredApplicationHandler>()
-            .AddScoped<INotificationsHandler, NotificationsHandler>()
-            .AddAutoMapper(config => config.AddProfile<DomainMapperProfile>());
+            .AddScoped<INotificationsHandler, NotificationsHandler>();
 }

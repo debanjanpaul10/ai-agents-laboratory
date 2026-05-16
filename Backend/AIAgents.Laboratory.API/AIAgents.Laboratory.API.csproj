@@ -11,13 +11,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
+    <Content Include="..\Core\AIAgents.Laboratory.Domain\Templates\FeedbackEmail.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Templates\FeedbackEmail.html</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.5.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.1.4" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.4" />
+    <PackageReference Include="OpenTelemetry.Api" Version="1.15.3" />
+    <PackageReference Include="SharpCompress" Version="0.48.1" />
+    <PackageReference Include="Snappier" Version="1.3.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.1.7" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,7 +38,6 @@
     <ProjectReference Include="..\Adapters\Infrastructure\AIAgents.Laboratory.Persistence.MongoDatabase\AIAgents.Laboratory.Persistence.MongoDatabase.csproj" />
     <ProjectReference Include="..\Adapters\Infrastructure\AIAgents.Laboratory.Persistence.SQLDatabase\AIAgents.Laboratory.Persistence.SQLDatabase.csproj" />
     <ProjectReference Include="..\Adapters\Infrastructure\AIAgents.Laboratory.Storage.Blobs\AIAgents.Laboratory.Storage.Blobs.csproj" />
-    <ProjectReference Include="..\Core\AIAgents.Laboratory.Domain\AIAgents.Laboratory.Domain.csproj" />
   </ItemGroup>
 
 </Project>

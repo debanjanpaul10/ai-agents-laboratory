@@ -13,5 +13,8 @@ public interface IAgentChatService
     /// <param name="chatRequest">The chat request.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The AI response.</returns>
-    Task<string> GetAgentChatResponseAsync(ChatRequestDomain chatRequest, CancellationToken cancellationToken = default);
+    Task<string> GetAgentChatResponseAsync(
+        ChatRequestDomain chatRequest,
+        CancellationToken cancellationToken = default
+    );
 }

@@ -28,8 +28,12 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public sealed class WorkspacesController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration,
-    ICorrelationContext correlationContext, ILogger<WorkspacesController> logger, IWorkspacesHandler workspacesHandler) : BaseController(httpContextAccessor, configuration)
+public sealed class WorkspacesController(
+    IHttpContextAccessor httpContextAccessor,
+    IConfiguration configuration,
+    ICorrelationContext correlationContext,
+    ILogger<WorkspacesController> logger,
+    IWorkspacesHandler workspacesHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Gets the list of all available workspaces available.
@@ -41,8 +45,13 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetAllWorkspacesAction.Summary, Description = GetAllWorkspacesAction.Description, OperationId = GetAllWorkspacesAction.OperationId)]
-    public async Task<ResponseDto> GetAllWorkspacesAsync(CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetAllWorkspacesAction.Summary,
+        Description = GetAllWorkspacesAction.Description,
+        OperationId = GetAllWorkspacesAction.OperationId)]
+    public async Task<ResponseDto> GetAllWorkspacesAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<AgentsWorkspaceDTO> result = [];
         try
@@ -91,8 +100,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetWorkspaceByWorkspaceIdAction.Summary, Description = GetWorkspaceByWorkspaceIdAction.Description, OperationId = GetWorkspaceByWorkspaceIdAction.OperationId)]
-    public async Task<ResponseDto> GetWorkspaceByWorkspaceIdAsync([FromQuery] string workspaceId, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetWorkspaceByWorkspaceIdAction.Summary,
+        Description = GetWorkspaceByWorkspaceIdAction.Description,
+        OperationId = GetWorkspaceByWorkspaceIdAction.OperationId)]
+    public async Task<ResponseDto> GetWorkspaceByWorkspaceIdAsync(
+        [FromQuery] string workspaceId,
+        CancellationToken cancellationToken = default
+    )
     {
         AgentsWorkspaceDTO result = new();
         try
@@ -144,8 +159,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = CreateNewWorkspaceAction.Summary, Description = CreateNewWorkspaceAction.Description, OperationId = CreateNewWorkspaceAction.OperationId)]
-    public async Task<ResponseDto> CreateNewWorkspaceAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = CreateNewWorkspaceAction.Summary,
+        Description = CreateNewWorkspaceAction.Description,
+        OperationId = CreateNewWorkspaceAction.OperationId)]
+    public async Task<ResponseDto> CreateNewWorkspaceAsync(
+        [FromBody] AgentsWorkspaceDTO agentsWorkspaceData,
+        CancellationToken cancellationToken = default
+    )
     {
         bool result = false;
         try
@@ -196,8 +217,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = DeleteExistingWorkspaceAction.Summary, Description = DeleteExistingWorkspaceAction.Description, OperationId = DeleteExistingWorkspaceAction.OperationId)]
-    public async Task<ResponseDto> DeleteExistingWorkspaceAsync([FromQuery] string workspaceGuidId, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = DeleteExistingWorkspaceAction.Summary,
+        Description = DeleteExistingWorkspaceAction.Description,
+        OperationId = DeleteExistingWorkspaceAction.OperationId)]
+    public async Task<ResponseDto> DeleteExistingWorkspaceAsync(
+        [FromQuery] string workspaceGuidId,
+        CancellationToken cancellationToken = default
+    )
     {
         bool result = false;
         try
@@ -249,8 +276,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = UpdateExistingWorkspaceDataAction.Summary, Description = UpdateExistingWorkspaceDataAction.Description, OperationId = UpdateExistingWorkspaceDataAction.OperationId)]
-    public async Task<ResponseDto> UpdateExistingWorkspaceDataAsync([FromBody] AgentsWorkspaceDTO agentsWorkspaceData, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = UpdateExistingWorkspaceDataAction.Summary,
+        Description = UpdateExistingWorkspaceDataAction.Description,
+        OperationId = UpdateExistingWorkspaceDataAction.OperationId)]
+    public async Task<ResponseDto> UpdateExistingWorkspaceDataAsync(
+        [FromBody] AgentsWorkspaceDTO agentsWorkspaceData,
+        CancellationToken cancellationToken = default
+    )
     {
         bool result = false;
         try
@@ -302,8 +335,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = InvokeWorkspaceAgentAction.Summary, Description = InvokeWorkspaceAgentAction.Description, OperationId = InvokeWorkspaceAgentAction.OperationId)]
-    public async Task<ResponseDto> InvokeWorkspaceAgentAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = InvokeWorkspaceAgentAction.Summary,
+        Description = InvokeWorkspaceAgentAction.Description,
+        OperationId = InvokeWorkspaceAgentAction.OperationId)]
+    public async Task<ResponseDto> InvokeWorkspaceAgentAsync(
+        [FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO,
+        CancellationToken cancellationToken = default
+    )
     {
         string result = string.Empty;
         try
@@ -354,8 +393,14 @@ public sealed class WorkspacesController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetWorkspaceGroupChatResponseAction.Summary, Description = GetWorkspaceGroupChatResponseAction.Description, OperationId = GetWorkspaceGroupChatResponseAction.OperationId)]
-    public async Task<ResponseDto> GetWorkspaceGroupChatResponseAsync([FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetWorkspaceGroupChatResponseAction.Summary,
+        Description = GetWorkspaceGroupChatResponseAction.Description,
+        OperationId = GetWorkspaceGroupChatResponseAction.OperationId)]
+    public async Task<ResponseDto> GetWorkspaceGroupChatResponseAsync(
+        [FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO,
+        CancellationToken cancellationToken = default
+    )
     {
         GroupChatResponseDTO result = new();
         try

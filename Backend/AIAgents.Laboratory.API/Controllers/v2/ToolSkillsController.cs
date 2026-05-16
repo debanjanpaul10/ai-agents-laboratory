@@ -26,8 +26,12 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 [ApiController]
 [ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route("aiagentsapi/v{version:apiVersion}/[controller]")]
-public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration,
-    ICorrelationContext correlationContext, ILogger<ToolSkillsController> logger, IToolSkillsHandler toolSkillsHandler) : BaseController(httpContextAccessor, configuration)
+public sealed class ToolSkillsController(
+    IHttpContextAccessor httpContextAccessor,
+    IConfiguration configuration,
+    ICorrelationContext correlationContext,
+    ILogger<ToolSkillsController> logger,
+    IToolSkillsHandler toolSkillsHandler) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
     /// Gets the list of all active tool skills asynchronously.
@@ -39,8 +43,13 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetAllToolSkillsAction.Summary, Description = GetAllToolSkillsAction.Description, OperationId = GetAllToolSkillsAction.OperationId)]
-    public async Task<ResponseDto> GetAllToolSkillsAsync(CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetAllToolSkillsAction.Summary,
+        Description = GetAllToolSkillsAction.Description,
+        OperationId = GetAllToolSkillsAction.OperationId)]
+    public async Task<ActionResult<ResponseDto>> GetAllToolSkillsAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<ToolSkillDTO> result = [];
         try
@@ -57,11 +66,13 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
 
                 if (result is not null)
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
@@ -89,8 +100,14 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetToolSkillBySkillIdAction.Summary, Description = GetToolSkillBySkillIdAction.Description, OperationId = GetToolSkillBySkillIdAction.OperationId)]
-    public async Task<ResponseDto> GetToolSkillBySkillIdAsync([FromQuery] string skillId, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetToolSkillBySkillIdAction.Summary,
+        Description = GetToolSkillBySkillIdAction.Description,
+        OperationId = GetToolSkillBySkillIdAction.OperationId)]
+    public async Task<ActionResult<ResponseDto>> GetToolSkillBySkillIdAsync(
+        [FromQuery] string skillId,
+        CancellationToken cancellationToken = default
+    )
     {
         ToolSkillDTO result = new();
         try
@@ -143,8 +160,14 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = AddNewToolSkillAction.Summary, Description = AddNewToolSkillAction.Description, OperationId = AddNewToolSkillAction.OperationId)]
-    public async Task<ResponseDto> AddNewToolSkillAsync([FromForm] ToolSkillDTO toolSkillData, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = AddNewToolSkillAction.Summary,
+        Description = AddNewToolSkillAction.Description,
+        OperationId = AddNewToolSkillAction.OperationId)]
+    public async Task<ActionResult<ResponseDto>> AddNewToolSkillAsync(
+        [FromForm] ToolSkillDTO toolSkillData,
+        CancellationToken cancellationToken = default
+    )
     {
         bool result = false;
         try
@@ -196,8 +219,14 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = UpdateExistingToolSkillDataAction.Summary, Description = UpdateExistingToolSkillDataAction.Description, OperationId = UpdateExistingToolSkillDataAction.OperationId)]
-    public async Task<ResponseDto> UpdateExistingToolSkillDataAsync([FromForm] ToolSkillDTO updateToolSkillData, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = UpdateExistingToolSkillDataAction.Summary,
+        Description = UpdateExistingToolSkillDataAction.Description,
+        OperationId = UpdateExistingToolSkillDataAction.OperationId)]
+    public async Task<ActionResult<ResponseDto>> UpdateExistingToolSkillDataAsync(
+        [FromForm] ToolSkillDTO updateToolSkillData,
+        CancellationToken cancellationToken = default
+    )
     {
         bool result = false;
         try
@@ -248,8 +277,14 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = DeleteExistingToolSkillBySkillIdAction.Summary, Description = DeleteExistingToolSkillBySkillIdAction.Description, OperationId = DeleteExistingToolSkillBySkillIdAction.OperationId)]
-    public async Task<ResponseDto> DeleteExistingToolSkillBySkillIdAsync([FromQuery] string skillId, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = DeleteExistingToolSkillBySkillIdAction.Summary,
+        Description = DeleteExistingToolSkillBySkillIdAction.Description,
+        OperationId = DeleteExistingToolSkillBySkillIdAction.OperationId)]
+    public async Task<ActionResult<ResponseDto>> DeleteExistingToolSkillBySkillIdAsync(
+        [FromQuery] string skillId,
+        CancellationToken cancellationToken = default
+    )
     {
         bool result = false;
         try
@@ -300,8 +335,14 @@ public sealed class ToolSkillsController(IHttpContextAccessor httpContextAccesso
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(Summary = GetAllMcpToolsAvailableAction.Summary, Description = GetAllMcpToolsAvailableAction.Description, OperationId = GetAllMcpToolsAvailableAction.OperationId)]
-    public async Task<ResponseDto> GetAllMcpToolsAvailableAsync(McpServerToolRequestDTO mcpServerToolRequest, CancellationToken cancellationToken = default)
+    [SwaggerOperation(
+        Summary = GetAllMcpToolsAvailableAction.Summary,
+        Description = GetAllMcpToolsAvailableAction.Description,
+        OperationId = GetAllMcpToolsAvailableAction.OperationId)]
+    public async Task<ActionResult<ResponseDto>> GetAllMcpToolsAvailableAsync(
+        McpServerToolRequestDTO mcpServerToolRequest,
+        CancellationToken cancellationToken = default
+    )
     {
         IEnumerable<McpServerToolsDTO> result = [];
         try

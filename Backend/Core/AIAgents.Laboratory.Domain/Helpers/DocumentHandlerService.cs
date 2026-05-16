@@ -15,7 +15,10 @@ internal static class DocumentHandlerService
     /// </summary>
     /// <param name="uploadedFiles">The uploaded files</param>
     /// <param name="allowedFileFormats">The allowed file formats.</param>
-    internal static void ValidateUploadedFiles(IList<IFormFile> uploadedFiles, string allowedFileFormats)
+    internal static void ValidateUploadedFiles(
+        IList<IFormFile> uploadedFiles,
+        string allowedFileFormats
+    )
     {
         if (uploadedFiles is null || !uploadedFiles.Any() || string.IsNullOrWhiteSpace(allowedFileFormats))
             throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
@@ -39,7 +42,10 @@ internal static class DocumentHandlerService
     /// <param name="agentData">The agent data.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task to wait on.</returns>
-    internal static async Task ProcessKnowledgebaseDocumentDataAsync(this AgentDataDomain agentData, CancellationToken cancellationToken = default)
+    internal static async Task ProcessKnowledgebaseDocumentDataAsync(
+        this AgentDataDomain agentData,
+        CancellationToken cancellationToken = default
+    )
     {
         if (agentData.KnowledgeBaseDocument is null || !agentData.KnowledgeBaseDocument.Any())
             throw new FileNotFoundException(ExceptionConstants.FileNotFoundExceptionMessage);
@@ -78,7 +84,8 @@ internal static class DocumentHandlerService
         foreach (var file in agentData.StoredKnowledgeBase)
         {
             var stream = new MemoryStream(file.FileContent);
-            knowledgeBaseFiles.Add(new FormFileImplementation(stream, file.FileContent.Length, file.FileName, file.FileName));
+            var formFile = new FormFileImplementation(stream, file.FileContent.Length, file.FileName, file.FileName);
+            knowledgeBaseFiles.Add(formFile);
         }
 
         agentData.KnowledgeBaseDocument = knowledgeBaseFiles;

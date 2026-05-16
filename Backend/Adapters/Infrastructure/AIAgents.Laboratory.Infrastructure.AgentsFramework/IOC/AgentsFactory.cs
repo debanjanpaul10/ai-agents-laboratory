@@ -20,15 +20,24 @@ internal static class AgentsFactory
     /// <param name="serviceProvider">The service provider for dependency injection.</param>
     /// <returns>A configured agent configuration.</returns>
     /// <exception cref="InvalidOperationException">Thrown when required configuration is missing.</exception>
-    internal static AgentConfiguration CreateAgentConfigurationFromAppConfig(IConfiguration appConfiguration, IServiceProvider serviceProvider)
+    internal static AgentConfiguration CreateAgentConfigurationFromAppConfig(
+        IConfiguration appConfiguration,
+        IServiceProvider serviceProvider
+    )
     {
         ArgumentNullException.ThrowIfNull(appConfiguration);
 
         var currentAiServiceProvider = appConfiguration[AzureAppConfigurationConstants.CurrentAiServiceProvider]
             ?? throw new KeyNotFoundException(ExceptionConstants.CurrentAiServiceProviderMissingMessage);
 
-        var agentConfiguration = BuildAgentConfigurationFromAppConfig(appConfiguration, currentAiServiceProvider);
-        return CreateAgentConfiguration(agentConfiguration, serviceProvider);
+        var agentConfiguration = BuildAgentConfigurationFromAppConfig(
+            appConfiguration,
+            serviceProvider: currentAiServiceProvider
+        );
+        return CreateAgentConfiguration(
+            configuration: agentConfiguration,
+            serviceProvider
+        );
     }
 
     /// <summary>
@@ -97,7 +106,7 @@ internal static class AgentsFactory
 
         var azureCredential = new Azure.AzureKeyCredential(config.ApiKey);
         var client = new Azure.AI.OpenAI.AzureOpenAIClient(new Uri(config.ApiEndpoint), azureCredential);
-        return client.GetChatClient(config.ModelId).AsIChatClient();
+        return client.GetChatClient(deploymentName: config.ModelId).AsIChatClient();
     }
 
     /// <summary>
@@ -108,7 +117,10 @@ internal static class AgentsFactory
     /// <returns>A validated agent configuration.</returns>
     /// <exception cref="ArgumentNullException">Thrown when configuration is null.</exception>
     /// <exception cref="InvalidOperationException">Thrown when configuration is invalid or service provider is unsupported.</exception>
-    private static AgentConfiguration CreateAgentConfiguration(AgentConfiguration configuration, IServiceProvider serviceProvider)
+    private static AgentConfiguration CreateAgentConfiguration(
+        AgentConfiguration configuration,
+        IServiceProvider serviceProvider
+    )
     {
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(serviceProvider);
@@ -147,7 +159,10 @@ internal static class AgentsFactory
     /// <param name="appConfiguration">The application configuration.</param>
     /// <param name="serviceProvider">The service provider name.</param>
     /// <returns>An agent configuration.</returns>
-    private static AgentConfiguration BuildAgentConfigurationFromAppConfig(IConfiguration appConfiguration, string serviceProvider)
+    private static AgentConfiguration BuildAgentConfigurationFromAppConfig(
+        IConfiguration appConfiguration,
+        string serviceProvider
+    )
     {
         var agentConfig = new AgentConfiguration
         {

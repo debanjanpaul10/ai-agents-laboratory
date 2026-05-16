@@ -25,7 +25,7 @@ var host = new HostBuilder()
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICorrelationContext, CorrelationContext>();
-        services.AddBusinessDependencies().AddDataDependencies(configuration).AddRepositories();
+        services.AddBusinessDependencies(configuration).AddDataDependencies(configuration).AddRepositories();
     })
     .ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Information))
     .Build();

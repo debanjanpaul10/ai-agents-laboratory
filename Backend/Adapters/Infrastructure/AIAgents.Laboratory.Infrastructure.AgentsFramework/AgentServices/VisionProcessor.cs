@@ -18,21 +18,23 @@ namespace AIAgents.Laboratory.Infrastructure.AgentsFramework.AgentServices;
 /// <param name="logger">The logger instance used to record diagnostic and operational information for the vision processing operations.</param>
 /// <param name="correlationContext">The correlation context used to track and correlate logs and exceptions across different components of the application.</param>
 /// <seealso cref="IVisionProcessor"/>
-public sealed class VisionProcessor(IConfiguration configuration, ILogger<VisionProcessor> logger, ICorrelationContext correlationContext) : IVisionProcessor
+public sealed class VisionProcessor(
+    IConfiguration configuration,
+    ILogger<VisionProcessor> logger,
+    ICorrelationContext correlationContext) : IVisionProcessor
 {
-    /// <summary>
-    /// Asynchronously extracts text data from an image located at the specified URL using a computer vision service.
-    /// </summary>
-    /// <remarks>This method uses an external computer vision service to perform optical character recognition
-    /// (OCR) on the image. Network connectivity and appropriate service credentials are required. The operation may take several seconds to complete depending on image size and service response time.</remarks>
-    /// <param name="imageUrl">The URL of the image to analyze. Must be a valid, accessible image URL.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation. Optional.</param>
-    /// <returns>A collection of strings containing the lines of text recognized in the image. The collection is empty if no text is found.</returns>
-    public async Task<IEnumerable<string>> ReadDataFromImageWithComputerVisionAsync(string imageUrl, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<IEnumerable<string>> ReadDataFromImageWithComputerVisionAsync(
+        string imageUrl,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl
+            );
 
             IList<string> imageTextData = [];
 
@@ -71,12 +73,22 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl);
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(ReadDataFromImageWithComputerVisionAsync), DateTime.UtcNow, imageUrl
+            );
         }
     }
 
@@ -91,9 +103,9 @@ public sealed class VisionProcessor(IConfiguration configuration, ILogger<Vision
     {
         var aiVisionKey = configuration[AzureAppConfigurationConstants.AzureAiVisionKey];
         var aiVisionEndpoint = configuration[AzureAppConfigurationConstants.AzureAiVisionEndpoint];
+        var credentials = new ApiKeyServiceClientCredentials(subscriptionKey: aiVisionKey);
 
-        var aiVisionClient = new ComputerVisionClient(new ApiKeyServiceClientCredentials(aiVisionKey)) { Endpoint = aiVisionEndpoint };
-        return aiVisionClient;
+        return new ComputerVisionClient(credentials) { Endpoint = aiVisionEndpoint };
     }
 
     #endregion

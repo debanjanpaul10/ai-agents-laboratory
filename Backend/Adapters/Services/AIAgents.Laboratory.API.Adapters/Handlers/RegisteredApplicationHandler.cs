@@ -1,18 +1,16 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Ports.In;
-using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
 /// <summary>
 /// Provides the implementation for handling registered application related operations in the API layer, such as retrieving, creating, updating, and deleting registered applications for the current logged in user.
 /// </summary>
-/// <param name="mapper">The auto mapper service.</param>
 /// <param name="raService">The registered application services.</param>
 /// <seealso cref="IRegisteredApplicationHandler"/>
-public sealed class RegisteredApplicationHandler(IMapper mapper, IRegisteredApplicationService raService) : IRegisteredApplicationHandler
+public sealed class RegisteredApplicationHandler(IRegisteredApplicationService raService) : IRegisteredApplicationHandler
 {
     /// <summary>
     /// Creates a new registered application for the current logged in user with the provided application data.
@@ -23,7 +21,7 @@ public sealed class RegisteredApplicationHandler(IMapper mapper, IRegisteredAppl
     /// <returns>A boolean for success/failure.</returns>
     public async Task<bool> CreateNewRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDto newApplicationData, CancellationToken cancellationToken = default)
     {
-        var domainInput = mapper.Map<RegisteredApplicationDomain>(newApplicationData);
+        var domainInput = DomainMapperProfile.MapToDomain(newApplicationData);
         return await raService.CreateNewRegisteredApplicationAsync(
             currentLoggedInUser,
             newApplicationData: domainInput,
@@ -62,7 +60,7 @@ public sealed class RegisteredApplicationHandler(IMapper mapper, IRegisteredAppl
             applicationId,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<RegisteredApplicationDto>(domainResult);
+        return DomainMapperProfile.MapToDto(domainResult);
     }
 
     /// <summary>
@@ -77,7 +75,7 @@ public sealed class RegisteredApplicationHandler(IMapper mapper, IRegisteredAppl
             currentLoggedInUser,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<IEnumerable<RegisteredApplicationDto>>(domainResult);
+        return [.. domainResult.Select(DomainMapperProfile.MapToDto)];
     }
 
     /// <summary>
@@ -90,7 +88,7 @@ public sealed class RegisteredApplicationHandler(IMapper mapper, IRegisteredAppl
     /// <returns>A boolean for success/failure.</returns>
     public async Task<bool> UpdateExistingRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDto updateApplicationData, CancellationToken cancellationToken = default)
     {
-        var domainInput = mapper.Map<RegisteredApplicationDomain>(updateApplicationData);
+        var domainInput = DomainMapperProfile.MapToDomain(updateApplicationData);
         return await raService.UpdateExistingRegisteredApplicationAsync(
             currentLoggedInUser,
             updateApplicationData: domainInput,

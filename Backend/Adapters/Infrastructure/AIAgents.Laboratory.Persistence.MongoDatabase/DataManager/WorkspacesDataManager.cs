@@ -1,8 +1,8 @@
 using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Contracts;
+using AIAgents.Laboratory.Persistence.MongoDatabase.Mapper;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Models;
-using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using static AIAgents.Laboratory.Persistence.MongoDatabase.Helpers.Constants;
@@ -14,13 +14,12 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
 /// </summary>
 /// <remarks>
 /// It implements the <see cref="IWorkspacesDataManager"/> interface, allowing for operations such as creating, retrieving, updating, and deleting workspaces. 
-/// The class uses an instance of <see cref="IMongoDatabaseRepository"/> to interact with the MongoDB database and an <see cref="IMapper"/> for mapping between domain models and data models.
+/// The class uses an instance of <see cref="IMongoDatabaseRepository"/> to interact with the MongoDB database and <see cref="MongoDataMapperProfile"/> for mapping between domain models and data models.
 /// </remarks>
 /// <param name="configuration">The configuration instance.</param>
-/// <param name="mapper">The mapper instance.</param>
 /// <param name="mongoDatabaseRepository">The MongoDB database repository instance.</param>
 /// <seealso cref="IWorkspacesDataManager"/>
-public sealed class WorkspacesDataManager(IConfiguration configuration, IMapper mapper, IMongoDatabaseRepository mongoDatabaseRepository) : IWorkspacesDataManager
+public sealed class WorkspacesDataManager(IConfiguration configuration, IMongoDatabaseRepository mongoDatabaseRepository) : IWorkspacesDataManager
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -43,11 +42,12 @@ public sealed class WorkspacesDataManager(IConfiguration configuration, IMapper 
     /// <returns>A boolean for <c>success/failure.</c></returns>
     public async Task<bool> CreateNewWorkspaceAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default)
     {
-        var dbInput = mapper.Map<AgentsWorkspaceDataModel>(agentsWorkspaceData);
+        var dbInput = MongoDataMapperProfile.MapToModel(domain: agentsWorkspaceData);
         return await mongoDatabaseRepository.SaveDataAsync(
             data: dbInput,
             databaseName: this.MongoDatabaseName,
             collectionName: this.WorkspacesCollectionName,
+            bypassDocumentValidation: true,
             cancellationToken
         ).ConfigureAwait(false);
     }
@@ -104,7 +104,7 @@ public sealed class WorkspacesDataManager(IConfiguration configuration, IMapper 
             filter,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<IEnumerable<AgentsWorkspaceDomain>>(result);
+        return [.. result.Select(MongoDataMapperProfile.MapToDomain)];
     }
 
     /// <summary>
@@ -118,7 +118,8 @@ public sealed class WorkspacesDataManager(IConfiguration configuration, IMapper 
     {
         var filter = Builders<AgentsWorkspaceDataModel>.Filter.And(
             Builders<AgentsWorkspaceDataModel>.Filter.Eq(x => x.IsActive, true),
-            Builders<AgentsWorkspaceDataModel>.Filter.Eq(x => x.AgentWorkspaceGuid, workspaceId));
+            Builders<AgentsWorkspaceDataModel>.Filter.Eq(x => x.AgentWorkspaceGuid, workspaceId)
+        );
 
         var allData = await mongoDatabaseRepository.GetDataFromCollectionAsync(
             databaseName: this.MongoDatabaseName,
@@ -126,7 +127,7 @@ public sealed class WorkspacesDataManager(IConfiguration configuration, IMapper 
             filter,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<AgentsWorkspaceDomain>(allData?.First() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage));
+        return MongoDataMapperProfile.MapToDomain(model: allData?.First() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage));
     }
 
     /// <summary>
@@ -138,10 +139,11 @@ public sealed class WorkspacesDataManager(IConfiguration configuration, IMapper 
     /// <returns>A boolean for <c>success/failure.</c></returns>
     public async Task<bool> UpdateExistingWorkspaceDataAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default)
     {
-        var dbInput = mapper.Map<AgentsWorkspaceDataModel>(agentsWorkspaceData);
+        var dbInput = MongoDataMapperProfile.MapToModel(domain: agentsWorkspaceData);
         var filter = Builders<AgentsWorkspaceDataModel>.Filter.And(
             Builders<AgentsWorkspaceDataModel>.Filter.Eq(x => x.IsActive, true),
-            Builders<AgentsWorkspaceDataModel>.Filter.Eq(x => x.AgentWorkspaceGuid, agentsWorkspaceData.AgentWorkspaceGuid));
+            Builders<AgentsWorkspaceDataModel>.Filter.Eq(x => x.AgentWorkspaceGuid, agentsWorkspaceData.AgentWorkspaceGuid)
+        );
 
         var allWorkspacesData = await mongoDatabaseRepository.GetDataFromCollectionAsync(
             databaseName: this.MongoDatabaseName,

@@ -1,7 +1,6 @@
 ﻿using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Contracts;
 using AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
-using AIAgents.Laboratory.Persistence.MongoDatabase.Mapper;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Repository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,8 +23,7 @@ public static class DIContainer
     public static IServiceCollection AddMongoDbAdapterDependencies(this IServiceCollection services, IConfiguration configuration) =>
         services.ConfigureMongoDbServer(configuration)
         .AddDataManagers()
-        .AddDataRepositories()
-        .AddAutoMapper(config => config.AddProfile<MongoDataMapperProfile>());
+        .AddDataRepositories();
 
     /// <summary>
     /// Configures the mongo database server.

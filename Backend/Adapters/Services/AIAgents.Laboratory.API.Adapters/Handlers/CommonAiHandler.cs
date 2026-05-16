@@ -1,7 +1,7 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
+using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.Ports.In;
-using AutoMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
@@ -9,9 +9,8 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// The Common AI Handler.
 /// </summary>
 /// <param name="commonAiService">The common ai service.</param>
-/// <param name="mapper">The mapper.</param>
 /// <seealso cref="AIAgents.Laboratory.API.Adapters.Contracts.ICommonAiHandler" />
-public sealed class CommonAiHandler(ICommonAiService commonAiService, IMapper mapper) : ICommonAiHandler
+public sealed class CommonAiHandler(ICommonAiService commonAiService) : ICommonAiHandler
 {
     /// <summary>
     /// Retrieves a collection of configuration settings associated with the specified key name.
@@ -37,7 +36,8 @@ public sealed class CommonAiHandler(ICommonAiService commonAiService, IMapper ma
     /// Gets the top active agents data list and the agents count asynchronously.
     /// </summary>
     /// <param name="userName">The current logged in user.</param>
-    /// <returns>A tupple containing the list of agents and the top 3 active ai agents.</returns>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A tuple containing the list of agents and the top 3 active ai agents.</returns>
     public async Task<TopActiveAgentsDTO> GetTopActiveAgentsDataAsync(string userName, CancellationToken cancellationToken = default)
     {
         var (ActiveAgentsCount, TopActiveAgentsList) = await commonAiService.GetTopActiveAgentsDataAsync(
@@ -48,7 +48,7 @@ public sealed class CommonAiHandler(ICommonAiService commonAiService, IMapper ma
         return new()
         {
             ActiveAgentsCount = ActiveAgentsCount,
-            TopActiveAgents = mapper.Map<IEnumerable<AgentDataDTO>>(TopActiveAgentsList)
+            TopActiveAgents = [.. TopActiveAgentsList.Select(DomainMapperProfile.MapToDto)]
         };
     }
 }

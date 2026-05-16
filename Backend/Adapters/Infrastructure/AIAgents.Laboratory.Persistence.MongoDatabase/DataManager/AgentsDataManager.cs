@@ -1,8 +1,8 @@
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Contracts;
+using AIAgents.Laboratory.Persistence.MongoDatabase.Mapper;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Models;
-using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using static AIAgents.Laboratory.Persistence.MongoDatabase.Helpers.Constants;
@@ -11,14 +11,13 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
 
 /// <summary>
 /// Provides implementation for the <see cref="IAgentsDataManager"/> to manage agent data in a MongoDB database, including creating, retrieving, updating, and deleting agent data while ensuring proper access control based on user email and privacy settings. 
-/// This service uses AutoMapper for mapping between domain entities and database models, and relies on a MongoDB repository for data access operations.
+/// This service uses <see cref="MongoDataMapperProfile"/> for mapping between domain entities and database models, and relies on a MongoDB repository for data access operations.
 /// </summary>
 /// <remarks>The service ensures that only authorized users can access or modify agent data based on the created by email and privacy settings, and it abstracts the MongoDB data access logic from the domain layer.</remarks>
 /// <param name="configuration">The configuration service.</param>
-/// <param name="mapper">The auto mapper service.</param>
 /// <param name="mongoDatabaseRepository">The mongodb repository.</param>
 /// <seealso cref="IAgentsDataManager"/>
-public sealed class AgentsDataManager(IConfiguration configuration, IMapper mapper, IMongoDatabaseRepository mongoDatabaseRepository) : IAgentsDataManager
+public sealed class AgentsDataManager(IConfiguration configuration, IMongoDatabaseRepository mongoDatabaseRepository) : IAgentsDataManager
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -41,11 +40,12 @@ public sealed class AgentsDataManager(IConfiguration configuration, IMapper mapp
     /// <returns>The boolean for success/failure.</returns>
     public async Task<bool> CreateNewAgentAsync(AgentDataDomain agentData, string userEmail, CancellationToken cancellationToken = default)
     {
-        var dbInput = mapper.Map<AgentDataModel>(agentData);
+        var dbInput = MongoDataMapperProfile.MapToModel(domain: agentData);
         return await mongoDatabaseRepository.SaveDataAsync(
             data: dbInput,
             databaseName: this.MongoDatabaseName,
             collectionName: this.AgentsDataCollectionName,
+            bypassDocumentValidation: true,
             cancellationToken
         ).ConfigureAwait(false);
     }
@@ -97,8 +97,9 @@ public sealed class AgentsDataManager(IConfiguration configuration, IMapper mapp
     public async Task<AgentDataDomain> GetAgentDataByIdAsync(string agentId, string userEmail, CancellationToken cancellationToken = default)
     {
         var filter = Builders<AgentDataModel>.Filter.And(
-                Builders<AgentDataModel>.Filter.Eq(x => x.IsActive, true),
-                Builders<AgentDataModel>.Filter.Eq(x => x.AgentId, agentId));
+            Builders<AgentDataModel>.Filter.Eq(x => x.IsActive, true),
+            Builders<AgentDataModel>.Filter.Eq(x => x.AgentId, agentId)
+        );
 
         if (!string.IsNullOrEmpty(userEmail))
             filter = Builders<AgentDataModel>.Filter.And(
@@ -118,7 +119,7 @@ public sealed class AgentsDataManager(IConfiguration configuration, IMapper mapp
             filter,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<AgentDataDomain>(allData.First());
+        return MongoDataMapperProfile.MapToDomain(model: allData.First());
     }
 
     /// <summary>
@@ -130,16 +131,16 @@ public sealed class AgentsDataManager(IConfiguration configuration, IMapper mapp
     public async Task<IEnumerable<AgentDataDomain>> GetAllAgentsDataAsync(string userEmail, CancellationToken cancellationToken = default)
     {
         var filter = Builders<AgentDataModel>.Filter.And(
-                Builders<AgentDataModel>.Filter.Eq(x => x.IsActive, true),
-                Builders<AgentDataModel>.Filter.Eq(x => x.IsDefaultChatbot, false),
-                Builders<AgentDataModel>.Filter.Or(
-                    Builders<AgentDataModel>.Filter.Eq(x => x.IsPrivate, false),
-                    Builders<AgentDataModel>.Filter.And(
-                        Builders<AgentDataModel>.Filter.Eq(x => x.IsPrivate, true),
-                        Builders<AgentDataModel>.Filter.Eq(x => x.CreatedBy, userEmail)
-                    )
+            Builders<AgentDataModel>.Filter.Eq(x => x.IsActive, true),
+            Builders<AgentDataModel>.Filter.Eq(x => x.IsDefaultChatbot, false),
+            Builders<AgentDataModel>.Filter.Or(
+                Builders<AgentDataModel>.Filter.Eq(x => x.IsPrivate, false),
+                Builders<AgentDataModel>.Filter.And(
+                    Builders<AgentDataModel>.Filter.Eq(x => x.IsPrivate, true),
+                    Builders<AgentDataModel>.Filter.Eq(x => x.CreatedBy, userEmail)
                 )
-            );
+            )
+        );
 
         var dbResult = await mongoDatabaseRepository.GetDataFromCollectionAsync(
             databaseName: this.MongoDatabaseName,
@@ -147,13 +148,13 @@ public sealed class AgentsDataManager(IConfiguration configuration, IMapper mapp
             filter,
             cancellationToken
         ).ConfigureAwait(false);
-        return mapper.Map<IEnumerable<AgentDataDomain>>(dbResult);
+        return [.. dbResult.Select(MongoDataMapperProfile.MapToDomain)];
     }
 
     /// <summary>
     /// Updates the existing agent data.
     /// </summary>
-    /// <param name="updates">The update agent data domain model.</param>
+    /// <param name="updateDataDomain">The update agent data domain model.</param>
     /// <param name="userEmail">The current logged in user email address.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>

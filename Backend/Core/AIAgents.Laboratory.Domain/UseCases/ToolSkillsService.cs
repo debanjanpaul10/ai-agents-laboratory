@@ -27,50 +27,55 @@ public sealed class ToolSkillsService(
     IMcpClientServices mcpClientServices,
     INotificationsService notificationsService) : IToolSkillsService
 {
-    /// <summary>
-    /// Adds a new tool skill asynchronously.
-    /// </summary>
-    /// <param name="toolSkillData">The tool skill data domain model.</param>
-    /// <param name="userEmail">The user email.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The boolean for <c>success/failure</c></returns>
+    /// <inheritdoc />
     public async Task<bool> AddNewToolSkillAsync(
         ToolSkillDomain toolSkillData,
         string userEmail,
         CancellationToken cancellationToken = default
     )
     {
+        bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(AddNewToolSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, toolSkillData.ToolSkillDisplayName }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(AddNewToolSkillAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, toolSkillData.ToolSkillDisplayName })
+            );
 
             toolSkillData.ToolSkillGuid = Guid.NewGuid().ToString();
             toolSkillData.PrepareAuditEntityData(userEmail);
-            return await toolSkillsDataManager.AddNewToolSkillAsync(
+
+            response = await toolSkillsDataManager.AddNewToolSkillAsync(
                 toolSkillData,
                 userEmail,
                 cancellationToken
             ).ConfigureAwait(false);
+            return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AddNewToolSkillAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(AddNewToolSkillAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(AddNewToolSkillAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, toolSkillData.ToolSkillDisplayName }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(AddNewToolSkillAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, toolSkillData.ToolSkillDisplayName, response })
+            );
         }
     }
 
-    /// <summary>
-    /// Associates a skill and an agent asynchronously.
-    /// </summary>
-    /// <param name="agentData">The agent data containing agent name and agent guid.</param>
-    /// <param name="toolSkillId">The tool skill guid id.</param>
-    /// <param name="currentUserEmail">The current user email.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>A boolean for <c>success/failure.</c></returns>
+    /// <inheritdoc />
     public async Task<bool> AssociateSkillAndAgentAsync(
         IList<AssociatedAgentsSkillDataDomain> agentData,
         string toolSkillId,
@@ -82,10 +87,14 @@ public sealed class ToolSkillsService(
         ArgumentException.ThrowIfNullOrWhiteSpace(toolSkillId);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
+        bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, toolSkillId, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, toolSkillId, currentUserEmail })
+            );
 
             var toolData = await this.GetToolSkillBySkillIdAsync(
                 toolSkillId,
@@ -104,23 +113,27 @@ public sealed class ToolSkillsService(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, toolSkillId, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(AssociateSkillAndAgentAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, toolSkillId, currentUserEmail, response })
+            );
         }
     }
 
-    /// <summary>
-    /// Deletes an existing tool by tool skill id asynchronously.
-    /// </summary>
-    /// <param name="toolSkillId">The tool skill id to delete.</param>
-    /// <param name="currentUserEmail">The current logged in user email.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>A boolean for success/failure.</returns>
+    /// <inheritdoc />
     public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(
         string toolSkillId,
         string currentUserEmail,
@@ -133,8 +146,11 @@ public sealed class ToolSkillsService(
         bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId })
+            );
 
             response = await toolSkillsDataManager.DeleteExistingToolSkillBySkillIdAsync(
                 toolSkillId,
@@ -154,23 +170,27 @@ public sealed class ToolSkillsService(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(DeleteExistingToolSkillBySkillIdAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId, response })
+            );
         }
     }
 
-    /// <summary>
-    /// Gets all MCP tools available asynchronously.
-    /// </summary>
-    /// <param name="serverUrl">The MCP server url.</param>
-    /// <param name="currentUserEmail">The current user email.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The list of <see cref="McpClientTool"/></returns>
+    /// <inheritdoc />
     public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAvailableAsync(
         string serverUrl,
         string currentUserEmail,
@@ -180,34 +200,44 @@ public sealed class ToolSkillsService(
         ArgumentException.ThrowIfNullOrWhiteSpace(serverUrl);
         ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
 
+        IEnumerable<McpClientTool>? response = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, serverUrl, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, serverUrl, currentUserEmail })
+            );
 
-            return await mcpClientServices.GetAllMcpToolsAsync(
+            response = await mcpClientServices.GetAllMcpToolsAsync(
                 mcpServerUrl: serverUrl,
                 cancellationToken
             ).ConfigureAwait(false);
+            return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, serverUrl, currentUserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, serverUrl, currentUserEmail, response })
+            );
         }
     }
 
-    /// <summary>
-    /// Gets all the tool skill data asynchronously.
-    /// </summary>
-    /// <param name="userEmail">The current logged in user email.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The list of <see cref="ToolSkillDomain"/></returns>
+    /// <inheritdoc />
     public async Task<IEnumerable<ToolSkillDomain>> GetAllToolSkillsAsync(
         string userEmail,
         CancellationToken cancellationToken = default
@@ -216,8 +246,11 @@ public sealed class ToolSkillsService(
         IEnumerable<ToolSkillDomain>? result = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllToolSkillsAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetAllToolSkillsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail })
+            );
 
             result = await toolSkillsDataManager.GetAllToolSkillsAsync(
                 userEmail,
@@ -227,23 +260,27 @@ public sealed class ToolSkillsService(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllToolSkillsAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetAllToolSkillsAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllToolSkillsAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetAllToolSkillsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, result })
+            );
         }
     }
 
-    /// <summary>
-    /// Gets a single tool skill data by its skill id asynchronously.
-    /// </summary>
-    /// <param name="toolSkillId">The tool skill id to be fetched.</param>
-    /// <param name="currentUserEmail">The current logged in user email.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The tool skill domain model.</returns>
+    /// <inheritdoc />
     public async Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(
         string toolSkillId,
         string currentUserEmail,
@@ -254,8 +291,11 @@ public sealed class ToolSkillsService(
         ToolSkillDomain? result = null;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId })
+            );
 
             result = await toolSkillsDataManager.GetToolSkillBySkillIdAsync(
                 toolSkillId,
@@ -266,23 +306,27 @@ public sealed class ToolSkillsService(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetToolSkillBySkillIdAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, toolSkillId, result })
+            );
         }
     }
 
-    /// <summary>
-    /// Updates an existing tool skill data asynchronously.
-    /// </summary>
-    /// <param name="updateToolSkillData">The tool skill data domain model.</param>
-    /// <param name="currentUserEmail">The user email.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The boolean for <c>success/failure</c></returns>
+    /// <inheritdoc />
     public async Task<bool> UpdateExistingToolSkillDataAsync(
         ToolSkillDomain updateToolSkillData,
         string currentUserEmail,
@@ -295,8 +339,11 @@ public sealed class ToolSkillsService(
         bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, updateToolSkillData.ToolSkillGuid }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, updateToolSkillData.ToolSkillGuid })
+            );
 
             response = await toolSkillsDataManager.UpdateExistingToolSkillDataAsync(
                 updateToolSkillData,
@@ -316,13 +363,23 @@ public sealed class ToolSkillsService(
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, updateToolSkillData.ToolSkillGuid, response }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(UpdateExistingToolSkillDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentUserEmail, updateToolSkillData.ToolSkillGuid, response })
+            );
         }
     }
 

@@ -5,12 +5,14 @@ using AI.Agents.Laboratory.Functions.Business.Services;
 using AI.Agents.Laboratory.Functions.Data.Contracts;
 using AI.Agents.Laboratory.Functions.Data.Services;
 using AI.Agents.Laboratory.Functions.Shared.Constants;
+using Azure.Communication.Email;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
+using static AI.Agents.Laboratory.Functions.Shared.Constants.EnvironmentConfigurationConstants;
 
 namespace AI.Agents.Laboratory.Functions.IOC;
 
@@ -84,14 +86,18 @@ public static class DependencyInjection
     /// Adds business layer dependencies to the service collection, allowing for dependency injection of business services throughout the application.
     /// </summary>
     /// <param name="services">The IServiceCollection is used to register services for dependency injection, enabling the application to resolve and inject these services where needed.</param>
+    /// <param name="configuration">The configuration services.</param>
     /// <returns>The updated IServiceCollection with the registered business dependencies.</returns>
-    public static IServiceCollection AddBusinessDependencies(this IServiceCollection services) =>
-        services.AddScoped<IPushNotificationsService, PushNotificationsService>();
+    public static IServiceCollection AddBusinessDependencies(this IServiceCollection services, IConfiguration configuration) =>
+        services.ConfigureEmailClientServices(configuration)
+            .AddKeyedScoped<INotificationService, EmailNotificationsService>(NotificationServices.EmailNotifications)
+            .AddKeyedScoped<INotificationService, PushNotificationsService>(NotificationServices.AppPushNotifications);
 
     /// <summary>
     /// Adds data layer dependencies to the service collection, allowing for dependency injection of data services throughout the application.
     /// </summary>
     /// <param name="services">The IServiceCollection is used to register services for dependency injection, enabling the application to resolve and inject these services where needed.</param>
+    /// <param name="configuration">The configuration services.</param>
     /// <returns>The updated IServiceCollection with the registered data dependencies.</returns>
     public static IServiceCollection AddDataDependencies(this IServiceCollection services, IConfiguration configuration) =>
         services.ConfigureMongoDbServer(configuration)
@@ -150,5 +156,20 @@ public static class DependencyInjection
             rootDirectory = Path.GetFullPath(Path.Combine(currentDirectory, ".."));
 
         return rootDirectory;
+    }
+
+    /// <summary>
+    /// Configures the email client services.
+    /// </summary>
+    /// <param name="services">The services.</param>
+    /// <param name="configuration">The configuration.</param>
+    /// <returns>The updated IServiceCollection with the registered email client services.</returns>
+    private static IServiceCollection ConfigureEmailClientServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        var emailNotificationConnectionString = configuration[AzureAppConfigurationConstants.EmailNotificationServiceConnectionString];
+        ArgumentException.ThrowIfNullOrWhiteSpace(emailNotificationConnectionString);
+
+        services.AddSingleton(new EmailClient(emailNotificationConnectionString));
+        return services;
     }
 }

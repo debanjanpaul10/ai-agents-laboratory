@@ -3,8 +3,8 @@ using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Helpers;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Contracts;
+using AIAgents.Laboratory.Persistence.MongoDatabase.Mapper;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Models;
-using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -16,17 +16,15 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
 /// <summary>
 /// Provides an implementation of the INotificationsDataManager interface, responsible for handling data access operations related to notifications.
 /// </summary>
-/// <param name="correlationContext">The correlation context used to track and correlate logs and operations.
+/// <param name="correlationContext">The correlation context used to track and correlate logs and operations.</param>
 /// <param name="logger">The ILogger instance used for logging information, warnings, and errors that occur within the data manager's methods. This helps in monitoring the application's behavior and diagnosing issues when they arise.</param>
 /// <param name="configuration">The configuration instance used to access application settings.</param>
-/// <param name="mapper">The AutoMapper instance used for object mapping.</param>
 /// <param name="mongoDatabaseRepository">The MongoDB database repository used for data access operations.</param>
 /// <seealso cref="INotificationsDataManager"/>
 public sealed class NotificationsDataManager(
     ILogger<NotificationsDataManager> logger,
     ICorrelationContext correlationContext,
     IConfiguration configuration,
-    IMapper mapper,
     IMongoDatabaseRepository mongoDatabaseRepository) : INotificationsDataManager
 {
     /// <summary>
@@ -49,7 +47,6 @@ public sealed class NotificationsDataManager(
     /// <returns>
     /// A boolean value indicating whether the operation was successful (true) or not (false).
     /// </returns>
-    /// <exception cref="NotImplementedException"></exception>
     public async Task<bool> DeleteAllNotificationsForUserAsync(
         string currentLoggedInUser,
         CancellationToken cancellationToken = default
@@ -70,7 +67,7 @@ public sealed class NotificationsDataManager(
             var updates = new List<UpdateDefinition<NotificationsModel>>
             {
                 Builders<NotificationsModel>.Update.Set(field => field.IsActive, false),
-                Builders<NotificationsModel>.Update.Set(field =>field.DateModified, DateTime.UtcNow),
+                Builders<NotificationsModel>.Update.Set(field => field.DateModified, DateTime.UtcNow),
                 Builders<NotificationsModel>.Update.Set(field => field.ModifiedBy, currentLoggedInUser)
             };
             var update = Builders<NotificationsModel>.Update.Combine(updates);
@@ -106,7 +103,7 @@ public sealed class NotificationsDataManager(
 
     /// <summary>
     /// Retrieves a list of notifications for a specific user based on their username. 
-    /// This method allows clients to fetch all notifications that are relevant to a particular user
+    /// This method allows clients to fetch all notifications that are relevant to a particular user.
     /// </summary>
     /// <param name="recipientUserName">The username of the user for whom to retrieve notifications.</param>
     /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
@@ -135,7 +132,7 @@ public sealed class NotificationsDataManager(
                 filter: filter,
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
-            return mapper.Map<IEnumerable<NotificationsDomain>>(allData);
+            return [.. allData.Select(MongoDataMapperProfile.MapToDomain)];
         }
         catch (Exception ex)
         {
@@ -190,7 +187,7 @@ public sealed class NotificationsDataManager(
             var updates = new List<UpdateDefinition<NotificationsModel>>
             {
                 Builders<NotificationsModel>.Update.Set(field => field.IsRead, true),
-                Builders<NotificationsModel>.Update.Set(field =>field.DateModified, DateTime.UtcNow),
+                Builders<NotificationsModel>.Update.Set(field => field.DateModified, DateTime.UtcNow),
                 Builders<NotificationsModel>.Update.Set(field => field.ModifiedBy, currentLoggedInUser)
             };
             var update = Builders<NotificationsModel>.Update.Combine(updates);

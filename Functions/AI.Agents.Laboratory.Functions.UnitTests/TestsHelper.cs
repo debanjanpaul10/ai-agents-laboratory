@@ -9,4 +9,9 @@ internal static class TestsHelper
     /// A static readonly Guid used as a test correlation ID in unit tests.
     /// </summary>
     public static readonly Guid TestCorrelationIdGuid = Guid.NewGuid();
+
+    /// <summary>
+    /// A string used as a test exception message in unit tests to verify that exceptions are thrown and handled correctly within the components being tested.
+    /// </summary>
+    internal static readonly string TestExceptionMessage = "Test exception message for unit testing.";
 }

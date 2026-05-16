@@ -34,4 +34,20 @@ public static class EnvironmentConfigurationConstants
     /// The appsettings search pattern constant, used to define the search pattern for configuration files when loading settings in the Azure Function application. This constant allows the application to identify and load all configuration files that match the specified pattern (e.g., appsettings.*.json), enabling support for multiple environment-specific configuration files and ensuring that the application can access the necessary settings based on the current hosting environment.
     /// </summary>
     public const string AppsettingsSearchPattern = "appsettings.*";
+
+    /// <summary>
+    /// The notification services constants.
+    /// </summary>
+    public static class NotificationServices
+    {
+        /// <summary>
+        /// The email notifications constant.
+        /// </summary>
+        public const string EmailNotifications = "EmailNotifications";
+
+        /// <summary>
+        /// The application push notifications constant.
+        /// </summary>
+        public const string AppPushNotifications = "PushNotifications";
+    }
 }

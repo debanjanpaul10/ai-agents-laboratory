@@ -19,16 +19,16 @@ public static class DIContainer
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddDomainDependencies(this IServiceCollection services) =>
         services.AddScoped<ICommonAiService, CommonAiService>()
-        .AddScoped<IAgentsService, AgentsService>()
-        .AddScoped<IAgentChatService, AgentChatService>()
-        .AddScoped<IDirectChatService, DirectChatService>()
-        .AddScoped<IConversationHistoryService, ConversationHistoryService>()
-        .AddScoped<IFeedbackService, FeedbackService>()
-        .AddScoped<IDocumentIntelligenceService, DocumentIntelligenceService>()
-        .AddScoped<IToolSkillsService, ToolSkillsService>()
-        .AddScoped<IWorkspacesService, WorkspacesService>()
-        .AddScoped<IOrchestratorService, OrchestratorService>()
-        .AddScoped<IApplicationAdminService, ApplicationAdminService>()
-        .AddScoped<IRegisteredApplicationService, RegisteredApplicationService>()
-        .AddScoped<INotificationsService, NotificationsService>();
+            .AddScoped<IAgentsService, AgentsService>()
+            .AddScoped<IAgentChatService, AgentChatService>()
+            .AddScoped<IDirectChatService, DirectChatService>()
+            .AddScoped<IConversationHistoryService, ConversationHistoryService>()
+            .AddScoped<IFeedbackService, FeedbackService>()
+            .AddScoped<IDocumentIntelligenceService, DocumentIntelligenceService>()
+            .AddScoped<IToolSkillsService, ToolSkillsService>()
+            .AddScoped<IWorkspacesService, WorkspacesService>()
+            .AddScoped<IOrchestratorService, OrchestratorService>()
+            .AddScoped<IApplicationAdminService, ApplicationAdminService>()
+            .AddScoped<IRegisteredApplicationService, RegisteredApplicationService>()
+            .AddScoped<INotificationsService, NotificationsService>();
 }

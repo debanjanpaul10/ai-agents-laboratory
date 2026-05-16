@@ -15,7 +15,11 @@ public interface IAgentsHandler
     /// <param name="userEmail">The user email address.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> CreateNewAgentAsync(CreateAgentDTO agentData, string userEmail, CancellationToken cancellationToken = default);
+    Task<bool> CreateNewAgentAsync(
+        CreateAgentDTO agentData,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets all agents data asynchronous.
@@ -23,7 +27,10 @@ public interface IAgentsHandler
     /// <param name="userEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of <see cref="AgentDataDTO"/></returns>
-    Task<IEnumerable<AgentDataDTO>> GetAllAgentsDataAsync(string userEmail, CancellationToken cancellationToken = default);
+    Task<IEnumerable<AgentDataDTO>> GetAllAgentsDataAsync(
+        string userEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets the agent data by identifier asynchronous.
@@ -32,7 +39,11 @@ public interface IAgentsHandler
     /// <param name="userEmail">The user email address.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The agent data dto.</returns>
-    Task<AgentDataDTO> GetAgentDataByIdAsync(string agentId, string userEmail, CancellationToken cancellationToken = default);
+    Task<AgentDataDTO> GetAgentDataByIdAsync(
+        string agentId,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Updates the existing agent data.
@@ -41,7 +52,11 @@ public interface IAgentsHandler
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> UpdateExistingAgentDataAsync(AgentDataDTO updateAgentData, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> UpdateExistingAgentDataAsync(
+        AgentDataDTO updateAgentData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Deletes an existing agent data.
@@ -50,7 +65,11 @@ public interface IAgentsHandler
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> DeleteExistingAgentDataAsync(
+        string agentId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Downloads the knowledgebase file asynchronous.
@@ -59,5 +78,9 @@ public interface IAgentsHandler
     /// <param name="fileName">The file name.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The downloaded file url</returns>
-    Task<string> DownloadKnowledgebaseFileAsync(string agentGuid, string fileName, CancellationToken cancellationToken = default);
+    Task<string> DownloadKnowledgebaseFileAsync(
+        string agentGuid,
+        string fileName,
+        CancellationToken cancellationToken = default
+    );
 }
