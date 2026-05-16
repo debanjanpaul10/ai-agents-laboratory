@@ -110,7 +110,7 @@ jobs:
             - name: Install dependencies and build UI
               run: |
                   cd ${{ env.WEB_UI_PROJECT_PATH }}
-                  npm install
+                  npm ci --ignore-scripts
                   npm run build
 
             - name: Deploy UI to Azure Web App
@@ -191,7 +191,7 @@ jobs:
                   arguments: "/p:DropObjectsNotInSource=true /p:BlockOnPossibleDataLoss=false /p:IgnoreUserSettingsObjects=true /p:IgnoreLoginSids=true /p:IgnorePermissions=true /p:IgnoreRoleMembership=true"
 
     build-and-deploy-function:
-        name: Build Azure Functions project
+        name: Build and Deploy Azure Functions project
         if: ${{ github.event_name == 'push' || inputs.deploy_functions }}
         runs-on: ubuntu-latest
         environment: Production
