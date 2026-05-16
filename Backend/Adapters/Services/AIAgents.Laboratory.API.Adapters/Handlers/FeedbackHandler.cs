@@ -12,24 +12,14 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <seealso cref="IFeedbackHandler"/>
 public sealed class FeedbackHandler(IFeedbackService feedbackService) : IFeedbackHandler
 {
-    /// <summary>
-    /// Adds the new bug report data asynchronous.
-    /// </summary>
-    /// <param name="bugReportData">The bug report data.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for success/failure.</returns>
+    /// <inheritdoc/>
     public async Task<bool> AddNewBugReportDataAsync(AddBugReportDTO bugReportData, CancellationToken cancellationToken = default)
     {
         var domainInput = DomainMapperProfile.MapToDomain(bugReportData);
         return await feedbackService.AddNewBugReportDataAsync(bugReportData: domainInput).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Adds the new feature request data asynchronous.
-    /// </summary>
-    /// <param name="featureRequestData">The feature request data.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for success/failure.</returns>
+    /// <inheritdoc/>
     public async Task<bool> AddNewFeatureRequestDataAsync(NewFeatureRequestDTO featureRequestData, CancellationToken cancellationToken = default)
     {
         var domainInput = DomainMapperProfile.MapToDomain(featureRequestData);

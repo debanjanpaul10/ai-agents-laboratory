@@ -15,7 +15,11 @@ public interface IAgentsDataManager
     /// <param name="userEmail">The user email address.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> CreateNewAgentAsync(AgentDataDomain agentData, string userEmail, CancellationToken cancellationToken = default);
+    Task<bool> CreateNewAgentAsync(
+        AgentDataDomain agentData,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets all agents data asynchronous.
@@ -23,7 +27,10 @@ public interface IAgentsDataManager
     /// <param name="userEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of <see cref="AgentDataDomain"/></returns>
-    Task<IEnumerable<AgentDataDomain>> GetAllAgentsDataAsync(string userEmail, CancellationToken cancellationToken = default);
+    Task<IEnumerable<AgentDataDomain>> GetAllAgentsDataAsync(
+        string userEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets the agent data by identifier asynchronous.
@@ -32,7 +39,11 @@ public interface IAgentsDataManager
     /// <param name="userEmail">The user email address.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The agent data dto.</returns>
-    Task<AgentDataDomain> GetAgentDataByIdAsync(string agentId, string userEmail, CancellationToken cancellationToken = default);
+    Task<AgentDataDomain> GetAgentDataByIdAsync(
+        string agentId,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Updates the existing agent data.
@@ -41,7 +52,11 @@ public interface IAgentsDataManager
     /// <param name="userEmail">The current logged in user email address.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain, string userEmail, CancellationToken cancellationToken = default);
+    Task<bool> UpdateExistingAgentDataAsync(
+        AgentDataDomain updateDataDomain,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Deletes an existing agent data.
@@ -50,5 +65,9 @@ public interface IAgentsDataManager
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The boolean for success/failure.</returns>
-    Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> DeleteExistingAgentDataAsync(
+        string agentId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 }

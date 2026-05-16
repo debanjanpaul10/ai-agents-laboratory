@@ -10,7 +10,9 @@ public interface ICacheService
     /// </summary>
     /// <param name="key">The key.</param>
     /// <typeparam name="T"></typeparam>
-    T? GetCachedData<T>(string key);
+    T? GetCachedData<T>(
+        string key
+    );
 
     /// <summary>
     /// Sets async.
@@ -19,11 +21,17 @@ public interface ICacheService
     /// <param name="value">The value.</param>
     /// <param name="expirationTime">The expiration time.</param>
     /// <typeparam name="T"></typeparam>
-    bool SetCacheData<T>(string key, T value, TimeSpan expirationTime);
+    bool SetCacheData<T>(
+        string key,
+        T value,
+        TimeSpan expirationTime
+    );
 
     /// <summary>
     /// Removes data.
     /// </summary>
     /// <param name="key">The key.</param>
-    bool RemoveCachedData(string key);
+    bool RemoveCachedData(
+        string key
+    );
 }

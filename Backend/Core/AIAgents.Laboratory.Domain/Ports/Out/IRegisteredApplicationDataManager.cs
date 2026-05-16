@@ -16,7 +16,10 @@ public interface IRegisteredApplicationDataManager
     /// <param name="currentLoggedInUser">The current logged in user.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of <see cref="RegisteredApplicationDomain"/></returns>
-    Task<IEnumerable<RegisteredApplicationDomain>> GetRegisteredApplicationsAsync(string currentLoggedInUser, CancellationToken cancellationToken = default);
+    Task<IEnumerable<RegisteredApplicationDomain>> GetRegisteredApplicationsAsync(
+        string currentLoggedInUser,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets the details of a specific registered application by its ID for the current logged in user.
@@ -25,7 +28,11 @@ public interface IRegisteredApplicationDataManager
     /// <param name="applicationId">The application id to be searched for.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The registered application data model.</returns>
-    Task<RegisteredApplicationDomain> GetRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId, CancellationToken cancellationToken = default);
+    Task<RegisteredApplicationDomain> GetRegisteredApplicationByIdAsync(
+        string currentLoggedInUser,
+        int applicationId,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Creates a new registered application for the current logged in user with the provided application data.
@@ -34,7 +41,11 @@ public interface IRegisteredApplicationDataManager
     /// <param name="newApplicationData">The new application creation data model.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for success/failure.</returns>
-    Task<bool> CreateNewRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDomain newApplicationData, CancellationToken cancellationToken = default);
+    Task<bool> CreateNewRegisteredApplicationAsync(
+        string currentLoggedInUser,
+        RegisteredApplicationDomain newApplicationData,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Updates an existing registered application for the current logged in user with the provided application data. 
@@ -44,7 +55,11 @@ public interface IRegisteredApplicationDataManager
     /// <param name="updateApplicationData">The update application data model.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for success/failure.</returns>
-    Task<bool> UpdateExistingRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDomain updateApplicationData, CancellationToken cancellationToken = default);
+    Task<bool> UpdateExistingRegisteredApplicationAsync(
+        string currentLoggedInUser,
+        RegisteredApplicationDomain updateApplicationData,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Deletes a registered application by its ID for the current logged in user. 
@@ -54,5 +69,9 @@ public interface IRegisteredApplicationDataManager
     /// <param name="applicationId">The application id for which data is to be deleted.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for success/failure.</returns>
-    Task<bool> DeleteRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId, CancellationToken cancellationToken = default);
+    Task<bool> DeleteRegisteredApplicationByIdAsync(
+        string currentLoggedInUser,
+        int applicationId,
+        CancellationToken cancellationToken = default
+    );
 }

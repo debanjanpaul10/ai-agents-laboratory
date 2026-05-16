@@ -43,14 +43,12 @@ public sealed class AgentsDataManager(
     private readonly string AgentsDataCollectionName = configuration[MongoDbCollectionConstants.AgentsCollectionName]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
-    /// <summary>
-    /// Creates the new agent asynchronous.
-    /// </summary>
-    /// <param name="agentData">The agent data.</param>
-    /// <param name="userEmail">The user email address.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> CreateNewAgentAsync(AgentDataDomain agentData, string userEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> CreateNewAgentAsync(
+        AgentDataDomain agentData,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         bool response = false;
         try
@@ -92,14 +90,12 @@ public sealed class AgentsDataManager(
         }
     }
 
-    /// <summary>
-    /// Deletes an existing agent data.
-    /// </summary>
-    /// <param name="agentId">The agent id.</param>
-    /// <param name="currentUserEmail">The current logged in user email.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> DeleteExistingAgentDataAsync(string agentId, string currentUserEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> DeleteExistingAgentDataAsync(
+        string agentId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<AgentDataModel>.Filter.Where(x => x.IsActive && x.AgentId == agentId);
         var allAgents = await mongoDatabaseRepository.GetDataFromCollectionAsync(
@@ -129,14 +125,12 @@ public sealed class AgentsDataManager(
         ).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Gets the agent data by identifier asynchronous.
-    /// </summary>
-    /// <param name="agentId">The agent identifier.</param>
-    /// <param name="userEmail">The user email address.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The agent data dto.</returns>
-    public async Task<AgentDataDomain> GetAgentDataByIdAsync(string agentId, string userEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<AgentDataDomain> GetAgentDataByIdAsync(
+        string agentId,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<AgentDataModel>.Filter.And(
             Builders<AgentDataModel>.Filter.Eq(x => x.IsActive, true),
@@ -164,13 +158,11 @@ public sealed class AgentsDataManager(
         return MongoDataMapperProfile.MapToDomain(model: allData.First());
     }
 
-    /// <summary>
-    /// Gets all agents data asynchronous.
-    /// </summary>
-    /// <param name="userEmail">The current logged in user email.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The list of <see cref="AgentDataDomain"/></returns>
-    public async Task<IEnumerable<AgentDataDomain>> GetAllAgentsDataAsync(string userEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<IEnumerable<AgentDataDomain>> GetAllAgentsDataAsync(
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<AgentDataModel>.Filter.And(
             Builders<AgentDataModel>.Filter.Eq(x => x.IsActive, true),
@@ -193,14 +185,12 @@ public sealed class AgentsDataManager(
         return [.. dbResult.Select(MongoDataMapperProfile.MapToDomain)];
     }
 
-    /// <summary>
-    /// Updates the existing agent data.
-    /// </summary>
-    /// <param name="updateDataDomain">The update agent data domain model.</param>
-    /// <param name="userEmail">The current logged in user email address.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    public async Task<bool> UpdateExistingAgentDataAsync(AgentDataDomain updateDataDomain, string userEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> UpdateExistingAgentDataAsync(
+        AgentDataDomain updateDataDomain,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(updateDataDomain);
         ArgumentException.ThrowIfNullOrWhiteSpace(updateDataDomain.AgentId);

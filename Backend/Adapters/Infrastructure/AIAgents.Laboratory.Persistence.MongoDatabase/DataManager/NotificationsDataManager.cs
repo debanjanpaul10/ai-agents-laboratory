@@ -39,14 +39,7 @@ public sealed class NotificationsDataManager(
     private readonly string NotificationsCollectionName = configuration[MongoDbCollectionConstants.NotificationsCollectionName]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
-    /// <summary>
-    /// Deletes all notifications for user asynchronous.
-    /// </summary>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>
-    /// A boolean value indicating whether the operation was successful (true) or not (false).
-    /// </returns>
+    /// <inheritdoc/>
     public async Task<bool> DeleteAllNotificationsForUserAsync(
         string currentLoggedInUser,
         CancellationToken cancellationToken = default
@@ -101,13 +94,7 @@ public sealed class NotificationsDataManager(
         }
     }
 
-    /// <summary>
-    /// Retrieves a list of notifications for a specific user based on their username. 
-    /// This method allows clients to fetch all notifications that are relevant to a particular user.
-    /// </summary>
-    /// <param name="recipientUserName">The username of the user for whom to retrieve notifications.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
-    /// <returns>A list of notifications relevant to the specified user.</returns>
+    /// <inheritdoc/>
     public async Task<IEnumerable<NotificationsDomain>> GetNotificationsForUserAsync(
         string recipientUserName,
         CancellationToken cancellationToken = default
@@ -155,16 +142,7 @@ public sealed class NotificationsDataManager(
         }
     }
 
-    /// <summary>
-    /// Marks an existing notification as read for a specific user based on the notification identifier.
-    /// </summary>
-    /// <remarks>
-    /// Marking a notification as read typically involves updating the status of the notification in the data store to indicate that it has been acknowledged or viewed by the recipient user.
-    /// </remarks>
-    /// <param name="currentLoggedInUser">The username of the user for whom to mark the notification as read.</param>
-    /// <param name="notificationId">The identifier of the notification to be marked as read.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
-    /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
+    /// <inheritdoc/>
     public async Task<bool> MarkExistingNotificationAsReadAsync(
         string currentLoggedInUser,
         Guid notificationId,

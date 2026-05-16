@@ -12,32 +12,19 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <seealso cref="AIAgents.Laboratory.API.Adapters.Contracts.ICommonAiHandler" />
 public sealed class CommonAiHandler(ICommonAiService commonAiService) : ICommonAiHandler
 {
-    /// <summary>
-    /// Retrieves a collection of configuration settings associated with the specified key name.
-    /// </summary>
-    /// <param name="key">The key name used to identify the configuration group. Cannot be null or empty.</param>
-    /// <returns>A dictionary containing configuration key-value pairs for the specified key name.</returns>
+    /// <inheritdoc/>
     public Dictionary<string, string> GetConfigurationByKeyName(string key)
     {
         return commonAiService.GetConfigurationByKeyName(key);
     }
 
-    /// <summary>
-    /// Gets the configurations data for application.
-    /// </summary>
-    /// <param name="userName">The current logged in user.</param>
-    /// <returns>The dictionary containing the key-value pair.</returns>
+    /// <inheritdoc/>
     public Dictionary<string, string> GetConfigurationsData(string userName)
     {
         return commonAiService.GetConfigurationsData(userName);
     }
 
-    /// <summary>
-    /// Gets the top active agents data list and the agents count asynchronously.
-    /// </summary>
-    /// <param name="userName">The current logged in user.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A tuple containing the list of agents and the top 3 active ai agents.</returns>
+    /// <inheritdoc/>
     public async Task<TopActiveAgentsDTO> GetTopActiveAgentsDataAsync(string userName, CancellationToken cancellationToken = default)
     {
         var (ActiveAgentsCount, TopActiveAgentsList) = await commonAiService.GetTopActiveAgentsDataAsync(

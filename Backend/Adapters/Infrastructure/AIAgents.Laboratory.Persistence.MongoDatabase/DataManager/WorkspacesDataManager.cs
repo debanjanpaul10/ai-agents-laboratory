@@ -19,7 +19,9 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
 /// <param name="configuration">The configuration instance.</param>
 /// <param name="mongoDatabaseRepository">The MongoDB database repository instance.</param>
 /// <seealso cref="IWorkspacesDataManager"/>
-public sealed class WorkspacesDataManager(IConfiguration configuration, IMongoDatabaseRepository mongoDatabaseRepository) : IWorkspacesDataManager
+public sealed class WorkspacesDataManager(
+    IConfiguration configuration,
+    IMongoDatabaseRepository mongoDatabaseRepository) : IWorkspacesDataManager
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -33,33 +35,29 @@ public sealed class WorkspacesDataManager(IConfiguration configuration, IMongoDa
     private readonly string WorkspacesCollectionName = configuration[MongoDbCollectionConstants.WorkspaceCollectionName]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
-    /// <summary>
-    /// Creates a new workspace.
-    /// </summary>
-    /// <param name="agentsWorkspaceData">The agents workspace data.</param>
-    /// <param name="currentUserEmail">The current user email address.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> CreateNewWorkspaceAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> CreateNewWorkspaceAsync(
+        AgentsWorkspaceDomain agentsWorkspaceData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var dbInput = MongoDataMapperProfile.MapToModel(domain: agentsWorkspaceData);
         return await mongoDatabaseRepository.SaveDataAsync(
             data: dbInput,
             databaseName: this.MongoDatabaseName,
             collectionName: this.WorkspacesCollectionName,
-            bypassDocumentValidation: true,
+            bypassDocumentValidation: false,
             cancellationToken
         ).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Deletes the existing workspace by workspace guid id.
-    /// </summary>
-    /// <param name="workspaceGuidId">The workspace guid id.</param>
-    /// <param name="currentUserEmail">The current logged in user email address.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> DeleteExistingWorkspaceAsync(string workspaceGuidId, string currentUserEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> DeleteExistingWorkspaceAsync(
+        string workspaceGuidId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+     )
     {
         var filter = Builders<AgentsWorkspaceDataModel>.Filter.Where(ws => ws.IsActive && ws.AgentWorkspaceGuid == workspaceGuidId);
         var allWorkspaces = await mongoDatabaseRepository.GetDataFromCollectionAsync(
@@ -89,13 +87,11 @@ public sealed class WorkspacesDataManager(IConfiguration configuration, IMongoDa
         ).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Gets the collection of all available workspaces.
-    /// </summary>
-    /// <param name="currentUserEmail">The current logged in user name.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The list of <see cref="AgentsWorkspaceDomain"/></returns>
-    public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(string currentUserEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<AgentsWorkspaceDataModel>.Filter.And(Builders<AgentsWorkspaceDataModel>.Filter.Eq(x => x.IsActive, true));
         var result = await mongoDatabaseRepository.GetDataFromCollectionAsync(
@@ -107,14 +103,12 @@ public sealed class WorkspacesDataManager(IConfiguration configuration, IMongoDa
         return [.. result.Select(MongoDataMapperProfile.MapToDomain)];
     }
 
-    /// <summary>
-    /// Gets the workspace by workspace id.
-    /// </summary>
-    /// <param name="workspaceId">The workspace id.</param>
-    /// <param name="currentUserEmail">The current logged in user email</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The agent workspace domain model.</returns>
-    public async Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(string workspaceId, string currentUserEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(
+        string workspaceId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<AgentsWorkspaceDataModel>.Filter.And(
             Builders<AgentsWorkspaceDataModel>.Filter.Eq(x => x.IsActive, true),
@@ -130,14 +124,12 @@ public sealed class WorkspacesDataManager(IConfiguration configuration, IMongoDa
         return MongoDataMapperProfile.MapToDomain(model: allData?.First() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage));
     }
 
-    /// <summary>
-    /// Updates the existing workspace data.
-    /// </summary>
-    /// <param name="agentsWorkspaceData">The agents workspace data domain model.</param>
-    /// <param name="currentUserEmail">The current logged in user email.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A boolean for <c>success/failure.</c></returns>
-    public async Task<bool> UpdateExistingWorkspaceDataAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> UpdateExistingWorkspaceDataAsync(
+        AgentsWorkspaceDomain agentsWorkspaceData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var dbInput = MongoDataMapperProfile.MapToModel(domain: agentsWorkspaceData);
         var filter = Builders<AgentsWorkspaceDataModel>.Filter.And(

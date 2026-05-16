@@ -14,12 +14,7 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <seealso cref="IApplicationAdminHandler"/>
 public sealed class ApplicationAdminHandler(IApplicationAdminService applicationAdminService) : IApplicationAdminHandler
 {
-    /// <summary>
-    /// Gets all bug reports data asynchronous.
-    /// </summary>
-    /// <param name="currentLoggedinUser">The current logged in user.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A list of <see cref="BugReportDataDto"/></returns>
+    /// <inheritdoc/>
     public async Task<IEnumerable<BugReportDataDto>> GetAllBugReportsDataAsync(string currentLoggedinUser, CancellationToken cancellationToken = default)
     {
         var domainResult = await applicationAdminService.GetAllBugReportsDataAsync(
@@ -29,12 +24,7 @@ public sealed class ApplicationAdminHandler(IApplicationAdminService application
         return [.. domainResult.Select(DomainMapperProfile.MapToDto)];
     }
 
-    /// <summary>
-    /// Gets all submitted feature requests asynchronous.
-    /// </summary>
-    /// <param name="currentLoggedinUser">The current logged in user.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A list of <see cref="NewFeatureRequestDataDto"/></returns>
+    /// <inheritdoc/>
     public async Task<IEnumerable<NewFeatureRequestDataDto>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser, CancellationToken cancellationToken = default)
     {
         var domainResult = await applicationAdminService.GetAllSubmittedFeatureRequestsAsync(
@@ -44,11 +34,7 @@ public sealed class ApplicationAdminHandler(IApplicationAdminService application
         return [.. domainResult.Select(DomainMapperProfile.MapToDto)];
     }
 
-    /// <summary>
-    /// Checks if the admin access is enabled for the current logged in user asynchronous.
-    /// </summary>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <returns>The boolean for success/failure.</returns>
+    /// <inheritdoc/>
     public bool IsAdminAccessEnabledAsync(string currentLoggedInUser)
     {
         return applicationAdminService.IsAdminAccessEnabledAsync(currentLoggedInUser);

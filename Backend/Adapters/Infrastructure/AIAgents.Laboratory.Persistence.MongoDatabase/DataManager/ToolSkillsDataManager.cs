@@ -19,7 +19,9 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="mongoDatabaseRepository">The MongoDB database repository.</param>
 /// <seealso cref="IToolSkillsDataManager"/>
-public sealed class ToolSkillsDataManager(IConfiguration configuration, IMongoDatabaseRepository mongoDatabaseRepository) : IToolSkillsDataManager
+public sealed class ToolSkillsDataManager(
+    IConfiguration configuration,
+    IMongoDatabaseRepository mongoDatabaseRepository) : IToolSkillsDataManager
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -33,33 +35,29 @@ public sealed class ToolSkillsDataManager(IConfiguration configuration, IMongoDa
     private readonly string ToolSkillsCollectionName = configuration[MongoDbCollectionConstants.ToolSkillsCollectionName]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
-    /// <summary>
-    /// Adds a new tool skill asynchronously.
-    /// </summary>
-    /// <param name="toolSkillData">The tool skill data domain model.</param>
-    /// <param name="userEmail">The user email.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for <c>success/failure</c></returns>
-    public async Task<bool> AddNewToolSkillAsync(ToolSkillDomain toolSkillData, string userEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> AddNewToolSkillAsync(
+        ToolSkillDomain toolSkillData,
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var dbInput = MongoDataMapperProfile.MapToModel(domain: toolSkillData);
         return await mongoDatabaseRepository.SaveDataAsync(
             data: dbInput,
             databaseName: this.MongoDatabaseName,
             collectionName: this.ToolSkillsCollectionName,
-            bypassDocumentValidation: true,
+            bypassDocumentValidation: false,
             cancellationToken
         ).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Deletes an existing tool by tool skill id asynchronously.
-    /// </summary>
-    /// <param name="toolSkillId">The tool skill id to delete.</param>
-    /// <param name="currentUserEmail">The current logged in user email.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> DeleteExistingToolSkillBySkillIdAsync(
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<ToolSkillModel>.Filter.Where(tsd => tsd.IsActive && tsd.ToolSkillGuid == toolSkillId);
         var allToolSkills = await mongoDatabaseRepository.GetDataFromCollectionAsync(
@@ -89,13 +87,11 @@ public sealed class ToolSkillsDataManager(IConfiguration configuration, IMongoDa
         ).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Gets all the tool skill data asynchronously.
-    /// </summary>
-    /// <param name="userEmail">The current logged in user email.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The list of <see cref="ToolSkillDomain"/></returns>
-    public async Task<IEnumerable<ToolSkillDomain>> GetAllToolSkillsAsync(string userEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<IEnumerable<ToolSkillDomain>> GetAllToolSkillsAsync(
+        string userEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<ToolSkillModel>.Filter.And(Builders<ToolSkillModel>.Filter.Eq(x => x.IsActive, true));
         var result = await mongoDatabaseRepository.GetDataFromCollectionAsync(
@@ -107,14 +103,12 @@ public sealed class ToolSkillsDataManager(IConfiguration configuration, IMongoDa
         return [.. result.Select(MongoDataMapperProfile.MapToDomain)];
     }
 
-    /// <summary>
-    /// Gets a single tool skill data by its skill id asynchronously.
-    /// </summary>
-    /// <param name="toolSkillId">The tool skill id to be fetched.</param>
-    /// <param name="currentUserEmail">The current logged in user email.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The tool skill domain model.</returns>
-    public async Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(string toolSkillId, string currentUserEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<ToolSkillDomain> GetToolSkillBySkillIdAsync(
+        string toolSkillId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<ToolSkillModel>.Filter.And(
             Builders<ToolSkillModel>.Filter.Eq(x => x.IsActive, true), Builders<ToolSkillModel>.Filter.Eq(x => x.ToolSkillGuid, toolSkillId));
@@ -128,14 +122,12 @@ public sealed class ToolSkillsDataManager(IConfiguration configuration, IMongoDa
         return MongoDataMapperProfile.MapToDomain(model: allData?.First() ?? throw new FileNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage));
     }
 
-    /// <summary>
-    /// Updates an existing tool skill data asynchronously.
-    /// </summary>
-    /// <param name="updateToolSkillData">The tool skill data domain model.</param>
-    /// <param name="currentUserEmail">The user email.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The boolean for <c>success/failure</c></returns>
-    public async Task<bool> UpdateExistingToolSkillDataAsync(ToolSkillDomain updateToolSkillData, string currentUserEmail, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> UpdateExistingToolSkillDataAsync(
+        ToolSkillDomain updateToolSkillData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
     {
         var dbInput = MongoDataMapperProfile.MapToModel(domain: updateToolSkillData);
         var filter = Builders<ToolSkillModel>.Filter.And(

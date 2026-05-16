@@ -14,12 +14,7 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// <seealso cref="INotificationsHandler"/>
 public sealed class NotificationsHandler(INotificationsService notificationsService) : INotificationsHandler
 {
-    /// <summary>
-    /// Creates a new notification based on the provided request data.
-    /// </summary>
-    /// <param name="request">The request object containing the details of the notification to be created.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
-    /// <returns>True if the notification was created successfully; otherwise, false.</returns>
+    /// <inheritdoc/>
     public async Task<bool> CreateNewNotificationAsync(
         CreateNotificationRequestDto request,
         CancellationToken cancellationToken = default
@@ -32,14 +27,7 @@ public sealed class NotificationsHandler(INotificationsService notificationsServ
         ).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Deletes all notifications for user asynchronous.
-    /// </summary>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>
-    /// A boolean value indicating whether the operation was successful (true) or not (false).
-    /// </returns>
+    /// <inheritdoc/>
     public async Task<bool> DeleteAllNotificationsForUserAsync(
         string currentLoggedInUser,
         CancellationToken cancellationToken = default
@@ -51,13 +39,7 @@ public sealed class NotificationsHandler(INotificationsService notificationsServ
         ).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Retrieves a list of notifications for a specific user based on their username. 
-    /// This method allows clients to fetch all notifications that are relevant to a particular user.
-    /// </summary>
-    /// <param name="recipientUserName">The username of the user for whom to retrieve notifications.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
-    /// <returns>A list of notifications relevant to the specified user.</returns>
+    /// <inheritdoc/>
     public async Task<IEnumerable<NotificationsResponseDto>> GetNotificationsForUserAsync(
         string recipientUserName,
         CancellationToken cancellationToken = default
@@ -70,16 +52,7 @@ public sealed class NotificationsHandler(INotificationsService notificationsServ
         return [.. domainResponse.Select(DomainMapperProfile.MapToDto)];
     }
 
-    /// <summary>
-    /// Marks an existing notification as read for a specific user based on the notification identifier.
-    /// </summary>
-    /// <remarks>
-    /// Marking a notification as read typically involves updating the status of the notification in the data store to indicate that it has been acknowledged or viewed by the recipient user.
-    /// </remarks>
-    /// <param name="currentLoggedInUser">The username of the user for whom to mark the notification as read.</param>
-    /// <param name="notificationId">The identifier of the notification to be marked as read.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
-    /// <returns>A boolean value indicating whether the operation was successful (true) or not (false).</returns>
+    /// <inheritdoc/>
     public async Task<bool> MarkExistingNotificationAsReadAsync(
         string currentLoggedInUser,
         Guid notificationId,
@@ -93,14 +66,7 @@ public sealed class NotificationsHandler(INotificationsService notificationsServ
         ).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Streams notifications for a specific user in real-time using Server-Sent Events (SSE).
-    /// </summary>
-    /// <param name="recipientUserName">The username of the user for whom to stream notifications.</param>
-    /// <param name="response">The HttpResponse object used to send the streamed notifications to the client.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the operation if needed.</param>
-    /// <param name="requestAborted">The cancellation token to handle request abortion.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <inheritdoc/>
     public async Task StreamNotificationsForUserAsync(
         string recipientUserName,
         HttpResponse response,

@@ -37,12 +37,7 @@ public sealed class CloudinaryStorageManager(
     private readonly string CloudinaryVisionImagesFolderName = configuration[AzureAppConfigurationConstants.CloudinaryImageFolderNameConstant]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
-    /// <summary>
-    /// Deletes the documents data and folder from blob storage.
-    /// </summary>
-    /// <param name="agentId">The agent id.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the asynchronous process. Optional.</param>
-    /// <returns>A boolean for success/failure.</returns>
+    /// <inheritdoc/>
     public async Task<bool> DeleteDocumentsFolderAndDataAsync(
         string agentId,
         CancellationToken cancellationToken = default
@@ -143,13 +138,7 @@ public sealed class CloudinaryStorageManager(
         }
     }
 
-    /// <summary>
-    /// Downloads a file from blob storage.
-    /// </summary>
-    /// <param name="agentGuid">The agent guid id.</param>
-    /// <param name="fileName">The file name.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the asynchronous process. Optional.</param>
-    /// <returns>The download file link.</returns>
+    /// <inheritdoc/>
     public async Task<string> DownloadFileFromBlobStorageAsync(
         string agentGuid,
         string fileName,
@@ -233,14 +222,7 @@ public sealed class CloudinaryStorageManager(
         }
     }
 
-    /// <summary>
-    /// Uploads documents to BLOB storage.
-    /// </summary>
-    /// <param name="documentFile">The user uploaded document file.</param>
-    /// <param name="agentGuid">The agent guid id.</param>
-    /// <param name="fileType">The uploaded file type.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the asynchronous process. Optional.</param>
-    /// <returns>The public URL for the document.</returns>
+    /// <inheritdoc/>
     public async Task<string> UploadDocumentsToStorageAsync(
         IFormFile documentFile,
         string agentGuid,

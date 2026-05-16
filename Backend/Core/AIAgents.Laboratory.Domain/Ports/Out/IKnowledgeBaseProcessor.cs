@@ -43,5 +43,7 @@ public interface IKnowledgeBaseProcessor
     /// <remarks>Supported file types include plain text, PDF, Excel, and Word documents. If the file type is not supported, an exception is thrown.</remarks>
     /// <param name="knowledgeBaseDocumentDomain">The knowledge base document to read. Must not be null and must have a valid file name with a supported extension.</param>
     /// <returns>A string containing the content of the file. The format of the content depends on the file type.</returns>
-    string DetectAndReadFileContent(KnowledgeBaseDocumentDomain knowledgeBaseDocumentDomain);
+    string DetectAndReadFileContent(
+        KnowledgeBaseDocumentDomain knowledgeBaseDocumentDomain
+    );
 }
