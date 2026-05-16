@@ -80,17 +80,10 @@ public sealed class NotificationsStream : INotificationsStream
         /// </summary>
         private int _disposed;
 
-        /// <summary>
-        /// Gets the reader.
-        /// </summary>
-        /// <value>
-        /// The reader.
-        /// </value>
+        /// <inheritdoc/>
         public ChannelReader<NotificationsDomain> Reader { get; } = reader;
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
+        /// <inheritdoc/>
         public void Dispose()
         {
             if (Interlocked.Exchange(ref this._disposed, 1) == 0)

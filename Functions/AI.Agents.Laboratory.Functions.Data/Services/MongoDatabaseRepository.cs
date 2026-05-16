@@ -1,3 +1,4 @@
+using System.Data.SqlTypes;
 using AI.Agents.Laboratory.Functions.Data.Contracts;
 using AI.Agents.Laboratory.Functions.Shared.Constants;
 using AI.Agents.Laboratory.Functions.Shared.Exceptions;
@@ -21,17 +22,7 @@ public sealed class MongoDatabaseRepository(
     ILogger<MongoDatabaseRepository> logger,
     ICorrelationContext correlationContext) : IMongoDatabaseRepository
 {
-    /// <summary>
-    /// Saves data to a specified collection within a MongoDB database, returning a boolean indicating the success of the operation. 
-    /// The method includes logging at the start and end of the operation, as well as error logging in case of exceptions. 
-    /// It uses the InsertOneAsync method of the MongoDB driver to insert the document into the collection.
-    /// </summary>
-    /// <typeparam name="TResult">The type of the result to retrieve.</typeparam>
-    /// <param name="databaseName">The name of the database.</param>
-    /// <param name="collectionName">The name of the collection.</param>
-    /// <param name="filter">The filter to apply.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task representing the asynchronous operation, with a boolean indicating success.</returns>
+    /// <inheritdoc/>
     public async Task<IEnumerable<TResult>> GetDataFromCollectionAsync<TResult>(
         string databaseName,
         string collectionName,
@@ -75,21 +66,12 @@ public sealed class MongoDatabaseRepository(
         }
     }
 
-    /// <summary>
-    /// Saves data to a specified collection within a MongoDB database, returning a boolean indicating the success of the operation. 
-    /// The method includes logging at the start and end of the operation, as well as error logging in case of exceptions. 
-    /// It uses the InsertOneAsync method of the MongoDB driver to insert the document into the collection.
-    /// </summary>
-    /// <typeparam name="TInput">The type of the input data.</typeparam>
-    /// <param name="data">The data to save.</param>
-    /// <param name="databaseName">The name of the database.</param>
-    /// <param name="collectionName">The name of the collection.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task representing the asynchronous operation, with a boolean indicating success.</returns>
+    /// <inheritdoc/>
     public async Task<bool> SaveDataAsync<TInput>(
         TInput data,
         string databaseName,
         string collectionName,
+        bool bypassDocumentValidation = false,
         CancellationToken cancellationToken = default
     )
     {
@@ -102,11 +84,18 @@ public sealed class MongoDatabaseRepository(
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
             var collectionData = mongoDatabase.GetCollection<TInput>(collectionName);
-            await collectionData.InsertOneAsync(
-                document: data,
-                cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
-            return true;
+            if (collectionData is not null)
+            {
+                var insertOptions = new InsertOneOptions() { BypassDocumentValidation = bypassDocumentValidation };
+                await collectionData.InsertOneAsync(
+                    document: data,
+                    options: insertOptions,
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
+                return true;
+            }
+
+            throw new SqlTypeException(ExceptionConstants.SomethingWentWrongDefaultMessage);
         }
         catch (Exception ex)
         {
@@ -128,16 +117,7 @@ public sealed class MongoDatabaseRepository(
         }
     }
 
-    /// <summary>
-    /// Updates data in a specified collection within a MongoDB database based on a provided filter and update definition, returning a boolean indicating the success of the operation.
-    /// </summary>
-    /// <typeparam name="TDocument">The type of the document to update.</typeparam>
-    /// <param name="filter">The filter to apply.</param>
-    /// <param name="update">The update definition.</param>
-    /// <param name="databaseName">The name of the database.</param>
-    /// <param name="collectionName">The name of the collection.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task representing the asynchronous operation, with a boolean indicating success.</returns>
+    /// <inheritdoc/>
     public async Task<bool> UpdateDataInCollectionAsync<TDocument>(
         FilterDefinition<TDocument> filter,
         UpdateDefinition<TDocument> update,
@@ -183,15 +163,7 @@ public sealed class MongoDatabaseRepository(
         }
     }
 
-    /// <summary>
-    /// Deletes data from a specified collection within a MongoDB database based on a provided filter, returning a boolean indicating the success of the operation.
-    /// </summary>
-    /// <typeparam name="TDocument">The type of the document to delete.</typeparam>
-    /// <param name="filter">The filter to apply.</param>
-    /// <param name="databaseName">The name of the database.</param>
-    /// <param name="collectionName">The name of the collection.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task representing the asynchronous operation, with a boolean indicating success.</returns>
+    /// <inheritdoc/>
     public async Task<bool> DeleteDataFromCollectionAsync<TDocument>(
         FilterDefinition<TDocument> filter,
         string databaseName,

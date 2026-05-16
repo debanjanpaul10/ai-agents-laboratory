@@ -20,6 +20,7 @@ public interface IMongoDatabaseRepository
         TInput data,
         string databaseName,
         string collectionName,
+        bool bypassDocumentValidation = false,
         CancellationToken cancellationToken = default
     );
 
