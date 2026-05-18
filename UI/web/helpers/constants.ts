@@ -65,6 +65,7 @@ export const DashboardConstants = {
 		CreateNewSkill: "Saving Skill details",
 		McpToolsListLoading: "Getting the available MCP tools",
 		CreateNewWorkspace: "Saving workspace details",
+		InitializingApplication: "Initializing application..."
 	},
 };
 

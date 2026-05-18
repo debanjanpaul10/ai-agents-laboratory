@@ -12,6 +12,13 @@ import CreateAgentFlyoutComponent from "@components/manage-agents/agent-creator-
 import AssociateSkillsFlyoutComponent from "@components/manage-agents/associate-skills";
 import AssociateApplicationFlyoutComponent from "@components/manage-agents/associate-applications";
 
+/**
+ * This component manages the state and rendering of the Create Agent drawer and its associated flyouts for knowledge base file upload, AI vision image upload, skill association, and application association. 
+ * It listens to the global state to determine when to open or close the main drawer and ensures that only one flyout is open at a time. 
+ * The component also handles the selection and clearing of files, skills, and applications for the agent being created.
+ * @component `CreateAgentComponent`
+ * @returns A React component that renders the Create Agent drawer and its associated flyouts based on the application state.
+ */
 export default function CreateAgentComponent() {
     const dispatch = useAppDispatch();
 
@@ -112,7 +119,7 @@ export default function CreateAgentComponent() {
                                 onFilesChange={setSelectedKnowledgeFiles}
                                 selectedFiles={selectedKnowledgeFiles}
                                 existingFiles={[]}
-                                onExistingFilesChange={() => {}}
+                                onExistingFilesChange={() => { }}
                                 removedExistingFiles={[]}
                                 config={{
                                     headerConstants:
@@ -142,7 +149,7 @@ export default function CreateAgentComponent() {
                                 onFilesChange={setSelectedAiVisionImages}
                                 selectedFiles={selectedAiVisionImages}
                                 existingFiles={[]}
-                                onExistingFilesChange={() => {}}
+                                onExistingFilesChange={() => { }}
                                 removedExistingFiles={[]}
                                 config={{
                                     headerConstants:

@@ -27,5 +27,10 @@
   <Folder Name="/Tests/">
     <Project Path="Tests/AIAgents.Laboratory.Domain.UnitTests/AIAgents.Laboratory.Domain.UnitTests.csproj" />
   </Folder>
+  <Project Path="../UI/web/AI.Agents.Laboratory.Web.esproj">
+    <Platform Project="AnyCPU" />
+    <Build />
+    <Deploy />
+  </Project>
   <Project Path="AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj" />
 </Solution>
