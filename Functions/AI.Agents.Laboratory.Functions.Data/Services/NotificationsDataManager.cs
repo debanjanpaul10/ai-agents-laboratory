@@ -40,18 +40,7 @@ public sealed class NotificationsDataManager(
     private readonly string NotificationsCollectionName = configuration[MongoDbConfigurationConstants.NotificationsCollectionName]
         ?? throw new KeyNotFoundException(ExceptionConstants.MissingConfigurationMessage);
 
-    /// <summary>
-    /// Saves push notification data to a data store, returning a boolean indicating the success of the operation. 
-    /// </summary>
-    /// <remarks>
-    /// The method takes a NotificationRequest object as input, which contains the details of the notification to be saved. 
-    /// The implementation of this method is responsible for handling the actual data persistence logic, including any necessary transformations or validations before saving the data. 
-    /// It constructs a NotificationModel from the request data and uses the mongoDatabaseRepository to persist it to the specified collection in the MongoDB database. 
-    /// The method includes logging at the start and end of the operation, as well as error logging in case of exceptions, and throws an AIAgentsBusinessException if any issues occur during the process.
-    /// </remarks>
-    /// <param name="request">The notification request containing the details to be saved.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task representing the asynchronous operation, with a boolean indicating success.</returns>
+    /// <inheritdoc/>
     public async Task<bool> SavePushNotificationsDataAsync(
         NotificationRequest request,
         CancellationToken cancellationToken = default
@@ -72,6 +61,7 @@ public sealed class NotificationsDataManager(
                 data: document,
                 databaseName: MongoDatabaseName,
                 collectionName: NotificationsCollectionName,
+                bypassDocumentValidation: true,
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
             return response;

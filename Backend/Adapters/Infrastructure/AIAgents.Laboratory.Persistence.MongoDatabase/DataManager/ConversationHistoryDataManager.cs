@@ -87,7 +87,7 @@ public sealed class ConversationHistoryDataManager(
                 data: newConversationHistory,
                 databaseName: this.MongoDatabaseName,
                 collectionName: this.ConversationHistoryCollectionName,
-                bypassDocumentValidation: true,
+                bypassDocumentValidation: false,
                 cancellationToken
             ).ConfigureAwait(false);
             return MongoDataMapperProfile.MapToDomain(model: newConversationHistory);

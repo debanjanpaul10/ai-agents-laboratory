@@ -14,7 +14,10 @@ public interface IRepository<TEntity> where TEntity : class
     /// <param name="entity">The generic entity.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The generic entity.</returns>
-    Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default);
+    Task<TEntity> AddAsync(
+        TEntity entity,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Adds a range of entities to the repository.
@@ -22,7 +25,10 @@ public interface IRepository<TEntity> where TEntity : class
     /// <param name="entities">The list of generic entity.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of generic entity.</returns>
-    Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
+    Task<IEnumerable<TEntity>> AddRangeAsync(
+        IEnumerable<TEntity> entities,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Finds entities based on the provided predicate.
@@ -30,7 +36,10 @@ public interface IRepository<TEntity> where TEntity : class
     /// <param name="predicate">The entity finder predicate.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of generic entity.</returns>
-    Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
+    Task<IEnumerable<TEntity>> FindAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets all entities from the repository.
@@ -48,7 +57,8 @@ public interface IRepository<TEntity> where TEntity : class
         int pageSize = 0,
         int pageNumber = 1,
         bool isActiveOnly = true,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets all entities from the repository with pagination.
@@ -64,7 +74,8 @@ public interface IRepository<TEntity> where TEntity : class
         bool tracked = true,
         string? includeProperties = null,
         bool isActiveOnly = true,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets all entities from the repository with pagination.
@@ -82,7 +93,8 @@ public interface IRepository<TEntity> where TEntity : class
         bool ascending = true,
         int pageSize = 1000,
         int pageNumber = 1,
-        params Expression<Func<TEntity, object>>[] includeProperties);
+        params Expression<Func<TEntity, object>>[] includeProperties
+    );
 
     /// <summary>
     /// Gets the first entity that matches the provided predicate.
@@ -90,31 +102,42 @@ public interface IRepository<TEntity> where TEntity : class
     /// <param name="predicate">The filter predicate.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The generic entity.</returns>
-    Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
+    Task<TEntity?> FirstOrDefaultAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Removes an entity from the repository.
     /// </summary>
     /// <param name="entity">The generic entity.</param>
-    void Remove(TEntity entity);
+    void Remove(
+        TEntity entity
+    );
 
     /// <summary>
     /// Removes a range of entities from the repository.
     /// </summary>
     /// <param name="entities">The list of generic entity.</param>
-    void RemoveRange(IEnumerable<TEntity> entities);
+    void RemoveRange(
+        IEnumerable<TEntity> entities
+    );
 
     /// <summary>
     /// Updates an existing entity in the repository.
     /// </summary>
     /// <param name="entity">The generic entity.</param>
     /// <returns>The generic entity.</returns>
-    TEntity Update(TEntity entity);
+    TEntity Update(
+        TEntity entity
+    );
 
     /// <summary>
     /// Saves all changes made in this context to the underlying database.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The integer value.</returns>
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    Task<int> SaveChangesAsync(
+        CancellationToken cancellationToken = default
+    );
 }

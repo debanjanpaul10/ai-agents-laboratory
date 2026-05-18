@@ -51,7 +51,7 @@ public sealed class WorkspacesDataManager(
             data: dbInput,
             databaseName: this.MongoDatabaseName,
             collectionName: this.WorkspacesCollectionName,
-            bypassDocumentValidation: true,
+            bypassDocumentValidation: false,
             cancellationToken
         ).ConfigureAwait(false);
     }
