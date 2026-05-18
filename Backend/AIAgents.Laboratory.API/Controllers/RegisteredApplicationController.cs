@@ -11,7 +11,7 @@ using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.RegisteredApplicationController;
 
-namespace AIAgents.Laboratory.API.Controllers.v2;
+namespace AIAgents.Laboratory.API.Controllers;
 
 /// <summary>
 /// Provides API endpoints for managing registered applications for the authenticated user, including retrieving the list of registered applications, 
@@ -25,7 +25,6 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="registerAppHandler">The registered application adapter handler.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
-[ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route(ApiBaseRoute)]
 public sealed class RegisteredApplicationController(
     IHttpContextAccessor httpContextAccessor,

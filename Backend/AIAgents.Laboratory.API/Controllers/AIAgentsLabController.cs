@@ -12,7 +12,7 @@ using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ConfigurationController;
 
-namespace AIAgents.Laboratory.API.Controllers.v2;
+namespace AIAgents.Laboratory.API.Controllers;
 
 /// <summary>
 /// Provides API endpoints for retrieving AI agent configurations, submitting bug reports and feature requests, and obtaining top active agent data within the application.
@@ -26,8 +26,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="feedbackHandler">The handler responsible for processing feedback operations, including bug reports and feature requests.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
-[ApiVersion(ApiVersionsConstants.ApiVersionV2)]
-[Route("aiagentsapi/v{version:apiVersion}/[controller]")]
+[Route(ApiBaseRoute)]
 public sealed class AIAgentsLabController(
     IHttpContextAccessor httpContextAccessor,
     IConfiguration configuration,
