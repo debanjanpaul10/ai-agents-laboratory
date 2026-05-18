@@ -28,13 +28,7 @@ public sealed class OrchestratorService(
     IAgentChatService agentChatService,
     IAiServices aiServices) : IOrchestratorService
 {
-    /// <summary>
-    /// Get the orchestrator agent response for each agent asynchronously.
-    /// </summary>
-    /// <param name="chatRequest">The chat request domain model.</param>
-    /// <param name="workspaceDetails">The workspace details domain model.</param>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The final consolidated orchestrator response domain model.</returns>
+    /// <inheritdoc/>
     public async Task<OrchestratorFinalResponseDomain> GetOrchestratorAgentResponseAsync(
         WorkspaceAgentChatRequestDomain chatRequest,
         AgentsWorkspaceDomain workspaceDetails,
@@ -55,7 +49,9 @@ public sealed class OrchestratorService(
                 cancellationToken
             ).ConfigureAwait(false);
 
-            var orchestratorSystemPrompt = OrchestratorHelpers.GetOrchestratorSystemPrompt(agentsData);
+            var orchestratorSystemPrompt = OrchestratorHelpers.GetOrchestratorSystemPrompt(
+                agentsData
+            );
             ConversationHistoryDomain conversationHistory = new();
             IList<string> agentsInvoked = [];
             List<GroupChatAgentsResponseDomain> groupChatAgentsResponses = [];
@@ -74,12 +70,15 @@ public sealed class OrchestratorService(
                 ).ConfigureAwait(false);
 
                 // Parse Orchestrator Response
-                var parsedResponse = OrchestratorHelpers.ParseOrchestratorResponse(orchestratorResponse);
+                var parsedResponse = OrchestratorHelpers.ParseOrchestratorResponse(
+                    orchestratorResponse
+                );
                 if (parsedResponse?.Type == SystemOrchestratorFunction.OrchestratorResponseTypeFinalResponse)
                 {
                     response = OrchestratorHelpers.PrepareOrchestratorFinalResponse(
                         finalResponse: parsedResponse.Content,
-                        groupChatResponses: groupChatAgentsResponses);
+                        groupChatResponses: groupChatAgentsResponses
+                    );
                     return response;
                 }
                 else if (parsedResponse?.Type == SystemOrchestratorFunction.OrchestratorResponseTypeDelegate)

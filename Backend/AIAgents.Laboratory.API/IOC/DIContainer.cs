@@ -18,6 +18,7 @@ using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Microsoft.IdentityModel.Tokens;
 using static AIAgents.Laboratory.API.Helpers.Constants;
 
 namespace AIAgents.Laboratory.API.IOC;
@@ -114,7 +115,8 @@ public static class DIContainer
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
-            var tokenFormatUrl = configuration[AzureAppConfigurationConstants.TokenFormatUrlConstant] ?? throw new KeyNotFoundException(ExceptionConstants.MissingConfigurationMessage);
+            var tokenFormatUrl = configuration[AzureAppConfigurationConstants.TokenFormatUrlConstant]
+                ?? throw new KeyNotFoundException(ExceptionConstants.MissingConfigurationMessage);
             options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
             {
                 ValidateLifetime = true,
@@ -150,9 +152,13 @@ public static class DIContainer
         var claimsPrincipal = context.Principal;
         if (claimsPrincipal?.Identity is not ClaimsIdentity claimsIdentity || !claimsIdentity.IsAuthenticated)
         {
-            context.Fail(failureMessage: ExceptionConstants.InvalidTokenExceptionConstant);
+            var tokenValidationFailedException = new SecurityTokenValidationException(ExceptionConstants.InvalidTokenExceptionConstant);
+            context.Fail(failureMessage: tokenValidationFailedException.Message);
             var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();
-            logger.LogError(ExceptionConstants.InvalidTokenExceptionConstant);
+            logger.LogAppError(
+                exception: tokenValidationFailedException,
+                message: tokenValidationFailedException.Message
+            );
             return;
         }
 
@@ -170,10 +176,15 @@ public static class DIContainer
     {
         var authenticationFailedException = new UnauthorizedAccessException(ExceptionConstants.InvalidTokenExceptionConstant);
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();
-        logger.LogAppError(authenticationFailedException, authenticationFailedException.Message);
+        logger.LogAppError(
+            exception: authenticationFailedException,
+            message: authenticationFailedException.Message
+        );
 
         context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-        await context.HttpContext.Response.WriteAsync(authenticationFailedException.Message);
+        await context.HttpContext.Response.WriteAsync(
+            authenticationFailedException.Message
+        ).ConfigureAwait(false);
     }
 
     #endregion

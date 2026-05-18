@@ -102,6 +102,7 @@ public sealed class AgentChatService(
                     associatedSkillGuids: agentData.AssociatedSkillGuids,
                     cancellationToken
                 ).ConfigureAwait(false);
+
             else
                 response = await aiServices.GetAiFunctionResponseAsync(
                     input: chatMessage,

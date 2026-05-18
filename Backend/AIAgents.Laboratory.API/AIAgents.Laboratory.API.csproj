@@ -6,9 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="Controllers\v2\AIAgentsLabController.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="..\Core\AIAgents.Laboratory.Domain\Templates\FeedbackEmail.html">

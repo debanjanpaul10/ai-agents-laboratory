@@ -1,7 +1,7 @@
 export const environment = {
 	production: true,
 	apiBaseUrl:
-		"https://app-webapi-ai-agents-lab.azurewebsites.net/aiagentsapi/v2/",
+		"https://app-webapi-ai-agents-lab.azurewebsites.net/aiagentsapi/",
 	msalConfig: {
 		auth: {
 			clientId: "7df8eeab-dbed-4467-8675-05249f74170b",

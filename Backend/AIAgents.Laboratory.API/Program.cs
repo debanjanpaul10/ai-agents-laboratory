@@ -21,12 +21,14 @@ var credentials = builder.Environment.IsDevelopment()
 builder.ConfigureAzureAppConfiguration(credentials);
 builder.Services.ConfigureApplicationDependencies(
     configuration: builder.Configuration,
-    isDevelopmentMode: builder.Environment.IsDevelopment());
+    isDevelopmentMode: builder.Environment.IsDevelopment()
+);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddCors(
-    options => options.AddDefaultPolicy(policy => policy.SetIsOriginAllowed(_ => true).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
+    options => options.AddDefaultPolicy(policy => policy.SetIsOriginAllowed(_ => true).AllowAnyHeader().AllowAnyMethod().AllowCredentials())
+);
 builder.Services.AddApiVersions();
 
 builder.Services.AddSwaggerGen(options =>

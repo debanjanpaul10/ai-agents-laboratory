@@ -18,6 +18,15 @@ import MainLayout from "@components/common/main-layout";
 import FeedbackComponent from "@components/feedback";
 import { PollNotificationsAsync } from "@store/notifications/actions";
 
+/**
+ * The DashboardComponent is the main component for the dashboard page. 
+ * It fetches necessary data such as top active agents and user notifications when the user is authenticated. 
+ * It also checks if the configurations data is available in the store, and if not, it fetches it. 
+ * The component renders a welcome card, tiles for active agents, quick actions, and system health, as well as a direct chat component and feedback component. 
+ * If the user is not authenticated, it shows a loading screen while redirecting to the login page.
+ * @component `DashboardComponent`
+ * @returns A React component that renders the dashboard page of the application.
+ */
 export default function DashboardComponent() {
 	const dispatch = useAppDispatch();
 	const authContext = useAuth();

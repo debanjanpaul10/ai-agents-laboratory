@@ -13,7 +13,7 @@ using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ToolSkillsController;
 
-namespace AIAgents.Laboratory.API.Controllers.v2;
+namespace AIAgents.Laboratory.API.Controllers;
 
 /// <summary>
 /// The <c>ToolSkillsController</c> class is an API controller responsible for handling HTTP requests related to tool skills management in the AIAgents Laboratory application.
@@ -24,8 +24,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="toolSkillsHandler">The tool skills handler</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
-[ApiVersion(ApiVersionsConstants.ApiVersionV2)]
-[Route("aiagentsapi/v{version:apiVersion}/[controller]")]
+[Route(ApiBaseRoute)]
 public sealed class ToolSkillsController(
     IHttpContextAccessor httpContextAccessor,
     IConfiguration configuration,

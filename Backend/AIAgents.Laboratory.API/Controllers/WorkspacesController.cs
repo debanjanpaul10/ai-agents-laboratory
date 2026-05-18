@@ -13,7 +13,7 @@ using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.WorkspacesController;
 
-namespace AIAgents.Laboratory.API.Controllers.v2;
+namespace AIAgents.Laboratory.API.Controllers;
 
 /// <summary>
 /// The <c>WorkspacesController</c> class is an API controller responsible for handling HTTP requests related to workspace management in the AIAgents Laboratory application.
@@ -26,8 +26,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="logger">The logger service.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
-[ApiVersion(ApiVersionsConstants.ApiVersionV2)]
-[Route("aiagentsapi/v{version:apiVersion}/[controller]")]
+[Route(ApiBaseRoute)]
 public sealed class WorkspacesController(
     IHttpContextAccessor httpContextAccessor,
     IConfiguration configuration,
@@ -56,10 +55,13 @@ public sealed class WorkspacesController(
         IEnumerable<AgentsWorkspaceDTO> result = [];
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllWorkspacesAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetAllWorkspacesAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail })
+            );
 
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 result = await workspacesHandler.GetAllWorkspacesAsync(
                     userName: base.UserEmail,
@@ -68,24 +70,36 @@ public sealed class WorkspacesController(
 
                 if (result is not null)
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllWorkspacesAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetAllWorkspacesAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllWorkspacesAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetAllWorkspacesAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result })
+            );
         }
     }
 
@@ -112,11 +126,14 @@ public sealed class WorkspacesController(
         AgentsWorkspaceDTO result = new();
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceId }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceId })
+            );
 
             ArgumentException.ThrowIfNullOrEmpty(workspaceId);
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 result = await workspacesHandler.GetWorkspaceByWorkspaceIdAsync(
                     workspaceId,
@@ -126,24 +143,36 @@ public sealed class WorkspacesController(
 
                 if (result is not null)
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceId, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetWorkspaceByWorkspaceIdAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceId, result })
+            );
         }
     }
 
@@ -171,11 +200,14 @@ public sealed class WorkspacesController(
         bool result = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentsWorkspaceData }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(CreateNewWorkspaceAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, agentsWorkspaceData })
+            );
 
             ArgumentNullException.ThrowIfNull(agentsWorkspaceData);
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 result = await workspacesHandler.CreateNewWorkspaceAsync(
                     agentsWorkspaceData,
@@ -185,24 +217,36 @@ public sealed class WorkspacesController(
 
                 if (result)
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(CreateNewWorkspaceAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(CreateNewWorkspaceAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(CreateNewWorkspaceAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result })
+            );
         }
     }
 
@@ -222,7 +266,7 @@ public sealed class WorkspacesController(
         Description = DeleteExistingWorkspaceAction.Description,
         OperationId = DeleteExistingWorkspaceAction.OperationId)]
     public async Task<ResponseDto> DeleteExistingWorkspaceAsync(
-        [FromQuery] string workspaceGuidId,
+        [FromQuery] string workspaceGuid,
         CancellationToken cancellationToken = default
     )
     {
@@ -230,13 +274,13 @@ public sealed class WorkspacesController(
         try
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceGuidId }));
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceGuid }));
 
-            ArgumentException.ThrowIfNullOrEmpty(workspaceGuidId);
+            ArgumentException.ThrowIfNullOrEmpty(workspaceGuid);
             if (base.IsAuthorized(UserBased))
             {
                 result = await workspacesHandler.DeleteExistingWorkspaceAsync(
-                    workspaceGuidId,
+                    workspaceGuidId: workspaceGuid,
                     currentUserEmail: base.UserEmail,
                     cancellationToken
                 ).ConfigureAwait(false);
@@ -260,7 +304,7 @@ public sealed class WorkspacesController(
         finally
         {
             logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(DeleteExistingWorkspaceAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceGuidId, result }));
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceGuid, result }));
         }
     }
 
@@ -347,11 +391,14 @@ public sealed class WorkspacesController(
         string result = string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, chatRequestDTO }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, chatRequestDTO })
+            );
 
             ArgumentNullException.ThrowIfNull(chatRequestDTO);
-            if (base.IsAuthorized(ApplicationBased))
+            if (base.IsAuthorized(authorizationType: ApplicationBased))
             {
                 result = await workspacesHandler.InvokeWorkspaceAgentAsync(
                     chatRequestDTO,
@@ -360,24 +407,36 @@ public sealed class WorkspacesController(
 
                 if (!string.IsNullOrWhiteSpace(result))
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(InvokeWorkspaceAgentAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result })
+            );
         }
     }
 
@@ -405,11 +464,14 @@ public sealed class WorkspacesController(
         GroupChatResponseDTO result = new();
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, chatRequestDTO }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, chatRequestDTO })
+            );
 
             ArgumentNullException.ThrowIfNull(chatRequestDTO);
-            if (base.IsAuthorized(ApplicationBased))
+            if (base.IsAuthorized(authorizationType: ApplicationBased))
             {
                 result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(
                     chatRequest: chatRequestDTO,
@@ -418,24 +480,36 @@ public sealed class WorkspacesController(
 
                 if (result is not null && !string.IsNullOrEmpty(result.AgentResponse))
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result })
+            );
         }
     }
 }

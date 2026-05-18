@@ -12,7 +12,7 @@ using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ChatController;
 
-namespace AIAgents.Laboratory.API.Controllers.v2;
+namespace AIAgents.Laboratory.API.Controllers;
 
 /// <summary>
 /// Provides API endpoints for interacting with AI chat agents, including invoking chat operations, retrieving direct responses, managing conversation history, and clearing user data.
@@ -26,8 +26,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="chatHandler">The handler responsible for processing chat-related operations and communication with AI agents.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
-[ApiVersion(ApiVersionsConstants.ApiVersionV2)]
-[Route("aiagentsapi/v{version:apiVersion}/[controller]")]
+[Route(ApiBaseRoute)]
 public sealed class ChatController(
     IHttpContextAccessor httpContextAccessor,
     IConfiguration configuration,
