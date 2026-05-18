@@ -16,7 +16,6 @@ using AIAgents.Laboratory.Persistence.SQLDatabase.IOC;
 using AIAgents.Laboratory.Storage.Blobs.IOC;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.IdentityModel.Tokens;
 using static AIAgents.Laboratory.API.Helpers.Constants;
@@ -79,22 +78,6 @@ public static class DIContainer
             .AddRelationalSqlDependencies(configuration, isDevelopmentMode).AddBlobStorageDependencies(configuration);
 
         services.AddDomainDependencies();
-    }
-
-    /// <summary>
-    /// Adds API versioning to the service collection.
-    /// </summary>
-    /// <param name="services">The service collection.</param>
-    internal static void AddApiVersions(
-        this IServiceCollection services
-    )
-    {
-        services.AddApiVersioning(configuration =>
-        {
-            configuration.AssumeDefaultVersionWhenUnspecified = true;
-            configuration.DefaultApiVersion = new ApiVersion(majorVersion: 2, minorVersion: 0);
-            configuration.ReportApiVersions = true;
-        });
     }
 
     #region PRIVATE METHODS

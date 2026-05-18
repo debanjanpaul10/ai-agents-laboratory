@@ -10,46 +10,21 @@ internal static class Constants
     /// </summary>
     internal static class SwaggerConstants
     {
-        /// <summary>
-        /// The api version for Swagger documentation.
-        /// </summary>
         public const string ApiVersion = "v1";
-
-        /// <summary>
-        /// The swagger endpoint for the API documentation.
-        /// </summary>
         public const string SwaggerEndpointUrl = "/swagger/v1/swagger.json";
-
-        /// <summary>
-        /// The swagger ui endpoint prefix.
-        /// </summary>
-        public const string SwaggerUiPrefix = "swaggerui";
-
-        /// <summary>
-        /// The description for the Swagger documentation.
-        /// </summary>
         public const string SwaggerDescription = "API documentation for AI.Agents.Laboratory";
+
+        public const string SwaggerUiPrefix = "swaggerui";
+        public const string ApplicationAPIName = "AI.Agents.Laboratory.API";
 
         /// <summary>
         /// The Author Details class contains information about the author of the API.
         /// </summary>
         public static class AuthorDetails
         {
-            /// <summary>
-            /// The author's name.
-            /// </summary>
             public static readonly string Name = "Debanjan Paul";
-
-            /// <summary>
-            /// The author's email address.
-            /// </summary>
             public static readonly string Email = "debanjanpaul10@gmail.com";
         }
-
-        /// <summary>
-        /// The API name for Swagger documentation.
-        /// </summary>
-        public const string ApplicationAPIName = "AI.Agents.Laboratory.API";
     }
 
     /// <summary>
@@ -57,44 +32,16 @@ internal static class Constants
     /// </summary>
     internal static class LoggingConstants
     {
-        /// <summary>
-        /// The Correlation Id header constant.
-        /// </summary>
         internal const string CorrelationIdHeader = "X-Correlation-ID";
 
-        /// <summary>
-        /// The log helper method start.
-        /// </summary>
         internal const string LogHelperMethodStart = "{0} started at {1} for {2}";
-
-        /// <summary>
-        /// The log helper method failed.
-        /// </summary>
         internal const string LogHelperMethodFailed = "{0} failed at {1} with {2}";
-
-        /// <summary>
-        /// The log helper method end.
-        /// </summary>
         internal const string LogHelperMethodEnd = "{0} ended at {1} for {2}";
 
-        /// <summary>
-        /// The http logging message constant.
-        /// </summary>
         internal const string HttpLoggingMessage = "HTTP {Method} {Path} started";
 
-        /// <summary>
-        /// The http logging message constant with time elapsed.
-        /// </summary>
         internal const string HttpLoggingMessageWithTime = "HTTP {Method} {Path} responded {StatusCode} in {ElapsedMilliseconds}ms";
-
-        /// <summary>
-        /// The unhandled exception logging message constant.
-        /// </summary>
         internal const string UnhandledExceptionMessage = "Unhandled exception occurred. CorrelationId: {CorrelationId}, Path: {Path}, Method: {Method}";
-
-        /// <summary>
-        /// The notification stream cancelled message.
-        /// </summary>
         internal const string NotificationStreamCancelledMessage = "Notification stream cancelled.";
 
         /// <summary>
@@ -102,24 +49,9 @@ internal static class Constants
         /// </summary>
         internal static class HeaderLoggingConstants
         {
-            /// <summary>
-            /// The correlation id constant.
-            /// </summary>
             internal const string CorrelationId = "CorrelationId";
-
-            /// <summary>
-            /// The request path constant.
-            /// </summary>
             internal const string RequestPath = "RequestPath";
-
-            /// <summary>
-            /// The request method constant.
-            /// </summary>
             internal const string RequestMethod = "RequestMethod";
-
-            /// <summary>
-            /// The status code constant.
-            /// </summary>
             internal const string StatusCode = "StatusCode";
         }
     }
@@ -129,24 +61,10 @@ internal static class Constants
     /// </summary>
     internal static class EnvironmentConfigurationConstants
     {
-        /// <summary>
-        /// The local appsetings file name
-        /// </summary>
         internal const string LocalAppsetingsFileName = "appsettings.development.json";
 
-        /// <summary>
-        /// The application configuration endpoint key constant
-        /// </summary>
         internal const string AppConfigurationEndpointKeyConstant = "AppConfigurationEndpoint";
-
-        /// <summary>
-        /// The managed identity client identifier constant
-        /// </summary>
         internal const string ManagedIdentityClientIdConstant = "ManagedIdentityClientId";
-
-        /// <summary>
-        /// The application json constant
-        /// </summary>
         internal const string ApplicationJsonConstant = "application/json";
     }
 
