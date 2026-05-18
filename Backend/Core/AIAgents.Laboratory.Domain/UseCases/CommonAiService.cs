@@ -37,7 +37,9 @@ public sealed class CommonAiService(
     }
 
     /// <inheritdoc />
-    public Dictionary<string, string> GetConfigurationsData(string userName)
+    public Dictionary<string, string> GetConfigurationsData(
+        string userName
+    )
     {
         try
         {
@@ -92,7 +94,9 @@ public sealed class CommonAiService(
     }
 
     /// <inheritdoc />
-    public Dictionary<string, string> GetConfigurationByKeyName(string key)
+    public Dictionary<string, string> GetConfigurationByKeyName(
+        string key
+    )
     {
         try
         {
