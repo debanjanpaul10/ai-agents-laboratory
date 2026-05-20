@@ -15,7 +15,10 @@ import { useAppDispatch } from "@store/index";
 import { ShowErrorToaster } from "@shared/toaster";
 import { InvokeChatAgentAsync } from "@store/chat/actions";
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
-import { GetWorkspaceGroupChatResponseAsync } from "@store/workspaces/actions";
+import {
+	ClearWorkspaceConversationHistory,
+	GetWorkspaceGroupChatResponseAsync,
+} from "@store/workspaces/actions";
 import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import { GroupChatResponseDTO } from "@models/response/group-chat-response.dto";
@@ -34,6 +37,7 @@ export default function AssociatedAgentsChatPaneComponent({
 	const [messages, setMessages] = useState<Array<ChatMessage>>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isGroupChatAgent, setIsGroupChatAgent] = useState<boolean>(false);
+	const [conversationId, setConversationId] = useState<string>("");
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -47,7 +51,8 @@ export default function AssociatedAgentsChatPaneComponent({
 			selectedAgent?.agentGuid ===
 				RunWorkspaceConstants.ChatPane.GroupChatAgent.Guid,
 		);
-	}, [selectedAgent]);
+		setConversationId("");
+	}, [selectedAgent, workspaceDetailsData.agentWorkspaceGuid]);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setUserInput(e.target.value);
@@ -68,6 +73,15 @@ export default function AssociatedAgentsChatPaneComponent({
 	const clearConversation = () => {
 		setMessages([]);
 		setUserInput("");
+
+		dispatch(
+			ClearWorkspaceConversationHistory(
+				workspaceDetailsData.agentWorkspaceGuid,
+				conversationId,
+			),
+		);
+
+		setConversationId("");
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -104,7 +118,7 @@ export default function AssociatedAgentsChatPaneComponent({
 			const chatRequest: WorkspaceAgentChatRequestDTO = {
 				agentId: "",
 				applicationName: "",
-				conversationId: GenerateMessageId(),
+				conversationId,
 				userMessage: userInput,
 				workspaceId: workspaceDetailsData.agentWorkspaceGuid,
 			};
@@ -116,6 +130,10 @@ export default function AssociatedAgentsChatPaneComponent({
 			)) as GroupChatResponseDTO | null;
 
 			if (aiResponse?.agentResponse) {
+				if (aiResponse.conversationId) {
+					setConversationId(aiResponse.conversationId);
+				}
+
 				let content = aiResponse.agentResponse;
 				if (
 					aiResponse.agentsInvoked &&
@@ -161,7 +179,7 @@ export default function AssociatedAgentsChatPaneComponent({
 			setIsLoading(true);
 			const chatRequest: ChatRequestDTO = {
 				userMessage: userMessage.content.trim(),
-				conversationId: GenerateMessageId(),
+				conversationId: "",
 				agentId: selectedAgent.agentGuid,
 				agentName: selectedAgent.agentName,
 			};

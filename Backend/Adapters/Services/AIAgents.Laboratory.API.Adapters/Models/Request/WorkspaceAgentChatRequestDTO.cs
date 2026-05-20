@@ -3,7 +3,7 @@
 /// <summary>
 /// The Workspace Agent Chat Request DTO model.
 /// </summary>
-public sealed record WorkspaceAgentChatRequestDTO
+public sealed record WorkspaceAgentChatRequestDto
 {
     /// <summary>
     /// Gets or sets the conversation identifier.

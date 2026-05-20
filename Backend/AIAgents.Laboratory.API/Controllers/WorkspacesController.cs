@@ -384,7 +384,7 @@ public sealed class WorkspacesController(
         Description = InvokeWorkspaceAgentAction.Description,
         OperationId = InvokeWorkspaceAgentAction.OperationId)]
     public async Task<ResponseDto> InvokeWorkspaceAgentAsync(
-        [FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO,
+        [FromBody] WorkspaceAgentChatRequestDto chatRequestDTO,
         CancellationToken cancellationToken = default
     )
     {
@@ -448,7 +448,7 @@ public sealed class WorkspacesController(
     /// <returns>The response from the group chat.</returns>
     [HttpPost(WorkspacesRoutes.GetWorkspaceGroupChatResponse_Route)]
     [Consumes(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(GroupChatResponseDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GroupChatResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -457,11 +457,11 @@ public sealed class WorkspacesController(
         Description = GetWorkspaceGroupChatResponseAction.Description,
         OperationId = GetWorkspaceGroupChatResponseAction.OperationId)]
     public async Task<ResponseDto> GetWorkspaceGroupChatResponseAsync(
-        [FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO,
+        [FromBody] WorkspaceAgentChatRequestDto chatRequestDTO,
         CancellationToken cancellationToken = default
     )
     {
-        GroupChatResponseDTO result = new();
+        GroupChatResponseDto result = new();
         try
         {
             logger.LogAppInformation(
@@ -475,6 +475,7 @@ public sealed class WorkspacesController(
             {
                 result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(
                     chatRequest: chatRequestDTO,
+                    currentUserEmail: base.UserEmail ?? chatRequestDTO.ApplicationName,
                     cancellationToken
                 ).ConfigureAwait(false);
 
@@ -509,6 +510,83 @@ public sealed class WorkspacesController(
                 LoggingConstants.LogHelperMethodEnd,
                 nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
                     JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result })
+            );
+        }
+    }
+
+    /// <summary>
+    /// Clears the conversation history of a workspace for a given conversation id.
+    /// </summary>
+    /// <param name="workspaceGuid">The GUID of the workspace.</param>
+    /// <param name="conversationId">The ID of the conversation.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A boolean indicating whether the operation was successful.</returns>
+    [HttpPost(WorkspacesRoutes.ClearWorkspaceConversationHistory_Route)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+        Summary = ClearWorkspaceConversationHistoryAction.Summary,
+        Description = ClearWorkspaceConversationHistoryAction.Description,
+        OperationId = ClearWorkspaceConversationHistoryAction.OperationId)]
+    public async Task<ResponseDto> ClearWorkspaceConversationHistoryAsync(
+        [FromQuery] string workspaceGuid,
+        [FromQuery] string conversationId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        bool result = false;
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(ClearWorkspaceConversationHistoryAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceGuid, conversationId })
+            );
+
+            ArgumentException.ThrowIfNullOrEmpty(workspaceGuid);
+            ArgumentException.ThrowIfNullOrEmpty(conversationId);
+            if (base.IsAuthorized(UserBased))
+            {
+                result = await workspacesHandler.ClearWorkspaceConversationHistoryAsync(
+                    workspaceId: workspaceGuid,
+                    currentUserEmail: base.UserEmail,
+                    conversationId: conversationId,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+                if (result)
+                    return HandleSuccessRequestResponse(
+                        responseData: result
+                    );
+                else
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
+            }
+
+            return HandleUnAuthorizedRequestResponse();
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(ClearWorkspaceConversationHistoryAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(ClearWorkspaceConversationHistoryAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceGuid, conversationId, result })
             );
         }
     }

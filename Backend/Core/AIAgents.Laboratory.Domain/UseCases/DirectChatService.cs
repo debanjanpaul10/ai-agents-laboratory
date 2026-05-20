@@ -47,7 +47,9 @@ public sealed class DirectChatService(
                     JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, userQuery })
             );
 
-            var chatbotAgentGuid = configuration[AzureAppConfigurationConstants.AIChatbotAgentId] ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
+            var chatbotAgentGuid = configuration[AzureAppConfigurationConstants.AIChatbotAgentId]
+                ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
+
             var agentDataTask = agentsService.GetAgentDataByIdAsync(
                 agentId: chatbotAgentGuid,
                 userEmail,

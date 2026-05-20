@@ -11,6 +11,14 @@ public sealed record GroupChatResponseDomain
     public string AgentResponse { get; init; } = string.Empty;
 
     /// <summary>
+    /// Gets the conversation identifier.
+    /// </summary>
+    /// <value>
+    /// The conversation identifier.
+    /// </value>
+    public string ConversationId { get; init; } = string.Empty;
+
+    /// <summary>
     /// The list of agents invoked.
     /// </summary>
     public IList<string> AgentsInvoked { get; init; } = [];

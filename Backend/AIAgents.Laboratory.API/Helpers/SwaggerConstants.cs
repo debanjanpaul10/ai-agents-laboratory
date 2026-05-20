@@ -315,6 +315,13 @@ internal static class SwaggerConstants
             internal const string Description = "Calls the LLM directly with user message for workspace group chat.";
             internal const string OperationId = nameof(GetWorkspaceGroupChatResponseAction);
         }
+
+        internal static class ClearWorkspaceConversationHistoryAction
+        {
+            internal const string Summary = "Clears the workspace conversation history data.";
+            internal const string Description = "Clears the conversation history data for workspace.";
+            internal const string OperationId = nameof(ClearWorkspaceConversationHistoryAction);
+        }
     }
 
     /// <summary>

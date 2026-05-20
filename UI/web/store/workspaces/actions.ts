@@ -1,6 +1,7 @@
 import { Action, Dispatch } from "redux";
 import {
 	ADD_NEW_WORKSPACE_DATA,
+	CLEAR_WORKSPACE_CONVERSATION_HISTORY,
 	GET_ALL_WORKSPACES,
 	GET_WORKSPACE_BY_ID,
 	TOGGLE_ASSOCIATE_AGENTS_DRAWER,
@@ -11,6 +12,7 @@ import {
 } from "@store/workspaces/actionTypes";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 import {
+	ClearWorkspaceConversationHistoryApiAsync,
 	CreateNewWorkspaceApiAsync,
 	DeleteExistingWorkspaceApiAsync,
 	GetAllWorkspacesDataApiAsync,
@@ -19,8 +21,12 @@ import {
 	UpdateExistingWorkspaceDataApiAsync,
 } from "@shared/api-service";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
-import { WorkspaceToasterConstants } from "@helpers/toaster-constants";
+import {
+	ChatToasterConstants,
+	WorkspaceToasterConstants,
+} from "@helpers/toaster-constants";
 import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
+import { GroupChatResponseDTO } from "@models/response/group-chat-response.dto";
 import { ToggleChatResponseSpinner } from "@store/agents/actions";
 import { GET_CHAT_RESPONSE } from "@store/chat/actionTypes";
 
@@ -78,15 +84,12 @@ export function GetAllWorkspacesDataAsync() {
 	};
 }
 
-export function GetWorkspaceByWorkspaceIdAsync(
-	workspaceId: string,
-) {
+export function GetWorkspaceByWorkspaceIdAsync(workspaceId: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleWorkspacesLoader(true));
-			const response = await GetWorkspaceByWorkspaceIdApiAsync(
-				workspaceId,
-			);
+			const response =
+				await GetWorkspaceByWorkspaceIdApiAsync(workspaceId);
 
 			if (response?.isSuccess && response?.responseData)
 				dispatch({
@@ -108,9 +111,8 @@ export function CreateNewWorkspaceAsync(
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleCreateWorkspaceLoader(true));
-			const response = await CreateNewWorkspaceApiAsync(
-				agentsWorkspaceData,
-			);
+			const response =
+				await CreateNewWorkspaceApiAsync(agentsWorkspaceData);
 
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -130,15 +132,12 @@ export function CreateNewWorkspaceAsync(
 	};
 }
 
-export function DeleteExistingWorkspaceAsync(
-	workspaceGuidId: string,
-) {
+export function DeleteExistingWorkspaceAsync(workspaceGuidId: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleWorkspacesLoader(true));
-			const response = await DeleteExistingWorkspaceApiAsync(
-				workspaceGuidId,
-			);
+			const response =
+				await DeleteExistingWorkspaceApiAsync(workspaceGuidId);
 
 			if (response?.isSuccess && response?.responseData) {
 				dispatch(GetAllWorkspacesDataAsync() as any);
@@ -159,9 +158,8 @@ export function UpdateExistingWorkspaceDataAsync(
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleEditWorkspacesLoader(true));
-			const response = await UpdateExistingWorkspaceDataApiAsync(
-				agentsWorkspaceData,
-			);
+			const response =
+				await UpdateExistingWorkspaceDataApiAsync(agentsWorkspaceData);
 
 			if (response?.isSuccess && response?.responseData) {
 				dispatch(GetAllWorkspacesDataAsync() as any);
@@ -182,19 +180,46 @@ export function GetWorkspaceGroupChatResponseAsync(
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleChatResponseSpinner(true));
-			const response = await GetWorkspaceGroupChatResponseApiAsync(
-				chatRequestDto,
-			);
+			const response =
+				await GetWorkspaceGroupChatResponseApiAsync(chatRequestDto);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: GET_CHAT_RESPONSE,
 					payload: response.responseData,
 				});
 
-				return response.responseData as string;
+				return response.responseData as GroupChatResponseDTO;
 			}
 
 			return null;
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleChatResponseSpinner(false));
+		}
+	};
+}
+
+export function ClearWorkspaceConversationHistory(
+	workspaceGuid: string,
+	conversationId: string,
+) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleChatResponseSpinner(true));
+			const response = await ClearWorkspaceConversationHistoryApiAsync(
+				workspaceGuid,
+				conversationId,
+			);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: CLEAR_WORKSPACE_CONVERSATION_HISTORY,
+					payload: response.responseData,
+				});
+
+				ShowSuccessToaster(ChatToasterConstants.CLEAR_CONVERSATION);
+			}
 		} catch (error: any) {
 			console.error(error);
 			if (error.message) ShowErrorToaster(error.message);

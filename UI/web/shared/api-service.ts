@@ -165,6 +165,16 @@ export async function DeleteExistingWorkspaceApiAsync(workspaceGuidId: string) {
 	);
 }
 
+export async function ClearWorkspaceConversationHistoryApiAsync(
+	workspaceGuid: string,
+	conversationId: string,
+) {
+	return await PostAsync(
+		`workspaces/clearworkspaceconversation?workspaceGuid=${workspaceGuid}&conversationId=${conversationId}`,
+		null,
+	);
+}
+
 export async function UpdateExistingWorkspaceDataApiAsync(
 	agentsWorkspaceData: AgentsWorkspaceDTO | FormData,
 ) {

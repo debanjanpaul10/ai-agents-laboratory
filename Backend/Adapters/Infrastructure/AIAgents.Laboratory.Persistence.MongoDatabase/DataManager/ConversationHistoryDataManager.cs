@@ -34,12 +34,40 @@ public sealed class ConversationHistoryDataManager(
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
     /// <inheritdoc />
+    public async Task<bool> ClearConversationHistoryByWorkspaceAsync(
+        string workspaceId,
+        string conversationId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var filter = Builders<ConversationHistoryModel>.Filter.Where(
+            x => x.ConversationId == conversationId && x.IsActive && x.WorkspaceId == workspaceId && x.UserName == currentUserEmail
+        );
+        var allConversationHistoryData = await mongoDatabaseRepository.GetDataFromCollectionAsync(
+            databaseName: this.MongoDatabaseName,
+            collectionName: this.ConversationHistoryCollectionName,
+            filter: filter,
+            cancellationToken
+        ).ConfigureAwait(false);
+
+        return allConversationHistoryData.Any() && await mongoDatabaseRepository.DeleteDataFromCollectionAsync(
+            filter: filter,
+            databaseName: this.MongoDatabaseName,
+            collectionName: this.ConversationHistoryCollectionName,
+            cancellationToken
+        ).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public async Task<bool> ClearConversationHistoryForUserAsync(
         string userName,
         CancellationToken cancellationToken = default
     )
     {
-        var filter = Builders<ConversationHistoryModel>.Filter.Where(x => x.UserName == userName && x.IsActive);
+        var filter = Builders<ConversationHistoryModel>.Filter.Where(
+            x => x.UserName == userName && x.IsActive
+        );
         var allConversationHistoryData = await mongoDatabaseRepository.GetDataFromCollectionAsync(
             databaseName: this.MongoDatabaseName,
             collectionName: this.ConversationHistoryCollectionName,
@@ -68,11 +96,7 @@ public sealed class ConversationHistoryDataManager(
             cancellationToken
         ).ConfigureAwait(false);
 
-        if (allConversationHistoryData.Any())
-        {
-            return MongoDataMapperProfile.MapToDomain(model: allConversationHistoryData.First());
-        }
-        else
+        if (!allConversationHistoryData.Any())
         {
             var newConversationHistory = new ConversationHistoryModel()
             {
@@ -91,6 +115,54 @@ public sealed class ConversationHistoryDataManager(
                 cancellationToken
             ).ConfigureAwait(false);
             return MongoDataMapperProfile.MapToDomain(model: newConversationHistory);
+        }
+        else
+        {
+            return MongoDataMapperProfile.MapToDomain(model: allConversationHistoryData.First());
+        }
+    }
+    /// <inheritdoc />
+    public async Task<ConversationHistoryDomain> GetConversationHistoryByWorkspaceAsync(
+        string workspaceId,
+        string conversationId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var conversationHistoryFilter = Builders<ConversationHistoryModel>.Filter.Where(
+            x => x.ConversationId == conversationId && x.IsActive && x.WorkspaceId == workspaceId && x.UserName == currentUserEmail
+        );
+
+        var allConversationHistoryData = await mongoDatabaseRepository.GetDataFromCollectionAsync(
+            databaseName: this.MongoDatabaseName,
+            collectionName: this.ConversationHistoryCollectionName,
+            filter: conversationHistoryFilter,
+            cancellationToken
+        ).ConfigureAwait(false);
+        if (!allConversationHistoryData.Any())
+        {
+            var newConversationHistory = new ConversationHistoryModel()
+            {
+                WorkspaceId = workspaceId,
+                UserName = currentUserEmail,
+                ChatHistory = [],
+                ConversationId = conversationId,
+                IsActive = true,
+                LastModifiedOn = DateTime.UtcNow
+            };
+
+            await mongoDatabaseRepository.SaveDataAsync(
+                data: newConversationHistory,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.ConversationHistoryCollectionName,
+                bypassDocumentValidation: false,
+                cancellationToken
+            ).ConfigureAwait(false);
+            return MongoDataMapperProfile.MapToDomain(model: newConversationHistory);
+        }
+        else
+        {
+            return allConversationHistoryData.Select(selector: MongoDataMapperProfile.MapToDomain).First();
         }
     }
 
@@ -113,9 +185,12 @@ public sealed class ConversationHistoryDataManager(
         var conversationHistoryData = allConversationHistoryData.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage);
         var dbConversationHistory = MongoDataMapperProfile.MapToModel(domain: conversationHistory);
 
-        // Add the new message to the existing chat history
+        // Append any new chat history entries from the incoming conversation history.
         var updatedChatHistory = conversationHistoryData.ChatHistory.ToList();
-        updatedChatHistory.Add(dbConversationHistory.ChatHistory[^1]);
+        if (dbConversationHistory.ChatHistory.Count > updatedChatHistory.Count)
+            updatedChatHistory.AddRange(
+                dbConversationHistory.ChatHistory.Skip(updatedChatHistory.Count
+            ));
 
         // Update the existing document with the new chat history
         var update = Builders<ConversationHistoryModel>.Update

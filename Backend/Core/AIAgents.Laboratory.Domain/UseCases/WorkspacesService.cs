@@ -30,8 +30,60 @@ public sealed class WorkspacesService(
     ICorrelationContext correlationContext,
     IAgentChatService agentChatService,
     IOrchestratorService orchestratorService,
-    INotificationsService notificationsService) : IWorkspacesService
+    INotificationsService notificationsService,
+    IConversationHistoryService conversationHistoryService) : IWorkspacesService
 {
+
+    /// <inheritdoc />
+    public async Task<bool> ClearWorkspaceConversationHistoryAsync(
+        string workspaceId,
+        string currentUserEmail,
+        string conversationId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(workspaceId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
+
+        bool result = false;
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(ClearWorkspaceConversationHistoryAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail })
+            );
+
+            result = await conversationHistoryService.ClearConversationHistoryByWorkspaceAsync(
+                workspaceId,
+                conversationId,
+                currentUserEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(ClearWorkspaceConversationHistoryAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(ClearWorkspaceConversationHistoryAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, currentUserEmail, result })
+            );
+        }
+    }
+
     /// <inheritdoc />
     public async Task<bool> CreateNewWorkspaceAsync(
         AgentsWorkspaceDomain agentsWorkspaceData,
@@ -232,6 +284,8 @@ public sealed class WorkspacesService(
         ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.WorkspaceId);
         ArgumentException.ThrowIfNullOrWhiteSpace(chatRequest.UserMessage);
 
+        GroupChatResponseDomain? response = null;
+
         try
         {
             logger.LogAppInformation(
@@ -245,27 +299,45 @@ public sealed class WorkspacesService(
 
             var workspaceDetails = await this.GetWorkspaceByWorkspaceIdAsync(
                 workspaceId: chatRequest.WorkspaceId,
-                currentUserEmail: chatRequest.ApplicationName,
+                currentUserEmail: chatRequest.CurrentUserEmail,
                 cancellationToken
             ).ConfigureAwait(false);
 
             if (workspaceDetails is null || string.IsNullOrWhiteSpace(workspaceDetails.Id))
                 throw new FileNotFoundException(
-                    string.Format(CultureInfo.InvariantCulture, ExceptionConstants.WorkspaceNotFoundExceptionMessage, chatRequest.WorkspaceId));
+                    string.Format(CultureInfo.InvariantCulture, ExceptionConstants.WorkspaceNotFoundExceptionMessage, chatRequest.WorkspaceId)
+                );
 
             if (!workspaceDetails.IsGroupChatEnabled)
-                throw new MethodAccessException(ExceptionConstants.GroupchatNotEnabledExceptionMessage);
+                throw new MethodAccessException(
+                    ExceptionConstants.GroupchatNotEnabledExceptionMessage
+                );
+
+            var conversationHistory = await conversationHistoryService.GetConversationHistoryByWorkspaceAsync(
+                workspaceId: chatRequest.WorkspaceId,
+                conversationId: chatRequest.ConversationId,
+                currentUserEmail: chatRequest.CurrentUserEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
 
             var groupResponse = await orchestratorService.GetOrchestratorAgentResponseAsync(
                 chatRequest,
                 workspaceDetails,
+                conversationHistory,
                 cancellationToken
             ).ConfigureAwait(false);
-            return new GroupChatResponseDomain()
+
+            await conversationHistoryService.SaveMessageToConversationHistoryAsync(
+                conversationHistory: conversationHistory,
+                cancellationToken
+            ).ConfigureAwait(false);
+            response = new GroupChatResponseDomain()
             {
                 AgentResponse = groupResponse.FinalResponse,
-                AgentsInvoked = [.. groupResponse.GroupChatAgentsResponses.Select(x => x.AgentName)]
+                AgentsInvoked = [.. groupResponse.GroupChatAgentsResponses.Select(x => x.AgentName)],
+                ConversationId = chatRequest.ConversationId
             };
+            return response;
         }
         catch (Exception ex)
         {
@@ -284,7 +356,7 @@ public sealed class WorkspacesService(
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
                 nameof(GetWorkspaceGroupChatResponseAsync), DateTime.UtcNow,
-                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest })
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest, response })
             );
         }
     }

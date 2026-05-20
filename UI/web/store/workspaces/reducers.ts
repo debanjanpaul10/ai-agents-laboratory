@@ -1,4 +1,5 @@
 import {
+	CLEAR_WORKSPACE_CONVERSATION_HISTORY,
 	GET_ALL_WORKSPACES,
 	GET_WORKSPACE_BY_ID,
 	GET_WORKSPACE_GROUP_CHAT_RESPONSE,
@@ -18,6 +19,7 @@ const initialState: any = {
 	isAddWorkspaceDrawerOpen: false,
 	isAssociateAgentsDrawerOpen: false,
 	workspaceGroupChatResponse: {},
+	isWorkspaceConversationHistoryCleared: false,
 };
 
 export function WorkspacesReducer(state = initialState, action: any) {
@@ -68,6 +70,12 @@ export function WorkspacesReducer(state = initialState, action: any) {
 			return {
 				...state,
 				workspaceGroupChatResponse: action.payload,
+			};
+		}
+		case CLEAR_WORKSPACE_CONVERSATION_HISTORY: {
+			return {
+				...state,
+				isWorkspaceConversationHistoryCleared: action.payload,
 			};
 		}
 

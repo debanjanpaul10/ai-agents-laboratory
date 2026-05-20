@@ -67,6 +67,55 @@ public sealed class ConversationHistoryService(
     }
 
     /// <inheritdoc />
+    public async Task<ConversationHistoryDomain> GetConversationHistoryByWorkspaceAsync(
+        string workspaceId,
+        string conversationId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(conversationId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(workspaceId);
+        ConversationHistoryDomain? result = null;
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetConversationHistoryByWorkspaceAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, conversationId })
+            );
+
+            result = await conversationHistoryDataManager.GetConversationHistoryByWorkspaceAsync(
+                workspaceId,
+                conversationId,
+                currentUserEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetConversationHistoryByWorkspaceAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetConversationHistoryByWorkspaceAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, conversationId, result })
+            );
+        }
+    }
+
+    /// <inheritdoc />
     public async Task<bool> SaveMessageToConversationHistoryAsync(
         ConversationHistoryDomain conversationHistory,
         CancellationToken cancellationToken = default
@@ -150,6 +199,56 @@ public sealed class ConversationHistoryService(
                 LoggingConstants.LogHelperMethodEnd,
                 nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow,
                     JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userName, result })
+            );
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> ClearConversationHistoryByWorkspaceAsync(
+        string workspaceId,
+        string conversationId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(workspaceId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(conversationId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(currentUserEmail);
+        bool result = false;
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(ClearConversationHistoryByWorkspaceAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, conversationId, currentUserEmail })
+            );
+
+            result = await conversationHistoryDataManager.ClearConversationHistoryByWorkspaceAsync(
+                workspaceId,
+                conversationId,
+                currentUserEmail,
+                cancellationToken
+            ).ConfigureAwait(false);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(ClearConversationHistoryByWorkspaceAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(ClearConversationHistoryByWorkspaceAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, conversationId, currentUserEmail, result })
             );
         }
     }

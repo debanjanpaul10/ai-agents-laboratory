@@ -62,7 +62,7 @@ public sealed class ChatController(
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, chatRequestDTO }));
 
             ArgumentNullException.ThrowIfNull(chatRequestDTO);
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 result = await chatHandler.InvokeChatAgentAsync(
                     chatRequestDTO,
@@ -115,12 +115,15 @@ public sealed class ChatController(
         string result = string.Empty;
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetDirectChatResponseAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, userChatMessage }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetDirectChatResponseAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, userChatMessage })
+            );
 
             ArgumentNullException.ThrowIfNull(userChatMessage);
             ArgumentException.ThrowIfNullOrEmpty(userChatMessage.UserMessage);
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 result = await chatHandler.GetDirectChatResponseAsync(
                     userQuery: userChatMessage.UserMessage,
@@ -130,24 +133,36 @@ public sealed class ChatController(
 
                 if (!string.IsNullOrEmpty(result))
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetDirectChatResponseAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetDirectChatResponseAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetDirectChatResponseAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result })
+            );
         }
     }
 
@@ -175,7 +190,7 @@ public sealed class ChatController(
             logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow,
                 JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
 
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 result = await chatHandler.ClearConversationHistoryForUserAsync(
                     userName: base.UserEmail,
