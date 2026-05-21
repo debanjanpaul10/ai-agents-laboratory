@@ -24,61 +24,6 @@ public sealed class ConversationsController(
 ) : BaseController(httpContextAccessor, configuration)
 {
     /// <summary>
-    /// Clears the conversation history data for user.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
-    /// <returns>The boolean for success/failure.</returns>
-    [HttpPost(ConversationsRoutes.ClearConversationHistory_Route)]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(
-        Summary = ClearConversationHistoryForUserAction.Summary,
-        Description = ClearConversationHistoryForUserAction.Description,
-        OperationId = ClearConversationHistoryForUserAction.OperationId)]
-    public async Task<ResponseDto> ClearConversationHistoryForUserAsync(
-        CancellationToken cancellationToken = default
-    )
-    {
-        bool result = false;
-        try
-        {
-            logger.LogAppInformation(
-                LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
-
-            if (base.IsAuthorized(authorizationType: UserBased))
-            {
-                result = await conversationsHandler.ClearConversationHistoryForUserAsync(
-                    userName: base.UserEmail,
-                    cancellationToken
-                ).ConfigureAwait(false);
-
-                if (result)
-                    return HandleSuccessRequestResponse(
-                        responseData: result);
-                else
-                    return HandleBadRequestResponse(
-                        statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.ConversationHistoryCannotBeClearedMessageConstant);
-            }
-
-            return HandleUnAuthorizedRequestResponse();
-        }
-        catch (Exception ex)
-        {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
-        }
-        finally
-        {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
-        }
-    }
-
-    /// <summary>
     /// Gets the conversation history data for user.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
@@ -146,6 +91,135 @@ public sealed class ConversationsController(
             );
         }
     }
+
+    /// <summary>
+    /// Gets the workspace conversation history asynchronous.
+    /// </summary>
+    /// <param name="workspaceGuid">The workspace unique identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The conversation history.</returns>
+    [HttpGet(ConversationsRoutes.GetWorkspaceConversationHistory_Route)]
+    [ProducesResponseType(typeof(ConversationHistoryDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+        Summary = GetWorkspaceConversationHistoryAction.Summary,
+        Description = GetWorkspaceConversationHistoryAction.Description,
+        OperationId = GetWorkspaceConversationHistoryAction.OperationId)]
+    public async Task<ResponseDto> GetWorkspaceConversationHistoryAsync(
+        [FromQuery] string workspaceGuid,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ConversationHistoryDTO result = new();
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetWorkspaceConversationHistoryAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceGuid })
+            );
+
+            ArgumentException.ThrowIfNullOrEmpty(workspaceGuid);
+            if (base.IsAuthorized(authorizationType: ApplicationBased))
+            {
+                result = await conversationsHandler.GetWorkspaceConversationHistoryAsync(
+                    workspaceId: workspaceGuid,
+                    currentUserEmail: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+                if (result is not null)
+                    return HandleSuccessRequestResponse(
+                        responseData: result
+                    );
+                else
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
+            }
+
+            return HandleUnAuthorizedRequestResponse();
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetWorkspaceConversationHistoryAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetWorkspaceConversationHistoryAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceGuid, result })
+            );
+        }
+    }
+
+    /// <summary>
+    /// Clears the conversation history data for user.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token used to cancel the asynchronous operation. Optional.</param>
+    /// <returns>The boolean for success/failure.</returns>
+    [HttpPost(ConversationsRoutes.ClearConversationHistory_Route)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+        Summary = ClearConversationHistoryForUserAction.Summary,
+        Description = ClearConversationHistoryForUserAction.Description,
+        OperationId = ClearConversationHistoryForUserAction.OperationId)]
+    public async Task<ResponseDto> ClearConversationHistoryForUserAsync(
+        CancellationToken cancellationToken = default
+    )
+    {
+        bool result = false;
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail }));
+
+            if (base.IsAuthorized(authorizationType: UserBased))
+            {
+                result = await conversationsHandler.ClearConversationHistoryForUserAsync(
+                    userName: base.UserEmail,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+                if (result)
+                    return HandleSuccessRequestResponse(
+                        responseData: result);
+                else
+                    return HandleBadRequestResponse(
+                        statusCode: StatusCodes.Status400BadRequest,
+                        message: ExceptionConstants.ConversationHistoryCannotBeClearedMessageConstant);
+            }
+
+            return HandleUnAuthorizedRequestResponse();
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow, ex.Message);
+            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+        }
+        finally
+        {
+            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(ClearConversationHistoryForUserAsync), DateTime.UtcNow,
+                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+        }
+    }
+
 
     /// <summary>
     /// Clears the conversation history of a workspace for a given conversation id.
@@ -220,79 +294,6 @@ public sealed class ConversationsController(
                 LoggingConstants.LogHelperMethodEnd,
                 nameof(ClearWorkspaceConversationHistoryAsync), DateTime.UtcNow,
                     JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceGuid, conversationId, result })
-            );
-        }
-    }
-
-    /// <summary>
-    /// Gets the workspace conversation history asynchronous.
-    /// </summary>
-    /// <param name="workspaceGuid">The workspace unique identifier.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The conversation history.</returns>
-    [HttpGet(ConversationsRoutes.GetWorkspaceConversationHistory_Route)]
-    [ProducesResponseType(typeof(ConversationHistoryDTO), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [SwaggerOperation(
-        Summary = GetWorkspaceConversationHistoryAction.Summary,
-        Description = GetWorkspaceConversationHistoryAction.Description,
-        OperationId = GetWorkspaceConversationHistoryAction.OperationId)]
-    public async Task<ResponseDto> GetWorkspaceConversationHistoryAsync(
-        [FromQuery] string workspaceGuid,
-        CancellationToken cancellationToken = default
-    )
-    {
-        ConversationHistoryDTO result = new();
-        try
-        {
-            logger.LogAppInformation(
-                LoggingConstants.LogHelperMethodStart,
-                nameof(GetWorkspaceConversationHistoryAsync), DateTime.UtcNow,
-                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceGuid })
-            );
-
-            ArgumentException.ThrowIfNullOrEmpty(workspaceGuid);
-            if (base.IsAuthorized(authorizationType: ApplicationBased))
-            {
-                result = await conversationsHandler.GetWorkspaceConversationHistoryAsync(
-                    workspaceId: workspaceGuid,
-                    currentUserEmail: base.UserEmail,
-                    cancellationToken
-                ).ConfigureAwait(false);
-
-                if (result is not null)
-                    return HandleSuccessRequestResponse(
-                        responseData: result
-                    );
-                else
-                    return HandleBadRequestResponse(
-                        statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
-                    );
-            }
-
-            return HandleUnAuthorizedRequestResponse();
-        }
-        catch (Exception ex)
-        {
-            logger.LogAppError(
-                ex,
-                LoggingConstants.LogHelperMethodFailed,
-                nameof(GetWorkspaceConversationHistoryAsync), DateTime.UtcNow, ex.Message
-            );
-            throw new AIAgentsBusinessException(
-                message: ex.Message,
-                correlationId: correlationContext.CorrelationId
-            );
-        }
-        finally
-        {
-            logger.LogAppInformation(
-                LoggingConstants.LogHelperMethodEnd,
-                nameof(GetWorkspaceConversationHistoryAsync), DateTime.UtcNow,
-                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, workspaceGuid, result })
             );
         }
     }

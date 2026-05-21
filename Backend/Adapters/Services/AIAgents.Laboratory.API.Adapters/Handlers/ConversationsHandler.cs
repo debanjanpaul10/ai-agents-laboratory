@@ -13,20 +13,17 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 public sealed class ConversationsHandler(
     IConversationHistoryService conversationHistoryService) : IConversationsHandler
 {
-    /// <inheritdoc/>
-    public async Task<bool> ClearWorkspaceConversationHistoryAsync(
-        string workspaceId,
-        string currentUserEmail,
-        string conversationId,
+    /// <inheritdoc />
+    public async Task<ConversationHistoryDTO> GetConversationHistoryDataAsync(
+        string userName,
         CancellationToken cancellationToken = default
     )
     {
-        return await conversationHistoryService.ClearConversationHistoryByWorkspaceAsync(
-            workspaceId,
-            conversationId,
-            currentUserEmail,
+        var domainResult = await conversationHistoryService.GetConversationHistoryAsync(
+            userName,
             cancellationToken
         ).ConfigureAwait(false);
+        return DomainMapperProfile.MapToDto(domain: domainResult);
     }
 
     /// <inheritdoc/>
@@ -45,6 +42,22 @@ public sealed class ConversationsHandler(
         return DomainMapperProfile.MapToDto(domain: domainResult);
     }
 
+    /// <inheritdoc/>
+    public async Task<bool> ClearWorkspaceConversationHistoryAsync(
+        string workspaceId,
+        string currentUserEmail,
+        string conversationId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await conversationHistoryService.ClearConversationHistoryByWorkspaceAsync(
+            workspaceId,
+            conversationId,
+            currentUserEmail,
+            cancellationToken
+        ).ConfigureAwait(false);
+    }
+
     /// <inheritdoc />
     public async Task<bool> ClearConversationHistoryForUserAsync(
         string userName,
@@ -57,16 +70,5 @@ public sealed class ConversationsHandler(
         ).ConfigureAwait(false);
     }
 
-    /// <inheritdoc />
-    public async Task<ConversationHistoryDTO> GetConversationHistoryDataAsync(
-        string userName,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var domainResult = await conversationHistoryService.GetConversationHistoryAsync(
-            userName,
-            cancellationToken
-        ).ConfigureAwait(false);
-        return DomainMapperProfile.MapToDto(domain: domainResult);
-    }
+
 }

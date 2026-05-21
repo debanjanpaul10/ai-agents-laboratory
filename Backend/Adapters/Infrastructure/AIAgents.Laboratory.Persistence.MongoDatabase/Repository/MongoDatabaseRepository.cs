@@ -88,7 +88,8 @@ public sealed class MongoDatabaseRepository(
         {
             logger.LogAppInformation(
                 LoggingConstants.MethodStartedMessageConstant,
-                nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName })
+                nameof(SaveDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName, bypassDocumentValidation })
             );
 
             var mongoDatabase = mongoClient.GetDatabase(databaseName);
@@ -122,7 +123,8 @@ public sealed class MongoDatabaseRepository(
         {
             logger.LogAppInformation(
                 LoggingConstants.MethodEndedMessageConstant,
-                nameof(SaveDataAsync), DateTime.UtcNow, JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName })
+                nameof(SaveDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, databaseName, collectionName, bypassDocumentValidation })
             );
         }
     }
