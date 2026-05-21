@@ -190,8 +190,8 @@ public sealed class OrchestratorService(
     {
         IList<AgentDataDomain> agentsData = [];
         await Parallel.ForEachAsync(
-            workspaceDetails.ActiveAgentsListInWorkspace, cancellationToken,
-            async (agent, ct) =>
+            source: workspaceDetails.ActiveAgentsListInWorkspace, cancellationToken,
+            body: async (agent, ct) =>
             {
                 var agentData = await agentsService.GetAgentDataByIdAsync(
                     agentId: agent.AgentGuid,

@@ -2,7 +2,6 @@ using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
-using AIAgents.Laboratory.Domain.Contracts;
 using AIAgents.Laboratory.Domain.Ports.In;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
@@ -11,11 +10,9 @@ namespace AIAgents.Laboratory.API.Adapters.Handlers;
 /// The agent workspaces api adapter handler implementation.
 /// </summary>
 /// <param name="workspacesService">The workspace service.</param>
-/// <param name="conversationHistoryService">The conversation history service.</param>
 /// <seealso cref="IWorkspacesHandler"/>
 public sealed class WorkspacesHandler(
-    IWorkspacesService workspacesService,
-    IConversationHistoryService conversationHistoryService) : IWorkspacesHandler
+    IWorkspacesService workspacesService) : IWorkspacesHandler
 {
     /// <inheritdoc/>
     public async Task<bool> CreateNewWorkspaceAsync(
@@ -116,39 +113,6 @@ public sealed class WorkspacesHandler(
             currentUserEmail,
             cancellationToken
         ).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc/>
-    public async Task<bool> ClearWorkspaceConversationHistoryAsync(
-        string workspaceId,
-        string currentUserEmail,
-        string conversationId,
-        CancellationToken cancellationToken = default
-    )
-    {
-        return await workspacesService.ClearWorkspaceConversationHistoryAsync(
-            workspaceId,
-            currentUserEmail,
-            conversationId,
-            cancellationToken
-        ).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc/>
-    public async Task<ConversationHistoryDTO> GetWorkspaceConversationHistoryAsync(
-        string workspaceId,
-        string currentUserEmail,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var domainResult = await conversationHistoryService.GetConversationHistoryByWorkspaceAsync(
-            workspaceId,
-            conversationId: string.Empty,
-            currentUserEmail,
-            cancellationToken
-        ).ConfigureAwait(false);
-
-        return DomainMapperProfile.MapToDto(domain: domainResult);
     }
 }
 

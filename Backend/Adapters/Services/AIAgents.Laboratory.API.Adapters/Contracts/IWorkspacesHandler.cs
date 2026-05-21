@@ -94,32 +94,4 @@ public interface IWorkspacesHandler
         string currentUserEmail,
         CancellationToken cancellationToken = default
     );
-
-    /// <summary>
-    /// Clears the workspace conversation history.
-    /// </summary>
-    /// <param name="workspaceId">The workspace id.</param>
-    /// <param name="currentUserEmail">The current logged in user email.</param>
-    /// <param name="conversationId">The conversation id.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A boolean indicating success or failure.</returns>
-    Task<bool> ClearWorkspaceConversationHistoryAsync(
-        string workspaceId,
-        string currentUserEmail,
-        string conversationId,
-        CancellationToken cancellationToken = default
-    );
-
-    /// <summary>
-    /// Gets the workspace conversation history asynchronous.
-    /// </summary>
-    /// <param name="workspaceId">The workspace identifier.</param>
-    /// <param name="currentUserEmail">The current user email.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The conversation history.</returns>
-    Task<ConversationHistoryDTO> GetWorkspaceConversationHistoryAsync(
-        string workspaceId,
-        string currentUserEmail,
-        CancellationToken cancellationToken = default
-    );
 }
