@@ -64,7 +64,7 @@ public sealed class DirectChatService(
 
             var conversationHistoryData = conversationHistoryTask.Result;
             var agentMetaprompt = agentDataTask.Result.AgentMetaPrompt;
-            var chatHistoryList = conversationHistoryData.ChatHistory.ToList();
+            var chatHistoryList = conversationHistoryData.ChatHistory?.ToList() ?? [];
 
             aiResponse = await aiServices.GetChatbotResponseAsync(
                 conversationDataDomain: conversationHistoryData,
@@ -73,6 +73,11 @@ public sealed class DirectChatService(
                 cancellationToken
             ).ConfigureAwait(false);
 
+            chatHistoryList.Add(new ChatHistoryDomain
+            {
+                Role = ChatbotHelperConstants.UserRoleConstant,
+                Content = userQuery
+            });
             chatHistoryList.Add(new ChatHistoryDomain
             {
                 Role = ChatbotHelperConstants.AssistantRoleConstant,

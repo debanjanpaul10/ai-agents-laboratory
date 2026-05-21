@@ -43,7 +43,7 @@ export default function AssociatedAgentsChatPaneComponent({
 
 	const WorkspaceConversationHistoryData =
 		useAppSelector<ConversationHistoryDTO>(
-			(state) => state.WorkspacesReducer.workspaceConversationHistory,
+			(state) => state.ConversationsReducer.workspaceConversationHistory,
 		);
 
 	const mapWorkspaceConversationHistoryToMessages = (
@@ -70,7 +70,7 @@ export default function AssociatedAgentsChatPaneComponent({
 		if (!isGroupChatAgent) return;
 
 		setConversationId(
-			WorkspaceConversationHistoryData.conversationId || "",
+			WorkspaceConversationHistoryData?.conversationId || "",
 		);
 
 		if (
