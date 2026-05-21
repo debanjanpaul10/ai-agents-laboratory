@@ -6,10 +6,7 @@ import { WorkspacesConstants } from "@helpers/constants";
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { useAuth } from "@auth/AuthProvider";
 import { ShowSuccessToaster } from "@shared/toaster";
-import {
-	GetWorkspaceByWorkspaceIdAsync,
-	GetWorkspaceConversationHistoryAsync,
-} from "@store/workspaces/actions";
+import { GetWorkspaceByWorkspaceIdAsync } from "@store/workspaces/actions";
 import { FullScreenLoading } from "@components/common/spinner";
 import { GetAllConfigurations } from "@store/common/actions";
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
@@ -17,6 +14,7 @@ import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import AssociatedAgentsChatPaneComponent from "@components/workspace/associated-agents-chat";
 import AssociatedAgentsListPaneComponent from "@components/workspace/associated-agents-list";
 import { CommonToasterConstants } from "@helpers/toaster-constants";
+import { GetWorkspaceConversationHistoryAsync } from "@store/conversations/actions";
 
 export default function WorkspaceComponent() {
 	const dispatch = useAppDispatch();

@@ -15,13 +15,11 @@ import { ChatMessage } from "@shared/types";
 import { GenerateMessageId } from "@shared/utils";
 import { DirectChatRequestDTO } from "@models/request/direct-chat-request-dto";
 import { useAppDispatch, useAppSelector } from "@store/index";
-import {
-	ClearConversationHistoryAsync,
-	GetDirectChatResponseAsync,
-} from "@store/chat/actions";
+import { GetDirectChatResponseAsync } from "@store/chat/actions";
 import { FullScreenLoading } from "@components/common/spinner";
 import { GetAgentDataByIdAsync } from "@store/agents/actions";
 import { MarkdownRenderer } from "@components/common/markdown-renderer";
+import { ClearConversationHistoryAsync } from "@store/conversations/actions";
 
 export default function AgentChatComponent({
 	toggleChatbotInformation,
@@ -41,7 +39,7 @@ export default function AgentChatComponent({
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	const ConversationHistoryStoreData = useAppSelector(
-		(state) => state.ChatReducer.conversationHistory,
+		(state) => state.ConversationsReducer.conversationHistory,
 	);
 	const IsDirectChatLoadingStoreData = useAppSelector(
 		(state) => state.CommonReducer.isDirectChatLoading,
@@ -58,7 +56,10 @@ export default function AgentChatComponent({
 	) => {
 		return chatHistory.map((msg) => ({
 			id: GenerateMessageId(),
-			type: msg.role === "user" ? ("user" as const) : ("bot" as const),
+			type:
+				msg.role === "user"
+					? ("user" as const)
+					: ("assistant" as const),
 			content: msg.content,
 		}));
 	};
@@ -131,7 +132,7 @@ export default function AgentChatComponent({
 			if (aiResponse) {
 				const botMessage = {
 					id: GenerateMessageId(),
-					type: "bot" as const,
+					type: "assistant" as const,
 					content: aiResponse,
 				};
 

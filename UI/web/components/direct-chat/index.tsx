@@ -7,8 +7,8 @@ import {
 } from "@store/common/actions";
 import AgentChatComponent from "@components/direct-chat/agent-chat";
 import ChatbotInformationComponent from "@components/direct-chat/chatbot-information";
-import { GetConversationHistoryDataForUserAsync } from "@store/chat/actions";
 import { ApplicationConstants } from "@helpers/constants";
+import { GetConversationHistoryDataForUserAsync } from "@store/conversations/actions";
 
 export default function DirectChatComponent() {
 	const dispatch = useAppDispatch();

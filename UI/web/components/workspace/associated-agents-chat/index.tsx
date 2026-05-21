@@ -15,14 +15,12 @@ import { useAppDispatch, useAppSelector } from "@store/index";
 import { ShowErrorToaster } from "@shared/toaster";
 import { InvokeChatAgentAsync } from "@store/chat/actions";
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
-import {
-	ClearWorkspaceConversationHistory,
-	GetWorkspaceGroupChatResponseAsync,
-} from "@store/workspaces/actions";
+import { GetWorkspaceGroupChatResponseAsync } from "@store/workspaces/actions";
 import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import { GroupChatResponseDTO } from "@models/response/group-chat-response.dto";
 import { ConversationHistoryDTO } from "@models/response/conversation-history-dto";
+import { ClearWorkspaceConversationHistory } from "@store/conversations/actions";
 
 export default function AssociatedAgentsChatPaneComponent({
 	selectedAgent,

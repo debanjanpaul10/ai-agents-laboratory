@@ -1,10 +1,8 @@
 import { Action, Dispatch } from "redux";
 import {
 	ADD_NEW_WORKSPACE_DATA,
-	CLEAR_WORKSPACE_CONVERSATION_HISTORY,
 	GET_ALL_WORKSPACES,
 	GET_WORKSPACE_BY_ID,
-	GET_WORKSPACE_CONVERSATION_HISTORY,
 	TOGGLE_ASSOCIATE_AGENTS_DRAWER,
 	TOGGLE_CREATE_WORKSPACE_DRAWER,
 	TOGGLE_CREATE_WORKSPACE_LOADER,
@@ -13,20 +11,15 @@ import {
 } from "@store/workspaces/actionTypes";
 import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
 import {
-	ClearWorkspaceConversationHistoryApiAsync,
 	CreateNewWorkspaceApiAsync,
 	DeleteExistingWorkspaceApiAsync,
 	GetAllWorkspacesDataApiAsync,
 	GetWorkspaceByWorkspaceIdApiAsync,
-	GetWorkspaceConversationHistoryApiAsync,
 	GetWorkspaceGroupChatResponseApiAsync,
 	UpdateExistingWorkspaceDataApiAsync,
 } from "@shared/api-service";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
-import {
-	ChatToasterConstants,
-	WorkspaceToasterConstants,
-} from "@helpers/toaster-constants";
+import { WorkspaceToasterConstants } from "@helpers/toaster-constants";
 import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
 import { GroupChatResponseDTO } from "@models/response/group-chat-response.dto";
 import { ToggleChatResponseSpinner } from "@store/agents/actions";
@@ -194,58 +187,6 @@ export function GetWorkspaceGroupChatResponseAsync(
 			}
 
 			return null;
-		} catch (error: any) {
-			console.error(error);
-			if (error.message) ShowErrorToaster(error.message);
-		} finally {
-			dispatch(ToggleChatResponseSpinner(false));
-		}
-	};
-}
-
-export function ClearWorkspaceConversationHistory(
-	workspaceGuid: string,
-	conversationId: string,
-) {
-	return async (dispatch: Dispatch<Action>) => {
-		try {
-			dispatch(ToggleChatResponseSpinner(true));
-			const response = await ClearWorkspaceConversationHistoryApiAsync(
-				workspaceGuid,
-				conversationId,
-			);
-			if (response?.isSuccess && response?.responseData) {
-				dispatch({
-					type: CLEAR_WORKSPACE_CONVERSATION_HISTORY,
-					payload: response.responseData,
-				});
-
-				ShowSuccessToaster(ChatToasterConstants.CLEAR_CONVERSATION);
-				dispatch(
-					GetWorkspaceConversationHistoryAsync(workspaceGuid) as any,
-				);
-			}
-		} catch (error: any) {
-			console.error(error);
-			if (error.message) ShowErrorToaster(error.message);
-		} finally {
-			dispatch(ToggleChatResponseSpinner(false));
-		}
-	};
-}
-
-export function GetWorkspaceConversationHistoryAsync(workspaceGuid: string) {
-	return async (dispatch: Dispatch<Action>) => {
-		try {
-			dispatch(ToggleChatResponseSpinner(true));
-			const response =
-				await GetWorkspaceConversationHistoryApiAsync(workspaceGuid);
-			if (response?.isSuccess && response?.responseData) {
-				dispatch({
-					type: GET_WORKSPACE_CONVERSATION_HISTORY,
-					payload: response.responseData,
-				});
-			}
 		} catch (error: any) {
 			console.error(error);
 			if (error.message) ShowErrorToaster(error.message);
