@@ -4,6 +4,7 @@ import {
 	CLEAR_WORKSPACE_CONVERSATION_HISTORY,
 	GET_ALL_WORKSPACES,
 	GET_WORKSPACE_BY_ID,
+	GET_WORKSPACE_CONVERSATION_HISTORY,
 	TOGGLE_ASSOCIATE_AGENTS_DRAWER,
 	TOGGLE_CREATE_WORKSPACE_DRAWER,
 	TOGGLE_CREATE_WORKSPACE_LOADER,
@@ -17,6 +18,7 @@ import {
 	DeleteExistingWorkspaceApiAsync,
 	GetAllWorkspacesDataApiAsync,
 	GetWorkspaceByWorkspaceIdApiAsync,
+	GetWorkspaceConversationHistoryApiAsync,
 	GetWorkspaceGroupChatResponseApiAsync,
 	UpdateExistingWorkspaceDataApiAsync,
 } from "@shared/api-service";
@@ -219,6 +221,30 @@ export function ClearWorkspaceConversationHistory(
 				});
 
 				ShowSuccessToaster(ChatToasterConstants.CLEAR_CONVERSATION);
+				dispatch(
+					GetWorkspaceConversationHistoryAsync(workspaceGuid) as any,
+				);
+			}
+		} catch (error: any) {
+			console.error(error);
+			if (error.message) ShowErrorToaster(error.message);
+		} finally {
+			dispatch(ToggleChatResponseSpinner(false));
+		}
+	};
+}
+
+export function GetWorkspaceConversationHistoryAsync(workspaceGuid: string) {
+	return async (dispatch: Dispatch<Action>) => {
+		try {
+			dispatch(ToggleChatResponseSpinner(true));
+			const response =
+				await GetWorkspaceConversationHistoryApiAsync(workspaceGuid);
+			if (response?.isSuccess && response?.responseData) {
+				dispatch({
+					type: GET_WORKSPACE_CONVERSATION_HISTORY,
+					payload: response.responseData,
+				});
 			}
 		} catch (error: any) {
 			console.error(error);

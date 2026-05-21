@@ -77,6 +77,7 @@ public static class RouteConstants
         internal const string InvokeWorkspaceAgent_Route = "invokeworkspaceagent";
         internal const string GetWorkspaceGroupChatResponse_Route = "workspacegroupchatresponse";
         internal const string ClearWorkspaceConversationHistory_Route = "clearworkspaceconversation";
+        internal const string GetWorkspaceConversationHistory_Route = "getworkspaceconversationhistory";
     }
 
     /// <summary>

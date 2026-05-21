@@ -109,4 +109,17 @@ public interface IWorkspacesHandler
         string conversationId,
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>
+    /// Gets the workspace conversation history asynchronous.
+    /// </summary>
+    /// <param name="workspaceId">The workspace identifier.</param>
+    /// <param name="currentUserEmail">The current user email.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The conversation history.</returns>
+    Task<ConversationHistoryDTO> GetWorkspaceConversationHistoryAsync(
+        string workspaceId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 }

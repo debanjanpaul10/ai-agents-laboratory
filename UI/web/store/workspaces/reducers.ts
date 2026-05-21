@@ -2,6 +2,7 @@ import {
 	CLEAR_WORKSPACE_CONVERSATION_HISTORY,
 	GET_ALL_WORKSPACES,
 	GET_WORKSPACE_BY_ID,
+	GET_WORKSPACE_CONVERSATION_HISTORY,
 	GET_WORKSPACE_GROUP_CHAT_RESPONSE,
 	TOGGLE_ASSOCIATE_AGENTS_DRAWER,
 	TOGGLE_CREATE_WORKSPACE_DRAWER,
@@ -12,14 +13,16 @@ import {
 
 const initialState: any = {
 	isWorkspacesLoading: false,
-	allWorkspaces: [],
-	workspaceData: {},
 	isEditWorkspaceLoading: false,
 	isAddWorkspaceLoading: false,
 	isAddWorkspaceDrawerOpen: false,
 	isAssociateAgentsDrawerOpen: false,
-	workspaceGroupChatResponse: {},
 	isWorkspaceConversationHistoryCleared: false,
+
+	allWorkspaces: [],
+	workspaceData: {},
+	workspaceGroupChatResponse: {},
+	workspaceConversationHistory: [],
 };
 
 export function WorkspacesReducer(state = initialState, action: any) {
@@ -76,6 +79,12 @@ export function WorkspacesReducer(state = initialState, action: any) {
 			return {
 				...state,
 				isWorkspaceConversationHistoryCleared: action.payload,
+			};
+		}
+		case GET_WORKSPACE_CONVERSATION_HISTORY: {
+			return {
+				...state,
+				workspaceConversationHistory: action.payload,
 			};
 		}
 

@@ -316,11 +316,24 @@ internal static class SwaggerConstants
             internal const string OperationId = nameof(GetWorkspaceGroupChatResponseAction);
         }
 
+        /// <summary>
+        /// Swagger documentation for ClearWorkspaceConversationHistoryAsync.
+        /// </summary>
         internal static class ClearWorkspaceConversationHistoryAction
         {
             internal const string Summary = "Clears the workspace conversation history data.";
             internal const string Description = "Clears the conversation history data for workspace.";
             internal const string OperationId = nameof(ClearWorkspaceConversationHistoryAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for GetWorkspaceConversationHistoryDataAsync.
+        /// </summary>
+        internal static class GetWorkspaceConversationHistoryAction
+        {
+            internal const string Summary = "Gets the workspace conversation history data.";
+            internal const string Description = "Gets the conversation history data for workspace.";
+            internal const string OperationId = nameof(GetWorkspaceConversationHistoryAction);
         }
     }
 

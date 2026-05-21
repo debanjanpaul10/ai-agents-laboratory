@@ -11,7 +11,7 @@ import { ChatMessage } from "@shared/types";
 import { MarkdownRenderer } from "@components/common/markdown-renderer";
 import { GenerateMessageId } from "@shared/utils";
 import { ChatRequestDTO } from "@models/request/chat-request-dto";
-import { useAppDispatch } from "@store/index";
+import { useAppDispatch, useAppSelector } from "@store/index";
 import { ShowErrorToaster } from "@shared/toaster";
 import { InvokeChatAgentAsync } from "@store/chat/actions";
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
@@ -22,6 +22,7 @@ import {
 import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import { GroupChatResponseDTO } from "@models/response/group-chat-response.dto";
+import { ConversationHistoryDTO } from "@models/response/conversation-history-dto";
 
 export default function AssociatedAgentsChatPaneComponent({
 	selectedAgent,
@@ -42,17 +43,56 @@ export default function AssociatedAgentsChatPaneComponent({
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
+	const WorkspaceConversationHistoryData =
+		useAppSelector<ConversationHistoryDTO>(
+			(state) => state.WorkspacesReducer.workspaceConversationHistory,
+		);
+
+	const mapWorkspaceConversationHistoryToMessages = (
+		chatHistory: Array<{ role: string; content: string }>,
+	) => {
+		return chatHistory.map((msg) => ({
+			id: GenerateMessageId(),
+			type:
+				msg.role === "user"
+					? ("user" as const)
+					: ("assistant" as const),
+			content:
+				msg.role === "assistant"
+					? JSON.parse(msg.content).content
+					: msg.content,
+		}));
+	};
+
 	useEffect(() => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [messages]);
+
+	useEffect(() => {
+		if (!isGroupChatAgent) return;
+
+		setConversationId(
+			WorkspaceConversationHistoryData.conversationId || "",
+		);
+
+		if (
+			WorkspaceConversationHistoryData?.chatHistory &&
+			Array.isArray(WorkspaceConversationHistoryData.chatHistory)
+		) {
+			setMessages(
+				mapWorkspaceConversationHistoryToMessages(
+					WorkspaceConversationHistoryData.chatHistory,
+				),
+			);
+		}
+	}, [isGroupChatAgent, WorkspaceConversationHistoryData]);
 
 	useEffect(() => {
 		setIsGroupChatAgent(
 			selectedAgent?.agentGuid ===
 				RunWorkspaceConstants.ChatPane.GroupChatAgent.Guid,
 		);
-		setConversationId("");
-	}, [selectedAgent, workspaceDetailsData.agentWorkspaceGuid]);
+	}, [selectedAgent]);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setUserInput(e.target.value);
@@ -74,12 +114,14 @@ export default function AssociatedAgentsChatPaneComponent({
 		setMessages([]);
 		setUserInput("");
 
-		dispatch(
-			ClearWorkspaceConversationHistory(
-				workspaceDetailsData.agentWorkspaceGuid,
-				conversationId,
-			),
-		);
+		if (isGroupChatAgent && conversationId) {
+			dispatch(
+				ClearWorkspaceConversationHistory(
+					workspaceDetailsData.agentWorkspaceGuid,
+					conversationId,
+				),
+			);
+		}
 
 		setConversationId("");
 	};
@@ -144,7 +186,7 @@ export default function AssociatedAgentsChatPaneComponent({
 
 				const botMessage = {
 					id: GenerateMessageId(),
-					type: "bot" as const,
+					type: "assistant" as const,
 					content: content,
 				};
 
@@ -190,7 +232,7 @@ export default function AssociatedAgentsChatPaneComponent({
 			if (aiResponse) {
 				const botMessage = {
 					id: GenerateMessageId(),
-					type: "bot" as const,
+					type: "assistant" as const,
 					content: aiResponse,
 				};
 

@@ -74,7 +74,6 @@ public sealed class ConversationHistoryService(
         CancellationToken cancellationToken = default
     )
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(conversationId);
         ArgumentException.ThrowIfNullOrWhiteSpace(workspaceId);
         ConversationHistoryDomain? result = null;
         try

@@ -190,6 +190,14 @@ export async function GetWorkspaceGroupChatResponseApiAsync(
 	);
 }
 
+export async function GetWorkspaceConversationHistoryApiAsync(
+	workspaceGuid: string,
+) {
+	return await GetAsync(
+		`workspaces/getworkspaceconversationhistory?workspaceGuid=${workspaceGuid}`,
+	);
+}
+
 // #endregion
 
 // #region APPLICATION ADMIN

@@ -6,7 +6,10 @@ import { WorkspacesConstants } from "@helpers/constants";
 import { useAppDispatch, useAppSelector } from "@store/index";
 import { useAuth } from "@auth/AuthProvider";
 import { ShowSuccessToaster } from "@shared/toaster";
-import { GetWorkspaceByWorkspaceIdAsync } from "@store/workspaces/actions";
+import {
+	GetWorkspaceByWorkspaceIdAsync,
+	GetWorkspaceConversationHistoryAsync,
+} from "@store/workspaces/actions";
 import { FullScreenLoading } from "@components/common/spinner";
 import { GetAllConfigurations } from "@store/common/actions";
 import { WorkspaceAgentsDataDTO } from "@models/response/workspace-agents-data.dto";
@@ -46,12 +49,29 @@ export default function WorkspaceComponent() {
 		}
 	}, [router.query.id]);
 
+	useEffect(() => {
+		if (
+			WorkspaceDetailsData !== null &&
+			WorkspaceDetailsData.isGroupChatEnabled === true
+		)
+			GetWorkspaceConversationHistory(
+				WorkspaceDetailsData.agentWorkspaceGuid,
+			);
+	}, [
+		WorkspaceDetailsData.agentWorkspaceGuid,
+		WorkspaceDetailsData.isGroupChatEnabled,
+	]);
+
 	function GetWorkspaceByWorkspaceId(workspaceId: string) {
 		dispatch(GetWorkspaceByWorkspaceIdAsync(workspaceId));
 	}
 
 	function GetAllConfigurationsData() {
 		dispatch(GetAllConfigurations());
+	}
+
+	function GetWorkspaceConversationHistory(workspaceId: string) {
+		dispatch(GetWorkspaceConversationHistoryAsync(workspaceId) as any);
 	}
 
 	const handleAgentSelection = (agent: WorkspaceAgentsDataDTO) => {

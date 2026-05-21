@@ -294,9 +294,6 @@ public sealed class WorkspacesService(
                     JsonConvert.SerializeObject(new { correlationContext.CorrelationId, chatRequest })
             );
 
-            if (string.IsNullOrWhiteSpace(chatRequest.ConversationId))
-                chatRequest.ConversationId = Guid.NewGuid().ToString();
-
             var workspaceDetails = await this.GetWorkspaceByWorkspaceIdAsync(
                 workspaceId: chatRequest.WorkspaceId,
                 currentUserEmail: chatRequest.CurrentUserEmail,
@@ -335,7 +332,7 @@ public sealed class WorkspacesService(
             {
                 AgentResponse = groupResponse.FinalResponse,
                 AgentsInvoked = [.. groupResponse.GroupChatAgentsResponses.Select(x => x.AgentName)],
-                ConversationId = chatRequest.ConversationId
+                ConversationId = conversationHistory.ConversationId
             };
             return response;
         }

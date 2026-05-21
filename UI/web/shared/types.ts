@@ -121,7 +121,7 @@ export interface RegisteredApplicationsListComponentProps {
 
 export interface ChatMessage {
 	id: string;
-	type: "user" | "bot";
+	type: "user" | "assistant";
 	content: string;
 }
 

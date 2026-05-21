@@ -121,6 +121,7 @@ public sealed class ConversationHistoryDataManager(
             return MongoDataMapperProfile.MapToDomain(model: allConversationHistoryData.First());
         }
     }
+
     /// <inheritdoc />
     public async Task<ConversationHistoryDomain> GetConversationHistoryByWorkspaceAsync(
         string workspaceId,
@@ -129,9 +130,16 @@ public sealed class ConversationHistoryDataManager(
         CancellationToken cancellationToken = default
     )
     {
-        var conversationHistoryFilter = Builders<ConversationHistoryModel>.Filter.Where(
-            x => x.ConversationId == conversationId && x.IsActive && x.WorkspaceId == workspaceId && x.UserName == currentUserEmail
-        );
+        var conversationHistoryFilter = Builders<ConversationHistoryModel>.Filter
+            .Where(item => item.IsActive && item.WorkspaceId == workspaceId);
+
+        if (!string.IsNullOrWhiteSpace(currentUserEmail))
+            conversationHistoryFilter &= Builders<ConversationHistoryModel>.Filter
+                .Where(item => item.UserName == currentUserEmail);
+
+        if (!string.IsNullOrWhiteSpace(conversationId))
+            conversationHistoryFilter &= Builders<ConversationHistoryModel>.Filter
+                .Where(item => item.ConversationId == conversationId);
 
         var allConversationHistoryData = await mongoDatabaseRepository.GetDataFromCollectionAsync(
             databaseName: this.MongoDatabaseName,
@@ -141,6 +149,8 @@ public sealed class ConversationHistoryDataManager(
         ).ConfigureAwait(false);
         if (!allConversationHistoryData.Any())
         {
+            conversationId = string.IsNullOrWhiteSpace(conversationId)
+                ? Guid.NewGuid().ToString() : conversationId;
             var newConversationHistory = new ConversationHistoryModel()
             {
                 WorkspaceId = workspaceId,
