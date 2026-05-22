@@ -117,6 +117,7 @@ public static class RouteConstants
     {
         internal const string ClearWorkspaceConversationHistory_Route = "clearworkspaceconversation";
         internal const string GetWorkspaceConversationHistory_Route = "getworkspaceconversationhistory";
+        internal const string InitializeWorkspaceConversation_Route = "initializeworkspaceconversation";
 
         internal const string ClearConversationHistory_Route = "clearconversation";
         internal const string GetConversationHistoryUser_Route = "getconversationhistory";

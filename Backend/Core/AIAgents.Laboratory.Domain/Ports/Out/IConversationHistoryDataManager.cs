@@ -72,4 +72,19 @@ public interface IConversationHistoryDataManager
         string currentUserEmail,
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>
+    /// Initializes the workspace conversation asynchronous, which will create a new conversation for the workspace and return the conversation id.
+    /// </summary>
+    /// <param name="workspaceGuid">The workspace GUID.</param>
+    /// <param name="userOrApplicationName">The user or application name string.</param>
+    /// <param name="conversationId">The conversation id.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The conversation ID.</returns>
+    Task<ConversationHistoryDomain> InitializeWorkspaceConversationAsync(
+        string workspaceGuid,
+        string userOrApplicationName,
+        string conversationId = "",
+        CancellationToken cancellationToken = default
+    );
 }

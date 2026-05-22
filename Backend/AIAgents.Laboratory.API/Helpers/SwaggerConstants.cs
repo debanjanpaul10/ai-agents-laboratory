@@ -295,8 +295,6 @@ internal static class SwaggerConstants
             internal const string Description = "Calls the LLM directly with user message for workspace group chat.";
             internal const string OperationId = nameof(GetWorkspaceGroupChatResponseAction);
         }
-
-
     }
 
     /// <summary>
@@ -489,6 +487,16 @@ internal static class SwaggerConstants
             internal const string Summary = "Gets the workspace conversation history data.";
             internal const string Description = "Gets the conversation history data for workspace.";
             internal const string OperationId = nameof(GetWorkspaceConversationHistoryAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for InitializeWorkspaceConversationAsync.
+        /// </summary>
+        internal static class InitializeWorkspaceConversationAction
+        {
+            internal const string Summary = "Initializes the workspace conversation.";
+            internal const string Description = "Initializes the workspace conversation with system prompt and initial user message.";
+            internal const string OperationId = nameof(InitializeWorkspaceConversationAction);
         }
     }
 }

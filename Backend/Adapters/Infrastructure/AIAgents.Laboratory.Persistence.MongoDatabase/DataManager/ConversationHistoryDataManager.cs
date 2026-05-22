@@ -177,29 +177,16 @@ public sealed class ConversationHistoryDataManager(
             ).ConfigureAwait(false);
 
             if (!allConversationHistoryData.Any())
-            {
-                var newConversationHistory = new ConversationHistoryModel()
-                {
-                    UserName = userName,
-                    ChatHistory = [],
-                    ConversationId = Guid.NewGuid().ToString(),
-                    IsActive = true,
-                    LastModifiedOn = DateTime.UtcNow
-                };
-
-                await mongoDatabaseRepository.SaveDataAsync(
-                    data: newConversationHistory,
-                    databaseName: this.MongoDatabaseName,
-                    collectionName: this.ConversationHistoryCollectionName,
-                    bypassDocumentValidation: false,
+                response = await this.InitializeWorkspaceConversationAsync(
+                    workspaceGuid: string.Empty,
+                    userOrApplicationName: userName,
+                    conversationId: string.Empty,
                     cancellationToken
                 ).ConfigureAwait(false);
-                response = MongoDataMapperProfile.MapToDomain(model: newConversationHistory);
-            }
             else
-            {
-                response = MongoDataMapperProfile.MapToDomain(model: allConversationHistoryData.First());
-            }
+                response = MongoDataMapperProfile.MapToDomain(
+                    model: allConversationHistoryData.First()
+                );
 
             return response;
         }
@@ -259,32 +246,18 @@ public sealed class ConversationHistoryDataManager(
                 filter: conversationHistoryFilter,
                 cancellationToken
             ).ConfigureAwait(false);
-            if (!allConversationHistoryData.Any())
-            {
-                conversationId = string.IsNullOrWhiteSpace(conversationId) ? Guid.NewGuid().ToString() : conversationId;
-                var newConversationHistory = new ConversationHistoryModel()
-                {
-                    WorkspaceId = workspaceId,
-                    UserName = currentUserEmail,
-                    ChatHistory = [],
-                    ConversationId = conversationId,
-                    IsActive = true,
-                    LastModifiedOn = DateTime.UtcNow
-                };
 
-                await mongoDatabaseRepository.SaveDataAsync(
-                    data: newConversationHistory,
-                    databaseName: this.MongoDatabaseName,
-                    collectionName: this.ConversationHistoryCollectionName,
-                    bypassDocumentValidation: false,
+            if (!allConversationHistoryData.Any())
+                response = await this.InitializeWorkspaceConversationAsync(
+                    workspaceGuid: workspaceId,
+                    userOrApplicationName: currentUserEmail,
+                    conversationId,
                     cancellationToken
                 ).ConfigureAwait(false);
-                response = MongoDataMapperProfile.MapToDomain(model: newConversationHistory);
-            }
             else
-            {
-                response = allConversationHistoryData.Select(selector: MongoDataMapperProfile.MapToDomain).First();
-            }
+                response = allConversationHistoryData.Select(
+                    selector: MongoDataMapperProfile.MapToDomain
+                ).First();
 
             return response;
         }
@@ -306,6 +279,67 @@ public sealed class ConversationHistoryDataManager(
                 LoggingConstants.MethodEndedMessageConstant,
                 nameof(GetConversationHistoryByWorkspaceAsync), DateTime.UtcNow,
                     JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceId, conversationId, currentUserEmail, response })
+            );
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<ConversationHistoryDomain> InitializeWorkspaceConversationAsync(
+        string workspaceGuid,
+        string userOrApplicationName,
+        string conversationId = "",
+        CancellationToken cancellationToken = default
+    )
+    {
+        ConversationHistoryDomain result = new();
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.MethodStartedMessageConstant,
+                nameof(InitializeWorkspaceConversationAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuid })
+            );
+
+            var conversationHistoryData = new ConversationHistoryModel()
+            {
+                UserName = userOrApplicationName,
+                ChatHistory = [],
+                ConversationId = string.IsNullOrWhiteSpace(conversationId) ? Guid.NewGuid().ToString() : conversationId,
+                IsActive = true,
+                LastModifiedOn = DateTime.UtcNow
+            };
+
+            await mongoDatabaseRepository.SaveDataAsync(
+                data: conversationHistoryData,
+                databaseName: this.MongoDatabaseName,
+                collectionName: this.ConversationHistoryCollectionName,
+                bypassDocumentValidation: false,
+                cancellationToken
+            ).ConfigureAwait(false);
+
+            result = MongoDataMapperProfile.MapToDomain(
+                model: conversationHistoryData
+            );
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.MethodFailedWithMessageConstant,
+                nameof(InitializeWorkspaceConversationAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.MethodEndedMessageConstant,
+                nameof(InitializeWorkspaceConversationAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuid, result })
             );
         }
     }

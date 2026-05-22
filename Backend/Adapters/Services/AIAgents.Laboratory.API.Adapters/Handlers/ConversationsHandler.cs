@@ -70,5 +70,17 @@ public sealed class ConversationsHandler(
         ).ConfigureAwait(false);
     }
 
-
+    /// <inheritdoc />
+    public async Task<string> InitializeWorkspaceConversationAsync(
+        string workspaceGuid,
+        string userOrApplicationName,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await conversationHistoryService.InitializeWorkspaceConversationAsync(
+            workspaceGuid,
+            userOrApplicationName,
+            cancellationToken
+        ).ConfigureAwait(false);
+    }
 }

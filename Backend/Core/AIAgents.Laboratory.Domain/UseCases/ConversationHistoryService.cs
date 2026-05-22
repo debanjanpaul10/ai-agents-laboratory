@@ -251,4 +251,51 @@ public sealed class ConversationHistoryService(
             );
         }
     }
+
+    /// <inheritdoc />
+    public async Task<string> InitializeWorkspaceConversationAsync(
+        string workspaceGuid,
+        string userOrApplicationName,
+        CancellationToken cancellationToken = default
+    )
+    {
+        string result = string.Empty;
+        try
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(InitializeWorkspaceConversationAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuid })
+            );
+
+            var conversationHistoryData = await conversationHistoryDataManager.InitializeWorkspaceConversationAsync(
+                workspaceGuid,
+                userOrApplicationName,
+                conversationId: string.Empty,
+                cancellationToken
+            ).ConfigureAwait(false);
+            result = conversationHistoryData.ConversationId;
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(InitializeWorkspaceConversationAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
+        }
+        finally
+        {
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(InitializeWorkspaceConversationAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuid, result })
+            );
+        }
+    }
 }
