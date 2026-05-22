@@ -27,20 +27,24 @@ public sealed class McpAgentServices(
         CancellationToken cancellationToken = default
     )
     {
+        IEnumerable<McpClientTool> response = [];
         try
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodStart,
-                nameof(GetAllMcpToolsAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl)
+                nameof(GetAllMcpToolsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl })
             );
 
             var mcpClient = await this.CreateMcpClientAsync(
                 mcpServerUrl,
                 cancellationToken
             ).ConfigureAwait(false);
-            return await mcpClient.ListToolsAsync(
+
+            response = await mcpClient.ListToolsAsync(
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
+            return response;
         }
         catch (Exception ex)
         {
@@ -58,14 +62,19 @@ public sealed class McpAgentServices(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
-                nameof(GetAllMcpToolsAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl)
+                nameof(GetAllMcpToolsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl })
             );
         }
     }
 
     /// <inheritdoc/>
     public async Task<string> GetMcpToolResponseAsync(
-        string mcpServerUrl, string toolName, Dictionary<string, object?> toolArguments, CancellationToken cancellationToken = default)
+        string mcpServerUrl,
+        string toolName,
+        Dictionary<string, object?> toolArguments,
+        CancellationToken cancellationToken = default
+    )
     {
         string response = string.Empty;
         try
@@ -129,8 +138,8 @@ public sealed class McpAgentServices(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodStart,
-                nameof(CreateMcpClientAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl
-            ));
+                nameof(CreateMcpClientAsync), DateTime.UtcNow, mcpServerUrl
+            );
 
             var aiAgentsToken = await TokenHelper.GetAiAgentsLabTokenAsync(
                 correlationId: correlationContext.CorrelationId,
@@ -170,23 +179,9 @@ public sealed class McpAgentServices(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
-                nameof(CreateMcpClientAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl)
+                nameof(CreateMcpClientAsync), DateTime.UtcNow, mcpServerUrl
             );
         }
-    }
-
-    /// <summary>
-    /// Sanitizes a string value for safe logging by removing line breaks and control characters.
-    /// </summary>
-    /// <param name="value">The value to sanitize.</param>
-    /// <returns>The sanitized value suitable for logging.</returns>
-    private static string SanitizeForLogging(string value)
-    {
-        if (string.IsNullOrEmpty(value)) return value;
-
-        var withoutLineEndings = value.Replace("\r", string.Empty).Replace("\n", string.Empty);
-        var sanitizedChars = withoutLineEndings.Where(c => !char.IsControl(c) || c == '\t');
-        return new string([.. sanitizedChars]);
     }
 
     #endregion
