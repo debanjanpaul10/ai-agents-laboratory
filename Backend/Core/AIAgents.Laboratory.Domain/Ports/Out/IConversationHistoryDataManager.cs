@@ -74,13 +74,13 @@ public interface IConversationHistoryDataManager
     );
 
     /// <summary>
-    /// Initializes the workspace conversation asynchronous, which will create a new conversation for the workspace and return the conversation id.
+    /// Initializes the workspace conversation asynchronous.
     /// </summary>
-    /// <param name="workspaceGuid">The workspace GUID.</param>
-    /// <param name="userOrApplicationName">The user or application name string.</param>
-    /// <param name="conversationId">The conversation id.</param>
+    /// <param name="workspaceGuid">The workspace unique identifier.</param>
+    /// <param name="userOrApplicationName">Name of the user or application.</param>
+    /// <param name="conversationId">The conversation identifier.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The conversation ID.</returns>
+    /// <returns>The newly created conversation history.</returns>
     Task<ConversationHistoryDomain> InitializeWorkspaceConversationAsync(
         string workspaceGuid,
         string userOrApplicationName,

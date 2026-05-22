@@ -184,9 +184,7 @@ public sealed class ConversationHistoryDataManager(
                     cancellationToken
                 ).ConfigureAwait(false);
             else
-                response = MongoDataMapperProfile.MapToDomain(
-                    model: allConversationHistoryData.First()
-                );
+                response = MongoDataMapperProfile.MapToDomain(model: allConversationHistoryData.First());
 
             return response;
         }
@@ -255,9 +253,7 @@ public sealed class ConversationHistoryDataManager(
                     cancellationToken
                 ).ConfigureAwait(false);
             else
-                response = allConversationHistoryData.Select(
-                    selector: MongoDataMapperProfile.MapToDomain
-                ).First();
+                response = allConversationHistoryData.Select(selector: MongoDataMapperProfile.MapToDomain).First();
 
             return response;
         }
@@ -317,9 +313,7 @@ public sealed class ConversationHistoryDataManager(
                 cancellationToken
             ).ConfigureAwait(false);
 
-            result = MongoDataMapperProfile.MapToDomain(
-                model: conversationHistoryData
-            );
+            result = MongoDataMapperProfile.MapToDomain(model: conversationHistoryData);
             return result;
         }
         catch (Exception ex)

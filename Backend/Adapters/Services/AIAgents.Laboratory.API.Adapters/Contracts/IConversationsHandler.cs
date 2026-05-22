@@ -63,8 +63,8 @@ public interface IConversationsHandler
     /// <param name="workspaceGuid">The workspace GUID.</param>
     /// <param name="userOrApplicationName">The user or application name string.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The conversation ID.</returns>
-    Task<string> InitializeWorkspaceConversationAsync(
+    /// <returns>The newly created conversation history.</returns>
+    Task<ConversationHistoryDTO> InitializeWorkspaceConversationAsync(
         string workspaceGuid,
         string userOrApplicationName,
         CancellationToken cancellationToken = default

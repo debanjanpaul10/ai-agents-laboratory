@@ -253,13 +253,13 @@ public sealed class ConversationHistoryService(
     }
 
     /// <inheritdoc />
-    public async Task<string> InitializeWorkspaceConversationAsync(
+    public async Task<ConversationHistoryDomain> InitializeWorkspaceConversationAsync(
         string workspaceGuid,
         string userOrApplicationName,
         CancellationToken cancellationToken = default
     )
     {
-        string result = string.Empty;
+        ConversationHistoryDomain result = new();
         try
         {
             logger.LogAppInformation(
@@ -268,13 +268,12 @@ public sealed class ConversationHistoryService(
                     JsonConvert.SerializeObject(new { correlationContext.CorrelationId, workspaceGuid })
             );
 
-            var conversationHistoryData = await conversationHistoryDataManager.InitializeWorkspaceConversationAsync(
+            result = await conversationHistoryDataManager.InitializeWorkspaceConversationAsync(
                 workspaceGuid,
                 userOrApplicationName,
                 conversationId: string.Empty,
                 cancellationToken
             ).ConfigureAwait(false);
-            result = conversationHistoryData.ConversationId;
             return result;
         }
         catch (Exception ex)

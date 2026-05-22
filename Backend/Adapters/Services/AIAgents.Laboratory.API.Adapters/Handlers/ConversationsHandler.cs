@@ -71,16 +71,17 @@ public sealed class ConversationsHandler(
     }
 
     /// <inheritdoc />
-    public async Task<string> InitializeWorkspaceConversationAsync(
+    public async Task<ConversationHistoryDTO> InitializeWorkspaceConversationAsync(
         string workspaceGuid,
         string userOrApplicationName,
         CancellationToken cancellationToken = default
     )
     {
-        return await conversationHistoryService.InitializeWorkspaceConversationAsync(
+        var domainResult = await conversationHistoryService.InitializeWorkspaceConversationAsync(
             workspaceGuid,
             userOrApplicationName,
             cancellationToken
         ).ConfigureAwait(false);
+        return DomainMapperProfile.MapToDto(domain: domainResult);
     }
 }

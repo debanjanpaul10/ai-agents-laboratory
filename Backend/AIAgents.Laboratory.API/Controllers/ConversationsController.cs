@@ -303,7 +303,7 @@ public sealed class ConversationsController(
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The newly created conversation id.</returns>
     [HttpPost(ConversationsRoutes.InitializeWorkspaceConversation_Route)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ConversationHistoryDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -317,7 +317,7 @@ public sealed class ConversationsController(
         CancellationToken cancellationToken = default
     )
     {
-        string result = string.Empty;
+        ConversationHistoryDTO result = new();
         try
         {
             logger.LogAppInformation(
