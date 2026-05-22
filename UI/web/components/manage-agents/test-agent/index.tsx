@@ -65,7 +65,7 @@ export default function TestAgentComponent({
 			if (aiResponse) {
 				const botMessage = {
 					id: GenerateMessageId(),
-					type: "bot" as const,
+					type: "assistant" as const,
 					content: aiResponse,
 					timestamp: new Date(),
 				};
