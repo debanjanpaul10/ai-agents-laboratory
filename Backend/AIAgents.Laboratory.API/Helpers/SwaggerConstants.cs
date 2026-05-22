@@ -95,26 +95,6 @@ internal static class SwaggerConstants
             internal const string Description = "Calls the LLM directly with user message.";
             internal const string OperationId = nameof(GetDirectChatResponseAction);
         }
-
-        /// <summary>
-        /// Swagger documentation for ClearConversationHistoryForUserAsync.
-        /// </summary>
-        internal static class ClearConversationHistoryForUserAction
-        {
-            internal const string Summary = "Clears the conversation history data.";
-            internal const string Description = "Clears the conversation history data for user.";
-            internal const string OperationId = nameof(ClearConversationHistoryForUserAction);
-        }
-
-        /// <summary>
-        /// Swagger documentation for GetConversationHistoryDataForUserAsync.
-        /// </summary>
-        internal static class GetConversationHistoryDataForUserAction
-        {
-            internal const string Summary = "Gets the conversation history data.";
-            internal const string Description = "Gets the conversation history data for user.";
-            internal const string OperationId = nameof(GetConversationHistoryDataForUserAction);
-        }
     }
 
     /// <summary>
@@ -461,6 +441,62 @@ internal static class SwaggerConstants
             internal const string Summary = "Deletes all notifications for a user.";
             internal const string Description = "Deletes all the read and unread notifications for a user based on the user email.";
             internal const string OperationId = nameof(DeleteAllNotificationsForUserAction);
+        }
+    }
+
+    /// <summary>
+    /// Swagger documentation for ConversationsController.
+    /// </summary>
+    internal static class ConversationsController
+    {
+        /// <summary>
+        /// Swagger documentation for ClearConversationHistoryForUserAsync.
+        /// </summary>
+        internal static class ClearConversationHistoryForUserAction
+        {
+            internal const string Summary = "Clears the conversation history data.";
+            internal const string Description = "Clears the conversation history data for user.";
+            internal const string OperationId = nameof(ClearConversationHistoryForUserAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for GetConversationHistoryDataForUserAsync.
+        /// </summary>
+        internal static class GetConversationHistoryDataForUserAction
+        {
+            internal const string Summary = "Gets the conversation history data.";
+            internal const string Description = "Gets the conversation history data for user.";
+            internal const string OperationId = nameof(GetConversationHistoryDataForUserAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for ClearWorkspaceConversationHistoryAsync.
+        /// </summary>
+        internal static class ClearWorkspaceConversationHistoryAction
+        {
+            internal const string Summary = "Clears the workspace conversation history data.";
+            internal const string Description = "Clears the conversation history data for workspace.";
+            internal const string OperationId = nameof(ClearWorkspaceConversationHistoryAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for GetWorkspaceConversationHistoryDataAsync.
+        /// </summary>
+        internal static class GetWorkspaceConversationHistoryAction
+        {
+            internal const string Summary = "Gets the workspace conversation history data.";
+            internal const string Description = "Gets the conversation history data for workspace.";
+            internal const string OperationId = nameof(GetWorkspaceConversationHistoryAction);
+        }
+
+        /// <summary>
+        /// Swagger documentation for InitializeWorkspaceConversationAsync.
+        /// </summary>
+        internal static class InitializeWorkspaceConversationAction
+        {
+            internal const string Summary = "Initializes the workspace conversation.";
+            internal const string Description = "Initializes the workspace conversation with system prompt and initial user message.";
+            internal const string OperationId = nameof(InitializeWorkspaceConversationAction);
         }
     }
 }

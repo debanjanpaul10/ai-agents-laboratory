@@ -35,8 +35,6 @@ public static class RouteConstants
     {
         internal const string InvokeAgent_Route = "invokeagent";
         internal const string GetDirectChatResponse_Route = "directchat";
-        internal const string ClearConversationHistory_Route = "clearconversation";
-        internal const string GetConversationHistoryUser_Route = "getconversationhistory";
     }
 
     /// <summary>
@@ -110,5 +108,18 @@ public static class RouteConstants
         internal const string StreamNotificationsForUser_Route = "streamnotifications";
         internal const string MarkExistingNotificationAsRead_Route = "marknotificationasread";
         internal const string DeleteAllNotificationsForUser_Route = "deleteallnotifications";
+    }
+
+    /// <summary>
+    /// The route constants for Conversations Controller.
+    /// </summary>
+    internal static class ConversationsRoutes
+    {
+        internal const string ClearWorkspaceConversationHistory_Route = "clearworkspaceconversation";
+        internal const string GetWorkspaceConversationHistory_Route = "getworkspaceconversationhistory";
+        internal const string InitializeWorkspaceConversation_Route = "initializeworkspaceconversation";
+
+        internal const string ClearConversationHistory_Route = "clearconversation";
+        internal const string GetConversationHistoryUser_Route = "getconversationhistory";
     }
 }

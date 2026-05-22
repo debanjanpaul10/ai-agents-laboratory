@@ -38,4 +38,12 @@ public sealed record WorkspaceAgentChatRequestDomain
     /// </summary>
     /// <value>The application name.</value>
     public string ApplicationName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the current user email.
+    /// </summary>
+    /// <value>
+    /// The current user email.
+    /// </value>
+    public string CurrentUserEmail { get; set; } = string.Empty;
 }

@@ -92,4 +92,19 @@ public interface IWorkspacesService
         WorkspaceAgentChatRequestDomain chatRequest,
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>
+    /// Clears the workspace conversation history.
+    /// </summary>
+    /// <param name="workspaceId">The workspace id.</param>
+    /// <param name="currentUserEmail">The current logged in user email.</param>
+    /// <param name="conversationId">The conversation id for current chat session, which is used to identify the unique conversation history for different chat sessions in the same workspace.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A boolean indicating success or failure.</returns>
+    Task<bool> ClearWorkspaceConversationHistoryAsync(
+        string workspaceId,
+        string currentUserEmail,
+        string conversationId,
+        CancellationToken cancellationToken = default
+    );
 }

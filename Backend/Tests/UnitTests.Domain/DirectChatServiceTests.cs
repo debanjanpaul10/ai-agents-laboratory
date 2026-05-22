@@ -7,6 +7,7 @@ using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
+using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
 namespace AIAgents.Laboratory.Domain.UnitTests;
 
@@ -176,7 +177,8 @@ public sealed class DirectChatServiceTests
 
         // Assert
         Assert.Equal(aiResponse, result);
-        Assert.Contains(conversationData.ChatHistory, c => c.Content == aiResponse);
+        Assert.Contains(conversationData.ChatHistory, c => c.Role == ChatbotHelperConstants.UserRoleConstant && c.Content == userQuery);
+        Assert.Contains(conversationData.ChatHistory, c => c.Role == ChatbotHelperConstants.AssistantRoleConstant && c.Content == aiResponse);
 
         _mockConversationHistoryService
             .Verify(s => s.SaveMessageToConversationHistoryAsync(It.Is<ConversationHistoryDomain>(d => d == conversationData), It.IsAny<CancellationToken>()), Times.Once);

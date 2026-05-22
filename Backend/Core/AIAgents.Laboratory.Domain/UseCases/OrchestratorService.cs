@@ -32,6 +32,7 @@ public sealed class OrchestratorService(
     public async Task<OrchestratorFinalResponseDomain> GetOrchestratorAgentResponseAsync(
         WorkspaceAgentChatRequestDomain chatRequest,
         AgentsWorkspaceDomain workspaceDetails,
+        ConversationHistoryDomain conversationHistory,
         CancellationToken cancellationToken = default
     )
     {
@@ -52,9 +53,15 @@ public sealed class OrchestratorService(
             var orchestratorSystemPrompt = OrchestratorHelpers.GetOrchestratorSystemPrompt(
                 agentsData
             );
-            ConversationHistoryDomain conversationHistory = new();
             IList<string> agentsInvoked = [];
             List<GroupChatAgentsResponseDomain> groupChatAgentsResponses = [];
+
+            // Add the original user query to the conversation history once before orchestrator processing.
+            conversationHistory.ChatHistory.Add(new ChatHistoryDomain
+            {
+                Role = ChatbotHelperConstants.UserRoleConstant,
+                Content = chatRequest.UserMessage
+            });
 
             var loopCount = 0;
             while (loopCount < SystemOrchestratorFunction.MAX_ORCHESTRATOR_LOOPS)
@@ -161,7 +168,7 @@ public sealed class OrchestratorService(
         ).ConfigureAwait(false);
 
         // Add Orchestrator's own response to history to maintain context
-        conversationHistory.ChatHistory.Add(new ChatHistoryDomain
+        conversationHistory.ChatHistory.Add(new()
         {
             Role = ChatbotHelperConstants.AssistantRoleConstant,
             Content = orchestratorResponse
@@ -183,8 +190,8 @@ public sealed class OrchestratorService(
     {
         IList<AgentDataDomain> agentsData = [];
         await Parallel.ForEachAsync(
-            workspaceDetails.ActiveAgentsListInWorkspace, cancellationToken,
-            async (agent, ct) =>
+            source: workspaceDetails.ActiveAgentsListInWorkspace, cancellationToken,
+            body: async (agent, ct) =>
             {
                 var agentData = await agentsService.GetAgentDataByIdAsync(
                     agentId: agent.AgentGuid,
@@ -192,12 +199,8 @@ public sealed class OrchestratorService(
                     cancellationToken
                 ).ConfigureAwait(false);
                 if (agentData is not null)
-                {
                     lock (agentsData)
-                    {
                         agentsData.Add(agentData);
-                    }
-                }
             }
         ).ConfigureAwait(false);
 

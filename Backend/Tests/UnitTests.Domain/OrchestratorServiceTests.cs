@@ -53,11 +53,11 @@ public sealed class OrchestratorServiceTests
     public OrchestratorServiceTests()
     {
         _orchestratorService = new OrchestratorService(
-            _mockLogger.Object,
-            _mockCorrelationContext.Object,
-            _mockAgentsService.Object,
-            _mockAgentChatService.Object,
-            _mockAiServices.Object
+            logger: _mockLogger.Object,
+            correlationContext: _mockCorrelationContext.Object,
+            agentsService: _mockAgentsService.Object,
+            agentChatService: _mockAgentChatService.Object,
+            aiServices: _mockAiServices.Object
         );
 
         _mockCorrelationContext.Setup(c => c.CorrelationId).Returns(TestsHelpers.TestGuidId);
@@ -72,14 +72,25 @@ public sealed class OrchestratorServiceTests
         // Arrange
         var chatRequest = TestsHelpers.GetWorkspaceAgentChatRequestDomain();
         var workspaceDetails = TestsHelpers.GetAgentsWorkspaceDomain();
+        var mockConversationHistoryModel = TestsHelpers.GetConversationHistoryDomain(
+            userName: "mock-user"
+        );
 
         _mockAgentsService
-            .Setup(s => s.GetAgentDataByIdAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception("AgentsService Error"));
+            .Setup(s => s.GetAgentDataByIdAsync(
+                agentId: It.IsAny<string>(),
+                userEmail: It.IsAny<string>(),
+                cancellationToken: It.IsAny<CancellationToken>())
+            ).ThrowsAsync(new Exception("AgentsService Error"));
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<AIAgentsBusinessException>(() =>
-            _orchestratorService.GetOrchestratorAgentResponseAsync(chatRequest, workspaceDetails));
+            _orchestratorService.GetOrchestratorAgentResponseAsync(
+                chatRequest,
+                workspaceDetails,
+                conversationHistory: mockConversationHistoryModel
+            )
+        );
 
         Assert.Contains("AgentsService Error", ex.Message);
     }
@@ -96,8 +107,11 @@ public sealed class OrchestratorServiceTests
         var agentData = TestsHelpers.GetAgentDataDomain();
 
         _mockAgentsService
-            .Setup(s => s.GetAgentDataByIdAsync(TestsHelpers.TestGuidId, string.Empty, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(agentData);
+            .Setup(s => s.GetAgentDataByIdAsync(
+                agentId: TestsHelpers.TestGuidId,
+                userEmail: string.Empty,
+                cancellationToken: It.IsAny<CancellationToken>())
+            ).ReturnsAsync(agentData);
 
         var orchestratorResponseObj = new OrchestratorAgentResponseDomain
         {
@@ -107,13 +121,24 @@ public sealed class OrchestratorServiceTests
             Content = "Final Answer"
         };
         var serializedResponse = JsonConvert.SerializeObject(orchestratorResponseObj);
+        var mockConversationHistoryModel = TestsHelpers.GetConversationHistoryDomain(
+            userName: "mock-user"
+        );
 
         _mockAiServices
-            .Setup(s => s.GetChatbotResponseAsync(It.IsAny<ConversationHistoryDomain>(), chatRequest.UserMessage, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(serializedResponse);
+            .Setup(s => s.GetChatbotResponseAsync(
+                conversationDataDomain: It.IsAny<ConversationHistoryDomain>(),
+                userMessage: chatRequest.UserMessage,
+                agentMetaPrompt: It.IsAny<string>(),
+                cancellationToken: It.IsAny<CancellationToken>())
+            ).ReturnsAsync(serializedResponse);
 
         // Act
-        var result = await _orchestratorService.GetOrchestratorAgentResponseAsync(chatRequest, workspaceDetails);
+        var result = await _orchestratorService.GetOrchestratorAgentResponseAsync(
+            chatRequest,
+            workspaceDetails,
+            conversationHistory: mockConversationHistoryModel
+        );
 
         // Assert
         Assert.NotNull(result);
@@ -133,21 +158,35 @@ public sealed class OrchestratorServiceTests
         var agentData = TestsHelpers.GetAgentDataDomain();
 
         _mockAgentsService
-            .Setup(s => s.GetAgentDataByIdAsync(TestsHelpers.TestGuidId, string.Empty, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(agentData);
+            .Setup(s => s.GetAgentDataByIdAsync(
+                agentId: TestsHelpers.TestGuidId,
+                userEmail: string.Empty,
+                cancellationToken: It.IsAny<CancellationToken>())
+            ).ReturnsAsync(agentData);
 
         var orchestratorResponseObj = new OrchestratorAgentResponseDomain
         {
             Type = "invalid_type",
         };
         var serializedResponse = JsonConvert.SerializeObject(orchestratorResponseObj);
+        var mockConversationHistoryModel = TestsHelpers.GetConversationHistoryDomain(
+            userName: "mock-user"
+        );
 
         _mockAiServices
-            .Setup(s => s.GetChatbotResponseAsync(It.IsAny<ConversationHistoryDomain>(), chatRequest.UserMessage, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(serializedResponse);
+            .Setup(s => s.GetChatbotResponseAsync(
+                conversationDataDomain: It.IsAny<ConversationHistoryDomain>(),
+                userMessage: chatRequest.UserMessage,
+                agentMetaPrompt: It.IsAny<string>(),
+                cancellationToken: It.IsAny<CancellationToken>())
+            ).ReturnsAsync(serializedResponse);
 
         // Act
-        var result = await _orchestratorService.GetOrchestratorAgentResponseAsync(chatRequest, workspaceDetails);
+        var result = await _orchestratorService.GetOrchestratorAgentResponseAsync(
+            chatRequest,
+            workspaceDetails,
+            conversationHistory: mockConversationHistoryModel
+        );
 
         // Assert
         Assert.NotNull(result);
@@ -168,8 +207,11 @@ public sealed class OrchestratorServiceTests
         var agentData = TestsHelpers.GetAgentDataDomain();
 
         _mockAgentsService
-            .Setup(s => s.GetAgentDataByIdAsync(TestsHelpers.TestGuidId, string.Empty, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(agentData);
+            .Setup(s => s.GetAgentDataByIdAsync(
+                agentId: TestsHelpers.TestGuidId,
+                userEmail: string.Empty,
+                cancellationToken: It.IsAny<CancellationToken>())
+            ).ReturnsAsync(agentData);
 
         var orchestratorResponseObj = new OrchestratorAgentResponseDomain
         {
@@ -178,17 +220,30 @@ public sealed class OrchestratorServiceTests
             Instruction = "do task",
         };
         var serializedResponse = JsonConvert.SerializeObject(orchestratorResponseObj);
+        var mockConversationHistoryModel = TestsHelpers.GetConversationHistoryDomain(
+            userName: "mock-user"
+        );
 
         _mockAiServices
-            .Setup(s => s.GetChatbotResponseAsync(It.IsAny<ConversationHistoryDomain>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(serializedResponse);
+            .Setup(s => s.GetChatbotResponseAsync(
+                conversationDataDomain: It.IsAny<ConversationHistoryDomain>(),
+                userMessage: It.IsAny<string>(),
+                agentMetaPrompt: It.IsAny<string>(),
+                cancellationToken: It.IsAny<CancellationToken>())
+            ).ReturnsAsync(serializedResponse);
 
         _mockAgentChatService
-            .Setup(s => s.GetAgentChatResponseAsync(It.IsAny<ChatRequestDomain>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("Agent output");
+            .Setup(s => s.GetAgentChatResponseAsync(
+                chatRequest: It.IsAny<ChatRequestDomain>(),
+                cancellationToken: It.IsAny<CancellationToken>())
+            ).ReturnsAsync("Agent output");
 
         // Act
-        var result = await _orchestratorService.GetOrchestratorAgentResponseAsync(chatRequest, workspaceDetails);
+        var result = await _orchestratorService.GetOrchestratorAgentResponseAsync(
+            chatRequest,
+            workspaceDetails,
+            conversationHistory: mockConversationHistoryModel
+        );
 
         // Assert
         Assert.NotNull(result);
@@ -227,15 +282,26 @@ public sealed class OrchestratorServiceTests
             Content = "Done."
         };
         var serializedFinalResponse = JsonConvert.SerializeObject(orchestratorResponseFinal);
+        var mockConversationHistoryModel = TestsHelpers.GetConversationHistoryDomain(
+            userName: "mock-user"
+        );
 
         // Return delegate on first loop, final on second
         _mockAiServices
-            .SetupSequence(s => s.GetChatbotResponseAsync(It.IsAny<ConversationHistoryDomain>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(serializedDelegateResponse)
+            .SetupSequence(s => s.GetChatbotResponseAsync(
+                conversationDataDomain: It.IsAny<ConversationHistoryDomain>(),
+                userMessage: It.IsAny<string>(),
+                agentMetaPrompt: It.IsAny<string>(),
+                cancellationToken: It.IsAny<CancellationToken>())
+            ).ReturnsAsync(serializedDelegateResponse)
             .ReturnsAsync(serializedFinalResponse);
 
         // Act
-        var result = await _orchestratorService.GetOrchestratorAgentResponseAsync(chatRequest, workspaceDetails);
+        var result = await _orchestratorService.GetOrchestratorAgentResponseAsync(
+            chatRequest,
+            workspaceDetails,
+            conversationHistory: mockConversationHistoryModel
+        );
 
         // Assert
         Assert.NotNull(result);
@@ -244,6 +310,9 @@ public sealed class OrchestratorServiceTests
         Assert.Equal("NonExistentAgent", result.GroupChatAgentsResponses.First().AgentName);
         Assert.Contains("not available", result.GroupChatAgentsResponses.First().AgentResponse, StringComparison.OrdinalIgnoreCase);
 
-        _mockAgentChatService.Verify(s => s.GetAgentChatResponseAsync(It.IsAny<ChatRequestDomain>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockAgentChatService.Verify(s => s.GetAgentChatResponseAsync(
+            chatRequest: It.IsAny<ChatRequestDomain>(),
+            cancellationToken: It.IsAny<CancellationToken>()
+        ), Times.Never);
     }
 }

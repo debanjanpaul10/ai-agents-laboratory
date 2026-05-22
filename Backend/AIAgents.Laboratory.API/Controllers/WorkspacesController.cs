@@ -384,7 +384,7 @@ public sealed class WorkspacesController(
         Description = InvokeWorkspaceAgentAction.Description,
         OperationId = InvokeWorkspaceAgentAction.OperationId)]
     public async Task<ResponseDto> InvokeWorkspaceAgentAsync(
-        [FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO,
+        [FromBody] WorkspaceAgentChatRequestDto chatRequestDTO,
         CancellationToken cancellationToken = default
     )
     {
@@ -448,7 +448,7 @@ public sealed class WorkspacesController(
     /// <returns>The response from the group chat.</returns>
     [HttpPost(WorkspacesRoutes.GetWorkspaceGroupChatResponse_Route)]
     [Consumes(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(GroupChatResponseDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GroupChatResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -457,11 +457,11 @@ public sealed class WorkspacesController(
         Description = GetWorkspaceGroupChatResponseAction.Description,
         OperationId = GetWorkspaceGroupChatResponseAction.OperationId)]
     public async Task<ResponseDto> GetWorkspaceGroupChatResponseAsync(
-        [FromBody] WorkspaceAgentChatRequestDTO chatRequestDTO,
+        [FromBody] WorkspaceAgentChatRequestDto chatRequestDTO,
         CancellationToken cancellationToken = default
     )
     {
-        GroupChatResponseDTO result = new();
+        GroupChatResponseDto result = new();
         try
         {
             logger.LogAppInformation(
@@ -475,6 +475,7 @@ public sealed class WorkspacesController(
             {
                 result = await workspacesHandler.GetWorkspaceGroupChatResponseAsync(
                     chatRequest: chatRequestDTO,
+                    currentUserEmail: base.UserEmail ?? chatRequestDTO.ApplicationName,
                     cancellationToken
                 ).ConfigureAwait(false);
 

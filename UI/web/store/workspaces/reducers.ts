@@ -11,12 +11,13 @@ import {
 
 const initialState: any = {
 	isWorkspacesLoading: false,
-	allWorkspaces: [],
-	workspaceData: {},
 	isEditWorkspaceLoading: false,
 	isAddWorkspaceLoading: false,
 	isAddWorkspaceDrawerOpen: false,
 	isAssociateAgentsDrawerOpen: false,
+
+	allWorkspaces: [],
+	workspaceData: {},
 	workspaceGroupChatResponse: {},
 };
 

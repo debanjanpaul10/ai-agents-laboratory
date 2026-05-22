@@ -1,4 +1,5 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+﻿using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 
 namespace AIAgents.Laboratory.Domain.Contracts;
@@ -13,11 +14,13 @@ public interface IOrchestratorService
     /// </summary>
     /// <param name="chatRequest">The chat request domain model.</param>
     /// <param name="workspaceDetails">The workspace details domain model.</param>
+    /// <param name="conversationHistory">The conversation history domain model, if available.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The orchestrator agent response.</returns>
     Task<OrchestratorFinalResponseDomain> GetOrchestratorAgentResponseAsync(
         WorkspaceAgentChatRequestDomain chatRequest,
         AgentsWorkspaceDomain workspaceDetails,
+        ConversationHistoryDomain conversationHistory,
         CancellationToken cancellationToken = default
     );
 }

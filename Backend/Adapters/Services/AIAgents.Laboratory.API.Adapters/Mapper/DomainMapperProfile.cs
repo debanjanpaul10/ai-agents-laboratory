@@ -1,5 +1,4 @@
-﻿using AIAgents.Laboratory.API.Adapters.Models.Base;
-using AIAgents.Laboratory.API.Adapters.Models.Request;
+﻿using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
@@ -114,7 +113,7 @@ internal static class DomainMapperProfile
     /// </summary>
     /// <param name="dto">The request DTO.</param>
     /// <returns>The domain entity.</returns>
-    internal static WorkspaceAgentChatRequestDomain MapToDomain(WorkspaceAgentChatRequestDTO dto) => new()
+    internal static WorkspaceAgentChatRequestDomain MapToDomain(WorkspaceAgentChatRequestDto dto) => new()
     {
         ConversationId = dto.ConversationId,
         WorkspaceId = dto.WorkspaceId,
@@ -447,10 +446,11 @@ internal static class DomainMapperProfile
     /// </summary>
     /// <param name="domain">The domain entity.</param>
     /// <returns>The response DTO.</returns>
-    internal static GroupChatResponseDTO MapToDto(GroupChatResponseDomain domain) => new()
+    internal static GroupChatResponseDto MapToDto(GroupChatResponseDomain domain) => new()
     {
         AgentResponse = domain.AgentResponse,
-        AgentsInvoked = domain.AgentsInvoked
+        AgentsInvoked = domain.AgentsInvoked,
+        ConversationId = domain.ConversationId
     };
 
     /// <summary>

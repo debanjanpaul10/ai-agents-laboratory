@@ -25,7 +25,8 @@
     <File Path="../README.md" />
   </Folder>
   <Folder Name="/Tests/">
-    <Project Path="Tests/AIAgents.Laboratory.Domain.UnitTests/AIAgents.Laboratory.Domain.UnitTests.csproj" />
+    <Project Path="Tests/UnitTests.Adapters/UnitTests.Adapters.csproj" Id="dad0e127-a446-41cb-a767-976012403f91" />
+    <Project Path="Tests/UnitTests.Domain/UnitTests.Domain.csproj" />
   </Folder>
   <Project Path="AIAgents.Laboratory.API/AIAgents.Laboratory.API.csproj" />
 </Solution>

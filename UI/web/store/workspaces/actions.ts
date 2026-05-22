@@ -21,6 +21,7 @@ import {
 import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import { WorkspaceToasterConstants } from "@helpers/toaster-constants";
 import { WorkspaceAgentChatRequestDTO } from "@models/request/workspace-agent-chat-request.dto";
+import { GroupChatResponseDTO } from "@models/response/group-chat-response.dto";
 import { ToggleChatResponseSpinner } from "@store/agents/actions";
 import { GET_CHAT_RESPONSE } from "@store/chat/actionTypes";
 
@@ -78,15 +79,12 @@ export function GetAllWorkspacesDataAsync() {
 	};
 }
 
-export function GetWorkspaceByWorkspaceIdAsync(
-	workspaceId: string,
-) {
+export function GetWorkspaceByWorkspaceIdAsync(workspaceId: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleWorkspacesLoader(true));
-			const response = await GetWorkspaceByWorkspaceIdApiAsync(
-				workspaceId,
-			);
+			const response =
+				await GetWorkspaceByWorkspaceIdApiAsync(workspaceId);
 
 			if (response?.isSuccess && response?.responseData)
 				dispatch({
@@ -108,9 +106,8 @@ export function CreateNewWorkspaceAsync(
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleCreateWorkspaceLoader(true));
-			const response = await CreateNewWorkspaceApiAsync(
-				agentsWorkspaceData,
-			);
+			const response =
+				await CreateNewWorkspaceApiAsync(agentsWorkspaceData);
 
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
@@ -130,15 +127,12 @@ export function CreateNewWorkspaceAsync(
 	};
 }
 
-export function DeleteExistingWorkspaceAsync(
-	workspaceGuidId: string,
-) {
+export function DeleteExistingWorkspaceAsync(workspaceGuidId: string) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleWorkspacesLoader(true));
-			const response = await DeleteExistingWorkspaceApiAsync(
-				workspaceGuidId,
-			);
+			const response =
+				await DeleteExistingWorkspaceApiAsync(workspaceGuidId);
 
 			if (response?.isSuccess && response?.responseData) {
 				dispatch(GetAllWorkspacesDataAsync() as any);
@@ -159,9 +153,8 @@ export function UpdateExistingWorkspaceDataAsync(
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleEditWorkspacesLoader(true));
-			const response = await UpdateExistingWorkspaceDataApiAsync(
-				agentsWorkspaceData,
-			);
+			const response =
+				await UpdateExistingWorkspaceDataApiAsync(agentsWorkspaceData);
 
 			if (response?.isSuccess && response?.responseData) {
 				dispatch(GetAllWorkspacesDataAsync() as any);
@@ -182,16 +175,15 @@ export function GetWorkspaceGroupChatResponseAsync(
 	return async (dispatch: Dispatch<Action>) => {
 		try {
 			dispatch(ToggleChatResponseSpinner(true));
-			const response = await GetWorkspaceGroupChatResponseApiAsync(
-				chatRequestDto,
-			);
+			const response =
+				await GetWorkspaceGroupChatResponseApiAsync(chatRequestDto);
 			if (response?.isSuccess && response?.responseData) {
 				dispatch({
 					type: GET_CHAT_RESPONSE,
 					payload: response.responseData,
 				});
 
-				return response.responseData as string;
+				return response.responseData as GroupChatResponseDTO;
 			}
 
 			return null;

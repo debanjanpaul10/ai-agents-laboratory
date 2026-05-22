@@ -30,12 +30,7 @@ public sealed class EmailNotificationsService(
     private readonly string EMAIL_COMMUNICATION_SENDER = configuration[AzureAppConfigurationConstants.EmailNotificationServiceSenderAddress]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationMissingExceptionMessage);
 
-    /// <summary>
-    /// Sends the email notification asynchronous.
-    /// </summary>
-    /// <param name="notificationModel">The email notification model.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A boolean for success/failure.</returns>
+    /// <inheritdoc/>
     public async Task<bool> SendNotificationsAsync(
         NotificationRequest notificationModel,
         CancellationToken cancellationToken = default

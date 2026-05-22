@@ -14,7 +14,10 @@ public interface IWorkspacesHandler
     /// <param name="userName">The current logged in user name.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of <see cref="AgentsWorkspaceDTO"/></returns>
-    Task<IEnumerable<AgentsWorkspaceDTO>> GetAllWorkspacesAsync(string userName, CancellationToken cancellationToken = default);
+    Task<IEnumerable<AgentsWorkspaceDTO>> GetAllWorkspacesAsync(
+        string userName,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets the workspace by workspace id.
@@ -23,7 +26,11 @@ public interface IWorkspacesHandler
     /// <param name="currentUserEmail">The current logged in user email</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The agent workspace domain model.</returns>
-    Task<AgentsWorkspaceDTO> GetWorkspaceByWorkspaceIdAsync(string workspaceId, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<AgentsWorkspaceDTO> GetWorkspaceByWorkspaceIdAsync(
+        string workspaceId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Creates a new workspace.
@@ -32,7 +39,11 @@ public interface IWorkspacesHandler
     /// <param name="currentUserEmail">The current user email address.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    Task<bool> CreateNewWorkspaceAsync(AgentsWorkspaceDTO agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> CreateNewWorkspaceAsync(
+        AgentsWorkspaceDTO agentsWorkspaceData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Deletes the existing workspace by workspace guid id.
@@ -41,7 +52,11 @@ public interface IWorkspacesHandler
     /// <param name="currentUserEmail">The current logged in user email address.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    Task<bool> DeleteExistingWorkspaceAsync(string workspaceGuidId, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> DeleteExistingWorkspaceAsync(
+        string workspaceGuidId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Updates the existing workspace data.
@@ -50,7 +65,11 @@ public interface IWorkspacesHandler
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    Task<bool> UpdateExistingWorkspaceDataAsync(AgentsWorkspaceDTO agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> UpdateExistingWorkspaceDataAsync(
+        AgentsWorkspaceDTO agentsWorkspaceData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Invoke the workspace agent with user message and get the response.
@@ -58,13 +77,21 @@ public interface IWorkspacesHandler
     /// <param name="chatRequestDTO">The chat request dto model.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The string response from AI.</returns>
-    Task<string> InvokeWorkspaceAgentAsync(WorkspaceAgentChatRequestDTO chatRequestDTO, CancellationToken cancellationToken = default);
+    Task<string> InvokeWorkspaceAgentAsync(
+        WorkspaceAgentChatRequestDto chatRequestDTO,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
-    /// Gets the workspace group chat response.
+    /// Gets the workspace group chat response asynchronous.
     /// </summary>
-    /// <param name="chatRequest">The workspace agent chat request dto model.</param>
+    /// <param name="chatRequest">The chat request.</param>
+    /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The group chat response.</returns>
-    Task<GroupChatResponseDTO> GetWorkspaceGroupChatResponseAsync(WorkspaceAgentChatRequestDTO chatRequest, CancellationToken cancellationToken = default);
+    Task<GroupChatResponseDto> GetWorkspaceGroupChatResponseAsync(
+        WorkspaceAgentChatRequestDto chatRequest,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 }

@@ -14,6 +14,7 @@ import { AgentsWorkspaceDTO } from "@models/response/agents-workspace-dto";
 import AssociatedAgentsChatPaneComponent from "@components/workspace/associated-agents-chat";
 import AssociatedAgentsListPaneComponent from "@components/workspace/associated-agents-list";
 import { CommonToasterConstants } from "@helpers/toaster-constants";
+import { GetWorkspaceConversationHistoryAsync } from "@store/conversations/actions";
 
 export default function WorkspaceComponent() {
 	const dispatch = useAppDispatch();
@@ -46,12 +47,29 @@ export default function WorkspaceComponent() {
 		}
 	}, [router.query.id]);
 
+	useEffect(() => {
+		if (
+			WorkspaceDetailsData !== null &&
+			WorkspaceDetailsData.isGroupChatEnabled === true
+		)
+			GetWorkspaceConversationHistory(
+				WorkspaceDetailsData.agentWorkspaceGuid,
+			);
+	}, [
+		WorkspaceDetailsData.agentWorkspaceGuid,
+		WorkspaceDetailsData.isGroupChatEnabled,
+	]);
+
 	function GetWorkspaceByWorkspaceId(workspaceId: string) {
 		dispatch(GetWorkspaceByWorkspaceIdAsync(workspaceId));
 	}
 
 	function GetAllConfigurationsData() {
 		dispatch(GetAllConfigurations());
+	}
+
+	function GetWorkspaceConversationHistory(workspaceId: string) {
+		dispatch(GetWorkspaceConversationHistoryAsync(workspaceId) as any);
 	}
 
 	const handleAgentSelection = (agent: WorkspaceAgentsDataDTO) => {

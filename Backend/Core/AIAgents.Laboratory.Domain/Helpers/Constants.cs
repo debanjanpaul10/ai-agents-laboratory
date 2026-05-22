@@ -211,17 +211,17 @@ public static class Constants
     /// <summary>
     /// The chatbot helper constants.
     /// </summary>
-    internal static class ChatbotHelperConstants
+    public static class ChatbotHelperConstants
     {
         /// <summary>
         /// The user role constant.
         /// </summary>
-        internal const string UserRoleConstant = "user";
+        public const string UserRoleConstant = "user";
 
         /// <summary>
         /// The assistant role constant.
         /// </summary>
-        internal const string AssistantRoleConstant = "assistant";
+        public const string AssistantRoleConstant = "assistant";
     }
 
     /// <summary>

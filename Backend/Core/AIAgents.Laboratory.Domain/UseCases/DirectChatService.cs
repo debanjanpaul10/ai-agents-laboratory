@@ -47,7 +47,9 @@ public sealed class DirectChatService(
                     JsonConvert.SerializeObject(new { correlationContext.CorrelationId, userEmail, userQuery })
             );
 
-            var chatbotAgentGuid = configuration[AzureAppConfigurationConstants.AIChatbotAgentId] ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
+            var chatbotAgentGuid = configuration[AzureAppConfigurationConstants.AIChatbotAgentId]
+                ?? throw new KeyNotFoundException(ExceptionConstants.AgentNotFoundExceptionMessage);
+
             var agentDataTask = agentsService.GetAgentDataByIdAsync(
                 agentId: chatbotAgentGuid,
                 userEmail,
@@ -62,7 +64,7 @@ public sealed class DirectChatService(
 
             var conversationHistoryData = conversationHistoryTask.Result;
             var agentMetaprompt = agentDataTask.Result.AgentMetaPrompt;
-            var chatHistoryList = conversationHistoryData.ChatHistory.ToList();
+            var chatHistoryList = conversationHistoryData.ChatHistory?.ToList() ?? [];
 
             aiResponse = await aiServices.GetChatbotResponseAsync(
                 conversationDataDomain: conversationHistoryData,
@@ -71,6 +73,11 @@ public sealed class DirectChatService(
                 cancellationToken
             ).ConfigureAwait(false);
 
+            chatHistoryList.Add(new ChatHistoryDomain
+            {
+                Role = ChatbotHelperConstants.UserRoleConstant,
+                Content = userQuery
+            });
             chatHistoryList.Add(new ChatHistoryDomain
             {
                 Role = ChatbotHelperConstants.AssistantRoleConstant,

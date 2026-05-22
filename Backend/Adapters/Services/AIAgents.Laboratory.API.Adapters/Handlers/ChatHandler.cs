@@ -1,7 +1,6 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
 using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
-using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.Ports.In;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
@@ -30,31 +29,6 @@ public sealed class ChatHandler(
             userEmail,
             cancellationToken
         ).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> ClearConversationHistoryForUserAsync(
-        string userName,
-        CancellationToken cancellationToken = default
-    )
-    {
-        return await directChatService.ClearConversationHistoryForUserAsync(
-            userName,
-            cancellationToken
-        ).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc />
-    public async Task<ConversationHistoryDTO> GetConversationHistoryDataAsync(
-        string userName,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var domainResult = await directChatService.GetConversationHistoryDataAsync(
-            userName,
-            cancellationToken
-        ).ConfigureAwait(false);
-        return DomainMapperProfile.MapToDto(domain: domainResult);
     }
 
     #endregion

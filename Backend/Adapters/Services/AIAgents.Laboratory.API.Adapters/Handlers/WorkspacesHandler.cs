@@ -57,12 +57,14 @@ public sealed class WorkspacesHandler(
     }
 
     /// <inheritdoc/>
-    public async Task<GroupChatResponseDTO> GetWorkspaceGroupChatResponseAsync(
-        WorkspaceAgentChatRequestDTO chatRequest,
+    public async Task<GroupChatResponseDto> GetWorkspaceGroupChatResponseAsync(
+        WorkspaceAgentChatRequestDto chatRequest,
+        string currentUserEmail,
         CancellationToken cancellationToken = default
     )
     {
         var domainInput = DomainMapperProfile.MapToDomain(dto: chatRequest);
+        domainInput.CurrentUserEmail = currentUserEmail;
         var domainResult = await workspacesService.GetWorkspaceGroupChatResponseAsync(
             chatRequest: domainInput,
             cancellationToken
@@ -87,7 +89,7 @@ public sealed class WorkspacesHandler(
 
     /// <inheritdoc/>
     public async Task<string> InvokeWorkspaceAgentAsync(
-        WorkspaceAgentChatRequestDTO chatRequestDTO,
+        WorkspaceAgentChatRequestDto chatRequestDTO,
         CancellationToken cancellationToken = default
     )
     {
