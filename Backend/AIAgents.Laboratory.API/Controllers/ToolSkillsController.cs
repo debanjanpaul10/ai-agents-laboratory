@@ -346,10 +346,13 @@ public sealed class ToolSkillsController(
         IEnumerable<McpServerToolsDTO> result = [];
         try
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodStart, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, mcpServerToolRequest }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodStart,
+                nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, mcpServerToolRequest })
+            );
 
-            if (base.IsAuthorized(UserBased))
+            if (base.IsAuthorized(authorizationType: UserBased))
             {
                 result = await toolSkillsHandler.GetAllMcpToolsAvailableAsync(
                     serverUrl: mcpServerToolRequest.ServerUrl,
@@ -359,24 +362,36 @@ public sealed class ToolSkillsController(
 
                 if (result is not null)
                     return HandleSuccessRequestResponse(
-                        responseData: result);
+                        responseData: result
+                    );
                 else
                     return HandleBadRequestResponse(
                         statusCode: StatusCodes.Status400BadRequest,
-                        message: ExceptionConstants.SomethingWentWrongDefaultMessage);
+                        message: ExceptionConstants.SomethingWentWrongDefaultMessage
+                    );
             }
 
             return HandleUnAuthorizedRequestResponse();
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.LogHelperMethodFailed, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.LogHelperMethodFailed,
+                nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.LogHelperMethodEnd, nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result }));
+            logger.LogAppInformation(
+                LoggingConstants.LogHelperMethodEnd,
+                nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, base.UserEmail, result })
+            );
         }
     }
 }

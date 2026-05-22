@@ -108,9 +108,9 @@ export default function TestAgentComponent({
 	};
 
 	const getApplicationName = (applicationId: number): string => {
-		const app = (
-			RegisteredApplicationsListStoreData as RegisteredApplicationDTO[]
-		).find((a) => a.id === applicationId);
+		const app = RegisteredApplicationsListStoreData.find(
+			(a) => a.id === applicationId,
+		);
 		return app?.applicationName || "Unknown App";
 	};
 

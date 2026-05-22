@@ -53,7 +53,7 @@ public sealed class ToolSkillsHandler(IToolSkillsService toolSkillsService) : IT
             currentUserEmail,
             cancellationToken
         ).ConfigureAwait(false);
-        return domainResult.Select(tool => new McpServerToolsDTO
+        return domainResult.Select(selector: tool => new McpServerToolsDTO
         {
             ToolName = tool.Name,
             ToolDescription = tool.Description

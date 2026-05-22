@@ -232,7 +232,7 @@ public sealed class ToolSkillsService(
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
                 nameof(GetAllMcpToolsAvailableAsync), DateTime.UtcNow,
-                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, serverUrl, currentUserEmail, response })
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, serverUrl, currentUserEmail })
             );
         }
     }
