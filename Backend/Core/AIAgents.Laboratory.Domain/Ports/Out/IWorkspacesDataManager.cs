@@ -14,7 +14,10 @@ public interface IWorkspacesDataManager
     /// <param name="currentUserEmail">The current logged in user name.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The list of <see cref="AgentsWorkspaceDomain"/></returns>
-    Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<IEnumerable<AgentsWorkspaceDomain>> GetAllWorkspacesAsync(
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets the workspace by workspace id.
@@ -23,7 +26,11 @@ public interface IWorkspacesDataManager
     /// <param name="currentUserEmail">The current logged in user email</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The agent workspace domain model.</returns>
-    Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(string workspaceId, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<AgentsWorkspaceDomain> GetWorkspaceByWorkspaceIdAsync(
+        string workspaceId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Creates a new workspace.
@@ -32,7 +39,11 @@ public interface IWorkspacesDataManager
     /// <param name="currentUserEmail">The current user email address.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    Task<bool> CreateNewWorkspaceAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> CreateNewWorkspaceAsync(
+        AgentsWorkspaceDomain agentsWorkspaceData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Deletes the existing workspace by workspace guid id.
@@ -41,7 +52,11 @@ public interface IWorkspacesDataManager
     /// <param name="currentUserEmail">The current logged in user email address.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    Task<bool> DeleteExistingWorkspaceAsync(string workspaceGuidId, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> DeleteExistingWorkspaceAsync(
+        string workspaceGuidId,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Updates the existing workspace data.
@@ -50,5 +65,9 @@ public interface IWorkspacesDataManager
     /// <param name="currentUserEmail">The current logged in user email.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean for <c>success/failure.</c></returns>
-    Task<bool> UpdateExistingWorkspaceDataAsync(AgentsWorkspaceDomain agentsWorkspaceData, string currentUserEmail, CancellationToken cancellationToken = default);
+    Task<bool> UpdateExistingWorkspaceDataAsync(
+        AgentsWorkspaceDomain agentsWorkspaceData,
+        string currentUserEmail,
+        CancellationToken cancellationToken = default
+    );
 }

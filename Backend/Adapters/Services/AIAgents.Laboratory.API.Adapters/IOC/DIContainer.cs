@@ -25,5 +25,6 @@ public static class DIContainer
             .AddScoped<IWorkspacesHandler, WorkspacesHandler>()
             .AddScoped<IApplicationAdminHandler, ApplicationAdminHandler>()
             .AddScoped<IRegisteredApplicationHandler, RegisteredApplicationHandler>()
-            .AddScoped<INotificationsHandler, NotificationsHandler>();
+            .AddScoped<INotificationsHandler, NotificationsHandler>()
+            .AddScoped<IConversationsHandler, ConversationsHandler>();
 }

@@ -42,13 +42,11 @@ public sealed class GcpCloudStorageManager(
     private readonly string GCPVisionImagesFolderName = configuration[AzureAppConfigurationConstants.GCPImageFolderNameConstant]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
-    /// <summary>
-    /// Deletes the documents data and folder from blob storage.
-    /// </summary>
-    /// <param name="agentId">The agent id.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the asynchronous process. Optional.</param>
-    /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> DeleteDocumentsFolderAndDataAsync(string agentId, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> DeleteDocumentsFolderAndDataAsync(
+        string agentId,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
 
@@ -118,14 +116,12 @@ public sealed class GcpCloudStorageManager(
         }
     }
 
-    /// <summary>
-    /// Downloads a file from blob storage.
-    /// </summary>
-    /// <param name="agentGuid">The agent guid id.</param>
-    /// <param name="fileName">The file name.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the asynchronous process. Optional.</param>
-    /// <returns>The download file link.</returns>
-    public async Task<string> DownloadFileFromBlobStorageAsync(string agentGuid, string fileName, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<string> DownloadFileFromBlobStorageAsync(
+        string agentGuid,
+        string fileName,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentGuid);
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
@@ -165,15 +161,13 @@ public sealed class GcpCloudStorageManager(
         }
     }
 
-    /// <summary>
-    /// Uploads documents to BLOB storage.
-    /// </summary>
-    /// <param name="documentFile">The user uploaded document file.</param>
-    /// <param name="agentGuid">The agent guid id.</param>
-    /// <param name="fileType">The storage file type.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the asynchronous process. Optional.</param>
-    /// <returns>The public URL for the document.</returns>
-    public async Task<string> UploadDocumentsToStorageAsync(IFormFile documentFile, string agentGuid, UploadedFileType fileType, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<string> UploadDocumentsToStorageAsync(
+        IFormFile documentFile,
+        string agentGuid,
+        UploadedFileType fileType,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(agentGuid);
         if (documentFile.Length == 0)

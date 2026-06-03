@@ -237,6 +237,7 @@ export default function EditWorkspaceFlyoutComponent({
 									>
 										<input
 											type="checkbox"
+											id="isGroupChatEnabled"
 											checked={
 												editFormData.isGroupChatEnabled
 											}

@@ -66,14 +66,6 @@ export async function GetDirectChatResponseApiAsync(
 	return await PostAsync("chat/directchat", chatRequest);
 }
 
-export async function ClearConversationHistoryForUserApiAsync() {
-	return await PostAsync("chat/clearconversation", null);
-}
-
-export async function GetConversationHistoryDataForUserApiAsync() {
-	return await GetAsync("chat/getconversationhistory");
-}
-
 // #endregion
 
 // #region COMMON
@@ -255,6 +247,55 @@ export async function MarkNotificationAsReadApiAsync(notificationId: string) {
 
 export async function DeleteAllNotificationsForUserApiAsync() {
 	return await DeleteAsync("notifications/deleteallnotifications");
+}
+
+// #endregion
+
+// #region CONVERSATIONS
+
+/**
+ * Clears the conversation history for the user.
+ * @returns True if the conversation history was cleared successfully, false otherwise.
+ */
+export async function ClearConversationHistoryForUserApiAsync() {
+	return await PostAsync("conversations/clearconversation", null);
+}
+
+/**
+ * Gets the conversation history data for the user.
+ * @returns The conversation history data for the user if the API call was successful, null otherwise.
+ */
+export async function GetConversationHistoryDataForUserApiAsync() {
+	return await GetAsync("conversations/getconversationhistory");
+}
+
+/**
+ * Gets the conversation history for the workspace.
+ * @param workspaceGuid The GUID of the workspace.
+ * @returns The conversation history for the workspace if the API call was successful, null otherwise.
+ */
+export async function GetWorkspaceConversationHistoryApiAsync(
+	workspaceGuid: string,
+) {
+	return await GetAsync(
+		`conversations/getworkspaceconversationhistory?workspaceGuid=${workspaceGuid}`,
+	);
+}
+
+/**
+ * Clears the conversation history for the workspace.
+ * @param workspaceGuid The GUID of the workspace.
+ * @param conversationId The ID of the conversation to clear.
+ * @returns True if the conversation history was cleared successfully, false otherwise.
+ */
+export async function ClearWorkspaceConversationHistoryApiAsync(
+	workspaceGuid: string,
+	conversationId: string,
+) {
+	return await PostAsync(
+		`conversations/clearworkspaceconversation?workspaceGuid=${workspaceGuid}&conversationId=${conversationId}`,
+		null,
+	);
 }
 
 // #endregion

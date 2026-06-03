@@ -2,23 +2,16 @@ import { Action, Dispatch } from "redux";
 
 import { ChatRequestDTO } from "@models/request/chat-request-dto";
 import {
-	ClearConversationHistoryForUserApiAsync,
-	GetConversationHistoryDataForUserApiAsync,
 	GetDirectChatResponseApiAsync,
 	InvokeChatAgentApiAsync,
 } from "@shared/api-service";
 import { ToggleChatResponseSpinner } from "@store/agents/actions";
 import {
-	CLEAR_CONVERSATION_HISTORY,
 	DIRECT_CHAT_REQUEST,
 	GET_CHAT_RESPONSE,
-	GET_CONVERSATION_HISTORY,
 } from "@store/chat/actionTypes";
-import { ToggleDirectChatLoader } from "@store/common/actions";
 import { DirectChatRequestDTO } from "@models/request/direct-chat-request-dto";
-import { ConversationHistoryDTO } from "@models/response/conversation-history-dto";
-import { ShowErrorToaster, ShowSuccessToaster } from "@shared/toaster";
-import { ChatToasterConstants } from "@helpers/toaster-constants";
+import { ShowErrorToaster } from "@shared/toaster";
 
 export function InvokeChatAgentAsync(chatRequest: ChatRequestDTO) {
 	return async (dispatch: Dispatch<Action>) => {
@@ -45,31 +38,6 @@ export function InvokeChatAgentAsync(chatRequest: ChatRequestDTO) {
 	};
 }
 
-export function ClearConversationHistoryAsync() {
-	return async (dispatch: Dispatch<Action>) => {
-		try {
-			dispatch(ToggleDirectChatLoader(true));
-			const response = await ClearConversationHistoryForUserApiAsync();
-			if (response?.isSuccess && response?.responseData) {
-				dispatch({
-					type: CLEAR_CONVERSATION_HISTORY,
-					payload: response.responseData,
-				});
-
-				ShowSuccessToaster(ChatToasterConstants.CLEAR_CONVERSATION);
-				dispatch(GetConversationHistoryDataForUserAsync() as any);
-				return response.responseData as boolean;
-			}
-			return null;
-		} catch (error: any) {
-			console.error(error);
-			if (error.message) ShowErrorToaster(error.message);
-		} finally {
-			dispatch(ToggleDirectChatLoader(false));
-		}
-	};
-}
-
 export function GetDirectChatResponseAsync(userMessage: DirectChatRequestDTO) {
 	return async (dispatch: Dispatch<Action>) => {
 		try {
@@ -85,28 +53,6 @@ export function GetDirectChatResponseAsync(userMessage: DirectChatRequestDTO) {
 		} catch (error: any) {
 			console.error(error);
 			if (error.message) ShowErrorToaster(error.message);
-		}
-	};
-}
-
-export function GetConversationHistoryDataForUserAsync() {
-	return async (dispatch: Dispatch<Action>) => {
-		try {
-			dispatch(ToggleDirectChatLoader(true));
-			const response = await GetConversationHistoryDataForUserApiAsync();
-			if (response?.isSuccess && response?.responseData) {
-				dispatch({
-					type: GET_CONVERSATION_HISTORY,
-					payload: response.responseData,
-				});
-
-				return response.responseData as ConversationHistoryDTO;
-			}
-		} catch (error: any) {
-			console.error(error);
-			if (error.message) ShowErrorToaster(error.message);
-		} finally {
-			dispatch(ToggleDirectChatLoader(false));
 		}
 	};
 }

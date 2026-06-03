@@ -21,28 +21,32 @@ var credentials = builder.Environment.IsDevelopment()
 builder.ConfigureAzureAppConfiguration(credentials);
 builder.Services.ConfigureApplicationDependencies(
     configuration: builder.Configuration,
-    isDevelopmentMode: builder.Environment.IsDevelopment());
+    isDevelopmentMode: builder.Environment.IsDevelopment()
+);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddCors(
-    options => options.AddDefaultPolicy(policy => policy.SetIsOriginAllowed(_ => true).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
-builder.Services.AddApiVersions();
+    options => options.AddDefaultPolicy(policy => policy.SetIsOriginAllowed(_ => true).AllowAnyHeader().AllowAnyMethod().AllowCredentials())
+);
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc(SwaggerConstants.ApiVersion, new OpenApiInfo
-    {
-        Title = SwaggerConstants.ApplicationAPIName,
-        Version = SwaggerConstants.ApiVersion,
-        Description = SwaggerConstants.SwaggerDescription,
-        Contact = new OpenApiContact
+    options.SwaggerDoc(
+        name: SwaggerConstants.ApiVersion,
+        info: new OpenApiInfo
         {
-            Name = SwaggerConstants.AuthorDetails.Name,
-            Email = SwaggerConstants.AuthorDetails.Email
-        }
+            Title = SwaggerConstants.ApplicationAPIName,
+            Version = SwaggerConstants.ApiVersion,
+            Description = SwaggerConstants.SwaggerDescription,
+            Contact = new OpenApiContact
+            {
+                Name = SwaggerConstants.AuthorDetails.Name,
+                Email = SwaggerConstants.AuthorDetails.Email
+            }
 
-    });
+        }
+    );
     options.EnableAnnotations();
 });
 builder.Services.AddProblemDetails();
@@ -59,7 +63,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint(SwaggerConstants.SwaggerEndpointUrl, $"{SwaggerConstants.ApplicationAPIName}.{SwaggerConstants.ApiVersion}");
+        c.SwaggerEndpoint(
+            url: SwaggerConstants.SwaggerEndpointUrl,
+            name: $"{SwaggerConstants.ApplicationAPIName}.{SwaggerConstants.ApiVersion}"
+        );
         c.RoutePrefix = SwaggerConstants.SwaggerUiPrefix;
     });
 }

@@ -11,7 +11,7 @@ using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.ApplicationAdminController;
 
-namespace AIAgents.Laboratory.API.Controllers.v2;
+namespace AIAgents.Laboratory.API.Controllers;
 
 /// <summary>
 /// The <c>ApplicationAdminController</c> class is an API controller responsible for handling application administration related endpoints, such as retrieving submitted feature requests. 
@@ -24,8 +24,7 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="applicationAdminHandler">The application admin api adapter handler.</param>
 /// <seealso cref="BaseController"/>
 [ApiController]
-[ApiVersion(ApiVersionsConstants.ApiVersionV2)]
-[Route("aiagentsapi/v{version:apiVersion}/[controller]")]
+[Route(ApiBaseRoute)]
 public sealed class ApplicationAdminController(
     IHttpContextAccessor httpContextAccessor,
     IConfiguration configuration,

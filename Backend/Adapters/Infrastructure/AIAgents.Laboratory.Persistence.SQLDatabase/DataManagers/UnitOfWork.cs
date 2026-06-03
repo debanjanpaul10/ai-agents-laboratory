@@ -26,11 +26,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
 #pragma warning disable CS8618
     private IDbContextTransaction _transaction;
 
-    /// <summary>
-    /// This method returns a repository for the specified entity type.
-    /// </summary>
-    /// <typeparam name="TEntity">The entity type.</typeparam>
-    /// <returns>The generic entity type.</returns>
+    /// <inheritdoc/>
     public IRepository<TEntity> Repository<TEntity>() where TEntity : class
     {
         var type = typeof(TEntity);
@@ -43,11 +39,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
         return (IRepository<TEntity>)repository;
     }
 
-    /// <summary>
-    /// This method begins a new transaction asynchronously.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
-    /// <returns>A task to wait on.</returns>
+    /// <inheritdoc/>
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         this._transaction = await dbContext.Database
@@ -55,11 +47,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
             .ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Commits all changes made in this context to the database asynchronously.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
-    /// <returns>A task to wait on.</returns>
+    /// <inheritdoc/>
     public async Task CommitAsync(CancellationToken cancellationToken = default)
     {
         await dbContext
@@ -72,11 +60,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
                 .ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Rollbacks all changes made in this context to the database asynchronously.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
-    /// <returns>A task to wait on.</returns>
+    /// <inheritdoc/>
     public async Task RollbackAsync(CancellationToken cancellationToken = default)
     {
         if (this._transaction is not null)
@@ -85,11 +69,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
                 .ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// This method saves all changes made in this context to the database asynchronously.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token to be used to cancel the asynchronous process. Optional.</param>
-    /// <returns>The save changes count.</returns>
+    /// <inheritdoc/>
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return await dbContext
@@ -97,9 +77,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
             .ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Disposes the unit of work, releasing all resources.
-    /// </summary>
+    /// <inheritdoc/>
     public void Dispose()
     {
         dbContext.Dispose();
@@ -107,13 +85,7 @@ public sealed class UnitOfWork(SqlDbContext dbContext) : IUnitOfWork
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>
-    /// Executes the SQL query or command asynchronously. For entity types, returns mapped results. For scalar types (bool, int), returns result based on rows affected.
-    /// </summary>
-    /// <typeparam name="T">The result type.</typeparam>
-    /// <param name="sql">The SQL or stored procedure command.</param>
-    /// <param name="parameters">The parameters.</param>
-    /// <returns>The SQL query response as a list of T.</returns>
+    /// <inheritdoc/>
     public async Task<List<T>> ExecuteSqlQueryAsync<T>(string sql, params object[] parameters)
     {
         // For scalar types, treat as non-query and return rows affected or success as bool

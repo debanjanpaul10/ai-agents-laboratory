@@ -1,12 +1,8 @@
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
 namespace AIAgents.Laboratory.Domain.DomainEntities;
 
 /// <summary>
 /// The conversation history domain.
 /// </summary>
-[BsonIgnoreExtraElements]
 public sealed record ConversationHistoryDomain
 {
     /// <summary>
@@ -15,8 +11,7 @@ public sealed record ConversationHistoryDomain
     /// <value>
     /// The identifier.
     /// </value>
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
+
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
@@ -43,4 +38,9 @@ public sealed record ConversationHistoryDomain
     /// The last modified on date.
     /// </summary>
     public DateTime LastModifiedOn { get; set; }
+
+    /// <summary>
+    /// The workspace id for multi-agent collaboration scenario, where agents are working in the same workspace and need to access the same conversation history.
+    /// </summary>
+    public string? WorkspaceId { get; set; } = null;
 }

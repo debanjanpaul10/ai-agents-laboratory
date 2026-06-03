@@ -566,6 +566,7 @@ export default function CreateAgentFlyoutComponent({
                                     aria-label="Is Private"
                                 >
                                     <input
+                                        id="isPrivate"
                                         type="checkbox"
                                         checked={formData.isPrivate}
                                         onChange={(e) =>

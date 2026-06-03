@@ -28,17 +28,7 @@ public sealed class AgentFrameworkServices(
     IMcpClientServices mcpClientServices,
     IChatClient chatClient) : IAiServices
 {
-    /// <summary>
-    /// Gets the ai function aiResponse asynchronous.
-    /// </summary>
-    /// <typeparam name="TInput">The type of the input.</typeparam>
-    /// <param name="input">The input.</param>
-    /// <param name="pluginName">Name of the plugin.</param>
-    /// <param name="functionName">Name of the function.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>
-    /// The AI aiResponse.
-    /// </returns>
+    /// <inheritdoc/>
     public async Task<string> GetAiFunctionResponseAsync<TInput>(
         TInput input,
         string pluginName,
@@ -95,16 +85,7 @@ public sealed class AgentFrameworkServices(
         }
     }
 
-    /// <summary>
-    /// Gets the ai function aiResponse with MCP integration asynchronous.
-    /// </summary>
-    /// <typeparam name="TInput">The type of the input.</typeparam>
-    /// <param name="input">The input.</param>
-    /// <param name="mcpServerUrl">The MCP server URL.</param>
-    /// <param name="pluginName">Name of the plugin.</param>
-    /// <param name="functionName">Name of the function.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The AI aiResponse.</returns>
+    /// <inheritdoc/>
     public async Task<string> GetAiFunctionResponseAsync<TInput>(
         TInput input,
         string mcpServerUrl,
@@ -212,14 +193,7 @@ public sealed class AgentFrameworkServices(
         }
     }
 
-    /// <summary>
-    /// Gets the chatbot aiResponse.
-    /// </summary>
-    /// <param name="userMessage">The user message data.</param>
-    /// <param name="conversationDataDomain">The conversation history data domain.</param>
-    /// <param name="agentMetaPrompt">The agent meta prompt.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The AI chatbot aiResponse.</returns>
+    /// <inheritdoc/>
     public async Task<string> GetChatbotResponseAsync(
         ConversationHistoryDomain conversationDataDomain,
         string userMessage,

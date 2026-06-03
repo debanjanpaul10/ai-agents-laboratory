@@ -16,7 +16,9 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
 /// <param name="configuration">The configuration service.</param>
 /// <param name="mongoDatabaseRepository">The MongoDB database repository.</param>
 /// <seealso cref="IRegisteredApplicationDataManager"/>
-public sealed class RegisteredApplicationDataManager(IConfiguration configuration, IMongoDatabaseRepository mongoDatabaseRepository) : IRegisteredApplicationDataManager
+public sealed class RegisteredApplicationDataManager(
+    IConfiguration configuration,
+    IMongoDatabaseRepository mongoDatabaseRepository) : IRegisteredApplicationDataManager
 {
     /// <summary>
     /// The mongo database name configuration value.
@@ -30,34 +32,29 @@ public sealed class RegisteredApplicationDataManager(IConfiguration configuratio
     private readonly string RegisteredApplicationsCollectionName = configuration[MongoDbCollectionConstants.RegisteredApplicationsCollectionName]
         ?? throw new KeyNotFoundException(ExceptionConstants.ConfigurationKeyNotFoundExceptionMessage);
 
-    /// <summary>
-    /// Creates a new registered application for the current logged in user with the provided application data.
-    /// </summary>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="newApplicationData">The new application creation data model.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> CreateNewRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDomain newApplicationData, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> CreateNewRegisteredApplicationAsync(
+        string currentLoggedInUser,
+        RegisteredApplicationDomain newApplicationData,
+        CancellationToken cancellationToken = default
+    )
     {
         var dbInput = MongoDataMapperProfile.MapToModel(domain: newApplicationData);
         return await mongoDatabaseRepository.SaveDataAsync(
             data: dbInput,
             databaseName: MongoDatabaseName,
             collectionName: RegisteredApplicationsCollectionName,
-            bypassDocumentValidation: true,
+            bypassDocumentValidation: false,
             cancellationToken
         ).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Deletes a registered application by its ID for the current logged in user. 
-    /// </summary>
-    /// <remarks>The deletion is performed as a soft delete, where the IsActive property of the application is set to false instead of physically removing the record from the database.</remarks>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="applicationId">The application id for which data is to be deleted.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> DeleteRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> DeleteRegisteredApplicationByIdAsync(
+        string currentLoggedInUser,
+        int applicationId,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<RegisteredApplicationDataModel>.Filter.Where(item => item.IsActive && item.Id == applicationId);
         var allApplications = await mongoDatabaseRepository.GetDataFromCollectionAsync(
@@ -86,14 +83,12 @@ public sealed class RegisteredApplicationDataManager(IConfiguration configuratio
         ).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Gets the details of a specific registered application by its ID for the current logged in user.
-    /// </summary>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="applicationId">The application id to be searched for.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The registered application data model.</returns>
-    public async Task<RegisteredApplicationDomain> GetRegisteredApplicationByIdAsync(string currentLoggedInUser, int applicationId, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<RegisteredApplicationDomain> GetRegisteredApplicationByIdAsync(
+        string currentLoggedInUser,
+        int applicationId,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<RegisteredApplicationDataModel>.Filter.And(
             Builders<RegisteredApplicationDataModel>.Filter.Eq(x => x.IsActive, true),
@@ -108,13 +103,11 @@ public sealed class RegisteredApplicationDataManager(IConfiguration configuratio
         return MongoDataMapperProfile.MapToDomain(model: allData.FirstOrDefault() ?? throw new KeyNotFoundException(ExceptionConstants.DataNotFoundExceptionMessage));
     }
 
-    /// <summary>
-    /// Gets the list of registered applications for the current logged in user.
-    /// </summary>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The list of <see cref="RegisteredApplicationDomain"/></returns>
-    public async Task<IEnumerable<RegisteredApplicationDomain>> GetRegisteredApplicationsAsync(string currentLoggedInUser, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<IEnumerable<RegisteredApplicationDomain>> GetRegisteredApplicationsAsync(
+        string currentLoggedInUser,
+        CancellationToken cancellationToken = default
+    )
     {
         var filter = Builders<RegisteredApplicationDataModel>.Filter.And(
             Builders<RegisteredApplicationDataModel>.Filter.Eq(x => x.IsActive, true));
@@ -127,15 +120,12 @@ public sealed class RegisteredApplicationDataManager(IConfiguration configuratio
         return [.. result.Select(MongoDataMapperProfile.MapToDomain)];
     }
 
-    /// <summary>
-    /// Updates an existing registered application for the current logged in user with the provided application data. 
-    /// </summary>
-    /// <remarks>The application to be updated is identified by the Id property of the provided application data model.</remarks>
-    /// <param name="currentLoggedInUser">The current logged in user.</param>
-    /// <param name="updateApplicationData">The update application data model.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A boolean for success/failure.</returns>
-    public async Task<bool> UpdateExistingRegisteredApplicationAsync(string currentLoggedInUser, RegisteredApplicationDomain updateApplicationData, CancellationToken cancellationToken = default)
+    /// <inheritdoc/>
+    public async Task<bool> UpdateExistingRegisteredApplicationAsync(
+        string currentLoggedInUser,
+        RegisteredApplicationDomain updateApplicationData,
+        CancellationToken cancellationToken = default
+    )
     {
         var dbInput = MongoDataMapperProfile.MapToModel(domain: updateApplicationData);
 

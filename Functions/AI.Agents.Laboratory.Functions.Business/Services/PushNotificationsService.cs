@@ -21,12 +21,7 @@ public sealed class PushNotificationsService(
     ICorrelationContext correlationContext,
     INotificationsDataManager notificationsDataManager) : INotificationService
 {
-    /// <summary>
-    /// Processes an incoming push notification request and returns a boolean indicating the success of the operation.
-    /// </summary>
-    /// <param name="notificationModel">The notification request to process.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <inheritdoc/>
     public async Task<bool> SendNotificationsAsync(
         NotificationRequest notificationModel,
         CancellationToken cancellationToken = default

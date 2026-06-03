@@ -13,7 +13,7 @@ using static AIAgents.Laboratory.API.Helpers.Constants;
 using static AIAgents.Laboratory.API.Helpers.RouteConstants;
 using static AIAgents.Laboratory.API.Helpers.SwaggerConstants.AgentsController;
 
-namespace AIAgents.Laboratory.API.Controllers.v2;
+namespace AIAgents.Laboratory.API.Controllers;
 
 /// <summary>
 /// The <c>AgentsController</c> class is an API controller responsible for handling HTTP requests related to agent management in the AIAgents Laboratory application. 
@@ -27,7 +27,6 @@ namespace AIAgents.Laboratory.API.Controllers.v2;
 /// <param name="agentsHandler">The agents handler service.</param>
 /// <seealso cref="BaseController" />
 [ApiController]
-[ApiVersion(ApiVersionsConstants.ApiVersionV2)]
 [Route(ApiBaseRoute)]
 public sealed class AgentsController(
     IHttpContextAccessor httpContext,

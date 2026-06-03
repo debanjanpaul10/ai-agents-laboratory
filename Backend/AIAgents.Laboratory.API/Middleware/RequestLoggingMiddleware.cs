@@ -9,7 +9,9 @@ namespace AIAgents.Laboratory.API.Middleware;
 /// </summary>
 /// <param name="next">The next RequestDelegate in the pipeline.</param>
 /// <param name="logger">The ILogger instance for logging.</param>
-public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
+public sealed class RequestLoggingMiddleware(
+    RequestDelegate next,
+    ILogger<RequestLoggingMiddleware> logger)
 {
     /// <summary>
     /// Invokes the middleware to process the HTTP context.
@@ -21,7 +23,10 @@ public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<Reque
         var stopwatch = Stopwatch.StartNew();
 
         // Log request
-        logger.LogAppInformation(LoggingConstants.HttpLoggingMessage, httpContext.Request.Method, httpContext.Request.Path);
+        logger.LogAppInformation(
+            LoggingConstants.HttpLoggingMessage,
+            httpContext.Request.Method, httpContext.Request.Path
+        );
 
         try
         {

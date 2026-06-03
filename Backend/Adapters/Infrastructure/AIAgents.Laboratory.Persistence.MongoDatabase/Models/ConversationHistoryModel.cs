@@ -42,4 +42,9 @@ public sealed record ConversationHistoryModel
     /// The last modified on date.
     /// </summary>
     public DateTime LastModifiedOn { get; set; }
+
+    /// <summary>
+    /// The workspace id for multi-agent collaboration scenario, where agents are working in the same workspace and need to access the same conversation history.
+    /// </summary>
+    public string? WorkspaceId { get; set; } = null;
 }

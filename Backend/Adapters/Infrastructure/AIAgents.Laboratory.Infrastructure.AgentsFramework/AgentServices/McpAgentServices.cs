@@ -21,32 +21,30 @@ public sealed class McpAgentServices(
     ILogger<McpAgentServices> logger,
     ICorrelationContext correlationContext) : IMcpClientServices
 {
-    /// <summary>
-    /// Asynchronously retrieves all available MCP client tools from the specified MCP server endpoint.
-    /// </summary>
-    /// <param name="mcpServerUrl">The URL of the MCP server endpoint from which to retrieve the list of client tools. Must be a valid, absolute URI.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see
-    /// cref="McpClientTool"/> objects representing the available client tools. The collection will be empty if no tools are found.</returns>
+    /// <inheritdoc/>
     public async Task<IEnumerable<McpClientTool>> GetAllMcpToolsAsync(
         string mcpServerUrl,
         CancellationToken cancellationToken = default
     )
     {
+        IEnumerable<McpClientTool> response = [];
         try
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodStart,
-                nameof(GetAllMcpToolsAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl)
+                nameof(GetAllMcpToolsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl })
             );
 
             var mcpClient = await this.CreateMcpClientAsync(
                 mcpServerUrl,
                 cancellationToken
             ).ConfigureAwait(false);
-            return await mcpClient.ListToolsAsync(
+
+            response = await mcpClient.ListToolsAsync(
                 cancellationToken: cancellationToken
             ).ConfigureAwait(false);
+            return response;
         }
         catch (Exception ex)
         {
@@ -64,23 +62,19 @@ public sealed class McpAgentServices(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
-                nameof(GetAllMcpToolsAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl)
+                nameof(GetAllMcpToolsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, mcpServerUrl })
             );
         }
     }
 
-    /// <summary>
-    /// Gets the MCP tool response asynchronous.
-    /// </summary>
-    /// <param name="mcpServerUrl">The MCP server URL.</param>
-    /// <param name="toolName">Name of the tool.</param>
-    /// <param name="toolArguments">The tool arguments.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>
-    /// The MCP Tool Response.
-    /// </returns>
+    /// <inheritdoc/>
     public async Task<string> GetMcpToolResponseAsync(
-        string mcpServerUrl, string toolName, Dictionary<string, object?> toolArguments, CancellationToken cancellationToken = default)
+        string mcpServerUrl,
+        string toolName,
+        Dictionary<string, object?> toolArguments,
+        CancellationToken cancellationToken = default
+    )
     {
         string response = string.Empty;
         try
@@ -144,8 +138,8 @@ public sealed class McpAgentServices(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodStart,
-                nameof(CreateMcpClientAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl
-            ));
+                nameof(CreateMcpClientAsync), DateTime.UtcNow, mcpServerUrl
+            );
 
             var aiAgentsToken = await TokenHelper.GetAiAgentsLabTokenAsync(
                 correlationId: correlationContext.CorrelationId,
@@ -185,23 +179,9 @@ public sealed class McpAgentServices(
         {
             logger.LogAppInformation(
                 LoggingConstants.LogHelperMethodEnd,
-                nameof(CreateMcpClientAsync), DateTime.UtcNow, SanitizeForLogging(mcpServerUrl)
+                nameof(CreateMcpClientAsync), DateTime.UtcNow, mcpServerUrl
             );
         }
-    }
-
-    /// <summary>
-    /// Sanitizes a string value for safe logging by removing line breaks and control characters.
-    /// </summary>
-    /// <param name="value">The value to sanitize.</param>
-    /// <returns>The sanitized value suitable for logging.</returns>
-    private static string SanitizeForLogging(string value)
-    {
-        if (string.IsNullOrEmpty(value)) return value;
-
-        var withoutLineEndings = value.Replace("\r", string.Empty).Replace("\n", string.Empty);
-        var sanitizedChars = withoutLineEndings.Where(c => !char.IsControl(c) || c == '\t');
-        return new string([.. sanitizedChars]);
     }
 
     #endregion
