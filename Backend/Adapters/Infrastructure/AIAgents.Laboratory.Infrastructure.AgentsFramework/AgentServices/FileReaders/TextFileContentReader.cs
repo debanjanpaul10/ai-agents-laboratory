@@ -1,6 +1,6 @@
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Agents;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.Contracts;
 using Microsoft.Extensions.Logging;
 using static AIAgents.Laboratory.Infrastructure.AgentsFramework.Helpers.Constants;
@@ -25,14 +25,10 @@ internal sealed class TextFileContentReader(
     /// </summary>
     public IReadOnlyCollection<string> SupportedExtensions { get; } = [KnowledgeBaseConstants.FileContentTypes.JsonFiles, KnowledgeBaseConstants.FileContentTypes.PlainTextFiles];
 
-    /// <summary>
-    /// Reads the content of a plain text file, including JSON files, by converting the byte array content into a UTF-8 encoded string.
-    /// </summary>
-    /// <remarks>This method checks if the file content is null or empty and returns an empty string in such cases. 
-    /// It logs the start and end of the reading process, as well as any exceptions that occur, which are rethrown as <see cref="AIAgentsException"/>.</remarks>
-    /// <param name="knowledgeBaseDocument">The object containing the PDF file content to be read.</param>
-    /// <returns>The string content of the file.</returns>
-    public string Read(KnowledgeBaseDocumentDomain knowledgeBaseDocument)
+    /// <inheritdoc />
+    public string Read(
+        KnowledgeBaseDocumentDomain knowledgeBaseDocument
+    )
     {
         ArgumentNullException.ThrowIfNull(knowledgeBaseDocument);
 

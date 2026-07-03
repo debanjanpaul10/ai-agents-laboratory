@@ -1,6 +1,6 @@
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Contracts;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Mapper;
@@ -17,7 +17,7 @@ namespace AIAgents.Laboratory.Persistence.MongoDatabase.DataManager;
 /// Provides an implementation of the INotificationsDataManager interface, responsible for handling data access operations related to notifications.
 /// </summary>
 /// <param name="correlationContext">The correlation context used to track and correlate logs and operations.</param>
-/// <param name="logger">The ILogger instance used for logging information, warnings, and errors that occur within the data manager's methods. This helps in monitoring the application's behavior and diagnosing issues when they arise.</param>
+/// <param name="logger">The ILogger instance used for logging information, warnings, and errors that occur within the data manager's methods.</param>
 /// <param name="configuration">The configuration instance used to access application settings.</param>
 /// <param name="mongoDatabaseRepository">The MongoDB database repository used for data access operations.</param>
 /// <seealso cref="INotificationsDataManager"/>

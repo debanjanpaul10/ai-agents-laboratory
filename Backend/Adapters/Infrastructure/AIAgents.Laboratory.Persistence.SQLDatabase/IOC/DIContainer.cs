@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Context;
+using AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.DataManagers;
+using AIAgents.Laboratory.Persistence.SQLDatabase.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +35,7 @@ public static class DIContainer
                 sqlServerOptionsAction: options => options.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null))
         );
 
-        services.AddDataManagerDependencies();
+        services.AddDataManagerDependencies().AddRepositoryDependencies();
         return services;
     }
 
@@ -45,4 +47,12 @@ public static class DIContainer
     private static IServiceCollection AddDataManagerDependencies(this IServiceCollection services) =>
         services.AddScoped<IUnitOfWork, UnitOfWork>()
         .AddScoped<IFeedbackDataManager, FeedbackDataManager>();
+
+    /// <summary>
+    /// Add the repositories.
+    /// </summary>
+    /// <param name="services">The services.</param>
+    /// <returns>The updated services collection.</returns>
+    private static IServiceCollection AddRepositoryDependencies(this IServiceCollection services) =>
+        services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 }

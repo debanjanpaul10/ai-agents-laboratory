@@ -34,7 +34,9 @@ public sealed class FileContentReaderFactory(
     /// </summary>
     /// <param name="fileExtension">The file extension for which to resolve the content reader (e.g., ".txt", ".pdf"). The extension should include the leading dot and is case-insensitive.</param>
     /// <returns>The <see cref="IFileContentReader"/> instance that can handle the specified file extension.</returns>
-    public IFileContentReader Resolve(string fileExtension)
+    public IFileContentReader Resolve(
+        string fileExtension
+    )
     {
         try
         {

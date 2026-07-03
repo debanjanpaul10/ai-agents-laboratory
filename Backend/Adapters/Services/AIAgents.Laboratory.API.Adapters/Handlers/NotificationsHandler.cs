@@ -1,9 +1,10 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
-using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.Ports.In;
 using Microsoft.AspNetCore.Http;
+using static AIAgents.Laboratory.API.Adapters.Mapper.DomainToResponseMapper;
+using static AIAgents.Laboratory.API.Adapters.Mapper.RequestToDomainMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
@@ -20,7 +21,7 @@ public sealed class NotificationsHandler(INotificationsService notificationsServ
         CancellationToken cancellationToken = default
     )
     {
-        var domainInput = DomainMapperProfile.MapToDomain(request);
+        var domainInput = MapToDomain(request);
         return await notificationsService.CreateNewNotificationAsync(
             request: domainInput,
             cancellationToken
@@ -31,13 +32,11 @@ public sealed class NotificationsHandler(INotificationsService notificationsServ
     public async Task<bool> DeleteAllNotificationsForUserAsync(
         string currentLoggedInUser,
         CancellationToken cancellationToken = default
-    )
-    {
-        return await notificationsService.DeleteAllNotificationsForUserAsync(
+    ) =>
+        await notificationsService.DeleteAllNotificationsForUserAsync(
             currentLoggedInUser,
             cancellationToken
         ).ConfigureAwait(false);
-    }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<NotificationsResponseDto>> GetNotificationsForUserAsync(
@@ -49,7 +48,7 @@ public sealed class NotificationsHandler(INotificationsService notificationsServ
             recipientUserName,
             cancellationToken
         ).ConfigureAwait(false);
-        return [.. domainResponse.Select(DomainMapperProfile.MapToDto)];
+        return [.. domainResponse.Select(MapToDto)];
     }
 
     /// <inheritdoc/>
@@ -57,14 +56,12 @@ public sealed class NotificationsHandler(INotificationsService notificationsServ
         string currentLoggedInUser,
         Guid notificationId,
         CancellationToken cancellationToken = default
-    )
-    {
-        return await notificationsService.MarkExistingNotificationAsReadAsync(
+    ) =>
+        await notificationsService.MarkExistingNotificationAsReadAsync(
             currentLoggedInUser,
             notificationId,
             cancellationToken
         ).ConfigureAwait(false);
-    }
 
     /// <inheritdoc/>
     public async Task StreamNotificationsForUserAsync(

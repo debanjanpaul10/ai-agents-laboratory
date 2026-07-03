@@ -1,6 +1,6 @@
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Agents;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.Contracts;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -25,14 +25,10 @@ internal sealed class WordFileContentReader(
     /// </summary>
     public IReadOnlyCollection<string> SupportedExtensions { get; } = KnowledgeBaseConstants.FileContentTypes.WordFiles.Split(KnowledgeBaseConstants.CommaSeparator);
 
-    /// <summary>
-    /// Reads the content of a Word document from the provided <see cref="KnowledgeBaseDocumentDomain"/> object and returns it as a string.
-    /// </summary>
-    /// <remarks>This method uses the Open XML SDK to read the content of the Word document. It extracts the text from each paragraph in the document and concatenates them into a single string, which is then returned. 
-    /// If the file content is null or empty, it returns an empty string. Any exceptions encountered during the reading process are logged and rethrown as <see cref="AIAgentsException"/>.</remarks>
-    /// <param name="knowledgeBaseDocument">The object containing the PDF file content to be read.</param>
-    /// <returns>The string content of the file.</returns>
-    public string Read(KnowledgeBaseDocumentDomain knowledgeBaseDocument)
+    /// <inheritdoc />
+    public string Read(
+        KnowledgeBaseDocumentDomain knowledgeBaseDocument
+    )
     {
         ArgumentNullException.ThrowIfNull(knowledgeBaseDocument);
 

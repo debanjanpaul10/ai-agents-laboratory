@@ -1,8 +1,9 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
-using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.Ports.In;
+using static AIAgents.Laboratory.API.Adapters.Mapper.DomainToResponseMapper;
+using static AIAgents.Laboratory.API.Adapters.Mapper.RequestToDomainMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
@@ -20,7 +21,7 @@ public sealed class AgentsHandler(IAgentsService agentsService) : IAgentsHandler
         CancellationToken cancellationToken = default
     )
     {
-        var domainInput = DomainMapperProfile.MapToDomain(agentData);
+        var domainInput = MapToDomain(dto: agentData);
         return await agentsService.CreateNewAgentAsync(
             agentData: domainInput,
             userEmail,
@@ -40,7 +41,7 @@ public sealed class AgentsHandler(IAgentsService agentsService) : IAgentsHandler
             userEmail,
             cancellationToken
         ).ConfigureAwait(false);
-        return DomainMapperProfile.MapToDto(domainResult);
+        return MapToDto(domainResult);
     }
 
     /// <inheritdoc/>
@@ -53,7 +54,7 @@ public sealed class AgentsHandler(IAgentsService agentsService) : IAgentsHandler
             userEmail,
             cancellationToken
         ).ConfigureAwait(false);
-        return [.. domainResult.Select(DomainMapperProfile.MapToDto)];
+        return [.. domainResult.Select(MapToDto)];
     }
 
     /// <inheritdoc/>
@@ -63,7 +64,7 @@ public sealed class AgentsHandler(IAgentsService agentsService) : IAgentsHandler
         CancellationToken cancellationToken = default
     )
     {
-        var domainRequest = DomainMapperProfile.MapToDomain(updateAgentData);
+        var domainRequest = MapToDomain(updateAgentData);
         return await agentsService.UpdateExistingAgentDataAsync(
             updateDataDomain: domainRequest,
             userEmail: currentUserEmail,

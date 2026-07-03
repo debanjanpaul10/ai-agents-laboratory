@@ -1,9 +1,9 @@
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Feedback;
 using AIAgents.Laboratory.Domain.Ports.Out;
+using AIAgents.Laboratory.Persistence.SQLDatabase.Contracts;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Mapper;
-using AIAgents.Laboratory.Persistence.SQLDatabase.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using static AIAgents.Laboratory.Persistence.SQLDatabase.Helpers.Constants;
@@ -15,14 +15,14 @@ namespace AIAgents.Laboratory.Persistence.SQLDatabase.DataManagers;
 /// </summary>
 /// <remarks>This class is intended for use in scenarios where feedback data, such as bug reports and feature requests, must be managed in a consistent and auditable manner. 
 /// All operations are performed asynchronously and are logged for traceability. Thread safety is ensured by the stateless nature of the manager and its reliance on injected dependencies.</remarks>
-/// <param name="unitOfWork">The unit of work used to coordinate repository operations and persist changes.</param>
 /// <param name="logger">The logger used for recording informational and error messages during operations.</param>
 /// <param name="correlationContext">The correlation context used to track request correlation identifiers for logging and exception handling.</param>
+/// <param name="feedbackRepository">The feedback data repository service used to manipulate the data from database for the feedback entities.</param>
 /// <seealso cref="IFeedbackDataManager"/>
 public sealed class FeedbackDataManager(
-    IUnitOfWork unitOfWork,
     ILogger<FeedbackDataManager> logger,
-    ICorrelationContext correlationContext) : IFeedbackDataManager
+    ICorrelationContext correlationContext,
+    IFeedbackRepository feedbackRepository) : IFeedbackDataManager
 {
     /// <inheritdoc/>
     public async Task<bool> AddNewBugReportDataAsync(
@@ -30,34 +30,43 @@ public sealed class FeedbackDataManager(
         CancellationToken cancellationToken = default
     )
     {
+        bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(AddNewBugReportDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, bugReportData }));
+            logger.LogAppInformation(
+                LoggingConstants.MethodStartedMessageConstant,
+                nameof(AddNewBugReportDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, bugReportData })
+            );
 
-            var entityData = DataMapperProfile.MapToEntity(domainInput: bugReportData);
-            var bugStatusEntity = await unitOfWork.Repository<BugItemStatusMappingEntity>()
-                .FirstOrDefaultAsync(status => status.StatusName == DatabaseConstants.NotStartedConstant && status.IsActive, cancellationToken)
-                .ConfigureAwait(false);
-
-            bugReportData.BugStatusId = bugStatusEntity?.Id ?? 0;
-
-            await unitOfWork.Repository<BugReportDataEntity>()
-                .AddAsync(entityData, cancellationToken)
-                .ConfigureAwait(false);
-            await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-            return true;
+            var entityData = DataMapperProfile.MapToEntity(
+                domainInput: bugReportData
+            );
+            response = await feedbackRepository.AddNewBugReportDataAsync(
+                bugReportData: entityData,
+                cancellationToken
+            ).ConfigureAwait(false);
+            return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(AddNewBugReportDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.MethodFailedWithMessageConstant,
+                nameof(AddNewBugReportDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(AddNewBugReportDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, bugReportData }));
+            logger.LogAppInformation(
+                LoggingConstants.MethodEndedMessageConstant,
+                nameof(AddNewBugReportDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, bugReportData, response })
+            );
         }
     }
 
@@ -67,29 +76,43 @@ public sealed class FeedbackDataManager(
         CancellationToken cancellationToken = default
     )
     {
+        bool response = false;
         try
         {
-            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, featureRequestData }));
+            logger.LogAppInformation(
+                LoggingConstants.MethodStartedMessageConstant,
+                nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, featureRequestData })
+            );
 
-            var entityData = DataMapperProfile.MapToEntity(domainInput: featureRequestData);
-
-            await unitOfWork.Repository<NewFeatureRequestDataEntity>()
-                .AddAsync(entityData, cancellationToken)
-                .ConfigureAwait(false);
-
-            await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            return true;
+            var entityData = DataMapperProfile.MapToEntity(
+                domainInput: featureRequestData
+            );
+            response = await feedbackRepository.AddNewFeatureRequestDataAsync(
+                featureRequestData: entityData,
+                cancellationToken
+            ).ConfigureAwait(false);
+            return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.MethodFailedWithMessageConstant,
+                nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, featureRequestData }));
+            logger.LogAppInformation(
+                LoggingConstants.MethodEndedMessageConstant,
+                nameof(AddNewFeatureRequestDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, featureRequestData, response })
+            );
         }
     }
 
@@ -99,25 +122,41 @@ public sealed class FeedbackDataManager(
         CancellationToken cancellationToken = default
     )
     {
+        IEnumerable<BugReportData> response = [];
         try
         {
-            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
+            logger.LogAppInformation(
+                LoggingConstants.MethodStartedMessageConstant,
+                nameof(GetAllBugReportsDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser })
+            );
 
-            var result = await unitOfWork.Repository<BugReportDataEntity>()
-                .GetAllAsync(x => x.IsActive, cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-            return [.. result.Select(DataMapperProfile.MapToDomain)];
+            var dbResponse = await feedbackRepository.GetAllBugReportsDataAsync(
+                currentLoggedinUser,
+                cancellationToken
+            ).ConfigureAwait(false);
+            response = [.. dbResponse.Select(DataMapperProfile.MapToDomain)];
+            return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.MethodFailedWithMessageConstant,
+                nameof(GetAllBugReportsDataAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetAllBugReportsDataAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
+            logger.LogAppInformation(
+                LoggingConstants.MethodEndedMessageConstant,
+                nameof(GetAllBugReportsDataAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser, response })
+            );
         }
     }
 
@@ -127,25 +166,41 @@ public sealed class FeedbackDataManager(
         CancellationToken cancellationToken = default
     )
     {
+        IEnumerable<NewFeatureRequestData> response = [];
         try
         {
-            logger.LogAppInformation(LoggingConstants.MethodStartedMessageConstant, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
+            logger.LogAppInformation(
+                LoggingConstants.MethodStartedMessageConstant,
+                nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser })
+            );
 
-            var result = await unitOfWork.Repository<NewFeatureRequestDataEntity>()
-                .GetAllAsync(x => x.IsActive, cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-            return [.. result.Select(DataMapperProfile.MapToDomain)];
+            var dbResponse = await feedbackRepository.GetAllSubmittedFeatureRequestsAsync(
+                currentLoggedinUser,
+                cancellationToken
+            ).ConfigureAwait(false);
+            response = [.. dbResponse.Select(DataMapperProfile.MapToDomain)];
+            return response;
         }
         catch (Exception ex)
         {
-            logger.LogAppError(ex, LoggingConstants.MethodFailedWithMessageConstant, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, ex.Message);
-            throw new AIAgentsBusinessException(ex.Message, correlationContext.CorrelationId);
+            logger.LogAppError(
+                ex,
+                LoggingConstants.MethodFailedWithMessageConstant,
+                nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow, ex.Message
+            );
+            throw new AIAgentsBusinessException(
+                message: ex.Message,
+                correlationId: correlationContext.CorrelationId
+            );
         }
         finally
         {
-            logger.LogAppInformation(LoggingConstants.MethodEndedMessageConstant, nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow,
-                JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser }));
+            logger.LogAppInformation(
+                LoggingConstants.MethodEndedMessageConstant,
+                nameof(GetAllSubmittedFeatureRequestsAsync), DateTime.UtcNow,
+                    JsonConvert.SerializeObject(new { correlationContext.CorrelationId, currentLoggedinUser, response })
+            );
         }
     }
 }

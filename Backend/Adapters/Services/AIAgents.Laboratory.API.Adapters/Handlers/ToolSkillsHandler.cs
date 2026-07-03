@@ -1,7 +1,8 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
-using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.Ports.In;
+using static AIAgents.Laboratory.API.Adapters.Mapper.DomainToResponseMapper;
+using static AIAgents.Laboratory.API.Adapters.Mapper.RequestToDomainMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
@@ -19,7 +20,7 @@ public sealed class ToolSkillsHandler(IToolSkillsService toolSkillsService) : IT
         CancellationToken cancellationToken = default
     )
     {
-        var domainInput = DomainMapperProfile.MapToDomain(toolSkillData);
+        var domainInput = MapToDomain(toolSkillData);
         return await toolSkillsService.AddNewToolSkillAsync(
             toolSkillData: domainInput,
             userEmail,
@@ -32,14 +33,12 @@ public sealed class ToolSkillsHandler(IToolSkillsService toolSkillsService) : IT
         string toolSkillId,
         string currentUserEmail,
         CancellationToken cancellationToken = default
-    )
-    {
-        return await toolSkillsService.DeleteExistingToolSkillBySkillIdAsync(
+    ) =>
+        await toolSkillsService.DeleteExistingToolSkillBySkillIdAsync(
             toolSkillId,
             currentUserEmail,
             cancellationToken
         ).ConfigureAwait(false);
-    }
 
     /// <inheritdoc />
     public async Task<IEnumerable<McpServerToolsDTO>> GetAllMcpToolsAvailableAsync(
@@ -70,7 +69,7 @@ public sealed class ToolSkillsHandler(IToolSkillsService toolSkillsService) : IT
             userEmail,
             cancellationToken
         ).ConfigureAwait(false);
-        return [.. domainResult.Select(DomainMapperProfile.MapToDto)];
+        return [.. domainResult.Select(MapToDto)];
     }
 
     /// <inheritdoc />
@@ -85,7 +84,7 @@ public sealed class ToolSkillsHandler(IToolSkillsService toolSkillsService) : IT
             currentUserEmail,
             cancellationToken
         ).ConfigureAwait(false);
-        return DomainMapperProfile.MapToDto(domainResult);
+        return MapToDto(domainResult);
     }
 
     /// <inheritdoc />
@@ -95,7 +94,7 @@ public sealed class ToolSkillsHandler(IToolSkillsService toolSkillsService) : IT
         CancellationToken cancellationToken = default
     )
     {
-        var domainInput = DomainMapperProfile.MapToDomain(updateToolSkillData);
+        var domainInput = MapToDomain(updateToolSkillData);
         return await toolSkillsService.UpdateExistingToolSkillDataAsync(
             updateToolSkillData: domainInput,
             currentUserEmail,

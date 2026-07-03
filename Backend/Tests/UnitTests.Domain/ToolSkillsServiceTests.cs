@@ -1,6 +1,7 @@
 ﻿using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models;
+using AIAgents.Laboratory.Domain.Models.Skills;
 using AIAgents.Laboratory.Domain.Ports.In;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Domain.UseCases;
@@ -55,11 +56,12 @@ public sealed class ToolSkillsServiceTests
             .Returns(Guid.NewGuid().ToString());
 
         _toolSkillsService = new ToolSkillsService(
-            _mockLogger.Object,
-            _mockCorrelationContext.Object,
-            _mockDataManager.Object,
-            _mockMcpClientServices.Object,
-            _mockNotificationsService.Object);
+            logger: _mockLogger.Object,
+            correlationContext: _mockCorrelationContext.Object,
+            toolSkillsDataManager: _mockDataManager.Object,
+            mcpClientServices: _mockMcpClientServices.Object,
+            notificationsService: _mockNotificationsService.Object
+        );
     }
 
     #region AddNewToolSkillAsync

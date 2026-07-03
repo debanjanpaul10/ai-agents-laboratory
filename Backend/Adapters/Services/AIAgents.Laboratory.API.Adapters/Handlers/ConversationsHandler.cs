@@ -1,7 +1,7 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
-using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.Contracts;
+using static AIAgents.Laboratory.API.Adapters.Mapper.DomainToResponseMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
@@ -23,7 +23,7 @@ public sealed class ConversationsHandler(
             userName,
             cancellationToken
         ).ConfigureAwait(false);
-        return DomainMapperProfile.MapToDto(domain: domainResult);
+        return MapToDto(domain: domainResult);
     }
 
     /// <inheritdoc/>
@@ -39,7 +39,7 @@ public sealed class ConversationsHandler(
             currentUserEmail,
             cancellationToken
         ).ConfigureAwait(false);
-        return DomainMapperProfile.MapToDto(domain: domainResult);
+        return MapToDto(domain: domainResult);
     }
 
     /// <inheritdoc/>
@@ -48,27 +48,23 @@ public sealed class ConversationsHandler(
         string currentUserEmail,
         string conversationId,
         CancellationToken cancellationToken = default
-    )
-    {
-        return await conversationHistoryService.ClearConversationHistoryByWorkspaceAsync(
+    ) =>
+        await conversationHistoryService.ClearConversationHistoryByWorkspaceAsync(
             workspaceId,
             conversationId,
             currentUserEmail,
             cancellationToken
         ).ConfigureAwait(false);
-    }
 
     /// <inheritdoc />
     public async Task<bool> ClearConversationHistoryForUserAsync(
         string userName,
         CancellationToken cancellationToken = default
-    )
-    {
-        return await conversationHistoryService.ClearConversationHistoryForUserAsync(
+    ) =>
+        await conversationHistoryService.ClearConversationHistoryForUserAsync(
             userName,
             cancellationToken
         ).ConfigureAwait(false);
-    }
 
     /// <inheritdoc />
     public async Task<ConversationHistoryDTO> InitializeWorkspaceConversationAsync(
@@ -82,6 +78,6 @@ public sealed class ConversationsHandler(
             userOrApplicationName,
             cancellationToken
         ).ConfigureAwait(false);
-        return DomainMapperProfile.MapToDto(domain: domainResult);
+        return MapToDto(domain: domainResult);
     }
 }

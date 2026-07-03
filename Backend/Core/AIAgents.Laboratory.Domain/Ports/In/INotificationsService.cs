@@ -1,4 +1,4 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities;
+﻿using AIAgents.Laboratory.Domain.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace AIAgents.Laboratory.Domain.Ports.In;

@@ -1,4 +1,4 @@
-using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
+using AIAgents.Laboratory.Domain.Models.Feedback;
 
 namespace AIAgents.Laboratory.Domain.Ports.In;
 

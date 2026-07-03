@@ -1,6 +1,6 @@
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Chats;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
