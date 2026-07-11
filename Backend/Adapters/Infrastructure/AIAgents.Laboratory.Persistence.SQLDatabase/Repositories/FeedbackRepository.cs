@@ -29,11 +29,9 @@ public sealed class FeedbackRepository(IUnitOfWork unitOfWork) : IFeedbackReposi
             .AddAsync(entity: bugReportData, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        await unitOfWork.SaveChangesAsync(
+        return await unitOfWork.SaveChangesAsync(
             cancellationToken
-        ).ConfigureAwait(false);
-
-        return true;
+        ).ConfigureAwait(false) > 0;
     }
 
     /// <inheritdoc/>
@@ -43,11 +41,12 @@ public sealed class FeedbackRepository(IUnitOfWork unitOfWork) : IFeedbackReposi
     )
     {
         await unitOfWork.Repository<NewFeatureRequestDataEntity>()
-            .AddAsync(entity: featureRequestData, cancellationToken)
+            .AddAsync(entity: featureRequestData, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        return true;
+        return await unitOfWork.SaveChangesAsync(
+            cancellationToken
+        ).ConfigureAwait(false) > 0;
     }
 
     /// <inheritdoc/>
