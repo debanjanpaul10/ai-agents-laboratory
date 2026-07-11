@@ -1,15 +1,16 @@
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Chats;
 using AIAgents.Laboratory.Domain.Ports.In;
 using AIAgents.Laboratory.Domain.Ports.Out;
+using AIAgents.Laboratory.Domain.UnitTests;
 using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
-namespace AIAgents.Laboratory.Domain.UnitTests;
+namespace UnitTests.Domain;
 
 /// <summary>
 /// The Direct Chat Services Tests class.
@@ -62,12 +63,13 @@ public sealed class DirectChatServiceTests
     public DirectChatServiceTests()
     {
         _directChatService = new DirectChatService(
-            _mockLogger.Object,
-            _mockConfiguration.Object,
-            _mockAgentsService.Object,
-            _mockCorrelationContext.Object,
-            _mockAiServices.Object,
-            _mockConversationHistoryService.Object);
+            logger: _mockLogger.Object,
+            configuration: _mockConfiguration.Object,
+            agentsService: _mockAgentsService.Object,
+            correlationContext: _mockCorrelationContext.Object,
+            aiServices: _mockAiServices.Object,
+            conversationHistoryService: _mockConversationHistoryService.Object
+        );
 
         _mockCorrelationContext.Setup(c => c.CorrelationId).Returns(Guid.NewGuid().ToString());
     }

@@ -35,7 +35,7 @@ public sealed class CommonAiHandler(ICommonAiService commonAiService) : ICommonA
         return new()
         {
             ActiveAgentsCount = ActiveAgentsCount,
-            TopActiveAgents = [.. TopActiveAgentsList.Select(DomainMapperProfile.MapToDto)]
+            TopActiveAgents = [.. TopActiveAgentsList.Select(DomainToResponseMapper.MapToDto)]
         };
     }
 }

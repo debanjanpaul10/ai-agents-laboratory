@@ -1,4 +1,4 @@
-using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.Models.Skills;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Contracts;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Mapper;

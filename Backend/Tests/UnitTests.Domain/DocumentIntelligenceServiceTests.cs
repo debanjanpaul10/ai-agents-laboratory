@@ -1,7 +1,8 @@
 ﻿using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Agents;
 using AIAgents.Laboratory.Domain.Ports.Out;
+using AIAgents.Laboratory.Domain.UnitTests;
 using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
-namespace AIAgents.Laboratory.Domain.UnitTests;
+namespace UnitTests.Domain;
 
 /// <summary>
 /// The Document Intelligence Service Tests class.

@@ -1,5 +1,5 @@
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
+using AIAgents.Laboratory.Domain.Models.Agents;
+using AIAgents.Laboratory.Domain.Models.Workspaces;
 
 namespace AIAgents.Laboratory.Domain.Ports.In;
 

@@ -1,7 +1,7 @@
 ﻿using AIAgents.Laboratory.API.Adapters.Contracts;
-using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.Domain.Ports.In;
+using static AIAgents.Laboratory.API.Adapters.Mapper.RequestToDomainMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
@@ -41,7 +41,7 @@ public sealed class ChatHandler(
         CancellationToken cancellationToken = default
     )
     {
-        var domainInput = DomainMapperProfile.MapToDomain(dto: chatRequestDTO);
+        var domainInput = MapToDomain(dto: chatRequestDTO);
         return await agentChatService.GetAgentChatResponseAsync(
             chatRequest: domainInput,
             cancellationToken

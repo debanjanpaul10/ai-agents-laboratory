@@ -1,6 +1,6 @@
 ﻿using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Agents;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.AgentServices.FileReaders;
 using Microsoft.Extensions.AI;
@@ -33,7 +33,9 @@ public sealed class KnowledgeBaseProcessor(
     FileContentReaderFactory fileContentReaderFactory) : IKnowledgeBaseProcessor
 {
     /// <inheritdoc />
-    public string DetectAndReadFileContent(KnowledgeBaseDocumentDomain knowledgeBaseDocumentDomain)
+    public string DetectAndReadFileContent(
+        KnowledgeBaseDocumentDomain knowledgeBaseDocumentDomain
+    )
     {
         ArgumentNullException.ThrowIfNull(knowledgeBaseDocumentDomain);
 
@@ -46,7 +48,7 @@ public sealed class KnowledgeBaseProcessor(
 
             var fileExtension = Path.GetExtension(knowledgeBaseDocumentDomain.FileName);
             var reader = fileContentReaderFactory.Resolve(fileExtension);
-            return reader.Read(knowledgeBaseDocumentDomain);
+            return reader.Read(knowledgeBaseDocument: knowledgeBaseDocumentDomain);
         }
         catch (Exception ex)
         {

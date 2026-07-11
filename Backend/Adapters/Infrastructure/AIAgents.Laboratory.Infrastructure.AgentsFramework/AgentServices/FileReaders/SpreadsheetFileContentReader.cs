@@ -1,6 +1,6 @@
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Agents;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.Contracts;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.Helpers;
 using DocumentFormat.OpenXml.Packaging;
@@ -25,14 +25,10 @@ internal sealed class SpreadsheetFileContentReader(
     /// </summary>
     public IReadOnlyCollection<string> SupportedExtensions { get; } = KnowledgeBaseConstants.FileContentTypes.ExcelFiles.Split(KnowledgeBaseConstants.CommaSeparator);
 
-    /// <summary>
-    /// Reads the content of a spreadsheet file and returns it as a string. The method takes a <see cref="KnowledgeBaseDocumentDomain"/> object as input, which contains the file content in byte array format. 
-    /// </summary>
-    /// <remarks>It uses the Open XML SDK to open the spreadsheet document, extract text from all sheets, and concatenate it into a single string. If the file content is empty, it returns an empty string. 
-    /// The method also includes error handling to log any exceptions that occur during the reading process and rethrows them as <see cref="AIAgentsException"/>.</remarks>
-    /// <param name="knowledgeBaseDocument">The object containing the PDF file content to be read.</param>
-    /// <returns>The string content of the file.</returns>
-    public string Read(KnowledgeBaseDocumentDomain knowledgeBaseDocument)
+    /// <inheritdoc />
+    public string Read(
+        KnowledgeBaseDocumentDomain knowledgeBaseDocument
+    )
     {
         ArgumentNullException.ThrowIfNull(knowledgeBaseDocument);
         ArgumentNullException.ThrowIfNull(knowledgeBaseDocument.FileContent);

@@ -1,6 +1,6 @@
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Agents;
 using AIAgents.Laboratory.Infrastructure.AgentsFramework.Contracts;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
@@ -28,12 +28,10 @@ internal sealed class PdfFileContentReader(
     /// </summary>
     public IReadOnlyCollection<string> SupportedExtensions { get; } = [KnowledgeBaseConstants.FileContentTypes.PdfFiles];
 
-    /// <summary>
-    /// Reads the content of a PDF file and returns it as a string. The method takes a <see cref="KnowledgeBaseDocumentDomain"/> object as input, which contains the file content in byte array format.
-    /// </summary>
-    /// <param name="knowledgeBaseDocument">The object containing the PDF file content to be read.</param>
-    /// <returns>The string content of the file.</returns>
-    public string Read(KnowledgeBaseDocumentDomain knowledgeBaseDocument)
+    /// <inheritdoc />
+    public string Read(
+        KnowledgeBaseDocumentDomain knowledgeBaseDocument
+    )
     {
         ArgumentNullException.ThrowIfNull(knowledgeBaseDocument);
 

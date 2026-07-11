@@ -1,7 +1,8 @@
-using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Agents;
+using AIAgents.Laboratory.Domain.Models.Chats;
+using AIAgents.Laboratory.Domain.Models.Skills;
+using AIAgents.Laboratory.Domain.Models.Workspaces;
 using Microsoft.AspNetCore.Http;
 
 namespace AIAgents.Laboratory.Domain.UnitTests;
@@ -36,7 +37,9 @@ internal static class TestsHelpers
     /// </summary>
     /// <param name="userName">Name of the user.</param>
     /// <returns>The conversation history domain model.</returns>
-    internal static ConversationHistoryDomain GetConversationHistoryDomain(string userName) =>
+    internal static ConversationHistoryDomain GetConversationHistoryDomain(
+        string userName
+    ) =>
         new()
         {
             Id = TestGuidId,
@@ -143,7 +146,7 @@ internal static class TestsHelpers
         bool withSkills = false
     )
     {
-        var agent = TestsHelpers.GetAgentDataDomain();
+        var agent = GetAgentDataDomain();
         agent.AgentId = agentId;
         agent.AgentMetaPrompt = "You are a helpful assistant.";
 

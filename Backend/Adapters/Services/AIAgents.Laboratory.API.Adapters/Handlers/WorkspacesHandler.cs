@@ -1,8 +1,9 @@
 using AIAgents.Laboratory.API.Adapters.Contracts;
-using AIAgents.Laboratory.API.Adapters.Mapper;
 using AIAgents.Laboratory.API.Adapters.Models.Request;
 using AIAgents.Laboratory.API.Adapters.Models.Response;
 using AIAgents.Laboratory.Domain.Ports.In;
+using static AIAgents.Laboratory.API.Adapters.Mapper.DomainToResponseMapper;
+using static AIAgents.Laboratory.API.Adapters.Mapper.RequestToDomainMapper;
 
 namespace AIAgents.Laboratory.API.Adapters.Handlers;
 
@@ -21,7 +22,7 @@ public sealed class WorkspacesHandler(
         CancellationToken cancellationToken = default
     )
     {
-        var domainModel = DomainMapperProfile.MapToDomain(dto: agentsWorkspaceData);
+        var domainModel = MapToDomain(dto: agentsWorkspaceData);
         return await workspacesService.CreateNewWorkspaceAsync(
             agentsWorkspaceData: domainModel,
             currentUserEmail,
@@ -34,14 +35,12 @@ public sealed class WorkspacesHandler(
         string workspaceGuidId,
         string currentUserEmail,
         CancellationToken cancellationToken = default
-    )
-    {
-        return await workspacesService.DeleteExistingWorkspaceAsync(
+    ) =>
+        await workspacesService.DeleteExistingWorkspaceAsync(
             workspaceGuidId,
             currentUserEmail,
             cancellationToken
         ).ConfigureAwait(false);
-    }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<AgentsWorkspaceDTO>> GetAllWorkspacesAsync(
@@ -53,7 +52,7 @@ public sealed class WorkspacesHandler(
             currentUserEmail: userName,
             cancellationToken
         ).ConfigureAwait(false);
-        return [.. domainResult.Select(DomainMapperProfile.MapToDto)];
+        return [.. domainResult.Select(MapToDto)];
     }
 
     /// <inheritdoc/>
@@ -63,13 +62,13 @@ public sealed class WorkspacesHandler(
         CancellationToken cancellationToken = default
     )
     {
-        var domainInput = DomainMapperProfile.MapToDomain(dto: chatRequest);
+        var domainInput = MapToDomain(dto: chatRequest);
         domainInput.CurrentUserEmail = currentUserEmail;
         var domainResult = await workspacesService.GetWorkspaceGroupChatResponseAsync(
             chatRequest: domainInput,
             cancellationToken
         ).ConfigureAwait(false);
-        return DomainMapperProfile.MapToDto(domainResult);
+        return MapToDto(domainResult);
     }
 
     /// <inheritdoc/>
@@ -84,7 +83,7 @@ public sealed class WorkspacesHandler(
             currentUserEmail,
             cancellationToken
         ).ConfigureAwait(false);
-        return DomainMapperProfile.MapToDto(domainResult);
+        return MapToDto(domainResult);
     }
 
     /// <inheritdoc/>
@@ -93,7 +92,7 @@ public sealed class WorkspacesHandler(
         CancellationToken cancellationToken = default
     )
     {
-        var domainInput = DomainMapperProfile.MapToDomain(dto: chatRequestDTO);
+        var domainInput = MapToDomain(dto: chatRequestDTO);
         return await workspacesService.InvokeWorkspaceAgentAsync(
             chatRequest: domainInput,
             cancellationToken
@@ -107,7 +106,7 @@ public sealed class WorkspacesHandler(
         CancellationToken cancellationToken = default
     )
     {
-        var domainModel = DomainMapperProfile.MapToDomain(dto: agentsWorkspaceData);
+        var domainModel = MapToDomain(dto: agentsWorkspaceData);
         return await workspacesService.UpdateExistingWorkspaceDataAsync(
             agentsWorkspaceData: domainModel,
             currentUserEmail,

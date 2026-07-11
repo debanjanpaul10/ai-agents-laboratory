@@ -1,6 +1,7 @@
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models;
+using AIAgents.Laboratory.Domain.Models.Skills;
 using AIAgents.Laboratory.Domain.Ports.In;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using Microsoft.Extensions.Logging;

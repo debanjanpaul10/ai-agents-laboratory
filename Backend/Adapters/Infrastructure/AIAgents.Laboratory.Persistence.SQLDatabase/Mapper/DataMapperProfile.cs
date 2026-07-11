@@ -1,5 +1,5 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
+﻿using AIAgents.Laboratory.Domain.Models;
+using AIAgents.Laboratory.Domain.Models.Feedback;
 using AIAgents.Laboratory.Persistence.SQLDatabase.Models;
 
 namespace AIAgents.Laboratory.Persistence.SQLDatabase.Mapper;

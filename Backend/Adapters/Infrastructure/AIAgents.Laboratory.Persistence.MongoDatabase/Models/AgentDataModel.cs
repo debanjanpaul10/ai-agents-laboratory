@@ -1,4 +1,4 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+﻿using AIAgents.Laboratory.Domain.Models.Agents;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;

@@ -1,6 +1,6 @@
 ﻿using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Chats;
 using AIAgents.Laboratory.Domain.Ports.Out;
 using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.Extensions.Logging;
@@ -43,9 +43,10 @@ public sealed class ConversationHistoryServiceTests
             .Returns(Guid.NewGuid().ToString());
 
         _service = new ConversationHistoryService(
-            _mockLogger.Object,
-            _mockCorrelationContext.Object,
-            _mockDataManager.Object);
+            logger: _mockLogger.Object,
+            correlationContext: _mockCorrelationContext.Object,
+            conversationHistoryDataManager: _mockDataManager.Object
+        );
     }
 
     #region GetConversationHistoryAsync

@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.Models;
 
 namespace AIAgents.Laboratory.Domain.UseCases;
 

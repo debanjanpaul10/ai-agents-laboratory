@@ -1,6 +1,9 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
-using AIAgents.Laboratory.Domain.DomainEntities.Workspaces;
+﻿using AIAgents.Laboratory.Domain.Models;
+using AIAgents.Laboratory.Domain.Models.Agents;
+using AIAgents.Laboratory.Domain.Models.Applications;
+using AIAgents.Laboratory.Domain.Models.Chats;
+using AIAgents.Laboratory.Domain.Models.Skills;
+using AIAgents.Laboratory.Domain.Models.Workspaces;
 using AIAgents.Laboratory.Persistence.MongoDatabase.Models;
 
 namespace AIAgents.Laboratory.Persistence.MongoDatabase.Mapper;
@@ -17,7 +20,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="domain">The domain input.</param>
     /// <returns>The data model.</returns>
-    internal static AgentDataModel MapToModel(AgentDataDomain domain) => new()
+    internal static AgentDataModel MapToModel(
+        AgentDataDomain domain
+    ) => new()
     {
         Id = domain.Id,
         AgentId = domain.AgentId,
@@ -46,7 +51,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="domain">The domain input.</param>
     /// <returns>The data model.</returns>
-    internal static ChatHistoryModel MapToModel(ChatHistoryDomain domain) => new()
+    internal static ChatHistoryModel MapToModel(
+        ChatHistoryDomain domain
+    ) => new()
     {
         Role = domain.Role,
         Content = domain.Content
@@ -57,7 +64,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="domain">The domain input.</param>
     /// <returns>The data model.</returns>
-    internal static ConversationHistoryModel MapToModel(ConversationHistoryDomain domain) => new()
+    internal static ConversationHistoryModel MapToModel(
+        ConversationHistoryDomain domain
+    ) => new()
     {
         Id = domain.Id,
         ConversationId = domain.ConversationId,
@@ -72,7 +81,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="domain">The domain input.</param>
     /// <returns>The data model.</returns>
-    internal static AgentsWorkspaceDataModel MapToModel(AgentsWorkspaceDomain domain) => new()
+    internal static AgentsWorkspaceDataModel MapToModel(
+        AgentsWorkspaceDomain domain
+    ) => new()
     {
         Id = domain.Id,
         AgentWorkspaceGuid = domain.AgentWorkspaceGuid,
@@ -92,7 +103,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="domain">The domain input.</param>
     /// <returns>The data model.</returns>
-    internal static WorkspaceAgentsDataModel MapToModel(WorkspaceAgentsDataDomain domain) => new()
+    internal static WorkspaceAgentsDataModel MapToModel(
+        WorkspaceAgentsDataDomain domain
+    ) => new()
     {
         AgentName = domain.AgentName,
         AgentGuid = domain.AgentGuid
@@ -103,7 +116,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="domain">The domain input.</param>
     /// <returns>The data model.</returns>
-    internal static RegisteredApplicationDataModel MapToModel(RegisteredApplicationDomain domain) => new()
+    internal static RegisteredApplicationDataModel MapToModel(
+        RegisteredApplicationDomain domain
+    ) => new()
     {
         _id = domain._id,
         Id = domain.Id,
@@ -123,7 +138,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="domain">The domain input.</param>
     /// <returns>The data model.</returns>
-    internal static ToolSkillModel MapToModel(ToolSkillDomain domain) => new()
+    internal static ToolSkillModel MapToModel(
+        ToolSkillDomain domain
+    ) => new()
     {
         Id = domain.Id,
         ToolSkillGuid = domain.ToolSkillGuid,
@@ -143,7 +160,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="domain">The domain input.</param>
     /// <returns>The data model.</returns>
-    internal static AssociatedAgentsSkillDataModel MapToModel(AssociatedAgentsSkillDataDomain domain) => new()
+    internal static AssociatedAgentsSkillDataModel MapToModel(
+        AssociatedAgentsSkillDataDomain domain
+    ) => new()
     {
         AgentName = domain.AgentName,
         AgentGuid = domain.AgentGuid
@@ -158,7 +177,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="model">The data model.</param>
     /// <returns>The domain entity.</returns>
-    internal static AgentDataDomain MapToDomain(AgentDataModel model) => new()
+    internal static AgentDataDomain MapToDomain(
+        AgentDataModel model
+    ) => new()
     {
         Id = model.Id,
         AgentId = model.AgentId,
@@ -187,7 +208,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="model">The data model.</param>
     /// <returns>The domain entity.</returns>
-    internal static ChatHistoryDomain MapToDomain(ChatHistoryModel model) => new()
+    internal static ChatHistoryDomain MapToDomain(
+        ChatHistoryModel model
+    ) => new()
     {
         Role = model.Role,
         Content = model.Content
@@ -198,7 +221,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="model">The data model.</param>
     /// <returns>The domain entity.</returns>
-    internal static ConversationHistoryDomain MapToDomain(ConversationHistoryModel model) => new()
+    internal static ConversationHistoryDomain MapToDomain(
+        ConversationHistoryModel model
+    ) => new()
     {
         Id = model.Id,
         ConversationId = model.ConversationId,
@@ -213,7 +238,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="model">The data model.</param>
     /// <returns>The domain entity.</returns>
-    internal static AgentsWorkspaceDomain MapToDomain(AgentsWorkspaceDataModel model) => new()
+    internal static AgentsWorkspaceDomain MapToDomain(
+        AgentsWorkspaceDataModel model
+    ) => new()
     {
         Id = model.Id,
         AgentWorkspaceGuid = model.AgentWorkspaceGuid,
@@ -233,7 +260,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="model">The data model.</param>
     /// <returns>The domain entity.</returns>
-    internal static WorkspaceAgentsDataDomain MapToDomain(WorkspaceAgentsDataModel model) => new()
+    internal static WorkspaceAgentsDataDomain MapToDomain(
+        WorkspaceAgentsDataModel model
+    ) => new()
     {
         AgentName = model.AgentName,
         AgentGuid = model.AgentGuid
@@ -244,7 +273,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="model">The data model.</param>
     /// <returns>The domain entity.</returns>
-    internal static RegisteredApplicationDomain MapToDomain(RegisteredApplicationDataModel model) => new()
+    internal static RegisteredApplicationDomain MapToDomain(
+        RegisteredApplicationDataModel model
+    ) => new()
     {
         _id = model._id,
         Id = model.Id,
@@ -264,7 +295,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="model">The data model.</param>
     /// <returns>The domain entity.</returns>
-    internal static ToolSkillDomain MapToDomain(ToolSkillModel model) => new()
+    internal static ToolSkillDomain MapToDomain(
+        ToolSkillModel model
+    ) => new()
     {
         Id = model.Id,
         ToolSkillGuid = model.ToolSkillGuid,
@@ -284,7 +317,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="model">The data model.</param>
     /// <returns>The domain entity.</returns>
-    internal static AssociatedAgentsSkillDataDomain MapToDomain(AssociatedAgentsSkillDataModel model) => new()
+    internal static AssociatedAgentsSkillDataDomain MapToDomain(
+        AssociatedAgentsSkillDataModel model
+    ) => new()
     {
         AgentName = model.AgentName,
         AgentGuid = model.AgentGuid
@@ -295,7 +330,9 @@ internal static class MongoDataMapperProfile
     /// </summary>
     /// <param name="model">The data model.</param>
     /// <returns>The domain entity.</returns>
-    internal static NotificationsDomain MapToDomain(NotificationsModel model) => new()
+    internal static NotificationsDomain MapToDomain(
+        NotificationsModel model
+    ) => new()
     {
         Id = model.Id,
         Title = model.Title,

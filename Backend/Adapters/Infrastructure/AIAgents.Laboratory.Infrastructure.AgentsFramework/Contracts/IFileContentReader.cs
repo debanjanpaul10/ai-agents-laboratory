@@ -1,4 +1,4 @@
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+using AIAgents.Laboratory.Domain.Models.Agents;
 
 namespace AIAgents.Laboratory.Infrastructure.AgentsFramework.Contracts;
 
@@ -23,5 +23,7 @@ public interface IFileContentReader
     /// If the file type is not supported, the implementation should throw an appropriate exception.</remarks>
     /// <param name="knowledgeBaseDocument">The knowledge base document domain model.</param>
     /// <returns>The string content of the file.</returns>
-    string Read(KnowledgeBaseDocumentDomain knowledgeBaseDocument);
+    string Read(
+        KnowledgeBaseDocumentDomain knowledgeBaseDocument
+    );
 }

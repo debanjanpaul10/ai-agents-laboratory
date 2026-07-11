@@ -1,4 +1,4 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities.FeedbackEntities;
+﻿using AIAgents.Laboratory.Domain.Models.Feedback;
 
 namespace AIAgents.Laboratory.Domain.Ports.In;
 
@@ -13,7 +13,10 @@ public interface IApplicationAdminService
     /// <param name="currentLoggedinUser">The current logged in user.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A list of <see cref="BugReportData"/></returns>
-    Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(string currentLoggedinUser, CancellationToken cancellationToken = default);
+    Task<IEnumerable<BugReportData>> GetAllBugReportsDataAsync(
+        string currentLoggedinUser,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Gets all submitted feature requests asynchronous.
@@ -21,7 +24,10 @@ public interface IApplicationAdminService
     /// <param name="currentLoggedinUser">The current logged in user.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A list of <see cref="NewFeatureRequestData"/></returns>
-    Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(string currentLoggedinUser, CancellationToken cancellationToken = default);
+    Task<IEnumerable<NewFeatureRequestData>> GetAllSubmittedFeatureRequestsAsync(
+        string currentLoggedinUser,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Checks if the admin access is enabled for the current logged in user asynchronous.

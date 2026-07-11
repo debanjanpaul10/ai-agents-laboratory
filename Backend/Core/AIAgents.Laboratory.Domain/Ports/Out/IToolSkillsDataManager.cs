@@ -1,4 +1,4 @@
-using AIAgents.Laboratory.Domain.DomainEntities;
+using AIAgents.Laboratory.Domain.Models.Skills;
 
 namespace AIAgents.Laboratory.Domain.Ports.Out;
 

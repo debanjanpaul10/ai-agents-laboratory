@@ -1,16 +1,17 @@
 ﻿using AIAgents.Laboratory.Domain.Contracts;
-using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
 using AIAgents.Laboratory.Domain.Helpers;
+using AIAgents.Laboratory.Domain.Models.Agents;
+using AIAgents.Laboratory.Domain.Models.Skills;
 using AIAgents.Laboratory.Domain.Ports.In;
 using AIAgents.Laboratory.Domain.Ports.Out;
+using AIAgents.Laboratory.Domain.UnitTests;
 using AIAgents.Laboratory.Domain.UseCases;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using static AIAgents.Laboratory.Domain.Helpers.Constants;
 
-namespace AIAgents.Laboratory.Domain.UnitTests;
+namespace UnitTests.Domain;
 
 /// <summary>
 /// The agent chat services tests class.
@@ -73,13 +74,13 @@ public sealed class AgentChatServiceTests
             .Returns(Guid.NewGuid().ToString());
 
         _agentChatService = new(
-            _mockConfiguration.Object,
-            _mockLogger.Object,
-            _mockCorrelationContext.Object,
-            _mockAgentsService.Object,
-            _mockKnowledgeBaseProcessor.Object,
-            _mockAiServices.Object,
-            _mockToolSkillService.Object
+            configuration: _mockConfiguration.Object,
+            logger: _mockLogger.Object,
+            correlationContext: _mockCorrelationContext.Object,
+            agentsService: _mockAgentsService.Object,
+            knowledgeBaseProcessor: _mockKnowledgeBaseProcessor.Object,
+            aiServices: _mockAiServices.Object,
+            toolSkillsService: _mockToolSkillService.Object
         );
     }
 

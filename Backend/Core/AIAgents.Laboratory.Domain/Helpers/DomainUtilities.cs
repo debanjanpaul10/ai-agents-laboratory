@@ -1,5 +1,5 @@
-﻿using AIAgents.Laboratory.Domain.DomainEntities;
-using AIAgents.Laboratory.Domain.DomainEntities.AgentsEntities;
+﻿using AIAgents.Laboratory.Domain.Models;
+using AIAgents.Laboratory.Domain.Models.Agents;
 
 namespace AIAgents.Laboratory.Domain.Helpers;
 
@@ -13,7 +13,10 @@ public static class DomainUtilities
     /// </summary>
     /// <param name="entityModel">The entity data model.</param>
     /// <param name="currentUser">The current logged in user.</param>
-    internal static void PrepareAuditEntityData(this BaseDomainModel entityModel, string currentUser)
+    internal static void PrepareAuditEntityData(
+        this BaseDomainModel entityModel,
+        string currentUser
+    )
     {
         entityModel.IsActive = true;
         entityModel.DateModified = DateTime.UtcNow;
@@ -60,5 +63,7 @@ public static class DomainUtilities
     /// </summary>
     /// <param name="agentData">The agent data domain model.</param>
     /// <returns>The boolean to indicate the KB content.</returns>
-    internal static bool HasKnowledgeBaseContent(this AgentDataDomain agentData) => agentData?.KnowledgeBaseDocument?.Count > 0 || agentData?.StoredKnowledgeBase?.Count > 0;
+    internal static bool HasKnowledgeBaseContent(
+        this AgentDataDomain agentData
+    ) => agentData?.KnowledgeBaseDocument?.Count > 0 || agentData?.StoredKnowledgeBase?.Count > 0;
 }
