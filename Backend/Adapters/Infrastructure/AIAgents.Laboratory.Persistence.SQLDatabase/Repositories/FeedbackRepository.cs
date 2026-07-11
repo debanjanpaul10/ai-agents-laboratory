@@ -19,13 +19,13 @@ public sealed class FeedbackRepository(IUnitOfWork unitOfWork) : IFeedbackReposi
     )
     {
         var bugStatusEntity = await unitOfWork.Repository<BugItemStatusMappingEntity>()
-            .FirstOrDefaultAsync(predicate: status => status.StatusName == DatabaseConstants.NotStartedConstant && status.IsActive, cancellationToken)
+            .FirstOrDefaultAsync(predicate: status => status.StatusName == DatabaseConstants.NotStartedConstant && status.IsActive, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
         bugReportData.BugStatusId = bugStatusEntity?.Id ?? 0;
 
         await unitOfWork.Repository<BugReportDataEntity>()
-            .AddAsync(entity: bugReportData, cancellationToken)
+            .AddAsync(entity: bugReportData, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
         await unitOfWork.SaveChangesAsync(
